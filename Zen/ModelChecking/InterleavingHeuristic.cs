@@ -313,102 +313,17 @@ namespace Microsoft.Research.Zen.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1>(ZenCreateObjectExpr<TObject, T1> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                return expression.FieldValue1.Accept(this, parameter);
-            });
-        }
+                var set = ImmutableHashSet<object>.Empty;
+                foreach (dynamic value in expression.Fields.Values)
+                {
+                    set = set.Union(value.Accept(this, parameter));
+                }
 
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2>(ZenCreateObjectExpr<TObject, T1, T2> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                return a.Union(b);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3>(ZenCreateObjectExpr<TObject, T1, T2, T3> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                return a.Union(b).Union(c);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                var d = expression.FieldValue4.Accept(this, parameter);
-                return a.Union(b).Union(c).Union(d);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                var d = expression.FieldValue4.Accept(this, parameter);
-                var e = expression.FieldValue5.Accept(this, parameter);
-                return a.Union(b).Union(c).Union(d).Union(e);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                var d = expression.FieldValue4.Accept(this, parameter);
-                var e = expression.FieldValue5.Accept(this, parameter);
-                var f = expression.FieldValue6.Accept(this, parameter);
-                return a.Union(b).Union(c).Union(d).Union(e).Union(f);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                var d = expression.FieldValue4.Accept(this, parameter);
-                var e = expression.FieldValue5.Accept(this, parameter);
-                var f = expression.FieldValue6.Accept(this, parameter);
-                var g = expression.FieldValue7.Accept(this, parameter);
-                return a.Union(b).Union(c).Union(d).Union(e).Union(f).Union(g);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var a = expression.FieldValue1.Accept(this, parameter);
-                var b = expression.FieldValue2.Accept(this, parameter);
-                var c = expression.FieldValue3.Accept(this, parameter);
-                var d = expression.FieldValue4.Accept(this, parameter);
-                var e = expression.FieldValue5.Accept(this, parameter);
-                var f = expression.FieldValue6.Accept(this, parameter);
-                var g = expression.FieldValue7.Accept(this, parameter);
-                var h = expression.FieldValue8.Accept(this, parameter);
-                return a.Union(b).Union(c).Union(d).Union(e).Union(f).Union(g).Union(h);
+                return set;
             });
         }
 
