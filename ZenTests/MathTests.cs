@@ -6,6 +6,7 @@ namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using static Microsoft.Research.Zen.Language;

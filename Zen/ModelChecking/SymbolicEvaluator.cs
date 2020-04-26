@@ -46,8 +46,6 @@ namespace Microsoft.Research.Zen.ModelChecking
             Backend backend,
             bool simplify)
         {
-            System.Console.WriteLine($"{expression}");
-
             expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
 

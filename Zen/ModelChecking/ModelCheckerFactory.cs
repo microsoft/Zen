@@ -38,16 +38,6 @@ namespace Microsoft.Research.Zen.ModelChecking
         {
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(expression);
-
-            /* foreach (var kv in heuristic.DisjointSets)
-            {
-                Console.WriteLine($"{kv.Key}");
-                foreach (var v in kv.Value)
-                {
-                    Console.WriteLine($"  value: {v}");
-                }
-            } */
-
             var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>>(solver);

@@ -10,56 +10,150 @@ Just add the project to your visual studio solution.
 To import the library, add the following line to your file:
 
 ```csharp
-using Zen;
+using Microsoft.Research.Zen;
 ```
 
-A simple use of the library is shown shown below:
+The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can be either concrete or symbolic. As a simple example, consider the following code:
 
 ```csharp
 // create a manager that uses chain-reduced binary decision diagrams
-var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
-
-// allocate three variables, two booleans and one 32-bit integer
-// the internal ordering will match the order allocated from the manager.
-var a = manager.CreateBool();
-var b = manager.CreateBool();
-var c = manager.CreateInt32();
-
-// build formulas from the variables.
-DD f1 = manager.Or(a.Id(), b.Id());
-DD f2 = manager.And(c.GreaterOrEqual(1), c.LessOrEqual(4));
-
-// get a satisfying assignment for a formula
-var assignment = manager.Sat(manager.And(f1, f2));
-
-// get the values as C# objects
-bool valuea = assignment.Get(a);  // valuea = false
-bool valueb = assignment.Get(b);  // valueb = true
-int valuec = assignment.Get(c);   // valuec = 1
+Zen<int> PerformMath(Zen<int> x, Zen<int> y)
+{
+    return 3 * x + y;
+}
 ```
 
-You can find more detailed examples in the tests.
+This is a function that takes a Zen parameter that represents an integer value and returns a Zen value of type integer by multiplying the input by 3 and adding the input to the result. Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values. Now one can create a `ZenFunction`:
+
+```csharp
+// create a ZenFunction from MultiplyFour
+var function = Function<int, int, int>(PerformMath);
+```
+
+Given a `ZenFunction` we can leverage the library to perform multiple tasks. The first is to simply evaluate the function on an input(s):
+
+```csharp
+var output = function.Evaluate(3, 2);
+// output = 11
+```
+
+To perform verification, we can ask Zen to find us an input(s) that leads to something being true:
+
+```csharp
+var input = function.Find((x, y, result) => And(x >= 0, x <= 10, result == 11));
+// input.Value = (0, 11)
+```
+
+Finally, Zen can compile the function to generate IL at runtime that executes with no performance penalty.
+
+```csharp
+function.Compile();
+output = function.Evaluate(3, 2);
+// output = 11
+```
+
+Comparing the performance between the two:
+
+```csharp
+var watch = System.Diagnostics.Stopwatch.StartNew();
+
+for (int i = 0; i < 1000000; i++) function.Evaluate(3, 2);
+
+Console.WriteLine($"interpreted function took: {watch.ElapsedMilliseconds}ms");
+watch.Restart();
+
+function.Compile();
+Console.WriteLine($"compilation took: {watch.ElapsedMilliseconds}ms");
+
+for (int i = 0; i < 1000000; i++) function.Evaluate(3, 2);
+
+Console.WriteLine($"compiled function took: {watch.ElapsedMilliseconds}ms");
+watch.Restart();
+```
+
+```
+interpreted function took: 4601ms
+compilation took: 4ms
+compiled function took: 6ms
+```
+
+# Supported Types
+
+Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`.
+It also supports values of type `IList` and `IDictionary`. For example:
+
+```csharp
+Zen<bool> ListOp(Zen<IList<int>> list)
+{
+    return list.Select(v => v + 1).Contains(4);
+} 
+```
+
+Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor. An example is shown next.
+
+# An example: Access Control Lists
+
+As a more comprehensive example, the following shows how to use Zen to encode and then verify a simplified network access control list.
+
+```csharp
+using static Microsoft.Research.Zen.Language;
+
+public class Packet
+{
+    public uint DstIp { get; set; }
+    public uint SrcIp { get; set; }
+}
+
+public class Acl
+{
+    public string Name { get; set; }
+    public AclLine[] Lines { get; set; }
+
+    public Zen<bool> Matches(Zen<Packet> packet)
+    {
+        return Matches(packet, 0);
+    }
+
+    private Zen<bool> Matches(Zen<Packet> packet, int lineNumber)
+    {
+        if (i == this.Lines.Length) return false;
+        var line = this.Lines[lineNumber];
+        return If(line.Matches(packet), line.Permitted, this.Matches(packet, lineNumber + 1));
+    }
+}
+
+public class AclLine
+{
+    public bool Permitted { get; set; }
+    public uint DstIpLow { get; set; }
+    public uint DstIpHigh { get; set; }
+    public uint SrcIpLow { get; set; }
+    public uint SrcIpHigh { get; set; }
+
+    public Zen<bool> Matches(Zen<Packet> packet)
+    {
+        var dstIp = packet.GetField<Packet, uint>("DstIp");
+        var srcIp = packet.GetField<Packet, uint>("SrcIp");
+        return And(dstIp >= this.DstIpLow,
+                    dstIp <= this.DstIpHigh,
+                    srcIp >= this.SrcIpLow,
+                    srcIp <= this.SrcIpHigh);
+    }
+}
+```
+
+```csharp
+var aclLine1 = new AclLine { DstIpLow = 10, DstIpHigh = 20, SrcIpLow = 7, SrcIpHigh = 39, Permitted = true };
+var aclLine2 = new AclLine { DstIpLow = 0, DstIpHigh = 100, SrcIpLow = 0, SrcIpHigh = 100, Permitted = false };
+var acl = Acl { Lines = new AclLine[] { aclLine1, aclLine2 } };
+
+var f = Funcion<Packet, bool>(p => acl.Matches(p));
+var packet = f.Find((p, permitted) => Not(permitted));
+```
 
 # Implementation
-The library is based on the cache-optimized implementation of decision diagrams [here](https://research.ibm.com/haifa/projects/verification/SixthSense/papers/bdd_iwls_01.pdf), and implements three variants: 
-- Binary decision diagrams ([link](https://en.wikipedia.org/wiki/Binary_decision_diagram))
-- Zero-suppressed binary decision diagrams ([link](https://en.wikipedia.org/wiki/Zero-suppressed_decision_diagram))
-- Chain-reduced binary decision diagrams ([link](https://link.springer.com/content/pdf/10.1007%2F978-3-319-89960-2_5.pdf))
+Zen builds an abstract syntax tree for the function it is representing and then leverages C#'s reflection capabilities to analyze the types at runtime and perform various tasks. The `Find` function uses symbolic model checking by leveraging state-of-the-art solvers such as [Z3](https://github.com/Z3Prover/z3). Compiling functions works by generating IL at runtime to avoid interpretation overhead.
 
-### Data representation
-Internally decision diagram nodes are represented using integer ids that are bit-packed with other metadata such as a garbage collection mark bit, and a complemented bit. User references to nodes (`DD` type) are maintained through a separate (smaller) table.
-
-### Garbage collection
-The `DD` reference table uses `WeakReference` wrappers to integrate with the .NET garbage collector. This means that users of the library do not need to perform any reference counting, which is common in BDD libraries. Nodes are maintained in a memory pool and the library maintains the invariant that a node allocated before another will appear earlier in this pool. This allows for various optimizations when looking up nodes in the unique table. To maintain this invariant, the library implements a mark, sweep, and shift garbage collector that compacts nodes when necessary. 
-
-### Memory allocation
-By hashconsing nodes in the unique table, the library ensures that two boolean functions are equal if and only if their pointers (indices) are equal. The unique table maintains all nodes and is periodically resized when out of memory. For performance reasons, we ensure that this table is always a power of two size. This makes allocating new space a bit inflexible (harder to use all memory) but in return makes all operations faster. To compensate for this inflexible allocation scheme, the library becomes more reluctant to resize the table as the number of nodes grows.
-
-### Optimizations
-The library makes use of "complement edges" (a single bit packed into the node id), which determines whether the formula represented by the node is negated. This ensures that all negation operations take constant time and also reduces memory consumption since a formula and its negation share the same representation. The implementation also includes a compressed node type `CBDDNode` which can offer large memory savings in many cases.
-
-### Operations
-Internally, the manager only supports a single operation: and, but then leverages free negation to support other operations efficiently. This does make some operations such as ite and iff more costly, but can improve cache behavior since there is now only a single operation cache. Because "and" is commutative, the cache can further order the arguments to avoid redundant entries. Currently, the library does not support dynamic variable reordering as well as a number of operations such as functional composition.
 
 # Contributing
 
