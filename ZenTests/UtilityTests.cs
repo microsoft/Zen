@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Zen;
 
     /// <summary>
     /// Tests for the Zen option type.

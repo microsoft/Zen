@@ -2,13 +2,13 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen
+namespace Microsoft.Research.Zen
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using Zen.Generation;
+    using Microsoft.Research.Zen.Generation;
 
     /// <summary>
     /// Collection of helper functions for building Zen programs.

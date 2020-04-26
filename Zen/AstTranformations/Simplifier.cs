@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen.AstTranformations
+namespace Microsoft.Research.Zen.AstTranformations
 {
     using System;
     using System.Collections.Generic;

@@ -2,13 +2,13 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen.Compilation
+namespace Microsoft.Research.Zen.Compilation
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq.Expressions;
-    using Zen.Interpretation;
+    using Microsoft.Research.Zen.Interpretation;
 
     /// <summary>
     /// Translates a Zen expression to a compilable expression.

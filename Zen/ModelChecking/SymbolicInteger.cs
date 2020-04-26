@@ -4,7 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Zen.ModelChecking
+namespace Microsoft.Research.Zen.ModelChecking
 {
     /// <summary>
     /// Representation of a symbolic boolean value.

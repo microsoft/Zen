@@ -2,13 +2,13 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
+    using Microsoft.Research.Zen.ModelChecking;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Zen;
-    using Zen.ModelChecking;
 
     using static Zen.Language;
 

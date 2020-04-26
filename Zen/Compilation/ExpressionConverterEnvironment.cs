@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen.Compilation
+namespace Microsoft.Research.Zen.Compilation
 {
     using System.Collections.Immutable;
     using System.Linq.Expressions;

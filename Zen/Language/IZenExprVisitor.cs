@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen
+namespace Microsoft.Research.Zen
 {
     /// <summary>
     /// Visitor interface for ZenExpr.

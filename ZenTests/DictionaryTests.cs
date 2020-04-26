@@ -2,15 +2,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Zen;
 
-    using static TestHelper;
-    using static Zen.Language;
+    using static Microsoft.Research.Zen.Language;
+    using static Microsoft.Research.ZenTests.TestHelper;
 
     /// <summary>
     /// Tests for the Zen dictionary type.

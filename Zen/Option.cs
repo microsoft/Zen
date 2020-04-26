@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
-namespace Zen
+namespace Microsoft.Research.Zen
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// A simple option type to parameterize over nullable
     /// values for both structs and classes.

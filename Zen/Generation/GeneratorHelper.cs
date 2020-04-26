@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen.Generation
+namespace Microsoft.Research.Zen.Generation
 {
     using System;
     using System.Collections.Generic;

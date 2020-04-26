@@ -2,9 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen
+namespace Microsoft.Research.Zen
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 

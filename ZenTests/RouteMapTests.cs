@@ -2,14 +2,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Zen;
-    using static Zen.Language;
+
+    using static Microsoft.Research.Zen.Language;
 
     /// <summary>
     /// Tests for Zen with route maps.

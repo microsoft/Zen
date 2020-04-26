@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Zen.ModelChecking
+namespace Microsoft.Research.Zen.ModelChecking
 {
-    using Zen.Interpretation;
+    using Microsoft.Research.Zen.Interpretation;
 
     /// <summary>
     /// Helper class to perform symbolic reasoning.

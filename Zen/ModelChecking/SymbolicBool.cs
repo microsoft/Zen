@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
-namespace Zen.ModelChecking
+namespace Microsoft.Research.Zen.ModelChecking
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>

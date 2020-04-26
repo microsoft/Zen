@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// Simple packet class for testing.
     /// </summary>

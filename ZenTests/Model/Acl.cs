@@ -2,12 +2,12 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenTests
+namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using Zen;
-    using static Zen.Language;
+    using Microsoft.Research.Zen;
+    using static Microsoft.Research.Zen.Language;
 
     /// <summary>
     /// Simple packet class for testing.
