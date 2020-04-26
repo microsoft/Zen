@@ -18,7 +18,6 @@ using Microsoft.Research.Zen;
 The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can be either concrete or symbolic. As a simple example, consider the following code:
 
 ```csharp
-// create a manager that uses chain-reduced binary decision diagrams
 Zen<int> PerformMath(Zen<int> x, Zen<int> y)
 {
     return 3 * x + y;

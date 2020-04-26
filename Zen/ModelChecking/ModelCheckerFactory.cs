@@ -4,7 +4,6 @@
 
 namespace Microsoft.Research.Zen.ModelChecking
 {
-    using System;
     using DecisionDiagrams;
     using Microsoft.Z3;
 
