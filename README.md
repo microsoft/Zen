@@ -1,4 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://dev.azure.com/rybecket/Zen/_apis/build/status/microsoft.Zen?branchName=master)](https://dev.azure.com/rybecket/Zen/_build/latest?definitionId=2&branchName=master)
+![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
 Zen is a library built at Microsoft Research that aims to simplify the process of building performant verification tools.
