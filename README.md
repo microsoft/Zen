@@ -118,7 +118,7 @@ public class Acl
 
     private Zen<bool> Matches(Zen<Packet> packet, int lineNumber)
     {
-        if (i == this.Lines.Length) return false;
+        if (lineNumber == this.Lines.Length) return false;
         var line = this.Lines[lineNumber];
         return If(line.Matches(packet), line.Permitted, this.Matches(packet, lineNumber + 1));
     }
