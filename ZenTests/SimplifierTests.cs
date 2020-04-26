@@ -95,7 +95,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet1()
         {
-            Create<Object1, int>(
+            Create<Object1>(
                     ("Item1", 0))
                 .GetField<Object1, string>("Foo")
                 .Simplify();
@@ -108,7 +108,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet2()
         {
-            Create<Object1, int, int>(
+            Create<Object1>(
                     ("Item1", 0),
                     ("Item2", 0))
                 .GetField<Object1, string>("Foo")
@@ -122,7 +122,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet3()
         {
-            Create<Object3, int, int, int>(
+            Create<Object3>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0))
@@ -137,7 +137,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet4()
         {
-            Create<Object8, int, int, int, int>(
+            Create<Object8>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0),
@@ -153,7 +153,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet5()
         {
-            Create<Object5, int, int, int, int, int>(
+            Create<Object5>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0),
@@ -170,7 +170,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet6()
         {
-            Create<Object6, int, int, int, int, int, int>(
+            Create<Object6>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0),
@@ -188,7 +188,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet7()
         {
-            Create<Object7, int, int, int, int, int, int, int>(
+            Create<Object7>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0),
@@ -207,7 +207,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldGet8()
         {
-            Create<Object8, int, int, int, int, int, int, int, int>(
+            Create<Object8>(
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0),
@@ -218,6 +218,17 @@ namespace Microsoft.Research.ZenTests
                     ("Item8", 0))
                 .GetField<Object8, string>("Foo")
                 .Simplify();
+        }
+
+        /// <summary>
+        /// Exception thrown since implicit conversion won't work with object fields.
+        /// </summary>
+        [TestMethod]
+        public void TestHashconsingWorksForCreate()
+        {
+            var x = Language.Create<Object2>(("Field1", Int(0)), ("Field2", Int(0)));
+            var y = Language.Create<Object2>(("Field2", Int(0)), ("Field1", Int(0)));
+            Assert.AreEqual(x, y);
         }
     }
 }

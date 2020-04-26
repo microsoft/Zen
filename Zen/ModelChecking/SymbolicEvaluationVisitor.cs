@@ -349,159 +349,17 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1>(ZenCreateObjectExpr<TObject, T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty.Add(
-                expression.FieldName1, expression.FieldValue1.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2>(ZenCreateObjectExpr<TObject, T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3>(ZenCreateObjectExpr<TObject, T1, T2, T3> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter))
-                .Add(expression.FieldName4, expression.FieldValue4.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter))
-                .Add(expression.FieldName4, expression.FieldValue4.Accept(this, parameter))
-                .Add(expression.FieldName5, expression.FieldValue5.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter))
-                .Add(expression.FieldName4, expression.FieldValue4.Accept(this, parameter))
-                .Add(expression.FieldName5, expression.FieldValue5.Accept(this, parameter))
-                .Add(expression.FieldName6, expression.FieldValue6.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter))
-                .Add(expression.FieldName4, expression.FieldValue4.Accept(this, parameter))
-                .Add(expression.FieldName5, expression.FieldValue5.Accept(this, parameter))
-                .Add(expression.FieldName6, expression.FieldValue6.Accept(this, parameter))
-                .Add(expression.FieldName7, expression.FieldValue7.Accept(this, parameter));
-
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
-            });
-        }
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty
-                .Add(expression.FieldName1, expression.FieldValue1.Accept(this, parameter))
-                .Add(expression.FieldName2, expression.FieldValue2.Accept(this, parameter))
-                .Add(expression.FieldName3, expression.FieldValue3.Accept(this, parameter))
-                .Add(expression.FieldName4, expression.FieldValue4.Accept(this, parameter))
-                .Add(expression.FieldName5, expression.FieldValue5.Accept(this, parameter))
-                .Add(expression.FieldName6, expression.FieldValue6.Accept(this, parameter))
-                .Add(expression.FieldName7, expression.FieldValue7.Accept(this, parameter))
-                .Add(expression.FieldName8, expression.FieldValue8.Accept(this, parameter));
+                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty;
+                foreach (var fieldValuePair in expression.Fields)
+                {
+                    var field = fieldValuePair.Key;
+                    dynamic fieldValue = fieldValuePair.Value;
+                    fields = fields.Add(field, fieldValue.Accept(this, parameter));
+                }
 
                 return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
             });

@@ -134,7 +134,7 @@ namespace Microsoft.Research.Zen
             var b = False();
             var v = (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T));
             return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>, bool, T>.Create(("Item1", b), ("Item2", v)),
+                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", b), ("Item2", v)),
                 CustomTupleToOption<T>);
         }
 
@@ -147,7 +147,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr);
 
             return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>, bool, T>.Create(("Item1", true), ("Item2", expr)),
+                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", True()), ("Item2", expr)),
                 CustomTupleToOption<T>);
         }
 
@@ -164,7 +164,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(value);
 
             return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>, bool, T>.Create(("Item1", flag), ("Item2", value)),
+                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", flag), ("Item2", value)),
                 CustomTupleToOption<T>);
         }
 
@@ -1456,219 +1456,11 @@ namespace Microsoft.Research.Zen
         /// <summary>
         /// Create a new Zen object from a constructor.
         /// </summary>
-        /// <param name="field">First field.</param>
+        /// <param name="fields">The fields as Zen values.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1>((string, Zen<T1>) field)
+        public static Zen<T> Create<T>(params (string, object)[] fields)
         {
-            return ZenCreateObjectExpr<T, T1>.Create(field);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2>((string, Zen<T1>) field1, (string, Zen<T2>) field2)
-        {
-            return ZenCreateObjectExpr<T, T1, T2>.Create(field1, field2);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3>.Create(field1, field2, field3);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <param name="field4">Fourth field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3, T4>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3, (string, Zen<T4>) field4)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4>.Create(field1, field2, field3, field4);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <param name="field4">Fourth field.</param>
-        /// <param name="field5">Fifth field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3, T4, T5>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3, (string, Zen<T4>) field4, (string, Zen<T5>) field5)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5>.Create(field1, field2, field3, field4, field5);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <param name="field4">Fourth field.</param>
-        /// <param name="field5">Fifth field.</param>
-        /// <param name="field6">Sixth field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3, T4, T5, T6>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3, (string, Zen<T4>) field4, (string, Zen<T5>) field5, (string, Zen<T6>) field6)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6>.Create(field1, field2, field3, field4, field5, field6);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <param name="field4">Fourth field.</param>
-        /// <param name="field5">Fifth field.</param>
-        /// <param name="field6">Sixth field.</param>
-        /// <param name="field7">Seventh field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3, T4, T5, T6, T7>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3, (string, Zen<T4>) field4, (string, Zen<T5>) field5, (string, Zen<T6>) field6, (string, Zen<T7>) field7)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6, T7>.Create(field1, field2, field3, field4, field5, field6, field7);
-        }
-
-        /// <summary>
-        /// Create a new Zen object from a constructor.
-        /// </summary>
-        /// <param name="field1">First field.</param>
-        /// <param name="field2">Second field.</param>
-        /// <param name="field3">Third field.</param>
-        /// <param name="field4">Fourth field.</param>
-        /// <param name="field5">Fifth field.</param>
-        /// <param name="field6">Sixth field.</param>
-        /// <param name="field7">Seventh field.</param>
-        /// <param name="field8">Eigth field.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T> Create<T, T1, T2, T3, T4, T5, T6, T7, T8>((string, Zen<T1>) field1, (string, Zen<T2>) field2, (string, Zen<T3>) field3, (string, Zen<T4>) field4, (string, Zen<T5>) field5, (string, Zen<T6>) field6, (string, Zen<T7>) field7, (string, Zen<T8>) field8)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6, T7, T8>.Create(field1, field2, field3, field4, field5, field6, field7, field8);
-        }
-
-        internal static Zen<T> CreateReflection<T, T1>(string fieldName1, Zen<T1> field1)
-        {
-            return ZenCreateObjectExpr<T, T1>.Create((fieldName1, field1));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2>(
-            string fieldName1,
-            string fieldName2,
-            Zen<T1> field1,
-            Zen<T2> field2)
-        {
-            return ZenCreateObjectExpr<T, T1, T2>.Create((fieldName1, field1), (fieldName2, field2));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3, T4>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            string fieldName4,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3,
-            Zen<T4> field4)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3), (fieldName4, field4));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3, T4, T5>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            string fieldName4,
-            string fieldName5,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3,
-            Zen<T4> field4,
-            Zen<T5> field5)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3), (fieldName4, field4), (fieldName5, field5));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3, T4, T5, T6>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            string fieldName4,
-            string fieldName5,
-            string fieldName6,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3,
-            Zen<T4> field4,
-            Zen<T5> field5,
-            Zen<T6> field6)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3), (fieldName4, field4), (fieldName5, field5), (fieldName6, field6));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3, T4, T5, T6, T7>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            string fieldName4,
-            string fieldName5,
-            string fieldName6,
-            string fieldName7,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3,
-            Zen<T4> field4,
-            Zen<T5> field5,
-            Zen<T6> field6,
-            Zen<T7> field7)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6, T7>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3), (fieldName4, field4), (fieldName5, field5), (fieldName6, field6), (fieldName7, field7));
-        }
-
-        internal static Zen<T> CreateReflection<T, T1, T2, T3, T4, T5, T6, T7, T8>(
-            string fieldName1,
-            string fieldName2,
-            string fieldName3,
-            string fieldName4,
-            string fieldName5,
-            string fieldName6,
-            string fieldName7,
-            string fieldName8,
-            Zen<T1> field1,
-            Zen<T2> field2,
-            Zen<T3> field3,
-            Zen<T4> field4,
-            Zen<T5> field5,
-            Zen<T6> field6,
-            Zen<T7> field7,
-            Zen<T8> field8)
-        {
-            return ZenCreateObjectExpr<T, T1, T2, T3, T4, T5, T6, T7, T8>.Create((fieldName1, field1), (fieldName2, field2), (fieldName3, field3), (fieldName4, field4), (fieldName5, field5), (fieldName6, field6), (fieldName7, field7), (fieldName8, field8));
+            return ZenCreateObjectExpr<T>.Create(fields);
         }
 
         /// <summary>
@@ -1682,7 +1474,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>, T1, T2>.Create(("Item1", expr1), ("Item2", expr2));
+            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
             return ZenAdapterExpr<Tuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToTuple<T1, T2>);
         }
 
@@ -1697,7 +1489,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>, T1, T2>.Create(("Item1", expr1), ("Item2", expr2));
+            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
             return ZenAdapterExpr<ValueTuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToValueTuple<T1, T2>);
         }
 

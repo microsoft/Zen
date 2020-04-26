@@ -37,28 +37,7 @@ namespace Microsoft.Research.Zen.Generation
         /// <summary>
         /// Name of the function used to create an object via reflection.
         /// </summary>
-        private static string createObjectMethodName = "CreateReflection";
-
-        /// <summary>
-        /// Get the object creation method for an object with a given number of fields.
-        /// </summary>
-        /// <param name="numFields">The number of fields.</param>
-        /// <returns>The method.</returns>
-        private static MethodInfo GetCreateObjectMethod(int numFields)
-        {
-            if (createObjectCache.TryGetValue(numFields, out var method))
-            {
-                return method;
-            }
-
-            method = typeof(Language)
-                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-                .Where(m => m.Name == createObjectMethodName && m.GetParameters().Length == 2 * numFields)
-                .First();
-
-            createObjectCache[numFields] = method;
-            return method;
-        }
+        private static MethodInfo createMethod = typeof(Language).GetMethod("Create");
 
         public static object ApplyToTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
         {
@@ -80,30 +59,15 @@ namespace Microsoft.Research.Zen.Generation
         {
             var asList = fields.ToArray();
 
-            var types = new Type[asList.Length + 1];
-            types[0] = objectType;
+            var method = createMethod.MakeGenericMethod(objectType);
 
+            var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                types[i + 1] = asList[i].Value;
+                args[i] = (asList[i].Key, recurse(asList[i].Value));
             }
 
-            var method = GetCreateObjectMethod(asList.Length).MakeGenericMethod(types);
-
-            var args = new object[2 * asList.Length];
-            for (int i = 0; i < asList.Length; i++)
-            {
-                args[i] = asList[i].Key;
-            }
-
-            for (int i = 0; i < asList.Length; i++)
-            {
-                var type = types[i + 1];
-                var obj = recurse(type);
-                args[i + asList.Length] = obj;
-            }
-
-            return method.Invoke(null, args);
+            return method.Invoke(null, new object[] { args });
         }
 
         public static object ApplyToList(Func<Type, object> recurse, Type innerType, int size)

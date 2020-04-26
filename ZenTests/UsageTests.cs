@@ -497,7 +497,7 @@ namespace Microsoft.Research.ZenTests
         [ExpectedException(typeof(ArgumentException))]
         public void TestGetFieldException2()
         {
-            Language.GetField<Object1, int>(Language.Create<Object1, int>(("Field1", 0)), null);
+            Language.GetField<Object1, int>(Language.Create<Object1>(("Field1", Int(0))), null);
         }
 
         /// <summary>
@@ -1449,6 +1449,16 @@ namespace Microsoft.Research.ZenTests
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate(0, 0, 0, 0));
+        }
+
+        /// <summary>
+        /// Exception thrown since implicit conversion won't work with object fields.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestImplicitObjectFieldConversionException()
+        {
+            Language.Create<Object1>(("Field1", 0));
         }
     }
 }

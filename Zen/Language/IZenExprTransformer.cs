@@ -212,56 +212,7 @@ namespace Microsoft.Research.Zen
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1>(ZenCreateObjectExpr<TObject, T1> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2>(ZenCreateObjectExpr<TObject, T1, T2> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3>(ZenCreateObjectExpr<TObject, T1, T2, T3> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7> expression);
-
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8> expression);
+        Zen<TObject> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression);
 
         /// <summary>
         /// Visit a LeqExpr.

@@ -124,6 +124,25 @@ namespace Microsoft.Research.Zen
         }
 
         /// <summary>
+        /// Validates that an object is a Zen object of some type.
+        /// </summary>
+        /// <param name="type">The object type.</param>
+        /// <param name="value">The field value to validate.</param>
+        /// <param name="fieldOrPropertyName">The object field name.</param>
+        public static void ValidateFieldIsZenObject(Type type, object value, string fieldOrPropertyName)
+        {
+            var fieldInfo = type.GetField(fieldOrPropertyName);
+            var expectedType = fieldInfo != null ? fieldInfo.FieldType : type.GetProperty(fieldOrPropertyName).PropertyType;
+            var expectedZenType = typeof(Zen<>).MakeGenericType(expectedType);
+
+            var valueType = value.GetType();
+            if (!expectedZenType.IsAssignableFrom(valueType))
+            {
+                throw new ZenException($"Attempting to create an object of type {type} using field {fieldOrPropertyName} with type {valueType}, when field type {expectedZenType} is expected");
+            }
+        }
+
+        /// <summary>
         /// Set the value of a field or property using reflection.
         /// </summary>
         /// <typeparam name="TObject">The object type.</typeparam>

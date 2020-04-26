@@ -331,103 +331,19 @@ namespace Microsoft.Research.Zen.AstTranformations
             return expression;
         }
 
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1>(ZenCreateObjectExpr<TObject, T1> expression)
+        public Zen<TObject> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression)
         {
             return LookupOrCompute(expression, () =>
             {
-                return ZenCreateObjectExpr<TObject, T1>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)));
-            });
-        }
+                var fieldValues = new List<(string, object)>();
+                foreach (var fieldValuePair in expression.Fields)
+                {
+                    var field = fieldValuePair.Key;
+                    dynamic value = fieldValuePair.Value;
+                    fieldValues.Add((field, value.Accept(this)));
+                }
 
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2>(ZenCreateObjectExpr<TObject, T1, T2> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3>(ZenCreateObjectExpr<TObject, T1, T2, T3> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3, T4>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)),
-                (expression.FieldName4, expression.FieldValue4.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)),
-                (expression.FieldName4, expression.FieldValue4.Accept(this)),
-                (expression.FieldName5, expression.FieldValue5.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)),
-                (expression.FieldName4, expression.FieldValue4.Accept(this)),
-                (expression.FieldName5, expression.FieldValue5.Accept(this)),
-                (expression.FieldName6, expression.FieldValue6.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)),
-                (expression.FieldName4, expression.FieldValue4.Accept(this)),
-                (expression.FieldName5, expression.FieldValue5.Accept(this)),
-                (expression.FieldName6, expression.FieldValue6.Accept(this)),
-                (expression.FieldName7, expression.FieldValue7.Accept(this)));
-            });
-        }
-
-        public Zen<TObject> VisitZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8>(ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8> expression)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return ZenCreateObjectExpr<TObject, T1, T2, T3, T4, T5, T6, T7, T8>.Create(
-                (expression.FieldName1, expression.FieldValue1.Accept(this)),
-                (expression.FieldName2, expression.FieldValue2.Accept(this)),
-                (expression.FieldName3, expression.FieldValue3.Accept(this)),
-                (expression.FieldName4, expression.FieldValue4.Accept(this)),
-                (expression.FieldName5, expression.FieldValue5.Accept(this)),
-                (expression.FieldName6, expression.FieldValue6.Accept(this)),
-                (expression.FieldName7, expression.FieldValue7.Accept(this)),
-                (expression.FieldName8, expression.FieldValue8.Accept(this)));
+                return ZenCreateObjectExpr<TObject>.Create(fieldValues.ToArray());
             });
         }
 
@@ -475,88 +391,13 @@ namespace Microsoft.Research.Zen.AstTranformations
 
                 var genericType = type.GetGenericTypeDefinition();
 
-                if (!genericType.Name.StartsWith("ZenCreateObject"))
-                {
-                    return ZenGetFieldExpr<T1, T2>.Create(expr, expression.FieldName);
-                }
-
                 // get(createobject(p1, ..., pn), namei) == pi
-
-                var property1 = type.GetProperty("FieldValue1");
-
-                if (property1.PropertyType == typeof(Zen<T2>))
+                if (expr is ZenCreateObjectExpr<T1> coe)
                 {
-                    var name1 = (string)type.GetProperty("FieldName1").GetValue(expr);
-                    if (name1 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property1.GetValue(expr);
-                    }
+                    return (Zen<T2>)coe.Fields[expression.FieldName];
                 }
 
-                var property2 = type.GetProperty("FieldValue2");
-                if (property2.PropertyType == typeof(Zen<T2>))
-                {
-                    var name2 = (string)type.GetProperty("FieldName2").GetValue(expr);
-                    if (name2 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property2.GetValue(expr);
-                    }
-                }
-
-                var property3 = type.GetProperty("FieldValue3");
-                if (property3.PropertyType == typeof(Zen<T2>))
-                {
-                    var name3 = (string)type.GetProperty("FieldName3").GetValue(expr);
-                    if (name3 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property3.GetValue(expr);
-                    }
-                }
-
-                var property4 = type.GetProperty("FieldValue4");
-                if (property4.PropertyType == typeof(Zen<T2>))
-                {
-                    var name4 = (string)type.GetProperty("FieldName4").GetValue(expr);
-                    if (name4 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property4.GetValue(expr);
-                    }
-                }
-
-                var property5 = type.GetProperty("FieldValue5");
-                if (property5.PropertyType == typeof(Zen<T2>))
-                {
-                    var name5 = (string)type.GetProperty("FieldName5").GetValue(expr);
-                    if (name5 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property5.GetValue(expr);
-                    }
-                }
-
-                var property6 = type.GetProperty("FieldValue6");
-                if (property6.PropertyType == typeof(Zen<T2>))
-                {
-                    var name6 = (string)type.GetProperty("FieldName6").GetValue(expr);
-                    if (name6 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property6.GetValue(expr);
-                    }
-                }
-
-                var property7 = type.GetProperty("FieldValue7");
-                if (property7.PropertyType == typeof(Zen<T2>))
-                {
-                    var name7 = (string)type.GetProperty("FieldName7").GetValue(expr);
-                    if (name7 == expression.FieldName)
-                    {
-                        return (Zen<T2>)property7.GetValue(expr);
-                    }
-                }
-
-                var property8 = type.GetProperty("FieldValue8");
-
-                var name8 = (string)type.GetProperty("FieldName8").GetValue(expr);
-                return (Zen<T2>)property8.GetValue(expr);
+                return ZenGetFieldExpr<T1, T2>.Create(expr, expression.FieldName);
             });
         }
 
