@@ -13,6 +13,7 @@ To import the library, add the following line to your file:
 
 ```csharp
 using Microsoft.Research.Zen;
+using static Microsoft.Research.Zen.Language;
 ```
 
 The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can be either concrete or symbolic. As a simple example, consider the following code:
