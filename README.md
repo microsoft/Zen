@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a library built at Microsoft Research that aims to simplify the process of building performant verification tools.
+Zen is a library built at Microsoft Research that aims to simplify the process of building verification tools. Zen lets you write a single implementation of a function and then both evaluate and verify the function.
 
 # Installation
 Just add the project to your visual studio solution.
@@ -25,33 +25,33 @@ Zen<int> PerformMath(Zen<int> x, Zen<int> y)
 }
 ```
 
-This is a function that takes a Zen parameter that represents an integer value and returns a Zen value of type integer by multiplying the input by 3 and adding the input to the result. Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values. Now one can create a `ZenFunction`:
+This is a function that takes two Zen parameterx (x and y) that represents an integer values and returns a new Zen value of type integer by multiplying x by 3 and adding y to the result. Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between literals and Zen values. 
+
+The next step is to create a `ZenFunction`:
 
 ```csharp
-// create a ZenFunction from MultiplyFour
 var function = Function<int, int, int>(PerformMath);
 ```
 
-Given a `ZenFunction` we can leverage the library to perform multiple tasks. The first is to simply evaluate the function on an input(s):
+Given a `ZenFunction` we can leverage the library to perform multiple tasks. The first is to simply evaluate the function on a collection of inputs:
 
 ```csharp
-var output = function.Evaluate(3, 2);
-// output = 11
+var output = function.Evaluate(3, 2); // output = 11
 ```
 
-To perform verification, we can ask Zen to find us an input(s) that leads to something being true:
+To perform verification, we can ask Zen to find us the inputs that leads to something being true:
 
 ```csharp
-var input = function.Find((x, y, result) => And(x >= 0, x <= 10, result == 11));
-// input.Value = (0, 11)
+var input = function.Find((x, y, result) => And(x >= 0, x <= 10, result == 11)); // input.Value = (0, 11)
 ```
 
-Finally, Zen can compile the function to generate IL at runtime that executes with no performance penalty.
+The type of the result in this case will be `Option<int, int>`, which will have a pair of integer inputs that make the expression true if such a pair exists.
+
+Finally, Zen can compile the function to generate IL at runtime that executes without a performance penalty.
 
 ```csharp
 function.Compile();
-output = function.Evaluate(3, 2);
-// output = 11
+output = function.Evaluate(3, 2); // output = 11
 ```
 
 Comparing the performance between the two:
@@ -61,28 +61,32 @@ var watch = System.Diagnostics.Stopwatch.StartNew();
 
 for (int i = 0; i < 1000000; i++) function.Evaluate(3, 2);
 
-Console.WriteLine($"interpreted function took: {watch.ElapsedMilliseconds}ms");
+Console.WriteLine($"interpreted function time: {watch.ElapsedMilliseconds}ms");
 watch.Restart();
 
 function.Compile();
-Console.WriteLine($"compilation took: {watch.ElapsedMilliseconds}ms");
+Console.WriteLine($"compilation time: {watch.ElapsedMilliseconds}ms");
+watch.Restart();
 
 for (int i = 0; i < 1000000; i++) function.Evaluate(3, 2);
 
-Console.WriteLine($"compiled function took: {watch.ElapsedMilliseconds}ms");
-watch.Restart();
+Console.WriteLine($"compiled function time: {watch.ElapsedMilliseconds}ms");
 ```
 
 ```
-interpreted function took: 4601ms
-compilation took: 4ms
-compiled function took: 6ms
+interpreted function time: 4601ms
+compilation time: 4ms
+compiled function time: 2ms
 ```
 
 # Supported Types
 
 Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`.
-It also supports values of type `IList` and `IDictionary`. For example:
+It also supports values of type `Tuple<T1, T2>`, `ValueTuple<T1, T2>`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. Currently it only supports classes/structs with up to 8 fields. The class/struct must also have a default constructor.
+
+# Examples
+
+As a simple example, one can process lists using Zen:
 
 ```csharp
 Zen<bool> ListOp(Zen<IList<int>> list)
@@ -91,15 +95,9 @@ Zen<bool> ListOp(Zen<IList<int>> list)
 } 
 ```
 
-Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor. An example is shown next.
-
-# An example: Access Control Lists
-
-As a more comprehensive example, the following shows how to use Zen to encode and then verify a simplified network access control list.
+As a more comprehensive example, the following shows how to use Zen to encode and then verify a simplified network access control list that allows or blocks packets using an ordered collection of rules.
 
 ```csharp
-using static Microsoft.Research.Zen.Language;
-
 public class Packet
 {
     public uint DstIp { get; set; }
@@ -118,7 +116,11 @@ public class Acl
 
     private Zen<bool> Matches(Zen<Packet> packet, int lineNumber)
     {
-        if (lineNumber == this.Lines.Length) return false;
+        if (lineNumber == this.Lines.Length) 
+        {
+            return false;
+        }
+
         var line = this.Lines[lineNumber];
         return If(line.Matches(packet), line.Permitted, this.Matches(packet, lineNumber + 1));
     }
@@ -137,20 +139,11 @@ public class AclLine
         var dstIp = packet.GetField<Packet, uint>("DstIp");
         var srcIp = packet.GetField<Packet, uint>("SrcIp");
         return And(dstIp >= this.DstIpLow,
-                    dstIp <= this.DstIpHigh,
-                    srcIp >= this.SrcIpLow,
-                    srcIp <= this.SrcIpHigh);
+                   dstIp <= this.DstIpHigh,
+                   srcIp >= this.SrcIpLow,
+                   srcIp <= this.SrcIpHigh);
     }
 }
-```
-
-```csharp
-var aclLine1 = new AclLine { DstIpLow = 10, DstIpHigh = 20, SrcIpLow = 7, SrcIpHigh = 39, Permitted = true };
-var aclLine2 = new AclLine { DstIpLow = 0, DstIpHigh = 100, SrcIpLow = 0, SrcIpHigh = 100, Permitted = false };
-var acl = Acl { Lines = new AclLine[] { aclLine1, aclLine2 } };
-
-var f = Funcion<Packet, bool>(p => acl.Matches(p));
-var packet = f.Find((p, permitted) => Not(permitted));
 ```
 
 # Implementation
