@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a library built at Microsoft Research that aims to simplify the process of building verification tools. Zen lets you write a single implementation of a function and then both evaluate and verify the function.
+Zen is a research library that aims to simplify the process of building verification tools. Zen lets users write a single implementation of a function and then execute, compile, and verify that function.
 
 # Installation
 Just add the project to your visual studio solution. Nuget package will be available soon.
