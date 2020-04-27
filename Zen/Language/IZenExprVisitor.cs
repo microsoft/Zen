@@ -217,7 +217,7 @@ namespace Microsoft.Research.Zen
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenListMatchExpr<TList, TResult>(ZenListMatchExpr<TList, TResult> expression, TParam parameter);
+        TReturn VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
 
         /// <summary>
         /// Visit a GetFieldExpr.

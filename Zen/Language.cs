@@ -175,7 +175,7 @@ namespace Microsoft.Research.Zen
         /// <param name="none">The none case.</param>
         /// <param name="some">The some case.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T2> Match<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T2>> none, Func<Zen<T1>, Zen<T2>> some)
+        public static Zen<T2> Case<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T2>> none, Func<Zen<T1>, Zen<T2>> some)
         {
             CommonUtilities.Validate(expr);
             CommonUtilities.Validate(none);
@@ -808,7 +808,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(valueExpr);
 
-            return listExpr.Match("AddBack",
+            return listExpr.Case(
                 empty: Singleton(valueExpr),
                 cons: (hd, tl) => AddBack(tl, valueExpr).AddFront(hd));
         }
@@ -838,7 +838,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(valueExpr);
 
-            return listExpr.Match("Duplicates",
+            return listExpr.Case(
                 empty: UShort(0),
                 cons: (hd, tl) =>
                     If(hd == valueExpr, tl.Duplicates(valueExpr), tl.Duplicates(valueExpr) + UShort(1)));
@@ -855,7 +855,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(valueExpr);
 
-            return listExpr.Match("RemoveFirst",
+            return listExpr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(hd == valueExpr, tl, tl.RemoveFirst(valueExpr).AddFront(hd)));
         }
@@ -871,7 +871,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(valueExpr);
 
-            return listExpr.Match("RemoveAll",
+            return listExpr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) =>
                 {
@@ -884,22 +884,19 @@ namespace Microsoft.Research.Zen
         /// Match and deconstruct a Zen list.
         /// </summary>
         /// <param name="listExpr">The list expression.</param>
-        /// <param name="uniqueId">A unique identifier for the match.</param>
         /// <param name="empty">The empty case.</param>
         /// <param name="cons">The cons case.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<TResult> Match<T, TResult>(
+        public static Zen<TResult> Case<T, TResult>(
             this Zen<IList<T>> listExpr,
-            object uniqueId,
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
             CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(uniqueId);
             CommonUtilities.Validate(empty);
             CommonUtilities.Validate(cons);
 
-            return ZenListMatchExpr<T, TResult>.Create(uniqueId, listExpr, empty, cons);
+            return ZenListCaseExpr<T, TResult>.Create(listExpr, empty, cons);
         }
 
         /// <summary>
@@ -913,7 +910,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(function);
 
-            return listExpr.Match("Select",
+            return listExpr.Case(
                 empty: EmptyList<T2>(),
                 cons: (hd, tl) => tl.Select(function).AddFront(function(hd)));
         }
@@ -929,7 +926,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(predicate);
 
-            return listExpr.Match("Where",
+            return listExpr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) =>
                 {
@@ -949,7 +946,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(predicate);
 
-            return listExpr.Match("Find",
+            return listExpr.Case(
                 empty: Null<T>(),
                 cons: (hd, tl) => If(predicate(hd), Some(hd), tl.Find(predicate)));
         }
@@ -963,7 +960,7 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(listExpr);
 
-            return listExpr.Match("Length",
+            return listExpr.Case(
                 empty: UShort(0),
                 cons: (hd, tl) => tl.Length() + 1);
         }
@@ -993,7 +990,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return expr1.Match("Append",
+            return expr1.Case(
                 empty: expr2,
                 cons: (hd, tl) => tl.Append(expr2).AddFront(hd));
         }
@@ -1007,7 +1004,7 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(expr);
 
-            return expr.Match("IsEmpty", empty: True(), cons: (hd, tl) => False());
+            return expr.Case(empty: True(), cons: (hd, tl) => False());
         }
 
         /// <summary>
@@ -1057,7 +1054,7 @@ namespace Microsoft.Research.Zen
 
         private static Zen<IList<T>> Reverse<T>(this Zen<IList<T>> expr, Zen<IList<T>> acc)
         {
-            return expr.Match("Reverse",
+            return expr.Case(
                 empty: acc,
                 cons: (hd, tl) => tl.Reverse(acc.AddFront(hd)));
         }
@@ -1073,7 +1070,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr);
             CommonUtilities.Validate(element);
 
-            return expr.Match("Intersperse",
+            return expr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(IsEmpty(tl), Singleton(hd), tl.Intersperse(element).AddFront(hd)));
         }
@@ -1091,7 +1088,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(init);
             CommonUtilities.Validate(function);
 
-            return expr.Match("Fold",
+            return expr.Case(
                 empty: init,
                 cons: (hd, tl) => function(hd, tl.Fold(init, function)));
         }
@@ -1147,7 +1144,7 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         private static Zen<IList<T>> Take<T>(this Zen<IList<T>> expr, Zen<ushort> numElements, int i)
         {
-            return expr.Match("Take",
+            return expr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(UShort((ushort)i) == numElements, EmptyList<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
         }
@@ -1163,7 +1160,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr);
             CommonUtilities.Validate(predicate);
 
-            return expr.Match("TakeWhile",
+            return expr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(predicate(hd), tl.TakeWhile(predicate).AddFront(hd), EmptyList<T>()));
         }
@@ -1191,7 +1188,7 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         private static Zen<IList<T>> Drop<T>(this Zen<IList<T>> expr, Zen<ushort> numElements, int i)
         {
-            return expr.Match("Drop",
+            return expr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(UShort((ushort)i) == numElements, expr, tl.Drop(numElements, i + 1)));
         }
@@ -1207,7 +1204,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr);
             CommonUtilities.Validate(predicate);
 
-            return expr.Match("DropWhile",
+            return expr.Case(
                 empty: EmptyList<T>(),
                 cons: (hd, tl) => If(predicate(hd), EmptyList<T>(), tl.DropWhile(predicate).AddFront(hd)));
         }
@@ -1235,7 +1232,7 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         private static Zen<Tuple<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index, int i)
         {
-            return expr.Match("SplitAt",
+            return expr.Case(
                 empty: Tuple(EmptyList<T>(), EmptyList<T>()),
                 cons: (hd, tl) =>
                 {
@@ -1270,7 +1267,7 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         private static Zen<Option<T>> At<T>(this Zen<IList<T>> listExpr, Zen<ushort> index, int i)
         {
-            return listExpr.Match("At",
+            return listExpr.Case(
                 empty: Null<T>(),
                 cons: (hd, tl) => If(UShort((ushort)i) == index, Some(hd), tl.At(index, i + 1)));
         }
@@ -1298,7 +1295,7 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         private static Zen<Option<ushort>> IndexOf<T>(this Zen<IList<T>> listExpr, Zen<T> value, int i)
         {
-            return listExpr.Match("IndexOf",
+            return listExpr.Case(
                 empty: Null<ushort>(),
                 cons: (hd, tl) => If(value == hd, Some(UShort((ushort)i)), tl.IndexOf(value, i + 1)));
         }
@@ -1312,11 +1309,10 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(expr);
 
-            return expr.Match("IsSorted",
+            return expr.Case(
                 empty: True(),
                 cons: (hd1, tl1) =>
-                    tl1.Match("IsSortedInner",
-                              empty: True(),
+                    tl1.Case(empty: True(),
                               cons: (hd2, tl2) => And(hd1 <= hd2, tl1.IsSorted())));
         }
 
@@ -1329,7 +1325,7 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(expr);
 
-            return expr.Match("Sort", empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
+            return expr.Case(empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
         }
 
         /// <summary>
@@ -1343,7 +1339,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(element);
             CommonUtilities.Validate(expr);
 
-            return expr.Match("Insert",
+            return expr.Case(
                 empty: Singleton(element),
                 cons: (hd, tl) => If(element <= hd, tl.AddFront(element), Insert(element, tl)));
         }
@@ -1418,7 +1414,7 @@ namespace Microsoft.Research.Zen
             CommonUtilities.Validate(expr);
             CommonUtilities.Validate(key);
 
-            return expr.Match("ListGet",
+            return expr.Case(
                 empty: Null<TValue>(),
                 cons: (hd, tl) => If(hd.Item1() == key, Some(hd.Item2()), tl.ListGet(key)));
         }

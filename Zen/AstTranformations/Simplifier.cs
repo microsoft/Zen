@@ -478,7 +478,7 @@ namespace Microsoft.Research.Zen.AstTranformations
             return expression;
         }
 
-        public Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListMatchExpr<TList, TResult> expression)
+        public Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -500,12 +500,12 @@ namespace Microsoft.Research.Zen.AstTranformations
 
                 if (list is ZenIfExpr<IList<TList>> l3)
                 {
-                    var tbranch = ZenListMatchExpr<TList, TResult>.Create(expression.UniqueId, l3.TrueExpr.Accept(this), expression.EmptyCase, expression.ConsCase);
-                    var fbranch = ZenListMatchExpr<TList, TResult>.Create(expression.UniqueId, l3.FalseExpr.Accept(this), expression.EmptyCase, expression.ConsCase);
+                    var tbranch = ZenListCaseExpr<TList, TResult>.Create(l3.TrueExpr.Accept(this), expression.EmptyCase, expression.ConsCase);
+                    var fbranch = ZenListCaseExpr<TList, TResult>.Create(l3.FalseExpr.Accept(this), expression.EmptyCase, expression.ConsCase);
                     return ZenIfExpr<TResult>.Create(l3.GuardExpr.Accept(this), tbranch.Accept(this), fbranch.Accept(this));
                 }
 
-                return ZenListMatchExpr<TList, TResult>.Create(expression.UniqueId, list, expression.EmptyCase, expression.ConsCase);
+                return ZenListCaseExpr<TList, TResult>.Create(list, expression.EmptyCase, expression.ConsCase);
             });
         }
 

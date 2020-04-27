@@ -779,9 +779,9 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchOptionException1()
+        public void TestCaseOptionException1()
         {
-            Language.Match<int, int>(null, null, null);
+            Language.Case<int, int>(null, null, (Func<Zen<int>, Zen<int>>)null);
         }
 
         /// <summary>
@@ -789,9 +789,9 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchOptionException2()
+        public void TestCaseOptionException2()
         {
-            Language.Match<int, int>(Language.Null<int>(), null, null);
+            Language.Case<int, int>(Language.Null<int>(), null, null);
         }
 
         /// <summary>
@@ -799,9 +799,9 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchOptionException3()
+        public void TestCaseOptionException3()
         {
-            Language.Match<int, int>(Language.Null<int>(), () => 0, null);
+            Language.Case<int, int>(Language.Null<int>(), () => 0, null);
         }
 
         /// <summary>
@@ -809,9 +809,10 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchListException1()
+        public void TestCaseListException1()
         {
-            Language.Match<int, int>(null, null, null, null);
+            Zen<IList<int>> x = null;
+            Language.Case<int, int>(x, null, null);
         }
 
         /// <summary>
@@ -819,9 +820,9 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchListException2()
+        public void TestCaseListException2()
         {
-            Language.Match<int, int>(EmptyList<int>(), null, null, null);
+            Language.Case<int, int>(EmptyList<int>(), null, null);
         }
 
         /// <summary>
@@ -829,19 +830,9 @@ namespace Microsoft.Research.ZenTests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchListException3()
+        public void TestCaseListException3()
         {
-            Language.Match<int, int>(EmptyList<int>(), "tag", null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestMatchListException4()
-        {
-            Language.Match<int, int>(EmptyList<int>(), "tag", 0, null);
+            Language.Case<int, int>(EmptyList<int>(), 0, null);
         }
 
         /// <summary>

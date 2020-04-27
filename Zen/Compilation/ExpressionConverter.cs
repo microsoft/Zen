@@ -554,7 +554,7 @@ namespace Microsoft.Research.Zen.Compilation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenListMatchExpr<TList, TResult>(ZenListMatchExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {

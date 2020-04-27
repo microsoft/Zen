@@ -92,7 +92,7 @@ namespace Microsoft.Research.ZenTests
         {
             CheckValid<Option<int>>(o =>
                 Implies(And(o.HasValue(), o.Value() <= Int(4)),
-                    o.Match(none: () => False(), some: v => v <= Int(4))));
+                    o.Case(none: () => False(), some: v => v <= Int(4))));
         }
 
         /// <summary>

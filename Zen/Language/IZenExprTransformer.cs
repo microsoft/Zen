@@ -191,7 +191,7 @@ namespace Microsoft.Research.Zen
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListMatchExpr<TList, TResult> expression);
+        Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression);
 
         /// <summary>
         /// Visit a GetFieldExpr.

@@ -11,56 +11,38 @@ namespace Microsoft.Research.Zen
     /// <summary>
     /// Class representing a True expression.
     /// </summary>
-    internal sealed class ZenListMatchExpr<T, TResult> : Zen<TResult>
+    internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
-        private static Dictionary<object, ZenListMatchExpr<T, TResult>> hashConsTable =
-            new Dictionary<object, ZenListMatchExpr<T, TResult>>();
+        private static Dictionary<object, ZenListCaseExpr<T, TResult>> hashConsTable =
+            new Dictionary<object, ZenListCaseExpr<T, TResult>>();
 
-        public static ZenListMatchExpr<T, TResult> Create(
-            object uniqueId,
+        public static ZenListCaseExpr<T, TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
-            CommonUtilities.Validate(uniqueId);
             CommonUtilities.Validate(listExpr);
             CommonUtilities.Validate(empty);
             CommonUtilities.Validate(cons);
 
-            var key = (uniqueId, listExpr, empty, cons);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = new ZenListMatchExpr<T, TResult>(uniqueId, listExpr, empty, cons);
-            hashConsTable[key] = ret;
-            return ret;
+            return new ZenListCaseExpr<T, TResult>(listExpr, empty, cons);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenListMatchExpr{TList, TResult}"/> class.
+        /// Initializes a new instance of the <see cref="ZenListCaseExpr{TList, TResult}"/> class.
         /// </summary>
-        /// <param name="uniqueId">The unique id.</param>
         /// <param name="listExpr">The list.</param>
         /// <param name="empty">The empty case.</param>
         /// <param name="cons">The cons case.</param>
-        private ZenListMatchExpr(
-            object uniqueId,
+        private ZenListCaseExpr(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
-            this.UniqueId = uniqueId;
             this.ListExpr = listExpr;
             this.EmptyCase = empty;
             this.ConsCase = cons;
         }
-
-        /// <summary>
-        /// Gets the unique id.
-        /// </summary>
-        public object UniqueId { get; }
 
         /// <summary>
         /// Gets the list expr.
@@ -84,7 +66,7 @@ namespace Microsoft.Research.Zen
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Match<{typeof(T)}, {typeof(TResult)}>({this.UniqueId}, {this.ListExpr}, {this.EmptyCase}, {this.ConsCase.GetHashCode()})";
+            return $"Case<{typeof(T)}, {typeof(TResult)}>({this.ListExpr}, {this.EmptyCase}, {this.ConsCase.GetHashCode()})";
         }
 
         /// <summary>
