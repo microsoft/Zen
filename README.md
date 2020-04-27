@@ -82,7 +82,7 @@ compiled function time: 2ms
 # Supported Types
 
 Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`.
-It also supports values of type `Tuple<T1, T2>`, `ValueTuple<T1, T2>`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. Currently it only supports classes/structs with up to 8 fields. The class/struct must also have a default constructor.
+It also supports values of type `Tuple<T1, T2>`, `ValueTuple<T1, T2>`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor.
 
 # Examples
 
