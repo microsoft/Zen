@@ -6,7 +6,7 @@
 Zen is a library built at Microsoft Research that aims to simplify the process of building verification tools. Zen lets you write a single implementation of a function and then both evaluate and verify the function.
 
 # Installation
-Just add the project to your visual studio solution.
+Just add the project to your visual studio solution. Nuget package will be available soon.
 
 # Getting Started
 To import the library, add the following line to your file:
@@ -111,17 +111,17 @@ Now to prove that the result of the sort is correct, we can write a second funct
 private static Zen<bool> IsSorted<T>(Zen<IList<T>> expr)
 {
     return expr.Case(
-        empty: True(),
+        empty: true,
         cons: (hd1, tl1) =>
-            tl1.Case(empty: True(),
-                        cons: (hd2, tl2) => And(hd1 <= hd2, IsSorted(tl1))));
+            tl1.Case(empty: true,
+                     cons: (hd2, tl2) => And(hd1 <= hd2, IsSorted(tl1))));
 }
 ```
 
 Finally, we can ask Zen to prove that the list will always be sorted and extract an implementation.
 
 ```csharp
-var function = Function<IList<int>, IList<int>>(list => Sort(list));
+var function = Function(Sort<int>);
 var input = function.Find((l, b) => Not(IsSorted(b)));  // input.HasValue == false
 
 // extract an implementation
