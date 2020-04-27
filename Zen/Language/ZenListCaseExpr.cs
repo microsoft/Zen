@@ -13,9 +13,6 @@ namespace Microsoft.Research.Zen
     /// </summary>
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
-        private static Dictionary<object, ZenListCaseExpr<T, TResult>> hashConsTable =
-            new Dictionary<object, ZenListCaseExpr<T, TResult>>();
-
         public static ZenListCaseExpr<T, TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
@@ -79,7 +76,7 @@ namespace Microsoft.Research.Zen
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenListMatchExpr(this, parameter);
+            return visitor.VisitZenListCaseExpr(this, parameter);
         }
 
         /// <summary>
@@ -89,7 +86,7 @@ namespace Microsoft.Research.Zen
         /// <returns>A return value.</returns>
         internal override Zen<TResult> Accept(IZenExprTransformer visitor)
         {
-            return visitor.VisitZenListMatchExpr(this);
+            return visitor.VisitZenListCaseExpr(this);
         }
     }
 }

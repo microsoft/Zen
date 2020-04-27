@@ -86,16 +86,55 @@ It also supports values of type `Tuple<T1, T2>`, `ValueTuple<T1, T2>`, `Option<T
 
 # Examples
 
-As a simple example, one can process lists using Zen:
+### Insertion sort
+
+As a simple example, we can use Zen to verify and extract an implementation of the [insertion sort](https://en.wikipedia.org/wiki/Insertion_sort) sorting algorithm. First we must implement the insertion sort algorithm. While Zen does not support looping constructs (for, while) it does support recursion through C# in the style of functional programming languages. Below is a simple implementation of insertion sort:
 
 ```csharp
-Zen<bool> ListOp(Zen<IList<int>> list)
+Zen<IList<T>> Sort<T>(Zen<IList<T>> expr)
 {
-    return list.Select(v => v + 1).Contains(4);
-} 
+    return expr.Case(empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
+}
+
+Zen<IList<T>> Insert<T>(Zen<T> element, Zen<IList<T>> expr)
+{
+    return expr.Case(
+        empty: Language.Singleton(element),
+        cons: (hd, tl) =>
+            If(element <= hd, expr.AddFront(element), Insert(element, tl).AddFront(hd)));
+}
 ```
 
-As a more comprehensive example, the following shows how to use Zen to encode and then verify a simplified network access control list that allows or blocks packets using an ordered collection of rules.
+Now to prove that the result of the sort is correct, we can write a second function: 
+
+```csharp
+private static Zen<bool> IsSorted<T>(Zen<IList<T>> expr)
+{
+    return expr.Case(
+        empty: True(),
+        cons: (hd1, tl1) =>
+            tl1.Case(empty: True(),
+                        cons: (hd2, tl2) => And(hd1 <= hd2, IsSorted(tl1))));
+}
+```
+
+Finally, we can ask Zen to prove that the list will always be sorted and extract an implementation.
+
+```csharp
+var function = Function<IList<int>, IList<int>>(list => Sort(list));
+var input = function.Find((l, b) => Not(IsSorted(b)));  // input.HasValue == false
+
+// extract an implementation
+function.Compile();
+Func<IList<int>, IList<int>> implementation = function;
+```
+
+Behind the scenes Zen is using [bounded model checking]() to perform verification. For lists, it only finds examples up to a given input size, which is configurable.
+
+
+### Network access control lists (ACLs)
+
+As another example, the following shows how to use Zen to encode and then verify a simplified network access control list that allows or blocks packets using an ordered collection of rules.
 
 ```csharp
 public class Packet
@@ -147,8 +186,9 @@ public class AclLine
 ```
 
 # Implementation
-Zen builds an abstract syntax tree for the function it is representing and then leverages C#'s reflection capabilities to analyze the types at runtime and perform various tasks. The `Find` function uses symbolic model checking by leveraging state-of-the-art solvers such as [Z3](https://github.com/Z3Prover/z3). Compiling functions works by generating IL at runtime to avoid interpretation overhead.
+Zen builds an abstract syntax tree (AST) for the function it is representing and then leverages C#'s reflection capabilities to interpret, compile, and symbolically evaluate the AST.
 
+The `Find` function uses symbolic model checking to exhaustively search for inputs that lead to a desired result. In the backend it supports two solvers, one based on SMT solvers such as [Z3](https://github.com/Z3Prover/z3) and another based on binary decision diagrams.
 
 # Contributing
 

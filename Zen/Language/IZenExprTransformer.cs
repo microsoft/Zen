@@ -187,11 +187,11 @@ namespace Microsoft.Research.Zen
         Zen<IList<T>> VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression);
 
         /// <summary>
-        /// Visit a ListMatchExpr.
+        /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression);
+        Zen<TResult> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression);
 
         /// <summary>
         /// Visit a GetFieldExpr.

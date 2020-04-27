@@ -573,7 +573,7 @@ namespace Microsoft.Research.Zen.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
-        public object VisitZenListMatchExpr<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenListCaseExpr<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
             {

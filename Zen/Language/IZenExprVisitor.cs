@@ -212,12 +212,12 @@ namespace Microsoft.Research.Zen
         TReturn VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a ListMatchExpr.
+        /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
+        TReturn VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
 
         /// <summary>
         /// Visit a GetFieldExpr.

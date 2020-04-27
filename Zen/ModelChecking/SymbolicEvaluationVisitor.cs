@@ -511,7 +511,7 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
         {
             var list = (SymbolicList<TModel, TVar, TBool, TInt>)expression.ListExpr.Accept(this, parameter);
 

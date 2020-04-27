@@ -285,7 +285,7 @@ namespace Microsoft.Research.Zen.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {

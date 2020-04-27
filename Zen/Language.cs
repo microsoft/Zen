@@ -1341,7 +1341,7 @@ namespace Microsoft.Research.Zen
 
             return expr.Case(
                 empty: Singleton(element),
-                cons: (hd, tl) => If(element <= hd, tl.AddFront(element), Insert(element, tl)));
+                cons: (hd, tl) => If(element <= hd, expr.AddFront(element), Insert(element, tl).AddFront(hd)));
         }
 
         /// <summary>

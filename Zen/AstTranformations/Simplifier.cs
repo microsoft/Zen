@@ -478,7 +478,7 @@ namespace Microsoft.Research.Zen.AstTranformations
             return expression;
         }
 
-        public Zen<TResult> VisitZenListMatchExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression)
+        public Zen<TResult> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression)
         {
             return LookupOrCompute(expression, () =>
             {
