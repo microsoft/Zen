@@ -44,41 +44,6 @@ namespace Microsoft.Research.ZenTests
         }
 
         /// <summary>
-        /// benchmark.
-        /// </summary>
-        [TestMethod]
-        public void TestRouteMapEvaluatePerformance()
-        {
-            var routeMap = ExampleRouteMap();
-
-            var function = Function<Route, Tuple<Option<Route>, int>>(r => routeMap.Process(r));
-
-            var aspath = new List<uint> { };
-            var communities = new List<uint> { 4 };
-            var prefix = new Prefix { DstIp = 0, Length = 18 };
-            var route = new Route { AsPath = aspath, Communities = communities, Prefix = prefix };
-
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-
-            for (int i = 0; i < 10000; i++)
-            {
-                function.Evaluate(route);
-            }
-
-            Console.WriteLine($"interpreted took: {watch.ElapsedMilliseconds}");
-            function.Compile();
-            watch.Restart();
-
-            for (int i = 0; i < 10000; i++)
-            {
-                function.Evaluate(route);
-            }
-
-            Console.WriteLine($"compiled took: {watch.ElapsedMilliseconds}");
-            watch.Restart();
-        }
-
-        /// <summary>
         /// Creates an example route map.
         /// </summary>
         /// <returns></returns>

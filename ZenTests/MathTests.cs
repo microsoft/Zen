@@ -5,6 +5,7 @@
 namespace Microsoft.Research.ZenTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -212,6 +213,49 @@ namespace Microsoft.Research.ZenTests
             CheckValid<uint, uint>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
             CheckValid<long, long>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
             CheckValid<ulong, ulong>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
+        }
+
+        /// <summary>
+        /// Test equality for composite types.
+        /// </summary>
+        [TestMethod]
+        public void TestEqualityComposite()
+        {
+            CheckAgreement<(byte, byte), (byte, byte)>((x, y) => x == y);
+            CheckAgreement<Tuple<byte, byte>, Tuple<byte, byte>>((x, y) => x == y);
+            CheckAgreement<Option<byte>, Option<byte>>((x, y) => x == y);
+            CheckAgreement<Packet, Packet>((x, y) => x == y);
+            CheckAgreement<ObjectField1, ObjectField1>((x, y) => x == y);
+        }
+
+        /// <summary>
+        /// Test equality for composite types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEqualityCompositeException1()
+        {
+            CheckAgreement<IList<int>, IList<int>>((l1, l2) => l1 == l2);
+        }
+
+        /// <summary>
+        /// Test equality for composite types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEqualityCompositeException2()
+        {
+            CheckAgreement<IDictionary<byte, byte>, IDictionary<byte, byte>>((l1, l2) => l1 == l2);
+        }
+
+        /// <summary>
+        /// Test equality for composite types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEqualityCompositeException3()
+        {
+            CheckAgreement<Option<IList<int>>, Option<IList<int>>>((l1, l2) => l1 == l2);
         }
 
         /// <summary>

@@ -17,7 +17,6 @@ namespace Microsoft.Research.Zen
         /// </summary>
         public ZenArbitraryExpr()
         {
-            CommonUtilities.ValidateIsIntegerOrBoolType(typeof(T));
         }
 
         /// <summary>

@@ -1326,7 +1326,7 @@ namespace Microsoft.Research.ZenTests
         /// Exception thrown for non-integer/bool parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestInvalidEquality()
         {
             _ = EmptyList<int>() == EmptyList<int>();

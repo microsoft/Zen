@@ -19,7 +19,6 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
-            CommonUtilities.ValidateIsIntegerOrBoolType(typeof(T));
 
             var key = (expr1, expr2);
             if (hashConsTable.TryGetValue(key, out var value))

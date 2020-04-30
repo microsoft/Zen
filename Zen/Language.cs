@@ -8,6 +8,7 @@ namespace Microsoft.Research.Zen
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.Research.Zen.Generation;
 
     /// <summary>
@@ -15,6 +16,8 @@ namespace Microsoft.Research.Zen
     /// </summary>
     public static class Language
     {
+        private static MethodInfo getFieldMethod = typeof(Language).GetMethod("GetField");
+
         /// <summary>
         /// The Zen value for false.
         /// </summary>
@@ -409,8 +412,75 @@ namespace Microsoft.Research.Zen
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
+            return EqHelper<T>(expr1, expr2);
+        }
 
-            return ZenEqExpr<T>.Create(expr1, expr2);
+        private static Zen<bool> EqHelper<T>(dynamic expr1, dynamic expr2)
+        {
+            var type = typeof(T);
+            if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
+            {
+                return ZenEqExpr<T>.Create(expr1, expr2);
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Option<>))
+            {
+                var eqBool = Eq(HasValue(expr1), HasValue(expr2));
+                var eqValue = Eq(Value(expr1), Value(expr2));
+                return And(eqBool, eqValue);
+            }
+
+            if (type.IsGenericType &&
+                    (type.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
+                     type.GetGenericTypeDefinition() == typeof(ValueTuple<,>)))
+            {
+                var eqItem1 = Eq(Item1(expr1), Item1(expr2));
+                var eqItem2 = Eq(Item2(expr1), Item2(expr2));
+                return And(eqItem1, eqItem2);
+            }
+
+            if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>))
+            {
+                throw new ZenException("Zen does not support equality of IList types.");
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            {
+                throw new ZenException("Zen does not support equality of IDictionary types.");
+            }
+
+            // some class or struct
+            var acc = True();
+            foreach (var field in ReflectionUtilities.GetAllFields(type))
+            {
+                var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
+                dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
+                dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
+                acc = And(acc, Eq(field1, field2));
+            }
+
+            foreach (var property in ReflectionUtilities.GetAllProperties(type))
+            {
+                var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
+                dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
+                dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
+                acc = And(acc, Eq(prop1, prop2));
+            }
+
+            return acc;
+        }
+
+        /// <summary>
+        /// Compute the equality of Zen values.
+        /// </summary>
+        /// <param name="expr1">First Zen expression.</param>
+        /// <param name="expr2">Second Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> Eq(Zen<bool> expr1, Zen<bool> expr2)
+        {
+            CommonUtilities.Validate(expr1);
+            CommonUtilities.Validate(expr2);
+            return ZenEqExpr<bool>.Create(expr1, expr2);
         }
 
         /// <summary>

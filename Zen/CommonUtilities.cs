@@ -123,17 +123,5 @@ namespace Microsoft.Research.Zen
                 throw new ArgumentException($"Invalid non-integer type {type} used as integer.");
             }
         }
-
-        /// <summary>
-        /// Validate that a type is an integer type.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void ValidateIsIntegerOrBoolType(Type type)
-        {
-            if (!ReflectionUtilities.IsIntegerType(type) && type != ReflectionUtilities.BoolType)
-            {
-                throw new ArgumentException($"Invalid non-integer/bool type {type} used.");
-            }
-        }
     }
 }
