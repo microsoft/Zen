@@ -6,7 +6,6 @@ namespace Microsoft.Research.Zen.AstTranformations
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
 
     /// <summary>
     /// Perform basic simplifications over a Zen expression. This includes:
@@ -403,7 +402,7 @@ namespace Microsoft.Research.Zen.AstTranformations
 
         public Zen<T> VisitZenIfExpr<T>(ZenIfExpr<T> expression)
         {
-            return LookupOrCompute(expression, () =>
+            return LookupOrCompute<T>(expression, () =>
             {
                 var g = expression.GuardExpr.Accept(this);
 
@@ -427,6 +426,37 @@ namespace Microsoft.Research.Zen.AstTranformations
                 if (ReferenceEquals(t, f))
                 {
                     return t;
+                }
+
+                if (typeof(T) == ReflectionUtilities.BoolType)
+                {
+                    // if e1 then true else e2 = Or(e1, e2)
+                    // if e1 then false else e2 = And(Not(e1), e2)
+                    if (t is ZenConstantBoolExpr te)
+                    {
+                        if (te.Value)
+                        {
+                            return ZenOrExpr.Create((dynamic)g, (dynamic)f);
+                        }
+                        else
+                        {
+                            return ZenAndExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)f);
+                        }
+                    }
+
+                    // if e1 then e2 else true = Or(Not(e1), e2)
+                    // if e1 then e2 else false = And(e1, e2)
+                    if (f is ZenConstantBoolExpr fe)
+                    {
+                        if (fe.Value)
+                        {
+                            return ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t);
+                        }
+                        else
+                        {
+                            return ZenAndExpr.Create((dynamic)g, (dynamic)t);
+                        }
+                    }
                 }
 
                 return ZenIfExpr<T>.Create(g, t, f);

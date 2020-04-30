@@ -5,6 +5,8 @@
 namespace Microsoft.Research.ZenTests
 {
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen;
+    using static Microsoft.Research.Zen.Language;
 
     /// <summary>
     /// Simple packet class for testing.
@@ -29,6 +31,33 @@ namespace Microsoft.Research.ZenTests
         public override string ToString()
         {
             return $"DstIp={DstIp}, SrcIp={SrcIp}";
+        }
+    }
+
+    /// <summary>
+    /// Helper class for Packets.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public static class PacketHelper
+    {
+        /// <summary>
+        /// Get the destination IP.
+        /// </summary>
+        /// <param name="packet">The packet.</param>
+        /// <returns>The ip.</returns>
+        public static Zen<uint> GetDstIp(this Zen<Packet> packet)
+        {
+            return packet.GetField<Packet, uint>("DstIp");
+        }
+
+        /// <summary>
+        /// Get the source IP.
+        /// </summary>
+        /// <param name="packet">The packet.</param>
+        /// <returns>The ip.</returns>
+        public static Zen<uint> GetSrcIp(this Zen<Packet> packet)
+        {
+            return packet.GetField<Packet, uint>("SrcIp");
         }
     }
 }

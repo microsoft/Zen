@@ -143,8 +143,8 @@ namespace Microsoft.Research.ZenTests
         /// <returns>Whether accepted.</returns>
         public Zen<bool> Match(Zen<Packet> packet)
         {
-            var dstIp = packet.GetField<Packet, uint>("DstIp");
-            var srcIp = packet.GetField<Packet, uint>("SrcIp");
+            var dstIp = packet.GetDstIp();
+            var srcIp = packet.GetSrcIp();
             return And(dstIp >= this.DstIpLow,
                        dstIp <= this.DstIpHigh,
                        srcIp >= this.SrcIpLow,

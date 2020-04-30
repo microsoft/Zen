@@ -89,6 +89,23 @@ namespace Microsoft.Research.ZenTests
         }
 
         /// <summary>
+        /// Simplify if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestIfSimplification()
+        {
+            var x = Int(1);
+            var y = Int(2);
+            var b = Arbitrary<bool>();
+            Assert.AreEqual(If(true, x, y).Simplify(), x);
+            Assert.AreEqual(If(false, x, y).Simplify(), y);
+            Assert.AreEqual(If(x == 0, true, b).Simplify(), Or(x == 0, b));
+            Assert.AreEqual(If(x == 0, false, b).Simplify(), And(Not(x == 0), b));
+            Assert.AreEqual(If(x == 0, b, true).Simplify(), Or(Not(x == 0), b));
+            Assert.AreEqual(If(x == 0, b, false).Simplify(), And(x == 0, b));
+        }
+
+        /// <summary>
         /// Simplify object get throws.
         /// </summary>
         [TestMethod]
@@ -226,8 +243,8 @@ namespace Microsoft.Research.ZenTests
         [TestMethod]
         public void TestHashconsingWorksForCreate()
         {
-            var x = Language.Create<Object2>(("Field1", Int(0)), ("Field2", Int(0)));
-            var y = Language.Create<Object2>(("Field2", Int(0)), ("Field1", Int(0)));
+            var x = Create<Object2>(("Field1", Int(0)), ("Field2", Int(0)));
+            var y = Create<Object2>(("Field2", Int(0)), ("Field1", Int(0)));
             Assert.AreEqual(x, y);
         }
     }
