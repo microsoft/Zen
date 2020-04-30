@@ -60,6 +60,41 @@ namespace Microsoft.Research.Zen
         public readonly static Type UlongType = typeof(ulong);
 
         /// <summary>
+        /// The type of a tuple.
+        /// </summary>
+        public readonly static Type TupleType = typeof(Tuple<,>);
+
+        /// <summary>
+        /// The type of a value tuple.
+        /// </summary>
+        public readonly static Type ValueTupleType = typeof(ValueTuple<,>);
+
+        /// <summary>
+        /// The type of an option.
+        /// </summary>
+        public readonly static Type OptionType = typeof(Option<>);
+
+        /// <summary>
+        /// Type of an IList.
+        /// </summary>
+        public readonly static Type IListType = typeof(IList<>);
+
+        /// <summary>
+        /// Type of an IDictionary.
+        /// </summary>
+        public readonly static Type IDictType = typeof(IDictionary<,>);
+
+        /// <summary>
+        /// Type of an List.
+        /// </summary>
+        public readonly static Type ListType = typeof(List<>);
+
+        /// <summary>
+        /// Type of an Dictionary.
+        /// </summary>
+        public readonly static Type DictType = typeof(Dictionary<,>);
+
+        /// <summary>
         /// Check if a type is a kind of integer.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -87,6 +122,89 @@ namespace Microsoft.Research.Zen
         public static bool IsSignedIntegerType(Type type)
         {
             return (type == ShortType || type == IntType || type == LongType);
+        }
+
+        /// <summary>
+        /// Check if a type is a tuple type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsTupleType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == TupleType;
+        }
+
+        /// <summary>
+        /// Check if a type is some kind of tuple type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsValueTupleType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == ValueTupleType;
+        }
+
+        /// <summary>
+        /// Check if a type is some kind of tuple type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsSomeTupleType(Type type)
+        {
+            return IsTupleType(type) || IsValueTupleType(type);
+        }
+
+        /// <summary>
+        /// Check if a type is some kind of tuple type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsOptionType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == OptionType;
+        }
+
+        /// <summary>
+        /// Check if a type is an IList type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsIListType(Type type)
+        {
+            return type.IsInterface &&
+                   type.IsGenericType &&
+                   type.GetGenericTypeDefinition() == IListType;
+        }
+
+        /// <summary>
+        /// Check if a type is an IDictionary type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsIDictionaryType(Type type)
+        {
+            return type.IsGenericType &&
+                   type.GetGenericTypeDefinition() == IDictType;
+        }
+
+        /// <summary>
+        /// Check if a type is a List type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsListType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == ListType;
+        }
+
+        /// <summary>
+        /// Check if a type is a Dictionary type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsDictionaryType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == DictType;
         }
 
         /// <summary>
@@ -260,6 +378,100 @@ namespace Microsoft.Research.Zen
         /// <returns>A value.</returns>
         public static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
         {
+            /* if (type == BoolType)
+            {
+                return visitor.VisitBool();
+            }
+
+            if (type == ByteType)
+            {
+                return visitor.VisitByte();
+            }
+
+            if (type == ShortType)
+            {
+                return visitor.VisitShort();
+            }
+
+            if (type == UshortType)
+            {
+                return visitor.VisitUshort();
+            }
+
+            if (type == IntType)
+            {
+                return visitor.VisitInt();
+            }
+
+            if (type == UintType)
+            {
+                return visitor.VisitUint();
+            }
+
+            if (type == LongType)
+            {
+                return visitor.VisitLong();
+            }
+
+            if (type == UlongType)
+            {
+                return visitor.VisitUlong();
+            }
+
+            if (IsOptionType(type))
+            {
+                var t = type.GetGenericArguments()[0];
+                return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), t);
+            }
+
+            if (IsTupleType(type))
+            {
+                var tleft = type.GetGenericArguments()[0];
+                var tright = type.GetGenericArguments()[1];
+                return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
+            }
+
+            if (IsValueTupleType(type))
+            {
+                var tleft = type.GetGenericArguments()[0];
+                var tright = type.GetGenericArguments()[1];
+                return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
+            }
+
+            if (IsIListType(type))
+            {
+                var t = type.GetGenericArguments()[0];
+                return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
+            }
+
+            if (IsIDictionaryType(type))
+            {
+                var args = type.GetGenericArguments();
+                var tkey = args[0];
+                var tvalue = args[1];
+                return visitor.VisitDictionary(ty => ApplyTypeVisitor(visitor, ty), type, tkey, tvalue);
+            }
+
+            if (IsListType(type) || IsDictionaryType(type))
+            {
+                throw new InvalidOperationException($"Unsupported object field type: {type}");
+            }
+
+            // some class or struct
+            var dict = new Dictionary<string, Type>();
+
+            foreach (var field in GetAllFields(type))
+            {
+                dict[field.Name] = field.FieldType;
+            }
+
+            foreach (var property in GetAllProperties(type))
+            {
+                dict[property.Name] = property.PropertyType;
+            }
+
+            return visitor.VisitObject(t => ApplyTypeVisitor(visitor, t), type, dict); */
+
             if (type == BoolType)
             {
                 return visitor.VisitBool();
@@ -300,33 +512,33 @@ namespace Microsoft.Research.Zen
                 return visitor.VisitUlong();
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Option<>))
+            if (IsOptionType(type))
             {
                 var t = type.GetGenericArguments()[0];
                 return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), t);
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Tuple<,>))
+            if (IsTupleType(type))
             {
                 var tleft = type.GetGenericArguments()[0];
                 var tright = type.GetGenericArguments()[1];
                 return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
+            if (IsValueTupleType(type))
             {
                 var tleft = type.GetGenericArguments()[0];
                 var tright = type.GetGenericArguments()[1];
                 return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
             }
 
-            if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>))
+            if (IsIListType(type))
             {
                 var t = type.GetGenericArguments()[0];
                 return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            if (IsIDictionaryType(type))
             {
                 var args = type.GetGenericArguments();
                 var tkey = args[0];
@@ -334,14 +546,9 @@ namespace Microsoft.Research.Zen
                 return visitor.VisitDictionary(ty => ApplyTypeVisitor(visitor, ty), type, tkey, tvalue);
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (IsListType(type) || IsDictionaryType(type))
             {
-                throw new InvalidOperationException($"Unsupported object field type: {type}, use IList");
-            }
-
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                throw new InvalidOperationException($"Unsupported object field type: {type}, use IDictionary");
+                throw new InvalidOperationException($"Unsupported object field type: {type}");
             }
 
             // some class or struct

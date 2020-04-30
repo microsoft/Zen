@@ -418,35 +418,29 @@ namespace Microsoft.Research.Zen
         private static Zen<bool> EqHelper<T>(dynamic expr1, dynamic expr2)
         {
             var type = typeof(T);
+
             if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
             {
                 return ZenEqExpr<T>.Create(expr1, expr2);
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Option<>))
+            if (ReflectionUtilities.IsOptionType(type))
             {
                 var eqBool = Eq(HasValue(expr1), HasValue(expr2));
                 var eqValue = Eq(Value(expr1), Value(expr2));
                 return And(eqBool, eqValue);
             }
 
-            if (type.IsGenericType &&
-                    (type.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
-                     type.GetGenericTypeDefinition() == typeof(ValueTuple<,>)))
+            if (ReflectionUtilities.IsSomeTupleType(type))
             {
                 var eqItem1 = Eq(Item1(expr1), Item1(expr2));
                 var eqItem2 = Eq(Item2(expr1), Item2(expr2));
                 return And(eqItem1, eqItem2);
             }
 
-            if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>))
+            if (ReflectionUtilities.IsIListType(type) || ReflectionUtilities.IsIDictionaryType(type))
             {
-                throw new ZenException("Zen does not support equality of IList types.");
-            }
-
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-            {
-                throw new ZenException("Zen does not support equality of IDictionary types.");
+                throw new ZenException($"Zen does not support equality of {type} types.");
             }
 
             // some class or struct
