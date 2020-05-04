@@ -4,6 +4,10 @@
 
 namespace Microsoft.Research.Zen.ModelChecking
 {
+    using System;
+    using System.Collections.Generic;
+    using DecisionDiagrams;
+    using Microsoft.Research.Zen.Generation;
     using Microsoft.Research.Zen.Interpretation;
 
     /// <summary>
@@ -11,6 +15,12 @@ namespace Microsoft.Research.Zen.ModelChecking
     /// </summary>
     internal static class SymbolicEvaluator
     {
+        private static DDManager<BDDNode> transformerManager = new DDManager<BDDNode>(new BDDNodeFactory());
+
+        private static Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues = new Dictionary<Type, (object, VariableSet<BDDNode>)>();
+
+        private static Dictionary<object, Variable<BDDNode>> arbitraryMapping = new Dictionary<object, Variable<BDDNode>>();
+
         public static bool Find(Zen<bool> expression, Backend backend, bool simplify)
         {
             expression = simplify ? expression.Simplify() : expression;
@@ -110,6 +120,121 @@ namespace Microsoft.Research.Zen.ModelChecking
             var result3 = input3.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result4 = input4.Accept(new ExpressionEvaluator(), interpreterEnv);
             return Option.Some(((T1)result1, (T2)result2, (T3)result3, (T4)result4));
+        }
+
+        public static StateSetTransformer<T1, T2> StateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
+        {
+            // create an arbitrary input and invoke the function
+            var generator = new SymbolicInputGenerator(0, false);
+            var input = Language.Arbitrary<T1>(generator);
+            var arbitrariesForInput = generator.ArbitraryExpressions;
+
+            var expression = function(input);
+
+            // create an arbitrary output value
+            generator = new SymbolicInputGenerator(0, false);
+            var output = Language.Arbitrary<T2>(generator);
+            var arbitrariesForOutput = generator.ArbitraryExpressions;
+
+            // create an expression relating input and output.
+            Zen<bool> newExpression = (expression == output);
+
+            // initialize the decision diagram solver
+            var heuristic = new InterleavingHeuristic();
+            var mustInterleave = heuristic.Compute(newExpression);
+            var solverDD = new SolverDD<BDDNode>(transformerManager, mustInterleave);
+
+            // hack: forces all arbitrary expressions to get evaluated even if not used in the invariant.
+            var arbitraryToVariable = new Dictionary<object, Variable<BDDNode>>();
+            foreach (var arbitrary in arbitrariesForInput)
+            {
+                if (arbitrary is Zen<bool>)
+                {
+                    var (v, _) = solverDD.CreateBoolVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<byte>)
+                {
+                    var (v, _) = solverDD.CreateByteVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<short> || arbitrary is Zen<ushort>)
+                {
+                    var (v, _) = solverDD.CreateShortVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<int> || arbitrary is Zen<uint>)
+                {
+                    var (v, _) = solverDD.CreateIntVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<long> || arbitrary is Zen<long>)
+                {
+                    var (v, _) = solverDD.CreateLongVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+            }
+
+            // get the decision diagram representing the equality.
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solverDD);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>();
+            var symbolicResult =
+                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>)newExpression.Accept(symbolicEvaluator, env);
+
+            DD result = (DD)(object)symbolicResult.Value;
+
+            // collect information about input and output manager variables
+            var inputArbitraryExprs = new HashSet<object>(arbitrariesForInput);
+            var outputArbitraryExprs = new HashSet<object>(arbitrariesForOutput);
+
+            var inputVariables = new List<Variable<BDDNode>>();
+            var outputVariables = new List<Variable<BDDNode>>();
+
+            foreach (var kv in symbolicEvaluator.ArbitraryVariables)
+            {
+                arbitraryToVariable[kv.Key] = kv.Value;
+            }
+
+            foreach (var kv in arbitraryToVariable)
+            {
+                arbitraryMapping[kv.Key] = kv.Value;
+
+                if (outputArbitraryExprs.Contains(kv.Key))
+                {
+                    outputVariables.Add(kv.Value);
+                }
+
+                if (inputArbitraryExprs.Contains(kv.Key))
+                {
+                    inputVariables.Add(kv.Value);
+                }
+            }
+
+            // create variable sets for easy quantification
+            var inputVariableSet = solverDD.Manager.CreateVariableSet(inputVariables.ToArray());
+            var outputVariableSet = solverDD.Manager.CreateVariableSet(outputVariables.ToArray());
+
+            if (!canonicalValues.ContainsKey(typeof(T1)))
+            {
+                canonicalValues[typeof(T1)] = (input, inputVariableSet);
+            }
+
+            if (!canonicalValues.ContainsKey(typeof(T2)))
+            {
+                canonicalValues[typeof(T2)] = (output, outputVariableSet);
+            }
+
+            return new StateSetTransformer<T1, T2>(
+                solverDD,
+                result,
+                (input, inputVariableSet),
+                (output, outputVariableSet),
+                arbitraryMapping,
+                canonicalValues);
         }
     }
 }

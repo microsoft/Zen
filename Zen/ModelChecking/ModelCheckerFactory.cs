@@ -37,9 +37,9 @@ namespace Microsoft.Research.Zen.ModelChecking
         {
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(expression);
-            var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
-            var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
-            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>>(solver);
+            var manager = new DDManager<BDDNode>(new BDDNodeFactory());
+            var solver = new SolverDD<BDDNode>(manager, mustInterleave);
+            return new ModelChecker<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solver);
         }
 
         /// <summary>

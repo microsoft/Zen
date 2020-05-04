@@ -37,10 +37,10 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// </returns>
         public Dictionary<object, object> ModelCheck(Zen<bool> expression)
         {
-            var modelChecker = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TInt>(solver);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TInt>(solver);
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt>();
             var symbolicResult =
-                (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Accept(modelChecker, env);
+                (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Accept(symbolicEvaluator, env);
 
             // Console.WriteLine($"[time] model checking: {watch.ElapsedMilliseconds}ms");
             // watch.Restart();
@@ -58,7 +58,7 @@ namespace Microsoft.Research.Zen.ModelChecking
 
             // compute the input given the assignment
             var arbitraryAssignment = new Dictionary<object, object>();
-            foreach (var kv in modelChecker.ArbitraryVariables)
+            foreach (var kv in symbolicEvaluator.ArbitraryVariables)
             {
                 var expr = kv.Key;
                 var variable = kv.Value;

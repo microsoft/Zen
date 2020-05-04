@@ -137,6 +137,15 @@ namespace Microsoft.Research.Zen
         }
 
         /// <summary>
+        /// Gets the function as a state transformer.
+        /// </summary>
+        /// <returns></returns>
+        public StateSetTransformer<T1, T2> Transformer()
+        {
+            return SymbolicEvaluator.StateTransformer(this.function);
+        }
+
+        /// <summary>
         /// Verify that if the function satisfies the precondition,
         /// then it also satisfies the postcondition.
         /// </summary>

@@ -35,6 +35,11 @@ namespace Microsoft.Research.Zen.Generation
         private static MethodInfo tupleToOptionMethod = typeof(Language).GetMethod("TupleToOption");
 
         /// <summary>
+        /// The arbitrary expressions generated.
+        /// </summary>
+        internal List<object> ArbitraryExpressions { get; } = new List<object>();
+
+        /// <summary>
         /// Maximum length of a list.
         /// </summary>
         private int maxSize;
@@ -52,17 +57,23 @@ namespace Microsoft.Research.Zen.Generation
 
         public object VisitBool()
         {
-            return new ZenArbitraryExpr<bool>();
+            var e = new ZenArbitraryExpr<bool>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitByte()
         {
-            return new ZenArbitraryExpr<byte>();
+            var e = new ZenArbitraryExpr<byte>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitInt()
         {
-            return new ZenArbitraryExpr<int>();
+            var e = new ZenArbitraryExpr<int>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitList(Func<Type, object> recurse, Type listType, Type elementType)
@@ -101,7 +112,9 @@ namespace Microsoft.Research.Zen.Generation
 
         public object VisitLong()
         {
-            return new ZenArbitraryExpr<long>();
+            var e = new ZenArbitraryExpr<long>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, Dictionary<string, Type> fields)
@@ -111,22 +124,30 @@ namespace Microsoft.Research.Zen.Generation
 
         public object VisitShort()
         {
-            return new ZenArbitraryExpr<short>();
+            var e = new ZenArbitraryExpr<short>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitUint()
         {
-            return new ZenArbitraryExpr<uint>();
+            var e = new ZenArbitraryExpr<uint>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitUlong()
         {
-            return new ZenArbitraryExpr<ulong>();
+            var e = new ZenArbitraryExpr<ulong>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitUshort()
         {
-            return new ZenArbitraryExpr<ushort>();
+            var e = new ZenArbitraryExpr<ushort>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public object VisitOption(Func<Type, object> recurse, Type innerType)
