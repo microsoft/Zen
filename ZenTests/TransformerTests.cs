@@ -158,5 +158,18 @@ namespace Microsoft.Research.ZenTests
             Assert.IsTrue(set1.Equals(set2));
             Assert.IsFalse(set1.Equals(2));
         }
+
+        /// <summary>
+        /// Test getting an element for an empty set.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerNoElement()
+        {
+            var f = Function<uint, uint>(i => i + 1);
+            var t = f.Transformer();
+            var emptySet = t.InputSet((x, y) => x + 2 == y);
+
+            Assert.IsFalse(emptySet.Element().HasValue);
+        }
     }
 }
