@@ -6,7 +6,6 @@ namespace Microsoft.Research.ZenTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using static Microsoft.Research.Zen.Language;
@@ -48,6 +47,11 @@ namespace Microsoft.Research.ZenTests
             var set2 = t1.TransformForward(set1);
             var set3 = t2.TransformForward(set2);
             var set4 = t2.OutputSet((b, i) => b);
+
+            Console.WriteLine(set1.Element());
+            Console.WriteLine(set2.Element());
+            Console.WriteLine(set3.Element());
+            Console.WriteLine(set4.Element());
 
             Assert.AreEqual(11U, set3.Element().Value);
             Assert.AreEqual(11U, set4.Element().Value);

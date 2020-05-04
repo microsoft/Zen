@@ -36,14 +36,10 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// </summary>
         /// <param name="manager">The manager object.</param>
         /// <param name="mustInterleave">Variable interleaving data.</param>
-        /// <param name="assignment">The existing assignment.</param>
-        public SolverDD(
-            DDManager<T> manager,
-            Dictionary<object, ImmutableHashSet<object>> mustInterleave,
-            Dictionary<object, Variable<T>> assignment = null)
+        public SolverDD(DDManager<T> manager, Dictionary<object, ImmutableHashSet<object>> mustInterleave)
         {
             this.Manager = manager;
-            this.ExistingAssignment = assignment == null ? new Dictionary<object, Variable<T>>() : assignment;
+            this.ExistingAssignment = new Dictionary<object, Variable<T>>();
 
             foreach (var set in mustInterleave.Values)
             {
@@ -57,37 +53,39 @@ namespace Microsoft.Research.Zen.ModelChecking
 
                 foreach (var elt in set)
                 {
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<byte>))
+                    var type = elt.GetType();
+
+                    if (type == typeof(ZenArbitraryExpr<byte>))
                     {
                         objsByte.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<short>))
+                    if (type == typeof(ZenArbitraryExpr<short>))
                     {
                         objsShort.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<ushort>))
+                    if (type == typeof(ZenArbitraryExpr<ushort>))
                     {
                         objsUshort.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<int>))
+                    if (type == typeof(ZenArbitraryExpr<int>))
                     {
                         objsInt.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<uint>))
+                    if (type == typeof(ZenArbitraryExpr<uint>))
                     {
                         objsUint.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<long>))
+                    if (type == typeof(ZenArbitraryExpr<long>))
                     {
                         objsLong.Add(elt);
                     }
 
-                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<ulong>))
+                    if (type == typeof(ZenArbitraryExpr<ulong>))
                     {
                         objsUlong.Add(elt);
                     }

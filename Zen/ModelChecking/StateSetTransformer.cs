@@ -17,32 +17,34 @@ namespace Microsoft.Research.Zen.ModelChecking
 
         private DD setTransformer;
 
-        private VariableSet<BDDNode> inputVariables;
-
-        private VariableSet<BDDNode> outputVariables;
-
-        private Dictionary<object, Variable<BDDNode>> arbitraryMapping;
-
         private Zen<T1> zenInput;
 
         private Zen<T2> zenOutput;
 
+        private VariableSet<BDDNode> inputVariables;
+
+        private VariableSet<BDDNode> outputVariables;
+
+        private Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues;
+
+        private Dictionary<object, Variable<BDDNode>> arbitraryMapping;
+
         internal StateSetTransformer(
             SolverDD<BDDNode> solver,
             DD setTransformer,
-            VariableSet<BDDNode> inputVariables,
-            VariableSet<BDDNode> outputVariables,
+            (Zen<T1>, VariableSet<BDDNode>) inputAndVariables,
+            (Zen<T2>, VariableSet<BDDNode>) outputAndVariables,
             Dictionary<object, Variable<BDDNode>> arbitraryMapping,
-            Zen<T1> zenInput,
-            Zen<T2> zenOutput)
+            Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues)
         {
             this.solver = solver;
             this.setTransformer = setTransformer;
-            this.inputVariables = inputVariables;
-            this.outputVariables = outputVariables;
+            this.zenInput = inputAndVariables.Item1;
+            this.zenOutput = outputAndVariables.Item1;
+            this.inputVariables = inputAndVariables.Item2;
+            this.outputVariables = outputAndVariables.Item2;
+            this.canonicalValues = canonicalValues;
             this.arbitraryMapping = arbitraryMapping;
-            this.zenInput = zenInput;
-            this.zenOutput = zenOutput;
         }
 
         /// <summary>
@@ -65,7 +67,13 @@ namespace Microsoft.Research.Zen.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
-            return new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables, true);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
+            return ConvertTo(result, this.canonicalValues[typeof(T1)]);
+        }
+
+        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>) conversionData)
+        {
+            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1);
         }
 
         /// <summary>
@@ -87,7 +95,8 @@ namespace Microsoft.Research.Zen.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, inputVariables);
-            return new StateSet<T2>(this.solver, dd, this.arbitraryMapping, this.zenOutput, this.outputVariables, false);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMapping, this.zenOutput, this.outputVariables);
+            return ConvertTo(result, this.canonicalValues[typeof(T2)]);
         }
 
         /// <summary>
@@ -95,11 +104,17 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// </summary>
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
-            input = input.IsInput ? input : input.AlignSetVariables(this.inputVariables, this.zenInput, true);
+            Console.WriteLine($"incoming: {this.solver.Manager.Display(input.Set)}");
+            input = ConvertTo(input, (this.zenInput, this.inputVariables));
+            Console.WriteLine($"convertIn: {this.solver.Manager.Display(input.Set)}");
             DD set = input.Set;
-            DD result = this.solver.Manager.And(set, this.setTransformer);
-            result = this.solver.Manager.Exists(result, this.inputVariables);
-            return new StateSet<T2>(this.solver, result, this.arbitraryMapping, this.zenOutput, this.outputVariables, false);
+            DD dd = this.solver.Manager.And(set, this.setTransformer);
+            dd = this.solver.Manager.Exists(dd, this.inputVariables);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMapping, this.zenOutput, this.outputVariables);
+            Console.WriteLine($"result: {this.solver.Manager.Display(result.Set)}");
+            var res = ConvertTo(result, this.canonicalValues[typeof(T2)]);
+            Console.WriteLine($"convertOut: {this.solver.Manager.Display(res.Set)}");
+            return res;
         }
 
         /// <summary>
@@ -107,11 +122,12 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// </summary>
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
-            output = output.IsInput ? output.AlignSetVariables(this.outputVariables, this.zenOutput, false) : output;
+            output = ConvertTo(output, (this.zenOutput, this.outputVariables));
             DD set = output.Set;
-            DD result = this.solver.Manager.And(set, this.setTransformer);
-            result = this.solver.Manager.Exists(result, this.outputVariables);
-            return new StateSet<T1>(this.solver, result, this.arbitraryMapping, this.zenInput, this.inputVariables, true);
+            DD dd = this.solver.Manager.And(set, this.setTransformer);
+            dd = this.solver.Manager.Exists(dd, this.outputVariables);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
+            return ConvertTo(result, this.canonicalValues[typeof(T1)]);
         }
     }
 }

@@ -24,25 +24,21 @@ namespace Microsoft.Research.Zen.ModelChecking
 
         internal VariableSet<BDDNode> VariableSet { get; }
 
-        internal bool IsInput { get; }
-
         internal StateSet(
             SolverDD<BDDNode> solver,
             DD stateSet,
             Dictionary<object, Variable<BDDNode>> arbitraryMapping,
             Zen<T> zenExpression,
-            VariableSet<BDDNode> variableSet,
-            bool isInput)
+            VariableSet<BDDNode> variableSet)
         {
             this.Solver = solver;
             this.Set = stateSet;
             this.ArbitraryMapping = arbitraryMapping;
             this.ZenExpression = zenExpression;
             this.VariableSet = variableSet;
-            this.IsInput = isInput;
         }
 
-        internal StateSet<T> AlignSetVariables(VariableSet<BDDNode> newVariableSet, Zen<T> newZenExpression, bool input)
+        internal StateSet<T> ConvertSetVariables(VariableSet<BDDNode> newVariableSet, Zen<T> newZenExpression)
         {
             var a1 = this.VariableSet.Variables;
             var a2 = newVariableSet.Variables;
@@ -54,22 +50,7 @@ namespace Microsoft.Research.Zen.ModelChecking
 
             var mapping = this.Solver.Manager.CreateVariableMap(map);
             var x = this.Solver.Manager.Replace(this.Set, mapping);
-            return new StateSet<T>(this.Solver, x, this.ArbitraryMapping, newZenExpression, newVariableSet, input);
-        }
-
-        internal static (StateSet<T>, StateSet<T>) AlignSetVariables(StateSet<T> set1, StateSet<T> set2)
-        {
-            if (set1.IsInput && !set2.IsInput)
-            {
-                return (set1, set2.AlignSetVariables(set1.VariableSet, set1.ZenExpression, true));
-            }
-
-            if (!set1.IsInput && set2.IsInput)
-            {
-                return (set2, set1.AlignSetVariables(set2.VariableSet, set2.ZenExpression, true));
-            }
-
-            return (set1, set2);
+            return new StateSet<T>(this.Solver, x, this.ArbitraryMapping, newZenExpression, newVariableSet);
         }
 
         /// <summary>
@@ -79,9 +60,8 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// <returns>The intersected state set.</returns>
         public StateSet<T> Intersect(StateSet<T> other)
         {
-            var (s1, s2) = AlignSetVariables(this, other);
-            var dd = this.Solver.Manager.And(s1.Set, s2.Set);
-            return new StateSet<T>(s1.Solver, dd, s1.ArbitraryMapping, s1.ZenExpression, s1.VariableSet, s1.IsInput);
+            var dd = this.Solver.Manager.And(this.Set, other.Set);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
@@ -91,9 +71,8 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// <returns>The intersected state set.</returns>
         public StateSet<T> Union(StateSet<T> other)
         {
-            var (s1, s2) = AlignSetVariables(this, other);
-            var dd = this.Solver.Manager.Or(s1.Set, s2.Set);
-            return new StateSet<T>(s1.Solver, dd, s1.ArbitraryMapping, s1.ZenExpression, s1.VariableSet, s1.IsInput);
+            var dd = this.Solver.Manager.Or(this.Set, other.Set);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
@@ -103,7 +82,7 @@ namespace Microsoft.Research.Zen.ModelChecking
         public StateSet<T> Complement()
         {
             var dd = this.Solver.Manager.Not(this.Set);
-            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet, this.IsInput);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
