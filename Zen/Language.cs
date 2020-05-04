@@ -124,8 +124,13 @@ namespace Microsoft.Research.Zen
         /// <returns>Zen value.</returns>
         public static Zen<T> Arbitrary<T>(int listSize = 5, bool checkSmallerLists = true)
         {
-            var visitor = new SymbolicInputGenerator(listSize, checkSmallerLists);
-            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(visitor, typeof(T));
+            var generator = new SymbolicInputGenerator(listSize, checkSmallerLists);
+            return Arbitrary<T>(generator);
+        }
+
+        internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator)
+        {
+            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T));
         }
 
         /// <summary>

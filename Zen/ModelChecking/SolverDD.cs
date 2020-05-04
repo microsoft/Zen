@@ -19,40 +19,31 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// <summary>
         /// Gets the manger object.
         /// </summary>
-        private DDManager<T> Manager { get; }
+        internal DDManager<T> Manager { get; }
 
         /// <summary>
-        /// Allocated manager variables for byte variables.
+        /// All allocated variables.
         /// </summary>
-        private Dictionary<object, VarInt8<T>> Allocated8 { get; }
+        internal List<Variable<T>> Variables { get; } = new List<Variable<T>>();
 
         /// <summary>
-        /// Allocated manager variables for short variables.
+        /// The existing assignment provided.
         /// </summary>
-        private Dictionary<object, VarInt16<T>> Allocated16 { get; }
-
-        /// <summary>
-        /// Allocated manager variables for int variables.
-        /// </summary>
-        private Dictionary<object, VarInt32<T>> Allocated32 { get; }
-
-        /// <summary>
-        /// Allocated manager variables for long variables.
-        /// </summary>
-        private Dictionary<object, VarInt64<T>> Allocated64 { get; }
+        private Dictionary<object, Variable<T>> ExistingAssignment { get; }
 
         /// <summary>
         /// Creates a new instanceof the SolverDD class.
         /// </summary>
         /// <param name="manager">The manager object.</param>
         /// <param name="mustInterleave">Variable interleaving data.</param>
-        public SolverDD(DDManager<T> manager, Dictionary<object, ImmutableHashSet<object>> mustInterleave)
+        /// <param name="assignment">The existing assignment.</param>
+        public SolverDD(
+            DDManager<T> manager,
+            Dictionary<object, ImmutableHashSet<object>> mustInterleave,
+            Dictionary<object, Variable<T>> assignment = null)
         {
             this.Manager = manager;
-            this.Allocated8 = new Dictionary<object, VarInt8<T>>();
-            this.Allocated16 = new Dictionary<object, VarInt16<T>>();
-            this.Allocated32 = new Dictionary<object, VarInt32<T>>();
-            this.Allocated64 = new Dictionary<object, VarInt64<T>>();
+            this.ExistingAssignment = assignment == null ? new Dictionary<object, Variable<T>>() : assignment;
 
             foreach (var set in mustInterleave.Values)
             {
@@ -66,37 +57,37 @@ namespace Microsoft.Research.Zen.ModelChecking
 
                 foreach (var elt in set)
                 {
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<byte>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<byte>))
                     {
                         objsByte.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<short>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<short>))
                     {
                         objsShort.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<ushort>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<ushort>))
                     {
                         objsUshort.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<int>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<int>))
                     {
                         objsInt.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<uint>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<uint>))
                     {
                         objsUint.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<long>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<long>))
                     {
                         objsLong.Add(elt);
                     }
 
-                    if (elt.GetType() == typeof(ZenArbitraryExpr<ulong>))
+                    if (!this.ExistingAssignment.ContainsKey(elt) && elt.GetType() == typeof(ZenArbitraryExpr<ulong>))
                     {
                         objsUlong.Add(elt);
                     }
@@ -105,46 +96,55 @@ namespace Microsoft.Research.Zen.ModelChecking
                 var bytevars = manager.CreateInterleavedInt8(objsByte.Count);
                 for (int i = 0; i < bytevars.Length; i++)
                 {
-                    this.Allocated8[objsByte[i]] = bytevars[i];
+                    this.ExistingAssignment[objsByte[i]] = bytevars[i];
+                    this.Variables.Add(bytevars[i]);
                 }
 
                 var shortvars = manager.CreateInterleavedInt16(objsShort.Count);
                 for (int i = 0; i < shortvars.Length; i++)
                 {
-                    this.Allocated16[objsShort[i]] = shortvars[i];
+                    this.ExistingAssignment[objsShort[i]] = shortvars[i];
+                    this.Variables.Add(shortvars[i]);
                 }
 
                 var ushortvars = manager.CreateInterleavedInt16(objsUshort.Count);
                 for (int i = 0; i < ushortvars.Length; i++)
                 {
-                    this.Allocated16[objsUshort[i]] = ushortvars[i];
+                    this.ExistingAssignment[objsUshort[i]] = ushortvars[i];
+                    this.Variables.Add(ushortvars[i]);
                 }
 
                 var intvars = manager.CreateInterleavedInt32(objsInt.Count);
                 for (int i = 0; i < intvars.Length; i++)
                 {
-                    this.Allocated32[objsInt[i]] = intvars[i];
+                    this.ExistingAssignment[objsInt[i]] = intvars[i];
+                    this.Variables.Add(intvars[i]);
                 }
 
                 var uintvars = manager.CreateInterleavedInt32(objsUint.Count);
                 for (int i = 0; i < uintvars.Length; i++)
                 {
-                    this.Allocated32[objsUint[i]] = uintvars[i];
+                    this.ExistingAssignment[objsUint[i]] = uintvars[i];
+                    this.Variables.Add(uintvars[i]);
                 }
 
                 var longvars = manager.CreateInterleavedInt64(objsLong.Count);
                 for (int i = 0; i < longvars.Length; i++)
                 {
-                    this.Allocated64[objsLong[i]] = longvars[i];
+                    this.ExistingAssignment[objsLong[i]] = longvars[i];
+                    this.Variables.Add(longvars[i]);
                 }
 
                 var ulongvars = manager.CreateInterleavedInt64(objsUlong.Count);
                 for (int i = 0; i < ulongvars.Length; i++)
                 {
-                    this.Allocated64[objsUlong[i]] = ulongvars[i];
+                    this.ExistingAssignment[objsUlong[i]] = ulongvars[i];
+                    this.Variables.Add(ulongvars[i]);
                 }
             }
         }
+
+        public Backend Backend { get; } = Backend.DecisionDiagrams;
 
         public DD False()
         {
@@ -228,15 +228,34 @@ namespace Microsoft.Research.Zen.ModelChecking
 
         public (Variable<T>, DD) CreateBoolVar(object e)
         {
-            var variable = this.Manager.CreateBool();
-            return (variable, variable.Id());
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                var varbool = (VarBool<T>)variable;
+                return (variable, varbool.Id());
+            }
+            else
+            {
+                var varbool = this.Manager.CreateBool();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = varbool;
+                return (varbool, varbool.Id());
+            }
         }
 
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateByteVar(object e)
         {
-            var variable = this.Allocated8.ContainsKey(e) ? this.Allocated8[e] : this.Manager.CreateInt8();
-            return (variable, this.Manager.CreateBitvector(variable));
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+            else
+            {
+                variable = this.Manager.CreateInt8();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = variable;
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
         }
 
         public BitVector<T> CreateByteConst(byte b)
@@ -247,8 +266,17 @@ namespace Microsoft.Research.Zen.ModelChecking
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateShortVar(object e)
         {
-            var variable = this.Allocated16.ContainsKey(e) ? this.Allocated16[e] : this.Manager.CreateInt16();
-            return (variable, this.Manager.CreateBitvector(variable));
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+            else
+            {
+                variable = this.Manager.CreateInt16();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = variable;
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
         }
 
         public BitVector<T> CreateShortConst(short s)
@@ -259,8 +287,17 @@ namespace Microsoft.Research.Zen.ModelChecking
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateIntVar(object e)
         {
-            var variable = this.Allocated32.ContainsKey(e) ? this.Allocated32[e] : this.Manager.CreateInt32();
-            return (variable, this.Manager.CreateBitvector(variable));
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+            else
+            {
+                variable = this.Manager.CreateInt32();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = variable;
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
         }
 
         public BitVector<T> CreateIntConst(int i)
@@ -271,8 +308,17 @@ namespace Microsoft.Research.Zen.ModelChecking
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateLongVar(object e)
         {
-            var variable = this.Allocated64.ContainsKey(e) ? this.Allocated64[e] : this.Manager.CreateInt64();
-            return (variable, this.Manager.CreateBitvector(variable));
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+            else
+            {
+                variable = this.Manager.CreateInt64();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = variable;
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
         }
 
         public BitVector<T> CreateLongConst(long l)

@@ -60,7 +60,7 @@ namespace Microsoft.Research.Zen
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"({this.Expr1} <= {this.Expr2})";
+            return $"({this.Expr1} >= {this.Expr2})";
         }
 
         /// <summary>
