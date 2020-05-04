@@ -14,11 +14,6 @@ namespace Microsoft.Research.Zen.ModelChecking
     public interface ISolver<TModel, TVariable, TBool, TInteger>
     {
         /// <summary>
-        /// The backend the solver implements.
-        /// </summary>
-        Backend Backend { get; }
-
-        /// <summary>
         /// The false expression.
         /// </summary>
         /// <returns>The expression.</returns>

@@ -142,8 +142,6 @@ namespace Microsoft.Research.Zen.ModelChecking
             }
         }
 
-        public Backend Backend { get; } = Backend.DecisionDiagrams;
-
         public DD False()
         {
             return this.Manager.False();

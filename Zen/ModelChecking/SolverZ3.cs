@@ -43,8 +43,6 @@ namespace Microsoft.Research.Zen.ModelChecking
             this.LongSort = this.context.MkBitVecSort(64);
         }
 
-        public Backend Backend { get; } = Backend.Z3;
-
         private Symbol FreshSymbol()
         {
             return this.context.MkSymbol(nextIndex++);

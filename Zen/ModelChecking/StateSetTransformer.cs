@@ -64,11 +64,19 @@ namespace Microsoft.Research.Zen.ModelChecking
                     (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>)expr.Accept(symbolicEvaluator, env);
                 var ddOutput = symbolicResult.Value;
                 set = this.solver.And(set, ddOutput);
+                // Console.WriteLine($"setTransformer: {this.solver.Manager.Display(setTransformer)}");
+                // Console.WriteLine($"ddoutput: {this.solver.Manager.Display(ddOutput)}");
+                // Console.WriteLine($"set: {this.solver.Manager.Display(set)}");
             }
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
             var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
+            // Console.WriteLine($"result: {this.solver.Manager.Display(result.Set)}");
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
+            // Console.WriteLine($"zen: {this.canonicalValues[typeof(T1)].Item1}");
+            // Console.WriteLine($"var: {this.canonicalValues[typeof(T1)].Item2.GetHashCode()}");
+            // Console.WriteLine($"curr: {this.inputVariables.GetHashCode()}");
+            // Console.WriteLine($"res: {this.solver.Manager.Display(res.Set)}");
         }
 
         private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>) conversionData)

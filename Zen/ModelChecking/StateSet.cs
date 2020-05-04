@@ -4,15 +4,15 @@
 
 namespace Microsoft.Research.Zen.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using DecisionDiagrams;
     using Microsoft.Research.Zen.Interpretation;
 
     /// <summary>
     /// An input-output set transformer.
     /// </summary>
-    public class StateSet<T> : IEquatable<StateSet<T>>
+    public class StateSet<T>
     {
         internal SolverDD<BDDNode> Solver { get; }
 
@@ -138,19 +138,10 @@ namespace Microsoft.Research.Zen.ModelChecking
         }
 
         /// <summary>
-        /// Equality between two state sets.
-        /// </summary>
-        /// <param name="other">The other state set.</param>
-        /// <returns>True or false.</returns>
-        public bool Equals(StateSet<T> other)
-        {
-            return this.Set.Equals(other.Set);
-        }
-
-        /// <summary>
         /// Gets the hash code.
         /// </summary>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public override int GetHashCode()
         {
             return this.Set.GetHashCode();

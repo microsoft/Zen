@@ -48,11 +48,6 @@ namespace Microsoft.Research.ZenTests
             var set3 = t2.TransformForward(set2);
             var set4 = t2.OutputSet((b, i) => b);
 
-            Console.WriteLine(set1.Element());
-            Console.WriteLine(set2.Element());
-            Console.WriteLine(set3.Element());
-            Console.WriteLine(set4.Element());
-
             Assert.AreEqual(11U, set3.Element().Value);
             Assert.AreEqual(11U, set4.Element().Value);
         }
@@ -111,6 +106,60 @@ namespace Microsoft.Research.ZenTests
             var set3 = set1.Intersect(set2);
             Assert.AreEqual(set1, set2);
             Assert.AreEqual(9U, set3.Element().Value);
+        }
+
+        /// <summary>
+        /// Test checking if a set is full.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerSetIsFull()
+        {
+            var t = Function<bool, bool>(b => true).Transformer();
+            var set = t.InputSet();
+            Assert.IsTrue(set.IsFull());
+        }
+
+        /// <summary>
+        /// Test checking if a set is full.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerSetIsEmpty()
+        {
+            var t = Function<bool, bool>(b => true).Transformer();
+            var set = t.InputSet().Complement();
+            Assert.IsTrue(set.IsEmpty());
+        }
+
+        /// <summary>
+        /// Test for different types.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerArgTypes()
+        {
+            Assert.IsTrue(Function<bool, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<byte, byte>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<short, short>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<ushort, ushort>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<int, int>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<uint, uint>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<long, long>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<ulong, ulong>(b => true).Transformer().InputSet().IsFull());
+        }
+
+        /// <summary>
+        /// Test state set equality.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerSetEquality()
+        {
+            var t1 = Function<bool, bool>(b => true).Transformer();
+            var t2 = Function<bool, bool>(b => true).Transformer();
+
+            var set1 = t1.InputSet((x, y) => Not(x));
+            var set2 = t2.InputSet((x, y) => Not(x));
+
+            Assert.IsTrue(set1.Equals(set2));
+            Assert.IsFalse(set1.Equals(2));
         }
     }
 }

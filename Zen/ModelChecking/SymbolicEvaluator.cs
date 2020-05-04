@@ -124,20 +124,17 @@ namespace Microsoft.Research.Zen.ModelChecking
 
         public static StateSetTransformer<T1, T2> StateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
         {
-            List<object> arbitrariesForOutput;
-            List<object> arbitrariesForInput;
-
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputGenerator(0, false);
             var input = Language.Arbitrary<T1>(generator);
-            arbitrariesForInput = generator.ArbitraryExpressions;
+            var arbitrariesForInput = generator.ArbitraryExpressions;
 
             var expression = function(input);
 
             // create an arbitrary output value
-            generator = new SymbolicInputGenerator(1, false);
+            generator = new SymbolicInputGenerator(0, false);
             var output = Language.Arbitrary<T2>(generator);
-            arbitrariesForOutput = generator.ArbitraryExpressions;
+            var arbitrariesForOutput = generator.ArbitraryExpressions;
 
             // create an expression relating input and output.
             Zen<bool> newExpression = (expression == output);
@@ -146,6 +143,41 @@ namespace Microsoft.Research.Zen.ModelChecking
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression);
             var solverDD = new SolverDD<BDDNode>(transformerManager, mustInterleave);
+
+            // hack: forces all arbitrary expressions to get evaluated even if not used in the invariant.
+            var arbitraryToVariable = new Dictionary<object, Variable<BDDNode>>();
+            foreach (var arbitrary in arbitrariesForInput)
+            {
+                if (arbitrary is Zen<bool>)
+                {
+                    var (v, _) = solverDD.CreateBoolVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<byte>)
+                {
+                    var (v, _) = solverDD.CreateByteVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<short> || arbitrary is Zen<ushort>)
+                {
+                    var (v, _) = solverDD.CreateShortVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<int> || arbitrary is Zen<uint>)
+                {
+                    var (v, _) = solverDD.CreateIntVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+
+                if (arbitrary is Zen<long> || arbitrary is Zen<long>)
+                {
+                    var (v, _) = solverDD.CreateLongVar(arbitrary);
+                    arbitraryToVariable[arbitrary] = v;
+                }
+            }
 
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solverDD);
@@ -164,19 +196,21 @@ namespace Microsoft.Research.Zen.ModelChecking
 
             foreach (var kv in symbolicEvaluator.ArbitraryVariables)
             {
-                var arbitraryExpr = kv.Key;
-                var variable = kv.Value;
+                arbitraryToVariable[kv.Key] = kv.Value;
+            }
 
-                arbitraryMapping[arbitraryExpr] = variable;
+            foreach (var kv in arbitraryToVariable)
+            {
+                arbitraryMapping[kv.Key] = kv.Value;
 
-                if (outputArbitraryExprs.Contains(arbitraryExpr))
+                if (outputArbitraryExprs.Contains(kv.Key))
                 {
-                    outputVariables.Add(variable);
+                    outputVariables.Add(kv.Value);
                 }
 
-                if (inputArbitraryExprs.Contains(arbitraryExpr))
+                if (inputArbitraryExprs.Contains(kv.Key))
                 {
-                    inputVariables.Add(variable);
+                    inputVariables.Add(kv.Value);
                 }
             }
 
