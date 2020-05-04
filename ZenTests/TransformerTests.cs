@@ -4,7 +4,6 @@
 
 namespace Microsoft.Research.ZenTests
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -83,11 +82,6 @@ namespace Microsoft.Research.ZenTests
             var outputSet = t.TransformForward(inputSet1);
             var inputSet2 = t.TransformBackwards(outputSet);
 
-            Console.WriteLine(inputSet1.Element());
-            Console.WriteLine(outputSet.Element());
-            Console.WriteLine(inputSet2.Element());
-            Console.WriteLine(inputSet2.Intersect(inputSet1.Complement()).Element());
-
             Assert.AreEqual(inputSet1, inputSet2);
         }
 
@@ -104,6 +98,7 @@ namespace Microsoft.Research.ZenTests
             var set1 = t1.InputSet((x, y) => y == 10);
             var set2 = t2.InputSet((x, y) => y == 11);
             var set3 = set1.Intersect(set2);
+
             Assert.AreEqual(set1, set2);
             Assert.AreEqual(9U, set3.Element().Value);
         }
@@ -116,6 +111,7 @@ namespace Microsoft.Research.ZenTests
         {
             var t = Function<bool, bool>(b => true).Transformer();
             var set = t.InputSet();
+
             Assert.IsTrue(set.IsFull());
         }
 
@@ -127,6 +123,7 @@ namespace Microsoft.Research.ZenTests
         {
             var t = Function<bool, bool>(b => true).Transformer();
             var set = t.InputSet().Complement();
+
             Assert.IsTrue(set.IsEmpty());
         }
 
