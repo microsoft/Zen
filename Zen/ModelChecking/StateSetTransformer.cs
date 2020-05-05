@@ -77,11 +77,9 @@ namespace Microsoft.Research.Zen.ModelChecking
             var y = new HashSet<Variable<BDDNode>>(conversionData.Item2.Variables);
             if (x.SetEquals(y))
             {
-                Console.WriteLine($"made it");
                 return sourceStateSet;
             }
 
-            Console.WriteLine($"nope");
             return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1);
         }
 

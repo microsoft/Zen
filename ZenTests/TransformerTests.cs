@@ -5,6 +5,7 @@
 namespace Microsoft.Research.ZenTests
 {
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Research.Zen.ModelChecking;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using static Microsoft.Research.Zen.Language;
