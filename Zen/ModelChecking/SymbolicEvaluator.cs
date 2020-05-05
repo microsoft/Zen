@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen.ModelChecking
+namespace Zen.ModelChecking
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using DecisionDiagrams;
-    using Microsoft.Research.Zen.Generation;
-    using Microsoft.Research.Zen.Interpretation;
+    using Zen.Generation;
+    using Zen.Interpretation;
 
     /// <summary>
     /// Helper class to perform symbolic reasoning.

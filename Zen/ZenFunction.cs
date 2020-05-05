@@ -2,12 +2,12 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen
+namespace Zen
 {
     using System;
-    using Microsoft.Research.Zen.Compilation;
-    using Microsoft.Research.Zen.Interpretation;
-    using Microsoft.Research.Zen.ModelChecking;
+    using Zen.Compilation;
+    using Zen.Interpretation;
+    using Zen.ModelChecking;
 
     /// <summary>
     /// Zen function representation.

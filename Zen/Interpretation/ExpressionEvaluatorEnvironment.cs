@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen.Interpretation
+namespace Zen.Interpretation
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;

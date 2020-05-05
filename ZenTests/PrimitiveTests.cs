@@ -2,15 +2,14 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.ZenTests
+namespace Zen.Tests
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Research.Zen;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using static Microsoft.Research.Zen.Language;
-    using static Microsoft.Research.ZenTests.TestHelper;
+    using Zen;
+    using static Zen.Language;
+    using static Zen.Tests.TestHelper;
 
     /// <summary>
     /// Tests for primitive types.

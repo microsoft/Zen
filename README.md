@@ -12,14 +12,14 @@ Just add the project to your visual studio solution. Nuget package will be avail
 To import the library, add the following line to your file:
 
 ```csharp
-using Microsoft.Research.Zen;
-using static Microsoft.Research.Zen.Language;
+using Zen;
+using static Zen.Language;
 ```
 
 The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can be either concrete or symbolic. As a simple example, consider the following code:
 
 ```csharp
-Zen<int> PerformMath(Zen<int> x, Zen<int> y)
+Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 {
     return 3 * x + y;
 }
@@ -30,7 +30,7 @@ This is a function that takes two Zen parameterx (x and y) that represents an in
 The next step is to create a `ZenFunction`:
 
 ```csharp
-var function = Function<int, int, int>(PerformMath);
+var function = Function<int, int, int>(MultiplyAndAdd);
 ```
 
 Given a `ZenFunction` we can leverage the library to perform multiple tasks. The first is to simply evaluate the function on a collection of inputs:
@@ -45,7 +45,7 @@ To perform verification, we can ask Zen to find us the inputs that leads to some
 var input = function.Find((x, y, result) => And(x >= 0, x <= 10, result == 11)); // input.Value = (0, 11)
 ```
 
-The type of the result in this case will be `Option<int, int>`, which will have a pair of integer inputs that make the expression true if such a pair exists.
+The type of the result in this case will be `Option<(int, int)>`, which will have a pair of integer inputs that make the expression true if such a pair exists.
 
 Finally, Zen can compile the function to generate IL at runtime that executes without a performance penalty.
 

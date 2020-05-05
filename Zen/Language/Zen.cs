@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen
+namespace Zen
 {
-    using Microsoft.Research.Zen.AstTranformations;
+    using Zen.AstTranformations;
 
     /// <summary>
     /// A Zen expression object parameterized over the C# type.

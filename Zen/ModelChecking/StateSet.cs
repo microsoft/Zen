@@ -2,12 +2,12 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen.ModelChecking
+namespace Zen.ModelChecking
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using DecisionDiagrams;
-    using Microsoft.Research.Zen.Interpretation;
+    using Zen.Interpretation;
 
     /// <summary>
     /// An input-output set transformer.

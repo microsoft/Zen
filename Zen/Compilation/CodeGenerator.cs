@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen.Compilation
+namespace Zen.Compilation
 {
     using System;
     using System.Collections.Immutable;

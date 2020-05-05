@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.Zen.ModelChecking
+namespace Zen.ModelChecking
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;

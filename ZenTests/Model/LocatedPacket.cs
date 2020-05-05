@@ -2,11 +2,11 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace Microsoft.Research.ZenTests
+namespace Zen.Tests
 {
     using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Research.Zen;
-    using static Microsoft.Research.Zen.Language;
+    using Zen;
+    using static Zen.Language;
 
     /// <summary>
     /// A packet with a location.
