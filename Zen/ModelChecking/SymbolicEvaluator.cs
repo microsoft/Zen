@@ -6,6 +6,7 @@ namespace Microsoft.Research.Zen.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using DecisionDiagrams;
     using Microsoft.Research.Zen.Generation;
     using Microsoft.Research.Zen.Interpretation;
@@ -15,11 +16,30 @@ namespace Microsoft.Research.Zen.ModelChecking
     /// </summary>
     internal static class SymbolicEvaluator
     {
-        private static DDManager<BDDNode> transformerManager = new DDManager<BDDNode>(new BDDNodeFactory());
+        /// <summary>
+        /// Manager object for building transformers.
+        /// </summary>
+        private static DDManager<BDDNode> transformerManager =
+            new DDManager<BDDNode>(new BDDNodeFactory());
 
-        private static Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues = new Dictionary<Type, (object, VariableSet<BDDNode>)>();
+        /// <summary>
+        /// Canonical variables used for a given type.
+        /// </summary>
+        private static Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues =
+            new Dictionary<Type, (object, VariableSet<BDDNode>)>();
 
-        private static Dictionary<object, Variable<BDDNode>> arbitraryMapping = new Dictionary<object, Variable<BDDNode>>();
+        /// <summary>
+        /// Mapping from arbitrary expression to their assigned variables.
+        /// </summary>
+        private static Dictionary<object, Variable<BDDNode>> arbitraryMapping =
+            new Dictionary<object, Variable<BDDNode>>();
+
+        /// <summary>
+        /// Keep track of, for each type, if there is an output
+        /// of that type that is dependency free.
+        /// </summary>
+        private static Dictionary<Type, VariableSet<BDDNode>> dependencyFreeOutput =
+            new Dictionary<Type, VariableSet<BDDNode>>();
 
         public static bool Find(Zen<bool> expression, Backend backend, bool simplify)
         {
@@ -142,62 +162,63 @@ namespace Microsoft.Research.Zen.ModelChecking
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression);
-            var solverDD = new SolverDD<BDDNode>(transformerManager, mustInterleave);
+            var solver = new SolverDD<BDDNode>(transformerManager, mustInterleave);
+
+            // optimization: if there are no dependencies variable ordering dependencies,
+            // then we can reuse the input variables from the canonical variable case.
+            var maxDependenciesPerType =
+                mustInterleave.Values.Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).Max()).Max();
+
+            bool isDependencyFree = maxDependenciesPerType <= 1;
+            if (isDependencyFree)
+            {
+                if (canonicalValues.TryGetValue(typeof(T1), out var canonicalValue))
+                {
+                    var variablesIn = canonicalValue.Item2.Variables;
+                    for (int i = 0; i < arbitrariesForInput.Count; i++)
+                    {
+                        solver.SetVariable(arbitrariesForInput[i], variablesIn[i]);
+                    }
+                }
+
+                if (dependencyFreeOutput.TryGetValue(typeof(T2), out var variableSet))
+                {
+                    var variablesOut = variableSet.Variables;
+                    for (int i = 0; i < arbitrariesForOutput.Count; i++)
+                    {
+                        solver.SetVariable(arbitrariesForOutput[i], variablesOut[i]);
+                    }
+                }
+            }
+
+            solver.Init();
 
             // hack: forces all arbitrary expressions to get evaluated even if not used in the invariant.
             var arbitraryToVariable = new Dictionary<object, Variable<BDDNode>>();
             foreach (var arbitrary in arbitrariesForInput)
             {
-                if (arbitrary is Zen<bool>)
-                {
-                    var (v, _) = solverDD.CreateBoolVar(arbitrary);
-                    arbitraryToVariable[arbitrary] = v;
-                }
-
-                if (arbitrary is Zen<byte>)
-                {
-                    var (v, _) = solverDD.CreateByteVar(arbitrary);
-                    arbitraryToVariable[arbitrary] = v;
-                }
-
-                if (arbitrary is Zen<short> || arbitrary is Zen<ushort>)
-                {
-                    var (v, _) = solverDD.CreateShortVar(arbitrary);
-                    arbitraryToVariable[arbitrary] = v;
-                }
-
-                if (arbitrary is Zen<int> || arbitrary is Zen<uint>)
-                {
-                    var (v, _) = solverDD.CreateIntVar(arbitrary);
-                    arbitraryToVariable[arbitrary] = v;
-                }
-
-                if (arbitrary is Zen<long> || arbitrary is Zen<long>)
-                {
-                    var (v, _) = solverDD.CreateLongVar(arbitrary);
-                    arbitraryToVariable[arbitrary] = v;
-                }
+                ForceVariableAssignment(solver, arbitraryToVariable, arbitrary);
             }
 
             // get the decision diagram representing the equality.
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solverDD);
+            var symbolicEvaluator =
+                new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solver);
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>();
-            var symbolicResult =
-                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>)newExpression.Accept(symbolicEvaluator, env);
+            var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
+            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>)symbolicValue;
 
             DD result = (DD)(object)symbolicResult.Value;
-
-            // collect information about input and output manager variables
-            var inputArbitraryExprs = new HashSet<object>(arbitrariesForInput);
-            var outputArbitraryExprs = new HashSet<object>(arbitrariesForOutput);
-
-            var inputVariables = new List<Variable<BDDNode>>();
-            var outputVariables = new List<Variable<BDDNode>>();
 
             foreach (var kv in symbolicEvaluator.ArbitraryVariables)
             {
                 arbitraryToVariable[kv.Key] = kv.Value;
             }
+
+            // collect information about input and output manager variables
+            var inputArbitraryExprs = new HashSet<object>(arbitrariesForInput);
+            var outputArbitraryExprs = new HashSet<object>(arbitrariesForOutput);
+            var inputVariables = new List<Variable<BDDNode>>();
+            var outputVariables = new List<Variable<BDDNode>>();
 
             foreach (var kv in arbitraryToVariable)
             {
@@ -215,8 +236,13 @@ namespace Microsoft.Research.Zen.ModelChecking
             }
 
             // create variable sets for easy quantification
-            var inputVariableSet = solverDD.Manager.CreateVariableSet(inputVariables.ToArray());
-            var outputVariableSet = solverDD.Manager.CreateVariableSet(outputVariables.ToArray());
+            var inputVariableSet = solver.Manager.CreateVariableSet(inputVariables.ToArray());
+            var outputVariableSet = solver.Manager.CreateVariableSet(outputVariables.ToArray());
+
+            if (isDependencyFree && !dependencyFreeOutput.ContainsKey(typeof(T2)))
+            {
+                dependencyFreeOutput[typeof(T2)] = outputVariableSet;
+            }
 
             if (!canonicalValues.ContainsKey(typeof(T1)))
             {
@@ -229,12 +255,48 @@ namespace Microsoft.Research.Zen.ModelChecking
             }
 
             return new StateSetTransformer<T1, T2>(
-                solverDD,
+                solver,
                 result,
                 (input, inputVariableSet),
                 (output, outputVariableSet),
                 arbitraryMapping,
                 canonicalValues);
+        }
+
+        private static void ForceVariableAssignment(
+            SolverDD<BDDNode> solver,
+            Dictionary<object, Variable<BDDNode>> zenExprToVariable,
+            object zenExpr)
+        {
+            if (zenExpr is Zen<bool>)
+            {
+                var (v, _) = solver.CreateBoolVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
+
+            if (zenExpr is Zen<byte>)
+            {
+                var (v, _) = solver.CreateByteVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
+
+            if (zenExpr is Zen<short> || zenExpr is Zen<ushort>)
+            {
+                var (v, _) = solver.CreateShortVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
+
+            if (zenExpr is Zen<int> || zenExpr is Zen<uint>)
+            {
+                var (v, _) = solver.CreateIntVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
+
+            if (zenExpr is Zen<long> || zenExpr is Zen<long>)
+            {
+                var (v, _) = solver.CreateLongVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
         }
     }
 }

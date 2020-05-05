@@ -27,6 +27,11 @@ namespace Microsoft.Research.Zen.ModelChecking
         internal List<Variable<T>> Variables { get; } = new List<Variable<T>>();
 
         /// <summary>
+        /// The variable "must interleave" dependencies.
+        /// </summary>
+        private Dictionary<object, ImmutableHashSet<object>> interleavingDependencies { get; }
+
+        /// <summary>
         /// The existing assignment provided.
         /// </summary>
         private Dictionary<object, Variable<T>> ExistingAssignment { get; }
@@ -35,13 +40,20 @@ namespace Microsoft.Research.Zen.ModelChecking
         /// Creates a new instanceof the SolverDD class.
         /// </summary>
         /// <param name="manager">The manager object.</param>
-        /// <param name="mustInterleave">Variable interleaving data.</param>
-        public SolverDD(DDManager<T> manager, Dictionary<object, ImmutableHashSet<object>> mustInterleave)
+        /// <param name="interleavingDependencies">Variable interleaving data.</param>
+        public SolverDD(DDManager<T> manager, Dictionary<object, ImmutableHashSet<object>> interleavingDependencies)
         {
             this.Manager = manager;
             this.ExistingAssignment = new Dictionary<object, Variable<T>>();
+            this.interleavingDependencies = interleavingDependencies;
+        }
 
-            foreach (var set in mustInterleave.Values)
+        /// <summary>
+        /// Initialize the solver.
+        /// </summary>
+        public void Init()
+        {
+            foreach (var set in this.interleavingDependencies.Values)
             {
                 var objsByte = new List<object>();
                 var objsShort = new List<object>();
@@ -91,55 +103,65 @@ namespace Microsoft.Research.Zen.ModelChecking
                     }
                 }
 
-                var bytevars = manager.CreateInterleavedInt8(objsByte.Count);
+                var bytevars = this.Manager.CreateInterleavedInt8(objsByte.Count);
                 for (int i = 0; i < bytevars.Length; i++)
                 {
                     this.ExistingAssignment[objsByte[i]] = bytevars[i];
                     this.Variables.Add(bytevars[i]);
                 }
 
-                var shortvars = manager.CreateInterleavedInt16(objsShort.Count);
+                var shortvars = this.Manager.CreateInterleavedInt16(objsShort.Count);
                 for (int i = 0; i < shortvars.Length; i++)
                 {
                     this.ExistingAssignment[objsShort[i]] = shortvars[i];
                     this.Variables.Add(shortvars[i]);
                 }
 
-                var ushortvars = manager.CreateInterleavedInt16(objsUshort.Count);
+                var ushortvars = this.Manager.CreateInterleavedInt16(objsUshort.Count);
                 for (int i = 0; i < ushortvars.Length; i++)
                 {
                     this.ExistingAssignment[objsUshort[i]] = ushortvars[i];
                     this.Variables.Add(ushortvars[i]);
                 }
 
-                var intvars = manager.CreateInterleavedInt32(objsInt.Count);
+                var intvars = this.Manager.CreateInterleavedInt32(objsInt.Count);
                 for (int i = 0; i < intvars.Length; i++)
                 {
                     this.ExistingAssignment[objsInt[i]] = intvars[i];
                     this.Variables.Add(intvars[i]);
                 }
 
-                var uintvars = manager.CreateInterleavedInt32(objsUint.Count);
+                var uintvars = this.Manager.CreateInterleavedInt32(objsUint.Count);
                 for (int i = 0; i < uintvars.Length; i++)
                 {
                     this.ExistingAssignment[objsUint[i]] = uintvars[i];
                     this.Variables.Add(uintvars[i]);
                 }
 
-                var longvars = manager.CreateInterleavedInt64(objsLong.Count);
+                var longvars = this.Manager.CreateInterleavedInt64(objsLong.Count);
                 for (int i = 0; i < longvars.Length; i++)
                 {
                     this.ExistingAssignment[objsLong[i]] = longvars[i];
                     this.Variables.Add(longvars[i]);
                 }
 
-                var ulongvars = manager.CreateInterleavedInt64(objsUlong.Count);
+                var ulongvars = this.Manager.CreateInterleavedInt64(objsUlong.Count);
                 for (int i = 0; i < ulongvars.Length; i++)
                 {
                     this.ExistingAssignment[objsUlong[i]] = ulongvars[i];
                     this.Variables.Add(ulongvars[i]);
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the variable to use for an arbitrary expression.
+        /// </summary>
+        /// <param name="zenArbitraryExpr">The expression.</param>
+        /// <param name="variable">The decision diagram variable.</param>
+        public void SetVariable(object zenArbitraryExpr, Variable<T> variable)
+        {
+            this.ExistingAssignment[zenArbitraryExpr] = variable;
         }
 
         public DD False()

@@ -39,6 +39,7 @@ namespace Microsoft.Research.Zen.ModelChecking
             var mustInterleave = heuristic.Compute(expression);
             var manager = new DDManager<BDDNode>(new BDDNodeFactory());
             var solver = new SolverDD<BDDNode>(manager, mustInterleave);
+            solver.Init();
             return new ModelChecker<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solver);
         }
 
