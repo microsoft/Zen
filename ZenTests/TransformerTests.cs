@@ -171,5 +171,24 @@ namespace Microsoft.Research.ZenTests
 
             Assert.IsFalse(emptySet.Element().HasValue);
         }
+
+        /// <summary>
+        /// Test a transformer over an object.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerObject()
+        {
+            var f = Function<Packet, bool>(p => And(p.GetDstIp() <= 4, p.GetSrcIp() <= 5));
+            var t = f.Transformer();
+
+            var set = t.InputSet((p, b) => Not(b));
+            Assert.IsFalse(set.Element().Value.DstIp <= 4 && set.Element().Value.SrcIp <= 5);
+
+            var outputSet = t.TransformForward(set);
+            Assert.AreEqual(false, outputSet.Element().Value);
+
+            var inputSet = t.TransformBackwards(outputSet);
+            Assert.IsFalse(set.Element().Value.DstIp <= 4 && set.Element().Value.SrcIp <= 5);
+        }
     }
 }

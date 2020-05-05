@@ -32,6 +32,17 @@ namespace Microsoft.Research.ZenTests
         {
             return $"DstIp={DstIp}, SrcIp={SrcIp}";
         }
+
+        /// <summary>
+        /// Create a packet object.
+        /// </summary>
+        /// <param name="dstIp">The destination IP.</param>
+        /// <param name="srcIp">The source IP.</param>
+        /// <returns>The packet.</returns>
+        public static Zen<Packet> Create(Zen<uint> dstIp, Zen<uint> srcIp)
+        {
+            return Create<Packet>(("DstIp", dstIp), ("SrcIp", srcIp));
+        }
     }
 
     /// <summary>
