@@ -6,7 +6,7 @@
 Zen is a research library that aims to simplify the process of building verification tools. Zen lets users write a single implementation of a function and then execute, compile, and verify that function.
 
 # Installation
-Just add the project to your visual studio solution. Nuget package will be available soon.
+Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
 
 # Getting Started
 To import the library, add the following line to your file:

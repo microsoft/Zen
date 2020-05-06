@@ -9,6 +9,8 @@
     <PackageProjectUrl>https://github.com/microsoft/Zen</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/Zen</RepositoryUrl>
     <Description>A library that simplifies building verification tools in .NET</Description>
+    <PackageTags>zen zenlib constraint solving verification smt binary decision diagrams diagram</PackageTags>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
