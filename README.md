@@ -12,8 +12,8 @@ Just add the project to your visual studio solution. Nuget package will be avail
 To import the library, add the following line to your file:
 
 ```csharp
-using Zen;
-using static Zen.Language;
+using ZenLib;
+using static ZenLib.Language;
 ```
 
 The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can be either concrete or symbolic. As a simple example, consider the following code:
