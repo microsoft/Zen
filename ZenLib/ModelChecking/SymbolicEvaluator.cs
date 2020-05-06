@@ -172,10 +172,8 @@ namespace ZenLib.ModelChecking
             bool isDependencyFree = maxDependenciesPerType <= 1;
             if (isDependencyFree)
             {
-                Console.WriteLine("dep free");
                 if (canonicalValues.TryGetValue(typeof(T1), out var canonicalValue))
                 {
-                    Console.WriteLine("reuse input");
                     var variablesIn = canonicalValue.Item2.Variables;
                     for (int i = 0; i < arbitrariesForInput.Count; i++)
                     {
@@ -185,17 +183,12 @@ namespace ZenLib.ModelChecking
 
                 if (dependencyFreeOutput.TryGetValue(typeof(T2), out var variableSet))
                 {
-                    Console.WriteLine("reuse output");
                     var variablesOut = variableSet.Variables;
                     for (int i = 0; i < arbitrariesForOutput.Count; i++)
                     {
                         solver.SetVariable(arbitrariesForOutput[i], variablesOut[i]);
                     }
                 }
-            }
-            else
-            {
-                Console.WriteLine("NO REUSE");
             }
 
             solver.Init();
