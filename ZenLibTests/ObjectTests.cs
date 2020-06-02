@@ -4,7 +4,9 @@
 
 namespace ZenLib.Tests
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Language;
@@ -931,6 +933,28 @@ namespace ZenLib.Tests
         {
             CheckValid<ObjectField1, int>((o, i) =>
                 o.WithField("Field1", i).GetField<ObjectField1, int>("Field1") == i);
+        }
+
+        /// <summary>
+        /// Test encapsulating a packet.
+        /// </summary>
+        [TestMethod]
+        public void TestPacketEncapsulation()
+        {
+            var encap = Function<IList<Packet>, IList<Packet>>(headers =>
+            {
+                var currentHeader = headers.At(0);
+                var newHeader = currentHeader.Value().WithField<Packet, uint>("DstIp", 5);
+                var newHeaders = headers.AddFront(newHeader);
+                return newHeaders;
+            });
+
+            var input = encap.Find((i, o) => o.At(0).Value().GetDstIp() == 5);
+            Assert.IsTrue(input.HasValue);
+
+            var o = encap.Evaluate(input.Value);
+            Assert.IsTrue(o.Count >= 1);
+            Assert.AreEqual(5U, o.First().DstIp);
         }
 
         /// <summary>

@@ -463,9 +463,14 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (bool)expression.GuardExpr.Accept(this, parameter);
-                var e2 = (T)expression.TrueExpr.Accept(this, parameter);
-                var e3 = (T)expression.FalseExpr.Accept(this, parameter);
-                return e1 ? e2 : e3;
+                if (e1)
+                {
+                    return (T)expression.TrueExpr.Accept(this, parameter);
+                }
+                else
+                {
+                    return (T)expression.FalseExpr.Accept(this, parameter);
+                }
             });
         }
 

@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using ZenLib.Generation;
@@ -1685,13 +1686,6 @@ namespace ZenLib
             return new ZenFunction<T1, T2, T3, T4, T5>(function);
         }
 
-        /// <summary>
-        /// Convert a Zen dictionary to a list.
-        /// </summary>
-        /// <typeparam name="T1">The key type.</typeparam>
-        /// <typeparam name="T2">The value type.</typeparam>
-        /// <param name="expr">The expression.</param>
-        /// <returns>List.</returns>
         private static object DictToList<T1, T2>(object expr)
         {
             var d = (IDictionary<T1, T2>)expr;
@@ -1704,13 +1698,6 @@ namespace ZenLib
             return list;
         }
 
-        /// <summary>
-        /// Convert a list of tuples to a dictionary.
-        /// </summary>
-        /// <typeparam name="T1">The key type.</typeparam>
-        /// <typeparam name="T2">The value type.</typeparam>
-        /// <param name="list">The list.</param>
-        /// <returns>Dictionary.</returns>
         private static object ListToDict<T1, T2>(object list)
         {
             var l = (IList<Tuple<T1, T2>>)list;
@@ -1723,84 +1710,53 @@ namespace ZenLib
             return dict;
         }
 
-        /// <summary>
-        /// Convert an option to a tuple.
-        /// </summary>
-        /// <param name="opt">The option.</param>
-        /// <returns>Tuple.</returns>
         private static object OptionToCustomTuple<T>(object opt)
         {
             var x = (Option<T>)opt;
             return new CustomTuple<bool, T> { Item1 = x.HasValue, Item2 = x.Value };
         }
 
-        /// <summary>
-        /// Convert a tuple to an option.
-        /// </summary>
-        /// <typeparam name="T">The option type.</typeparam>
-        /// <param name="tuple">The tuple.</param>
-        /// <returns>Option.</returns>
         private static object CustomTupleToOption<T>(object tuple)
         {
             var x = (CustomTuple<bool, T>)tuple;
-            return x.Item1 ? Option.Some(x.Item2) : Option.None<T>();
+            return new Option<T>(x.Item1, x.Item2);
         }
 
-        /// <summary>
-        /// Convert a tuple to a custom tuple.
-        /// </summary>
-        /// <param name="tup">The tuple..</param>
-        /// <returns>Custom tuple.</returns>
         private static object TupleToCustomTuple<T1, T2>(object tup)
         {
             var x = (Tuple<T1, T2>)tup;
             return new CustomTuple<T1, T2> { Item1 = x.Item1, Item2 = x.Item2 };
         }
 
-        /// <summary>
-        /// Convert a custom tuple to a tuple.
-        /// </summary>
-        /// <param name="tuple">The tuple.</param>
-        /// <returns>Option.</returns>
         private static object CustomTupleToTuple<T1, T2>(object tuple)
         {
             var x = (CustomTuple<T1, T2>)tuple;
             return new Tuple<T1, T2>(x.Item1, x.Item2);
         }
 
-        /// <summary>
-        /// Convert a Zen tuple to a custom tuple.
-        /// </summary>
-        /// <param name="tup">The tuple.</param>
-        /// <returns>CustomTuple.</returns>
         private static object ValueTupleToCustomTuple<T1, T2>(object tup)
         {
             var x = (ValueTuple<T1, T2>)tup;
             return new CustomTuple<T1, T2> { Item1 = x.Item1, Item2 = x.Item2 };
         }
 
-        /// <summary>
-        /// Convert a custom tuple to a tuple.
-        /// </summary>
-        /// <param name="tuple">The tuple.</param>
-        /// <returns>Option.</returns>
         private static object CustomTupleToValueTuple<T1, T2>(object tuple)
         {
             var x = (CustomTuple<T1, T2>)tuple;
             return new ValueTuple<T1, T2>(x.Item1, x.Item2);
         }
 
-        /// <summary>
-        /// Custom tuple object to simplify backend by converting
-        /// tuple operations to object operations.
-        /// </summary>
-        /// <typeparam name="T1"></typeparam>
-        /// <typeparam name="T2"></typeparam>
         internal class CustomTuple<T1, T2>
         {
             public T1 Item1 { get; set; }
 
             public T2 Item2 { get; set; }
+
+            [ExcludeFromCodeCoverage]
+            public override string ToString()
+            {
+                return $"({this.Item1}, {this.Item2})";
+            }
         }
     }
 }
