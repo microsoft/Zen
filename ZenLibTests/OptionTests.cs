@@ -141,5 +141,20 @@ namespace ZenLib.Tests
             Assert.AreEqual(1, o1.ValueOr(3));
             Assert.AreEqual(3, o2.ValueOr(3));
         }
+
+        /// <summary>
+        /// Test non-null default.
+        /// </summary>
+        [TestMethod]
+        public void TestOptionDefault()
+        {
+            var f = Function(() =>
+            {
+                var x = Null<Packet>();
+                return x.Value();
+            });
+
+            Assert.AreEqual(0U, f.Evaluate(false).DstIp);
+        }
     }
 }
