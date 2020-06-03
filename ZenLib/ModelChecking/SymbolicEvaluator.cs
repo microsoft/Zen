@@ -58,6 +58,7 @@ namespace ZenLib.ModelChecking
             expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
             var assignment = modelChecker.ModelCheck(expression);
+            Console.WriteLine($"made the ast");
 
             if (assignment == null)
             {

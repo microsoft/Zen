@@ -151,11 +151,17 @@ namespace ZenLib.ModelChecking
         public BoolExpr Ite(BoolExpr g, BoolExpr t, BoolExpr f)
         {
             return (BoolExpr)this.context.MkITE(g, t, f);
+            /* var v = (BoolExpr)this.context.MkConst(FreshSymbol(), t.Sort);
+            this.solver.Assert(this.context.MkEq(v, this.context.MkITE(g, t, f)));
+            return v; */
         }
 
         public BitVecExpr Ite(BoolExpr g, BitVecExpr t, BitVecExpr f)
         {
             return (BitVecExpr)this.context.MkITE(g, t, f);
+            /* var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), t.Sort);
+            this.solver.Assert(this.context.MkEq(v, (BitVecExpr)this.context.MkITE(g, t, f)));
+            return v; */
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)

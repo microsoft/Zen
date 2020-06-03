@@ -13,10 +13,25 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenAndExpr : Zen<bool>
     {
-        private static Dictionary<(object, object), ZenAndExpr> hashConsTable =
-            new Dictionary<(object, object), ZenAndExpr>();
+        private static Dictionary<(object, object), Zen<bool>> hashConsTable =
+            new Dictionary<(object, object), Zen<bool>>();
 
-        public static ZenAndExpr Create(Zen<bool> expr1, Zen<bool> expr2)
+        private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
+        {
+            if (e1 is ZenConstantBoolExpr x)
+            {
+                return (x.Value ? e2 : e1);
+            }
+
+            if (e2 is ZenConstantBoolExpr y)
+            {
+                return (y.Value ? e1 : e2);
+            }
+
+            return ZenAndExpr.Create(e1, e2);
+        }
+
+        public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -26,7 +41,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenAndExpr(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
