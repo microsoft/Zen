@@ -399,23 +399,5 @@ namespace ZenLib.ModelChecking
 
             return Option.Some(m);
         }
-
-        public BitVector<T> Max(BitVector<T> x, BitVector<T> y, bool signed)
-        {
-            var geq = signed ?
-                this.Manager.GreaterOrEqualSigned(x, y) :
-                this.Manager.GreaterOrEqual(x, y);
-
-            return this.Manager.Ite(geq, x, y);
-        }
-
-        public BitVector<T> Min(BitVector<T> x, BitVector<T> y, bool signed)
-        {
-            var leq = signed ?
-                this.Manager.LessOrEqualSigned(x, y) :
-                this.Manager.LessOrEqual(x, y);
-
-            return this.Manager.Ite(leq, x, y);
-        }
     }
 }

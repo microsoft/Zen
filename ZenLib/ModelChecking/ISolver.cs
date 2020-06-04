@@ -109,24 +109,6 @@ namespace ZenLib.ModelChecking
         TBool Or(TBool x, TBool y);
 
         /// <summary>
-        /// The 'Max' of two expressions.
-        /// </summary>
-        /// <param name="x">The first expression.</param>
-        /// <param name="y">The second expression.</param>
-        /// <param name="signed">Whether the integers are signed.</param>
-        /// <returns></returns>
-        TInteger Max(TInteger x, TInteger y, bool signed);
-
-        /// <summary>
-        /// The 'Max' of two expressions.
-        /// </summary>
-        /// <param name="x">The first expression.</param>
-        /// <param name="y">The second expression.</param>
-        /// <param name="signed">Whether the integers are signed.</param>
-        /// <returns></returns>
-        TInteger Min(TInteger x, TInteger y, bool signed);
-
-        /// <summary>
         /// The 'Not' of an expression.
         /// </summary>
         /// <param name="x">The first expression.</param>

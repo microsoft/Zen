@@ -180,22 +180,6 @@ namespace ZenLib
         TReturn VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a MaxExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenMaxExpr<T>(ZenMaxExpr<T> expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a MinExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenMinExpr<T>(ZenMinExpr<T> expression, TParam parameter);
-
-        /// <summary>
         /// Visit an EmptyListExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

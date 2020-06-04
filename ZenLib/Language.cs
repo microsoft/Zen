@@ -597,7 +597,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<byte>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -611,7 +611,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<short>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -625,7 +625,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<ushort>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -639,7 +639,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<int>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<uint>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -667,7 +667,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<long>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -681,7 +681,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMaxExpr<ulong>.Create(expr1, expr2);
+            return If(expr1 >= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -695,7 +695,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<byte>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -709,7 +709,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<short>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -723,7 +723,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<ushort>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -737,7 +737,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<int>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -751,7 +751,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<uint>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -765,7 +765,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<long>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>
@@ -779,7 +779,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinExpr<ulong>.Create(expr1, expr2);
+            return If(expr1 <= expr2, expr1, expr2);
         }
 
         /// <summary>

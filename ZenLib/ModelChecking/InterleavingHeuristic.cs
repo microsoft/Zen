@@ -109,26 +109,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenMaxExpr<T>(ZenMaxExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenMinExpr<T>(ZenMinExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                return x.Union(y);
-            });
-        }
-
         public ImmutableHashSet<object> VisitZenNotExpr(ZenNotExpr expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
