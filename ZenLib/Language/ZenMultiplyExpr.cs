@@ -13,10 +13,40 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenMultiplyExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object), ZenMultiplyExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenMultiplyExpr<T>>();
+        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
 
-        public static ZenMultiplyExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        public static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+
+            Console.WriteLine($"x: {x}, {e1}");
+            Console.WriteLine($"y: {y}. {e2}");
+
+            if (x.HasValue && y.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(x.Value * y.Value);
+            }
+
+            if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(0);
+            }
+
+            if (x.HasValue && x.Value == 1)
+            {
+                return e2;
+            }
+
+            if (y.HasValue && y.Value == 1)
+            {
+                return e1;
+            }
+
+            return new ZenMultiplyExpr<T>(e1, e2);
+        }
+
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -28,7 +58,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenMultiplyExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }

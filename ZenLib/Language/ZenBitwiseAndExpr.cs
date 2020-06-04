@@ -16,39 +16,12 @@ namespace ZenLib
 
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
         {
-            if (e1 is ZenConstantByteExpr xb && e2 is ZenConstantByteExpr yb)
-            {
-                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)(xb.Value & yb.Value));
-            }
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
-            if (e1 is ZenConstantShortExpr xs && e2 is ZenConstantShortExpr ys)
+            if (x.HasValue && y.HasValue)
             {
-                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)(xs.Value & ys.Value));
-            }
-
-            if (e1 is ZenConstantUshortExpr xus && e2 is ZenConstantUshortExpr yus)
-            {
-                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)(xus.Value & yus.Value));
-            }
-
-            if (e1 is ZenConstantIntExpr xi && e2 is ZenConstantIntExpr yi)
-            {
-                return (Zen<T>)(object)ZenConstantIntExpr.Create(xi.Value & yi.Value);
-            }
-
-            if (e1 is ZenConstantUintExpr xui && e2 is ZenConstantUintExpr yui)
-            {
-                return (Zen<T>)(object)ZenConstantUintExpr.Create(xui.Value & yui.Value);
-            }
-
-            if (e1 is ZenConstantLongExpr xl && e2 is ZenConstantLongExpr yl)
-            {
-                return (Zen<T>)(object)ZenConstantLongExpr.Create(xl.Value & yl.Value);
-            }
-
-            if (e1 is ZenConstantUlongExpr xul && e2 is ZenConstantUlongExpr yul)
-            {
-                return (Zen<T>)(object)ZenConstantUlongExpr.Create(xul.Value & yul.Value);
+                return ReflectionUtilities.CreateConstantValue<T>(x.Value & y.Value);
             }
 
             return new ZenBitwiseAndExpr<T>(e1, e2);

@@ -131,34 +131,9 @@ namespace ZenLib.Interpretation
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) & (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) & (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) & (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) & (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) & (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) & (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) & (ulong)expression.Expr2.Accept(this, parameter);
+                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
+                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
+                return ReflectionUtilities.Specialize<T>(x & y);
             });
         }
 
@@ -172,34 +147,8 @@ namespace ZenLib.Interpretation
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)~(byte)expression.Expr.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)~(short)expression.Expr.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)~(ushort)expression.Expr.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return ~(int)expression.Expr.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return ~(uint)expression.Expr.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return ~(long)expression.Expr.Accept(this, parameter);
-                }
-
-                return ~(ulong)expression.Expr.Accept(this, parameter);
+                var x = ReflectionUtilities.ToLong(expression.Expr.Accept(this, parameter));
+                return ReflectionUtilities.Specialize<T>(~x);
             });
         }
 
@@ -213,34 +162,9 @@ namespace ZenLib.Interpretation
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) | (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) | (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) | (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) | (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) | (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) | (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) | (ulong)expression.Expr2.Accept(this, parameter);
+                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
+                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
+                return ReflectionUtilities.Specialize<T>(x | y);
             });
         }
 
@@ -254,34 +178,9 @@ namespace ZenLib.Interpretation
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) ^ (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) ^ (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) ^ (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) ^ (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) ^ (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) ^ (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) ^ (ulong)expression.Expr2.Accept(this, parameter);
+                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
+                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
+                return ReflectionUtilities.Specialize<T>(x ^ y);
             });
         }
 
@@ -381,14 +280,8 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (bool)expression.GuardExpr.Accept(this, parameter);
-                if (e1)
-                {
-                    return (T)expression.TrueExpr.Accept(this, parameter);
-                }
-                else
-                {
-                    return (T)expression.FalseExpr.Accept(this, parameter);
-                }
+                var branch = e1 ? expression.TrueExpr : expression.FalseExpr;
+                return (T)branch.Accept(this, parameter);
             });
         }
 

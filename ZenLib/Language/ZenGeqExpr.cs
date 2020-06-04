@@ -16,39 +16,12 @@ namespace ZenLib
 
         private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2)
         {
-            if (e1 is ZenConstantByteExpr xb && e2 is ZenConstantByteExpr yb)
-            {
-                return xb.Value >= yb.Value;
-            }
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
-            if (e1 is ZenConstantShortExpr xs && e2 is ZenConstantShortExpr ys)
+            if (x.HasValue && y.HasValue)
             {
-                return xs.Value >= ys.Value;
-            }
-
-            if (e1 is ZenConstantUshortExpr xus && e2 is ZenConstantUshortExpr yus)
-            {
-                return xus.Value >= yus.Value;
-            }
-
-            if (e1 is ZenConstantIntExpr xi && e2 is ZenConstantIntExpr yi)
-            {
-                return xi.Value >= yi.Value;
-            }
-
-            if (e1 is ZenConstantUintExpr xui && e2 is ZenConstantUintExpr yui)
-            {
-                return xui.Value >= yui.Value;
-            }
-
-            if (e1 is ZenConstantLongExpr xl && e2 is ZenConstantLongExpr yl)
-            {
-                return xl.Value >= yl.Value;
-            }
-
-            if (e1 is ZenConstantUlongExpr xul && e2 is ZenConstantUlongExpr yul)
-            {
-                return xul.Value >= yul.Value;
+                return ReflectionUtilities.CreateConstantValue<bool>(x.Value >= y.Value ? 1L : 0L);
             }
 
             return new ZenGeqExpr<T>(e1, e2);

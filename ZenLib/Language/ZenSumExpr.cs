@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -13,10 +12,32 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSumExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object), ZenSumExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenSumExpr<T>>();
+        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
 
-        public static ZenSumExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        public static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+
+            if (x.HasValue && y.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(x.Value + y.Value);
+            }
+
+            if (x.HasValue && x.Value == 0)
+            {
+                return e2;
+            }
+
+            if (y.HasValue && y.Value == 0)
+            {
+                return e1;
+            }
+
+            return new ZenSumExpr<T>(e1, e2);
+        }
+
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -28,7 +49,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenSumExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }

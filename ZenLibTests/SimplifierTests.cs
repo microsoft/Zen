@@ -143,6 +143,40 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for addition.
+        /// </summary>
+        [TestMethod]
+        public void TestAdditionSimplification()
+        {
+            Assert.AreEqual((Byte(1) + Byte(0)), Byte(1));
+            Assert.AreEqual((Byte(0) + Byte(1)), Byte(1));
+            CheckValid<byte>(x => x + 0 == x);
+            CheckValid<byte>(x => 0 + x == x);
+        }
+
+        /// <summary>
+        /// Simplify for subtraction.
+        /// </summary>
+        [TestMethod]
+        public void TestMinusSimplification()
+        {
+            Assert.AreEqual((Byte(1) - Byte(0)), Byte(1));
+        }
+
+        /// <summary>
+        /// Simplify for multiplication.
+        /// </summary>
+        [TestMethod]
+        public void TestMultiplicationSimplification()
+        {
+            Assert.AreEqual((Byte(2) * Byte(2)), Byte(4));
+            CheckValid<byte>(x => x * 1 == x);
+            CheckValid<byte>(x => 1 * x == x);
+            CheckValid<byte>(x => x * 0 == 0);
+            CheckValid<byte>(x => 0 * x == 0);
+        }
+
+        /// <summary>
         /// Simplify if conditions.
         /// </summary>
         [TestMethod]

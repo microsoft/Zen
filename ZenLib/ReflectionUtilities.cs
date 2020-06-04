@@ -378,100 +378,6 @@ namespace ZenLib
         /// <returns>A value.</returns>
         public static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
         {
-            /* if (type == BoolType)
-            {
-                return visitor.VisitBool();
-            }
-
-            if (type == ByteType)
-            {
-                return visitor.VisitByte();
-            }
-
-            if (type == ShortType)
-            {
-                return visitor.VisitShort();
-            }
-
-            if (type == UshortType)
-            {
-                return visitor.VisitUshort();
-            }
-
-            if (type == IntType)
-            {
-                return visitor.VisitInt();
-            }
-
-            if (type == UintType)
-            {
-                return visitor.VisitUint();
-            }
-
-            if (type == LongType)
-            {
-                return visitor.VisitLong();
-            }
-
-            if (type == UlongType)
-            {
-                return visitor.VisitUlong();
-            }
-
-            if (IsOptionType(type))
-            {
-                var t = type.GetGenericArguments()[0];
-                return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), t);
-            }
-
-            if (IsTupleType(type))
-            {
-                var tleft = type.GetGenericArguments()[0];
-                var tright = type.GetGenericArguments()[1];
-                return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
-            }
-
-            if (IsValueTupleType(type))
-            {
-                var tleft = type.GetGenericArguments()[0];
-                var tright = type.GetGenericArguments()[1];
-                return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
-            }
-
-            if (IsIListType(type))
-            {
-                var t = type.GetGenericArguments()[0];
-                return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
-            }
-
-            if (IsIDictionaryType(type))
-            {
-                var args = type.GetGenericArguments();
-                var tkey = args[0];
-                var tvalue = args[1];
-                return visitor.VisitDictionary(ty => ApplyTypeVisitor(visitor, ty), type, tkey, tvalue);
-            }
-
-            if (IsListType(type) || IsDictionaryType(type))
-            {
-                throw new InvalidOperationException($"Unsupported object field type: {type}");
-            }
-
-            // some class or struct
-            var dict = new Dictionary<string, Type>();
-
-            foreach (var field in GetAllFields(type))
-            {
-                dict[field.Name] = field.FieldType;
-            }
-
-            foreach (var property in GetAllProperties(type))
-            {
-                dict[property.Name] = property.PropertyType;
-            }
-
-            return visitor.VisitObject(t => ApplyTypeVisitor(visitor, t), type, dict); */
-
             if (type == BoolType)
             {
                 return visitor.VisitBool();
@@ -565,6 +471,169 @@ namespace ZenLib
             }
 
             return visitor.VisitObject(t => ApplyTypeVisitor(visitor, t), type, dict);
+        }
+
+        /// <summary>
+        /// Get an integer value as a long.
+        /// </summary>
+        /// <typeparam name="T">The integer gype.</typeparam>
+        /// <param name="value">The Zen integer value.</param>
+        /// <returns>A long.</returns>
+        public static long? GetConstantIntegerValue<T>(Zen<T> value)
+        {
+            if (value is ZenConstantByteExpr xb)
+            {
+                return xb.Value;
+            }
+
+            if (value is ZenConstantShortExpr xs)
+            {
+                return xs.Value;
+            }
+
+            if (value is ZenConstantUshortExpr xus)
+            {
+                return xus.Value;
+            }
+
+            if (value is ZenConstantIntExpr xi)
+            {
+                return xi.Value;
+            }
+
+            if (value is ZenConstantUintExpr xui)
+            {
+                return xui.Value;
+            }
+
+            if (value is ZenConstantLongExpr xl)
+            {
+                return xl.Value;
+            }
+
+            if (value is ZenConstantUlongExpr xul)
+            {
+                return (long?)xul.Value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Create a constant Zen integer value.
+        /// </summary>
+        /// <typeparam name="T">The integer gype.</typeparam>
+        /// <param name="value">The Zen integer value.</param>
+        /// <returns>A long.</returns>
+        public static Zen<T> CreateConstantValue<T>(long value)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BoolType)
+            {
+                return (Zen<T>)(object)(value == 0L ? Language.False() : Language.True());
+            }
+            if (type == ReflectionUtilities.ByteType)
+            {
+                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)value);
+            }
+            if (type == ReflectionUtilities.ShortType)
+            {
+                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)value);
+            }
+            if (type == ReflectionUtilities.UshortType)
+            {
+                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)value);
+            }
+            if (type == ReflectionUtilities.IntType)
+            {
+                return (Zen<T>)(object)ZenConstantIntExpr.Create((int)value);
+            }
+            if (type == ReflectionUtilities.UintType)
+            {
+                return (Zen<T>)(object)ZenConstantUintExpr.Create((uint)value);
+            }
+            if (type == ReflectionUtilities.LongType)
+            {
+                return (Zen<T>)(object)ZenConstantLongExpr.Create(value);
+            }
+
+            return (Zen<T>)(object)ZenConstantUlongExpr.Create((ulong)value);
+        }
+
+        /// <summary>
+        /// Specialize a long to a particular type.
+        /// </summary>
+        /// <typeparam name="T">The result type.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns>The result.</returns>
+        public static object Specialize<T>(long value)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.ByteType)
+            {
+                return (byte)value;
+            }
+            if (type == ReflectionUtilities.ShortType)
+            {
+                return (short)value;
+            }
+            if (type == ReflectionUtilities.UshortType)
+            {
+                return (ushort)value;
+            }
+            if (type == ReflectionUtilities.IntType)
+            {
+                return (int)value;
+            }
+            if (type == ReflectionUtilities.UintType)
+            {
+                return (uint)value;
+            }
+            if (type == ReflectionUtilities.LongType)
+            {
+                return (long)value;
+            }
+
+            return (ulong)value;
+        }
+
+        /// <summary>
+        /// Specialize a long to a particular type.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The result.</returns>
+        public static long ToLong(object value)
+        {
+            var type = value.GetType();
+
+            if (type == ReflectionUtilities.ByteType)
+            {
+                return (byte)value;
+            }
+            if (type == ReflectionUtilities.ShortType)
+            {
+                return (short)value;
+            }
+            if (type == ReflectionUtilities.UshortType)
+            {
+                return (ushort)value;
+            }
+            if (type == ReflectionUtilities.IntType)
+            {
+                return (int)value;
+            }
+            if (type == ReflectionUtilities.UintType)
+            {
+                return (uint)value;
+            }
+            if (type == ReflectionUtilities.LongType)
+            {
+                return (long)value;
+            }
+
+            return (long)(ulong)value;
         }
     }
 }

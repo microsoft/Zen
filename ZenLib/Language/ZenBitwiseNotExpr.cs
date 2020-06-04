@@ -16,39 +16,16 @@ namespace ZenLib
 
         private static Zen<T> Simplify(Zen<T> e)
         {
-            if (e is ZenConstantByteExpr xb)
+            var x = ReflectionUtilities.GetConstantIntegerValue(e);
+
+            if (x.HasValue)
             {
-                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)(~xb.Value));
+                return ReflectionUtilities.CreateConstantValue<T>(~x.Value);
             }
 
-            if (e is ZenConstantShortExpr xs)
+            if (e is ZenBitwiseNotExpr<T> y)
             {
-                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)(~xs.Value));
-            }
-
-            if (e is ZenConstantUshortExpr xus)
-            {
-                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)(~xus.Value));
-            }
-
-            if (e is ZenConstantIntExpr xi)
-            {
-                return (Zen<T>)(object)ZenConstantIntExpr.Create(~xi.Value);
-            }
-
-            if (e is ZenConstantUintExpr xui)
-            {
-                return (Zen<T>)(object)ZenConstantUintExpr.Create(~xui.Value);
-            }
-
-            if (e is ZenConstantLongExpr xl)
-            {
-                return (Zen<T>)(object)ZenConstantLongExpr.Create(~xl.Value);
-            }
-
-            if (e is ZenConstantUlongExpr xul)
-            {
-                return (Zen<T>)(object)ZenConstantUlongExpr.Create(~xul.Value);
+                return y.Expr;
             }
 
             return new ZenBitwiseNotExpr<T>(e);
