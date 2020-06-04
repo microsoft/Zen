@@ -246,38 +246,6 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert a 'Max' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenMaxExpr<T>(ZenMaxExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var left = expression.Expr1.Accept(this, parameter);
-                var right = expression.Expr2.Accept(this, parameter);
-                return Expression.Condition(Expression.GreaterThanOrEqual(left, right), left, right);
-            });
-        }
-
-        /// <summary>
-        /// Convert a 'Min' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenMinExpr<T>(ZenMinExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var left = expression.Expr1.Accept(this, parameter);
-                var right = expression.Expr2.Accept(this, parameter);
-                return Expression.Condition(Expression.LessThanOrEqual(left, right), left, right);
-            });
-        }
-
-        /// <summary>
         /// Convert a 'BoolConstant' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>

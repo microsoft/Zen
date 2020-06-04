@@ -12,10 +12,26 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenBitwiseNotExpr<T> : Zen<T>
     {
-        private static Dictionary<object, ZenBitwiseNotExpr<T>> hashConsTable =
-            new Dictionary<object, ZenBitwiseNotExpr<T>>();
+        private static Dictionary<object, Zen<T>> hashConsTable = new Dictionary<object, Zen<T>>();
 
-        public static ZenBitwiseNotExpr<T> Create(Zen<T> expr)
+        private static Zen<T> Simplify(Zen<T> e)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e);
+
+            if (x.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(~x.Value);
+            }
+
+            if (e is ZenBitwiseNotExpr<T> y)
+            {
+                return y.Expr;
+            }
+
+            return new ZenBitwiseNotExpr<T>(e);
+        }
+
+        public static Zen<T> Create(Zen<T> expr)
         {
             CommonUtilities.Validate(expr);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
@@ -25,7 +41,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenBitwiseNotExpr<T>(expr);
+            var ret = Simplify(expr);
             hashConsTable[expr] = ret;
             return ret;
         }
@@ -65,16 +81,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenBitwiseNotExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenBitwiseNotExpr(this);
         }
     }
 }

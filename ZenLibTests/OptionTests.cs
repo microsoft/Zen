@@ -154,7 +154,7 @@ namespace ZenLib.Tests
                 return x.Value();
             });
 
-            Assert.AreEqual(0U, f.Evaluate(false).DstIp);
+            Assert.AreEqual(0U, f.Evaluate().DstIp);
         }
     }
 }

@@ -268,12 +268,12 @@ namespace ZenLib.Tests
         public void TestIntegerBitwiseNot()
         {
             Repeat(x => CheckAgreement<byte>(a => BitwiseNot(a) == x));
-            /* Repeat(x => CheckAgreement<short>(a => BitwiseNot(a) == x));
+            Repeat(x => CheckAgreement<short>(a => BitwiseNot(a) == x));
             Repeat(x => CheckAgreement<ushort>(a => BitwiseNot(a) == x));
             Repeat(x => CheckAgreement<int>(a => BitwiseNot(a) == x));
             Repeat(x => CheckAgreement<uint>(a => BitwiseNot(a) == x));
             Repeat(x => CheckAgreement<long>(a => BitwiseNot(a) == x));
-            Repeat(x => CheckAgreement<ulong>(a => BitwiseNot(a) == x)); */
+            Repeat(x => CheckAgreement<ulong>(a => BitwiseNot(a) == x));
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace ZenLib
         /// <param name="value"></param>
         public static implicit operator Func<T>(ZenFunction<T> value)
         {
-            return () => value.Evaluate(true);
+            return () => value.Evaluate();
         }
 
         internal ZenFunction(Func<Zen<T>> function)
@@ -36,16 +36,15 @@ namespace ZenLib
         /// <summary>
         /// Evaluate the function against a value.
         /// </summary>
-        /// <param name="simplify">Whether to simplify first.</param>
         /// <returns>Result.</returns>
-        public T Evaluate(bool simplify = true)
+        public T Evaluate()
         {
             if (compiledFunction != null)
             {
                 return compiledFunction();
             }
 
-            return Interpreter.Run(this.function, simplify);
+            return Interpreter.Run(this.function);
         }
 
         /// <summary>
@@ -69,13 +68,12 @@ namespace ZenLib
         /// then it also satisfies the postcondition.
         /// </summary>
         /// <param name="invariant">The invariant.</param>
-        /// <param name="simplify">Whether to simplify the expression.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
-        public bool Assert(Func<Zen<T>, Zen<bool>> invariant = null, bool simplify = true, Backend backend = Backend.Z3)
+        public bool Assert(Func<Zen<T>, Zen<bool>> invariant = null, Backend backend = Backend.Z3)
         {
             var result = invariant(this.function());
-            return SymbolicEvaluator.Find(result, backend, simplify);
+            return SymbolicEvaluator.Find(result, backend);
         }
     }
 
@@ -96,7 +94,7 @@ namespace ZenLib
         /// <param name="value"></param>
         public static implicit operator Func<T1, T2>(ZenFunction<T1, T2> value)
         {
-            return (v) => value.Evaluate(v, true);
+            return (v) => value.Evaluate(v);
         }
 
         internal ZenFunction(Func<Zen<T1>, Zen<T2>> function)
@@ -108,16 +106,15 @@ namespace ZenLib
         /// Evaluate the function against a value.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="simplify">Whether to simplify first.</param>
         /// <returns>Result.</returns>
-        public T2 Evaluate(T1 value, bool simplify = true)
+        public T2 Evaluate(T1 value)
         {
             if (compiledFunction != null)
             {
                 return compiledFunction(value);
             }
 
-            return Interpreter.Run(this.function, value, simplify);
+            return Interpreter.Run(this.function, value);
         }
 
         /// <summary>
@@ -153,7 +150,6 @@ namespace ZenLib
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
         /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
-        /// <param name="simplify">Whether to simplify the expression first.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<T1> Find(
@@ -161,12 +157,11 @@ namespace ZenLib
             Zen<T1> input = null,
             int listSize = 5,
             bool checkSmallerLists = true,
-            bool simplify = true,
             Backend backend = Backend.Z3)
         {
             input = (input is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input;
             var result = invariant(input, this.function(input));
-            return SymbolicEvaluator.Find(result, input, backend, simplify);
+            return SymbolicEvaluator.Find(result, input, backend);
         }
     }
 
@@ -188,7 +183,7 @@ namespace ZenLib
         /// <param name="value"></param>
         public static implicit operator Func<T1, T2, T3>(ZenFunction<T1, T2, T3> value)
         {
-            return (v1, v2) => value.Evaluate(v1, v2, true);
+            return (v1, v2) => value.Evaluate(v1, v2);
         }
 
         internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
@@ -201,16 +196,15 @@ namespace ZenLib
         /// </summary>
         /// <param name="value1">The first value.</param>
         /// <param name="value2">The second value.</param>
-        /// <param name="simplify">Whether to simplify first.</param>
         /// <returns>Result.</returns>
-        public T3 Evaluate(T1 value1, T2 value2, bool simplify = true)
+        public T3 Evaluate(T1 value1, T2 value2)
         {
             if (compiledFunction != null)
             {
                 return compiledFunction(value1, value2);
             }
 
-            return Interpreter.Run(this.function, value1, value2, simplify);
+            return Interpreter.Run(this.function, value1, value2);
         }
 
         /// <summary>
@@ -238,7 +232,6 @@ namespace ZenLib
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="listSize">The depth bound for any given object.</param>
         /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
-        /// <param name="simplify">Whether to simplify the expression first.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2)> Find(
@@ -247,13 +240,12 @@ namespace ZenLib
             Zen<T2> input2 = null,
             int listSize = 5,
             bool checkSmallerLists = true,
-            bool simplify = true,
             Backend backend = Backend.Z3)
         {
             input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
             input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
             var result = invariant(input1, input2, this.function(input1, input2));
-            return SymbolicEvaluator.Find(result, input1, input2, backend, simplify);
+            return SymbolicEvaluator.Find(result, input1, input2, backend);
         }
     }
 
@@ -276,7 +268,7 @@ namespace ZenLib
         /// <param name="value"></param>
         public static implicit operator Func<T1, T2, T3, T4>(ZenFunction<T1, T2, T3, T4> value)
         {
-            return (v1, v2, v3) => value.Evaluate(v1, v2, v3, true);
+            return (v1, v2, v3) => value.Evaluate(v1, v2, v3);
         }
 
         internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
@@ -290,16 +282,15 @@ namespace ZenLib
         /// <param name="value1">The first value.</param>
         /// <param name="value2">The second value.</param>
         /// <param name="value3">The third value.</param>
-        /// <param name="simplify">Whether to simplify first.</param>
         /// <returns>Result.</returns>
-        public T4 Evaluate(T1 value1, T2 value2, T3 value3, bool simplify = true)
+        public T4 Evaluate(T1 value1, T2 value2, T3 value3)
         {
             if (compiledFunction != null)
             {
                 return compiledFunction(value1, value2, value3);
             }
 
-            return Interpreter.Run(this.function, value1, value2, value3, simplify);
+            return Interpreter.Run(this.function, value1, value2, value3);
         }
 
         /// <summary>
@@ -328,7 +319,6 @@ namespace ZenLib
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="listSize">The depth bound for any given object.</param>
         /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
-        /// <param name="simplify">Whether to simplify the expression first.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3)> Find(
@@ -338,14 +328,13 @@ namespace ZenLib
             Zen<T3> input3 = null,
             int listSize = 5,
             bool checkSmallerLists = true,
-            bool simplify = true,
             Backend backend = Backend.Z3)
         {
             input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
             input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
             input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
             var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
-            return SymbolicEvaluator.Find(result, input1, input2, input3, backend, simplify);
+            return SymbolicEvaluator.Find(result, input1, input2, input3, backend);
         }
     }
 
@@ -369,7 +358,7 @@ namespace ZenLib
         /// <param name="value"></param>
         public static implicit operator Func<T1, T2, T3, T4, T5>(ZenFunction<T1, T2, T3, T4, T5> value)
         {
-            return (v1, v2, v3, v4) => value.Evaluate(v1, v2, v3, v4, true);
+            return (v1, v2, v3, v4) => value.Evaluate(v1, v2, v3, v4);
         }
 
         internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
@@ -384,16 +373,15 @@ namespace ZenLib
         /// <param name="value2">The second value.</param>
         /// <param name="value3">The third value.</param>
         /// <param name="value4">The fourth value.</param>
-        /// <param name="simplify">Whether to simplify first.</param>
         /// <returns>Result.</returns>
-        public T5 Evaluate(T1 value1, T2 value2, T3 value3, T4 value4, bool simplify = true)
+        public T5 Evaluate(T1 value1, T2 value2, T3 value3, T4 value4)
         {
             if (compiledFunction != null)
             {
                 return compiledFunction(value1, value2, value3, value4);
             }
 
-            return Interpreter.Run(this.function, value1, value2, value3, value4, simplify);
+            return Interpreter.Run(this.function, value1, value2, value3, value4);
         }
 
         /// <summary>
@@ -423,7 +411,6 @@ namespace ZenLib
         /// <param name="input4">Default fourth input that captures structural constraints.</param>
         /// <param name="listSize">The depth bound for any given object.</param>
         /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
-        /// <param name="simplify">Whether to simplify the expression first.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3, T4)> Find(
@@ -434,7 +421,6 @@ namespace ZenLib
             Zen<T4> input4 = null,
             int listSize = 5,
             bool checkSmallerLists = true,
-            bool simplify = true,
             Backend backend = Backend.Z3)
         {
             input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
@@ -442,7 +428,7 @@ namespace ZenLib
             input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
             input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
             var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
-            return SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend, simplify);
+            return SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend);
         }
     }
 }

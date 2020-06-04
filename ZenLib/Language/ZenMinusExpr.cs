@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -13,10 +12,26 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenMinusExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object), ZenMinusExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenMinusExpr<T>>();
+        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
 
-        public static ZenMinusExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        public static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+
+            if (x.HasValue && y.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(x.Value - y.Value);
+            }
+
+            if (y.HasValue && y.Value == 0)
+            {
+                return e1;
+            }
+
+            return new ZenMinusExpr<T>(e1, e2);
+        }
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -28,7 +43,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenMinusExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -75,16 +90,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenMinusExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenMinusExpr(this);
         }
     }
 }

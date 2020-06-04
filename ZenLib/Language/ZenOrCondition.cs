@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -13,10 +12,25 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenOrExpr : Zen<bool>
     {
-        private static Dictionary<(object, object), ZenOrExpr> hashConsTable =
-            new Dictionary<(object, object), ZenOrExpr>();
+        private static Dictionary<(object, object), Zen<bool>> hashConsTable =
+            new Dictionary<(object, object), Zen<bool>>();
 
-        public static ZenOrExpr Create(Zen<bool> expr1, Zen<bool> expr2)
+        private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
+        {
+            if (e1 is ZenConstantBoolExpr x)
+            {
+                return (x.Value ? e1 : e2);
+            }
+
+            if (e2 is ZenConstantBoolExpr y)
+            {
+                return (y.Value ? e2 : e1);
+            }
+
+            return new ZenOrExpr(e1, e2);
+        }
+
+        public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -27,7 +41,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenOrExpr(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -60,7 +74,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Or({this.Expr1.ToString()}, {this.Expr2.ToString()})";
+            return $"Or({this.Expr1}, {this.Expr2})";
         }
 
         /// <summary>
@@ -74,16 +88,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenOrExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<bool> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenOrExpr(this);
         }
     }
 }

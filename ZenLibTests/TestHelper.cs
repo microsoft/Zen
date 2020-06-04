@@ -51,6 +51,16 @@ namespace ZenLib.Tests
             }
         }
 
+        private static void Start(TestParameter p)
+        {
+            Language.SimplifyRecursive = p.Simplify;
+        }
+
+        private static void Stop(TestParameter p)
+        {
+            Language.SimplifyRecursive = true;
+        }
+
         /// <summary>
         /// Check a predicate is valid.
         /// </summary>
@@ -60,18 +70,22 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                result = f.Find((i1, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
-                Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value));
+
+                Stop(p);
             }
         }
 
@@ -85,18 +99,22 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
+
+                Stop(p);
             }
         }
 
@@ -111,18 +129,22 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, i3, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
+
+                Stop(p);
             }
         }
 
@@ -138,18 +160,22 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
+
+                Stop(p);
             }
         }
 
@@ -162,15 +188,19 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 // prove that it is not valid
                 var f = Function(function);
-                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
-                Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value));
+
+                Stop(p);
             }
         }
 
@@ -184,14 +214,18 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 f.Compile();
-                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
+
+                Stop(p);
             }
         }
 
@@ -203,33 +237,40 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
-                var f = Function(function);
-                var result = f.Assert(o => o, simplify: p.Simplify, backend: p.Backend);
+                Start(p);
 
-                Assert.AreEqual(f.Evaluate(p.Simplify), result);
+                var f = Function(function);
+                var result = f.Assert(o => o, backend: p.Backend);
+
+                Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
-                Assert.AreEqual(f.Evaluate(p.Simplify), result);
+                Assert.AreEqual(f.Evaluate(), result);
+
+                Stop(p);
             }
         }
 
         /// <summary>
         /// Check that the backends agree on the result.
         /// </summary>
-        /// <typeparam name="T1">First input type.</typeparam>
         /// <param name="function">The function.</param>
         public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function)
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 var f = Function(function);
-                var result = f.Find((i1, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, o) => o, listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
-                    Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                    Assert.IsTrue(f.Evaluate(result.Value));
                     f.Compile();
-                    Assert.IsTrue(f.Evaluate(result.Value, p.Simplify));
+                    Assert.IsTrue(f.Evaluate(result.Value));
                 }
+
+                Stop(p);
             }
         }
 
@@ -243,15 +284,19 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
+                Start(p);
+
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => o, listSize: p.ListSize, simplify: p.Simplify, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
-                    Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                    Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                     f.Compile();
-                    Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, p.Simplify));
+                    Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 }
+
+                Stop(p);
             }
         }
 

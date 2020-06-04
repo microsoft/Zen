@@ -12,10 +12,22 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenBitwiseOrExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object), ZenBitwiseOrExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenBitwiseOrExpr<T>>();
+        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
 
-        public static ZenBitwiseOrExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+
+            if (x.HasValue && y.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<T>(x.Value | y.Value);
+            }
+
+            return new ZenBitwiseOrExpr<T>(e1, e2);
+        }
+
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -27,7 +39,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenBitwiseOrExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -74,16 +86,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenBitwiseOrExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenBitwiseOrExpr(this);
         }
     }
 }

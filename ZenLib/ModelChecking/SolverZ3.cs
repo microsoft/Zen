@@ -32,9 +32,10 @@ namespace ZenLib.ModelChecking
             this.nextIndex = 0;
             this.context = new Context();
             var t1 = this.context.MkTactic("simplify");
-            var t2 = this.context.MkTactic("bit-blast");
-            var t3 = this.context.MkTactic("smt");
-            var tactic = this.context.AndThen(t1, t2, t3);
+            var t2 = this.context.MkTactic("solve-eqs");
+            var t3 = this.context.MkTactic("bit-blast");
+            var t4 = this.context.MkTactic("smt");
+            var tactic = this.context.AndThen(t1, t2, t3, t4);
             this.solver = this.context.MkSolver(tactic);
             this.BoolSort = this.context.MkBoolSort();
             this.ByteSort = this.context.MkBitVecSort(8);
@@ -151,11 +152,17 @@ namespace ZenLib.ModelChecking
         public BoolExpr Ite(BoolExpr g, BoolExpr t, BoolExpr f)
         {
             return (BoolExpr)this.context.MkITE(g, t, f);
+            /* var v = (BoolExpr)this.context.MkConst(FreshSymbol(), t.Sort);
+            this.solver.Assert(this.context.MkEq(v, this.context.MkITE(g, t, f)));
+            return v; */
         }
 
         public BitVecExpr Ite(BoolExpr g, BitVecExpr t, BitVecExpr f)
         {
             return (BitVecExpr)this.context.MkITE(g, t, f);
+            /* var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), t.Sort);
+            this.solver.Assert(this.context.MkEq(v, (BitVecExpr)this.context.MkITE(g, t, f)));
+            return v; */
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -250,34 +257,6 @@ namespace ZenLib.ModelChecking
             }
 
             return Option.Some(this.solver.Model);
-        }
-
-        public BitVecExpr Max(BitVecExpr x, BitVecExpr y, bool signed)
-        {
-            var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), x.Sort);
-
-            var isOneOf = this.context.MkOr(this.context.MkEq(v, x), this.context.MkEq(v, y));
-
-            var isAtLeast = this.context.MkAnd(
-                signed ? this.context.MkBVSGE(v, x) : this.context.MkBVUGE(v, x),
-                signed ? this.context.MkBVSGE(v, y) : this.context.MkBVUGE(v, y));
-
-            this.solver.Assert(isOneOf, isAtLeast);
-            return v;
-        }
-
-        public BitVecExpr Min(BitVecExpr x, BitVecExpr y, bool signed)
-        {
-            var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), x.Sort);
-
-            var isOneOf = this.context.MkOr(this.context.MkEq(v, x), this.context.MkEq(v, y));
-
-            var isAtLeast = this.context.MkAnd(
-                signed ? this.context.MkBVSLE(v, x) : this.context.MkBVULE(v, x),
-                signed ? this.context.MkBVSLE(v, y) : this.context.MkBVULE(v, y));
-
-            this.solver.Assert(isOneOf, isAtLeast);
-            return v;
         }
     }
 }

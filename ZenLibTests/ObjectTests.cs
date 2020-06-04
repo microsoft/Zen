@@ -874,11 +874,11 @@ namespace ZenLib.Tests
                 Create<ObjectField1>(
                     ("Field1", Int(1))));
 
-            var o1 = f.Evaluate(false);
+            var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
             o1.Field1 = 0; // needed to avoid dead code compiler error.
             f.Compile();
-            var o2 = f.Evaluate(false);
+            var o2 = f.Evaluate();
             Assert.AreEqual(o2.Field1, 1);
         }
 
@@ -892,11 +892,11 @@ namespace ZenLib.Tests
                 Create<StructField1>(
                     ("Field1", Int(1))));
 
-            var o1 = f.Evaluate(false);
+            var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
             o1.Field1 = 0; // needed to avoid dead code compiler error.
             f.Compile();
-            var o2 = f.Evaluate(false);
+            var o2 = f.Evaluate();
             Assert.AreEqual(o2.Field1, 1);
             o2.Field1 = 0;
         }

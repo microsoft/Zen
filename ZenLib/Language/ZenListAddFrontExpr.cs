@@ -74,15 +74,5 @@ namespace ZenLib
         {
             return visitor.VisitZenListAddFrontExpr(this, parameter);
         }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<IList<T>> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenListAddFrontExpr(this);
-        }
     }
 }

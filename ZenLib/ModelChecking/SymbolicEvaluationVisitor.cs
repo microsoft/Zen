@@ -634,40 +634,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Visit an MaxExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenMaxExpr<T>(ZenMaxExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var isSigned = ReflectionUtilities.IsSignedIntegerType(typeof(T));
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Max(v1.Value, v2.Value, isSigned));
-            });
-        }
-
-        /// <summary>
-        /// Visit an MinExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenMinExpr<T>(ZenMinExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var isSigned = ReflectionUtilities.IsSignedIntegerType(typeof(T));
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Min(v1.Value, v2.Value, isSigned));
-            });
-        }
-
-        /// <summary>
         /// Visit a SumExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

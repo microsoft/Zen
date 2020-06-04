@@ -12,10 +12,22 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenGeqExpr<T> : Zen<bool>
     {
-        private static Dictionary<(object, object), ZenGeqExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenGeqExpr<T>>();
+        private static Dictionary<(object, object), Zen<bool>> hashConsTable = new Dictionary<(object, object), Zen<bool>>();
 
-        public static ZenGeqExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+
+            if (x.HasValue && y.HasValue)
+            {
+                return ReflectionUtilities.CreateConstantValue<bool>(x.Value >= y.Value ? 1L : 0L);
+            }
+
+            return new ZenGeqExpr<T>(e1, e2);
+        }
+
+        public static Zen<bool> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -27,7 +39,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenGeqExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -74,16 +86,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenGeqExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<bool> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenGeqExpr(this);
         }
     }
 }

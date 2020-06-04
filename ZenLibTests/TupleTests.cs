@@ -113,8 +113,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTypeNull()
         {
-            var f = Function<Option<(int, int)>>(() => Null<(int, int)>());
-            Assert.AreEqual(f.Evaluate(false), Option.None<(int, int)>());
+            var f = Function(() => Null<(int, int)>());
+            Assert.AreEqual(f.Evaluate(), Option.None<(int, int)>());
         }
     }
 }
