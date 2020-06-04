@@ -13,9 +13,24 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenNotExpr : Zen<bool>
     {
-        private static Dictionary<object, ZenNotExpr> hashConsTable = new Dictionary<object, ZenNotExpr>();
+        private static Dictionary<object, Zen<bool>> hashConsTable = new Dictionary<object, Zen<bool>>();
 
-        public static ZenNotExpr Create(Zen<bool> expr)
+        private static Zen<bool> Simplify(Zen<bool> e)
+        {
+            if (e is ZenConstantBoolExpr x)
+            {
+                return x.Value ? ZenConstantBoolExpr.False : ZenConstantBoolExpr.True;
+            }
+
+            if (e is ZenNotExpr y)
+            {
+                return y.Expr;
+            }
+
+            return new ZenNotExpr(e);
+        }
+
+        public static Zen<bool> Create(Zen<bool> expr)
         {
             CommonUtilities.Validate(expr);
 
@@ -24,7 +39,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenNotExpr(expr);
+            var ret = Simplify(expr);
             hashConsTable[expr] = ret;
             return ret;
         }
@@ -50,7 +65,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Not({this.Expr.ToString()})";
+            return $"Not({this.Expr})";
         }
 
         /// <summary>
@@ -64,16 +79,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenNotExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<bool> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenNotExpr(this);
         }
     }
 }

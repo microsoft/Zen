@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -13,8 +12,7 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenAndExpr : Zen<bool>
     {
-        private static Dictionary<(object, object), Zen<bool>> hashConsTable =
-            new Dictionary<(object, object), Zen<bool>>();
+        private static Dictionary<(object, object), Zen<bool>> hashConsTable = new Dictionary<(object, object), Zen<bool>>();
 
         private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
         {
@@ -28,7 +26,7 @@ namespace ZenLib
                 return (y.Value ? e1 : e2);
             }
 
-            return ZenAndExpr.Create(e1, e2);
+            return new ZenAndExpr(e1, e2);
         }
 
         public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
@@ -74,7 +72,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"And({this.Expr1.ToString()}, {this.Expr2.ToString()})";
+            return $"And({this.Expr1}, {this.Expr2})";
         }
 
         /// <summary>
@@ -88,16 +86,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenAndExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<bool> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenAndExpr(this);
         }
     }
 }

@@ -14,10 +14,10 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenCreateObjectExpr<TObject> : Zen<TObject>
     {
-        private static Dictionary<(string, object)[], ZenCreateObjectExpr<TObject>> hashConsTable =
-            new Dictionary<(string, object)[], ZenCreateObjectExpr<TObject>>(new ArrayComparer());
+        private static Dictionary<(string, object)[], Zen<TObject>> hashConsTable =
+            new Dictionary<(string, object)[], Zen<TObject>>(new ArrayComparer());
 
-        public static ZenCreateObjectExpr<TObject> Create(params (string, object)[] fields)
+        public static Zen<TObject> Create(params (string, object)[] fields)
         {
             CommonUtilities.Validate(fields);
             foreach (var field in fields)
@@ -60,7 +60,7 @@ namespace ZenLib
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("CreateObject(");
+            sb.Append($"new {typeof(TObject).Name}(");
             foreach (var fieldValuePair in this.Fields)
             {
                 sb.Append($"{fieldValuePair.Key}={fieldValuePair.Value}, ");
@@ -81,16 +81,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenCreateObjectExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<TObject> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenCreateObjectExpr(this);
         }
 
         /// <summary>

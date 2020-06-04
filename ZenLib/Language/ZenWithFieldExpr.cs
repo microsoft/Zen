@@ -68,7 +68,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"WithField({this.Expr.ToString()}, {this.FieldName}, {this.FieldValue.ToString()})";
+            return $"({this.Expr} with {this.FieldName}={this.FieldValue})";
         }
 
         /// <summary>
@@ -82,16 +82,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenWithFieldExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T1> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenWithFieldExpr(this);
         }
     }
 }

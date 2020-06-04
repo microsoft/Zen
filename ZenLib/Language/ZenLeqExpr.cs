@@ -12,10 +12,49 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenLeqExpr<T> : Zen<bool>
     {
-        private static Dictionary<(object, object), ZenLeqExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenLeqExpr<T>>();
+        private static Dictionary<(object, object), Zen<bool>> hashConsTable = new Dictionary<(object, object), Zen<bool>>();
 
-        public static ZenLeqExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            if (e1 is ZenConstantByteExpr xb && e2 is ZenConstantByteExpr yb)
+            {
+                return xb.Value <= yb.Value;
+            }
+
+            if (e1 is ZenConstantShortExpr xs && e2 is ZenConstantShortExpr ys)
+            {
+                return xs.Value <= ys.Value;
+            }
+
+            if (e1 is ZenConstantUshortExpr xus && e2 is ZenConstantUshortExpr yus)
+            {
+                return xus.Value <= yus.Value;
+            }
+
+            if (e1 is ZenConstantIntExpr xi && e2 is ZenConstantIntExpr yi)
+            {
+                return xi.Value <= yi.Value;
+            }
+
+            if (e1 is ZenConstantUintExpr xui && e2 is ZenConstantUintExpr yui)
+            {
+                return xui.Value <= yui.Value;
+            }
+
+            if (e1 is ZenConstantLongExpr xl && e2 is ZenConstantLongExpr yl)
+            {
+                return xl.Value <= yl.Value;
+            }
+
+            if (e1 is ZenConstantUlongExpr xul && e2 is ZenConstantUlongExpr yul)
+            {
+                return xul.Value <= yul.Value;
+            }
+
+            return new ZenLeqExpr<T>(e1, e2);
+        }
+
+        public static Zen<bool> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -27,7 +66,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenLeqExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -74,16 +113,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenLeqExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<bool> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenLeqExpr(this);
         }
     }
 }

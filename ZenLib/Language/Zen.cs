@@ -4,8 +4,6 @@
 
 namespace ZenLib
 {
-    using ZenLib.AstTranformations;
-
     /// <summary>
     /// A Zen expression object parameterized over the C# type.
     /// </summary>
@@ -17,12 +15,6 @@ namespace ZenLib
         /// </summary>
         /// <returns>A value of the return type.</returns>
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
-
-        /// <summary>
-        /// Accept a visitor for the ZenExpr object.
-        /// </summary>
-        /// <returns>A value of the return type.</returns>
-        internal abstract Zen<T> Accept(IZenExprTransformer visitor);
 
         /// <summary>
         /// Convert a bool to the appropriate Zen type.
@@ -288,15 +280,6 @@ namespace ZenLib
             }
 
             throw new ZenException($"Invalid implicit conversion from integer to type: {type}");
-        }
-
-        /// <summary>
-        /// Simplify an expression.
-        /// </summary>
-        /// <returns>The simplified expression.</returns>
-        public Zen<T> Simplify()
-        {
-            return this.Accept(new Simplifier());
         }
 
         /// <summary>

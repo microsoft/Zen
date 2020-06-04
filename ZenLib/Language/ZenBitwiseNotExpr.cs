@@ -12,10 +12,49 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenBitwiseNotExpr<T> : Zen<T>
     {
-        private static Dictionary<object, ZenBitwiseNotExpr<T>> hashConsTable =
-            new Dictionary<object, ZenBitwiseNotExpr<T>>();
+        private static Dictionary<object, Zen<T>> hashConsTable = new Dictionary<object, Zen<T>>();
 
-        public static ZenBitwiseNotExpr<T> Create(Zen<T> expr)
+        private static Zen<T> Simplify(Zen<T> e)
+        {
+            if (e is ZenConstantByteExpr xb)
+            {
+                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)(~xb.Value));
+            }
+
+            if (e is ZenConstantShortExpr xs)
+            {
+                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)(~xs.Value));
+            }
+
+            if (e is ZenConstantUshortExpr xus)
+            {
+                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)(~xus.Value));
+            }
+
+            if (e is ZenConstantIntExpr xi)
+            {
+                return (Zen<T>)(object)ZenConstantIntExpr.Create(~xi.Value);
+            }
+
+            if (e is ZenConstantUintExpr xui)
+            {
+                return (Zen<T>)(object)ZenConstantUintExpr.Create(~xui.Value);
+            }
+
+            if (e is ZenConstantLongExpr xl)
+            {
+                return (Zen<T>)(object)ZenConstantLongExpr.Create(~xl.Value);
+            }
+
+            if (e is ZenConstantUlongExpr xul)
+            {
+                return (Zen<T>)(object)ZenConstantUlongExpr.Create(~xul.Value);
+            }
+
+            return new ZenBitwiseNotExpr<T>(e);
+        }
+
+        public static Zen<T> Create(Zen<T> expr)
         {
             CommonUtilities.Validate(expr);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
@@ -25,7 +64,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenBitwiseNotExpr<T>(expr);
+            var ret = Simplify(expr);
             hashConsTable[expr] = ret;
             return ret;
         }
@@ -65,16 +104,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenBitwiseNotExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenBitwiseNotExpr(this);
         }
     }
 }

@@ -13,7 +13,32 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
-        public static ZenListCaseExpr<T, TResult> Create(
+        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase)
+        {
+            if (e is ZenListEmptyExpr<T> l1)
+            {
+                return emptyCase;
+            }
+
+            if (e is ZenListAddFrontExpr<T> l2)
+            {
+                return consCase(l2.Element, l2.Expr);
+            }
+
+            if (Language.SimplifyRecursive)
+            {
+                if (e is ZenIfExpr<IList<T>> l3)
+                {
+                    var tbranch = ZenListCaseExpr<T, TResult>.Create(l3.TrueExpr, emptyCase, consCase);
+                    var fbranch = ZenListCaseExpr<T, TResult>.Create(l3.FalseExpr, emptyCase, consCase);
+                    return ZenIfExpr<TResult>.Create(l3.GuardExpr, tbranch, fbranch);
+                }
+            }
+
+            return new ZenListCaseExpr<T, TResult>(e, emptyCase, consCase);
+        }
+
+        public static Zen<TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
@@ -22,7 +47,7 @@ namespace ZenLib
             CommonUtilities.Validate(empty);
             CommonUtilities.Validate(cons);
 
-            return new ZenListCaseExpr<T, TResult>(listExpr, empty, cons);
+            return Simplify(listExpr, empty, cons);
         }
 
         /// <summary>
@@ -63,7 +88,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Case<{typeof(T)}, {typeof(TResult)}>({this.ListExpr}, {this.EmptyCase}, {this.ConsCase.GetHashCode()})";
+            return $"case({this.ListExpr}, {this.EmptyCase}, {this.ConsCase.GetHashCode()})";
         }
 
         /// <summary>
@@ -77,16 +102,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenListCaseExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<TResult> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenListCaseExpr(this);
         }
     }
 }

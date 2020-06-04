@@ -24,7 +24,7 @@ namespace ZenLib.Compilation
         {
             var args = ImmutableDictionary<string, Expression>.Empty;
             var env = new ExpressionConverterEnvironment(args);
-            var e = function().Simplify();
+            var e = function();
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T>>(expr, new ParameterExpression[] { });
             return lambda.Compile();
@@ -45,7 +45,7 @@ namespace ZenLib.Compilation
             args = args.Add(arg1.Id, param1);
 
             var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1).Simplify();
+            var e = function(arg1);
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2>>(expr, new ParameterExpression[] { param1 });
             return lambda.Compile();
@@ -70,7 +70,7 @@ namespace ZenLib.Compilation
             args = args.Add(arg2.Id, param2);
 
             var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2).Simplify();
+            var e = function(arg1, arg2);
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3>>(expr, new ParameterExpression[] { param1, param2 });
             return lambda.Compile();
@@ -99,7 +99,7 @@ namespace ZenLib.Compilation
             args = args.Add(arg3.Id, param3);
 
             var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2, arg3).Simplify();
+            var e = function(arg1, arg2, arg3);
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4>>(expr, new ParameterExpression[] { param1, param2, param3 });
             return lambda.Compile();
@@ -132,7 +132,7 @@ namespace ZenLib.Compilation
             args = args.Add(arg4.Id, param4);
 
             var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2, arg3, arg4).Simplify();
+            var e = function(arg1, arg2, arg3, arg4);
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4, T5>>(expr, new ParameterExpression[] { param1, param2, param3, param4 });
             return lambda.Compile();

@@ -76,15 +76,5 @@ namespace ZenLib
         {
             return visitor.VisitZenSumExpr(this, parameter);
         }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenSumExpr(this);
-        }
     }
 }

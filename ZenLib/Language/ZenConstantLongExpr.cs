@@ -12,9 +12,9 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenConstantLongExpr : Zen<long>
     {
-        private static Dictionary<long, ZenConstantLongExpr> hashConsTable = new Dictionary<long, ZenConstantLongExpr>();
+        private static Dictionary<long, Zen<long>> hashConsTable = new Dictionary<long, Zen<long>>();
 
-        public static ZenConstantLongExpr Create(long value)
+        public static Zen<long> Create(long value)
         {
             if (hashConsTable.TryGetValue(value, out var v))
             {
@@ -61,16 +61,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenConstantLongExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<long> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenConstantLongExpr(this);
         }
     }
 }

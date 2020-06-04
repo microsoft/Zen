@@ -12,10 +12,49 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenBitwiseAndExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object), ZenBitwiseAndExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenBitwiseAndExpr<T>>();
+        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
 
-        public static ZenBitwiseAndExpr<T> Create(Zen<T> expr1, Zen<T> expr2)
+        private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        {
+            if (e1 is ZenConstantByteExpr xb && e2 is ZenConstantByteExpr yb)
+            {
+                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)(xb.Value & yb.Value));
+            }
+
+            if (e1 is ZenConstantShortExpr xs && e2 is ZenConstantShortExpr ys)
+            {
+                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)(xs.Value & ys.Value));
+            }
+
+            if (e1 is ZenConstantUshortExpr xus && e2 is ZenConstantUshortExpr yus)
+            {
+                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)(xus.Value & yus.Value));
+            }
+
+            if (e1 is ZenConstantIntExpr xi && e2 is ZenConstantIntExpr yi)
+            {
+                return (Zen<T>)(object)ZenConstantIntExpr.Create(xi.Value & yi.Value);
+            }
+
+            if (e1 is ZenConstantUintExpr xui && e2 is ZenConstantUintExpr yui)
+            {
+                return (Zen<T>)(object)ZenConstantUintExpr.Create(xui.Value & yui.Value);
+            }
+
+            if (e1 is ZenConstantLongExpr xl && e2 is ZenConstantLongExpr yl)
+            {
+                return (Zen<T>)(object)ZenConstantLongExpr.Create(xl.Value & yl.Value);
+            }
+
+            if (e1 is ZenConstantUlongExpr xul && e2 is ZenConstantUlongExpr yul)
+            {
+                return (Zen<T>)(object)ZenConstantUlongExpr.Create(xul.Value & yul.Value);
+            }
+
+            return new ZenBitwiseAndExpr<T>(e1, e2);
+        }
+
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -27,7 +66,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenBitwiseAndExpr<T>(expr1, expr2);
+            var ret = Simplify(expr1, expr2);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -60,7 +99,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"({this.Expr1.ToString()} & {this.Expr2.ToString()})";
+            return $"({this.Expr1} & {this.Expr2})";
         }
 
         /// <summary>
@@ -74,16 +113,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenBitwiseAndExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenBitwiseAndExpr(this);
         }
     }
 }

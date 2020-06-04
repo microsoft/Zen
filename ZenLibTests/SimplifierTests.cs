@@ -23,13 +23,24 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBitwiseNotNot()
         {
-            Assert.AreEqual((~~Byte(3)).Simplify(), Byte(3));
-            Assert.AreEqual((~~Short(3)).Simplify(), Short(3));
-            Assert.AreEqual((~~UShort(3)).Simplify(), UShort(3));
-            Assert.AreEqual((~~Int(3)).Simplify(), Int(3));
-            Assert.AreEqual((~~UInt(3)).Simplify(), UInt(3));
-            Assert.AreEqual((~~Long(3)).Simplify(), Long(3));
-            Assert.AreEqual((~~ULong(3)).Simplify(), ULong(3));
+            Assert.AreEqual((~~Byte(3)), Byte(3));
+            Assert.AreEqual((~~Short(3)), Short(3));
+            Assert.AreEqual((~~UShort(3)), UShort(3));
+            Assert.AreEqual((~~Int(3)), Int(3));
+            Assert.AreEqual((~~UInt(3)), UInt(3));
+            Assert.AreEqual((~~Long(3)), Long(3));
+            Assert.AreEqual((~~ULong(3)), ULong(3));
+        }
+
+        /// <summary>
+        /// Test hash consing of terms.
+        /// </summary>
+        [TestMethod]
+        public void TestHashCons()
+        {
+            Assert.IsTrue(ReferenceEquals(~Int(10), ~Int(10)));
+            Assert.IsTrue(ReferenceEquals(Int(10) - Int(10), Int(10) - Int(10)));
+            Assert.IsTrue(ReferenceEquals(Int(10) * Int(10), Int(10) * Int(10)));
         }
 
         /// <summary>
@@ -38,10 +49,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAndConstant()
         {
-            Assert.AreEqual(And(true, true).Simplify(), true);
-            Assert.AreEqual(And(true, false).Simplify(), false);
-            Assert.AreEqual(And(false, true).Simplify(), false);
-            Assert.AreEqual(And(false, false).Simplify(), false);
+            Assert.AreEqual(And(true, true), true);
+            Assert.AreEqual(And(true, false), false);
+            Assert.AreEqual(And(false, true), false);
+            Assert.AreEqual(And(false, false), false);
         }
 
         /// <summary>
@@ -50,16 +61,16 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOrConstant()
         {
-            Assert.AreEqual(Or(true, true).Simplify(), true);
-            Assert.AreEqual(Or(true, false).Simplify(), true);
-            Assert.AreEqual(Or(false, true).Simplify(), true);
-            Assert.AreEqual(Or(false, false).Simplify(), false);
+            Assert.AreEqual(Or(true, true), true);
+            Assert.AreEqual(Or(true, false), true);
+            Assert.AreEqual(Or(false, true), true);
+            Assert.AreEqual(Or(false, false), false);
 
             var x = Arbitrary<bool>();
-            Assert.AreEqual(Or(x, true).Simplify(), true);
-            Assert.AreEqual(Or(x, false).Simplify(), x);
-            Assert.AreEqual(Or(false, x).Simplify(), x);
-            Assert.AreEqual(Or(true, x).Simplify(), true);
+            Assert.AreEqual(Or(x, true), true);
+            Assert.AreEqual(Or(x, false), x);
+            Assert.AreEqual(Or(false, x), x);
+            Assert.AreEqual(Or(true, x), true);
         }
 
         /// <summary>
@@ -68,8 +79,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestNotConstant()
         {
-            Assert.AreEqual(Not(true).Simplify(), false);
-            Assert.AreEqual(Not(false).Simplify(), true);
+            Assert.AreEqual(Not(true), false);
+            Assert.AreEqual(Not(false), true);
         }
 
         /// <summary>
@@ -78,13 +89,57 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBitwiseAndConstant()
         {
-            Assert.AreEqual((Byte(1) & Byte(1)).Simplify(), Byte(1));
-            Assert.AreEqual((Short(1) & Short(1)).Simplify(), Short(1));
-            Assert.AreEqual((UShort(1) & UShort(1)).Simplify(), UShort(1));
-            Assert.AreEqual((Int(1) & Int(1)).Simplify(), Int(1));
-            Assert.AreEqual((UInt(1) & UInt(1)).Simplify(), UInt(1));
-            Assert.AreEqual((Long(1) & Long(1)).Simplify(), Long(1));
-            Assert.AreEqual((ULong(1) & ULong(1)).Simplify(), ULong(1));
+            Assert.AreEqual((Byte(1) & Byte(1)), Byte(1));
+            Assert.AreEqual((Short(1) & Short(1)), Short(1));
+            Assert.AreEqual((UShort(1) & UShort(1)), UShort(1));
+            Assert.AreEqual((Int(1) & Int(1)), Int(1));
+            Assert.AreEqual((UInt(1) & UInt(1)), UInt(1));
+            Assert.AreEqual((Long(1) & Long(1)), Long(1));
+            Assert.AreEqual((ULong(1) & ULong(1)), ULong(1));
+        }
+
+        /// <summary>
+        /// Simplify less than or equal.
+        /// </summary>
+        [TestMethod]
+        public void TestLeqSimplification()
+        {
+            Assert.AreEqual((Byte(1) <= Byte(1)), True());
+            Assert.AreEqual((Byte(1) <= Byte(0)), False());
+            Assert.AreEqual((Short(1) <= Short(1)), True());
+            Assert.AreEqual((Short(1) <= Short(0)), False());
+            Assert.AreEqual((UShort(1) <= UShort(1)), True());
+            Assert.AreEqual((UShort(1) <= UShort(0)), False());
+            Assert.AreEqual((Int(1) <= Int(1)), True());
+            Assert.AreEqual((Int(1) <= Int(0)), False());
+            Assert.AreEqual((UInt(1) <= UInt(1)), True());
+            Assert.AreEqual((UInt(1) <= UInt(0)), False());
+            Assert.AreEqual((Long(1) <= Long(1)), True());
+            Assert.AreEqual((Long(1) <= Long(0)), False());
+            Assert.AreEqual((ULong(1) <= ULong(1)), True());
+            Assert.AreEqual((ULong(1) <= ULong(0)), False());
+        }
+
+        /// <summary>
+        /// Simplify greater than or equal.
+        /// </summary>
+        [TestMethod]
+        public void TestGeqSimplification()
+        {
+            Assert.AreEqual((Byte(1) >= Byte(1)), True());
+            Assert.AreEqual((Byte(0) >= Byte(1)), False());
+            Assert.AreEqual((Short(1) >= Short(1)), True());
+            Assert.AreEqual((Short(0) >= Short(1)), False());
+            Assert.AreEqual((UShort(1) >= UShort(1)), True());
+            Assert.AreEqual((UShort(0) >= UShort(1)), False());
+            Assert.AreEqual((Int(1) >= Int(1)), True());
+            Assert.AreEqual((Int(0) >= Int(1)), False());
+            Assert.AreEqual((UInt(1) >= UInt(1)), True());
+            Assert.AreEqual((UInt(0) >= UInt(1)), False());
+            Assert.AreEqual((Long(1) >= Long(1)), True());
+            Assert.AreEqual((Long(0) >= Long(1)), False());
+            Assert.AreEqual((ULong(1) >= ULong(1)), True());
+            Assert.AreEqual((ULong(0) >= ULong(1)), False());
         }
 
         /// <summary>
@@ -96,12 +151,12 @@ namespace ZenLib.Tests
             var x = Int(1);
             var y = Int(2);
             var b = Arbitrary<bool>();
-            Assert.AreEqual(If(true, x, y).Simplify(), x);
-            Assert.AreEqual(If(false, x, y).Simplify(), y);
-            Assert.AreEqual(If(x == 0, true, b).Simplify(), Or(x == 0, b));
-            Assert.AreEqual(If(x == 0, false, b).Simplify(), And(Not(x == 0), b));
-            Assert.AreEqual(If(x == 0, b, true).Simplify(), Or(Not(x == 0), b));
-            Assert.AreEqual(If(x == 0, b, false).Simplify(), And(x == 0, b));
+            Assert.AreEqual(If(true, x, y), x);
+            Assert.AreEqual(If(false, x, y), y);
+            Assert.AreEqual(If(x == 0, true, b), Or(x == 0, b));
+            Assert.AreEqual(If(x == 0, false, b), And(Not(x == 0), b));
+            Assert.AreEqual(If(x == 0, b, true), Or(Not(x == 0), b));
+            Assert.AreEqual(If(x == 0, b, false), And(x == 0, b));
         }
 
         /// <summary>
@@ -113,8 +168,7 @@ namespace ZenLib.Tests
         {
             Create<Object1>(
                     ("Item1", 0))
-                .GetField<Object1, string>("Foo")
-                .Simplify();
+                .GetField<Object1, string>("Foo");
         }
 
         /// <summary>
@@ -127,8 +181,7 @@ namespace ZenLib.Tests
             Create<Object1>(
                     ("Item1", 0),
                     ("Item2", 0))
-                .GetField<Object1, string>("Foo")
-                .Simplify();
+                .GetField<Object1, string>("Foo");
         }
 
         /// <summary>
@@ -142,8 +195,7 @@ namespace ZenLib.Tests
                     ("Item1", 0),
                     ("Item2", 0),
                     ("Item3", 0))
-                .GetField<Object3, string>("Foo")
-                .Simplify();
+                .GetField<Object3, string>("Foo");
         }
 
         /// <summary>
@@ -158,8 +210,7 @@ namespace ZenLib.Tests
                     ("Item2", 0),
                     ("Item3", 0),
                     ("Item4", 0))
-                .GetField<Object8, string>("Foo")
-                .Simplify();
+                .GetField<Object8, string>("Foo");
         }
 
         /// <summary>
@@ -175,8 +226,7 @@ namespace ZenLib.Tests
                     ("Item3", 0),
                     ("Item4", 0),
                     ("Item5", 0))
-                .GetField<Object5, string>("Foo")
-                .Simplify();
+                .GetField<Object5, string>("Foo");
         }
 
         /// <summary>
@@ -193,8 +243,7 @@ namespace ZenLib.Tests
                     ("Item4", 0),
                     ("Item5", 0),
                     ("Item6", 0))
-                .GetField<Object6, string>("Foo")
-                .Simplify();
+                .GetField<Object6, string>("Foo");
         }
 
         /// <summary>
@@ -212,8 +261,7 @@ namespace ZenLib.Tests
                     ("Item5", 0),
                     ("Item6", 0),
                     ("Item7", 0))
-                .GetField<Object7, string>("Foo")
-                .Simplify();
+                .GetField<Object7, string>("Foo");
         }
 
         /// <summary>
@@ -232,8 +280,7 @@ namespace ZenLib.Tests
                     ("Item6", 0),
                     ("Item7", 0),
                     ("Item8", 0))
-                .GetField<Object8, string>("Foo")
-                .Simplify();
+                .GetField<Object8, string>("Foo");
         }
 
         /// <summary>

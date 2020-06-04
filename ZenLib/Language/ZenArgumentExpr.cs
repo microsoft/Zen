@@ -33,7 +33,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Argument({this.Id})";
+            return $"Arg({this.Id})";
         }
 
         /// <summary>
@@ -47,16 +47,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenArgumentExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenArgumentExpr(this);
         }
     }
 }

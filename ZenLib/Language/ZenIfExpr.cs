@@ -12,10 +12,49 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenIfExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object, object), ZenIfExpr<T>> hashConsTable =
-            new Dictionary<(object, object, object), ZenIfExpr<T>>();
+        private static Dictionary<(object, object, object), Zen<T>> hashConsTable =
+            new Dictionary<(object, object, object), Zen<T>>();
 
-        public static ZenIfExpr<T> Create(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
+        private static Zen<T> Simplify(Zen<bool> g, Zen<T> t, Zen<T> f)
+        {
+            // if true then e1 else e2 = e1
+            // if false then e1 else e2 = e2
+            if (g is ZenConstantBoolExpr ce)
+            {
+                return ce.Value ? t : f;
+            }
+
+            // if g then e else e = e
+            if (ReferenceEquals(t, f))
+            {
+                return t;
+            }
+
+            if (typeof(T) == ReflectionUtilities.BoolType)
+            {
+                // if e1 then true else e2 = Or(e1, e2)
+                // if e1 then false else e2 = And(Not(e1), e2)
+                if (t is ZenConstantBoolExpr te)
+                {
+                    return te.Value ?
+                        ZenOrExpr.Create((dynamic)g, (dynamic)f) :
+                        ZenAndExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)f);
+                }
+
+                // if e1 then e2 else true = Or(Not(e1), e2)
+                // if e1 then e2 else false = And(e1, e2)
+                if (f is ZenConstantBoolExpr fe)
+                {
+                    return fe.Value ?
+                        ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :
+                        ZenAndExpr.Create((dynamic)g, (dynamic)t);
+                }
+            }
+
+            return new ZenIfExpr<T>(g, t, f);
+        }
+
+        public static Zen<T> Create(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
             CommonUtilities.Validate(guardExpr);
             CommonUtilities.Validate(trueExpr);
@@ -27,7 +66,7 @@ namespace ZenLib
                 return value;
             }
 
-            var ret = new ZenIfExpr<T>(guardExpr, trueExpr, falseExpr);
+            var ret = Simplify(guardExpr, trueExpr, falseExpr);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -67,7 +106,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"If({this.GuardExpr.ToString()}, {this.TrueExpr.ToString()}, {this.FalseExpr.ToString()})";
+            return $"if({this.GuardExpr}, {this.TrueExpr}, {this.FalseExpr})";
         }
 
         /// <summary>
@@ -81,16 +120,6 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.VisitZenIfExpr(this, parameter);
-        }
-
-        /// <summary>
-        /// Implementing the transformer interface.
-        /// </summary>
-        /// <param name="visitor">The visitor object.</param>
-        /// <returns>A return value.</returns>
-        internal override Zen<T> Accept(IZenExprTransformer visitor)
-        {
-            return visitor.VisitZenIfExpr(this);
         }
     }
 }

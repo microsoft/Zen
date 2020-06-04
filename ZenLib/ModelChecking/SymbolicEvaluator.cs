@@ -41,9 +41,8 @@ namespace ZenLib.ModelChecking
         private static Dictionary<Type, VariableSet<BDDNode>> dependencyFreeOutput =
             new Dictionary<Type, VariableSet<BDDNode>>();
 
-        public static bool Find(Zen<bool> expression, Backend backend, bool simplify)
+        public static bool Find(Zen<bool> expression, Backend backend)
         {
-            expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
             var assignment = modelChecker.ModelCheck(expression);
             return assignment != null;
@@ -52,14 +51,10 @@ namespace ZenLib.ModelChecking
         public static Option<T> Find<T>(
             Zen<bool> expression,
             Zen<T> input,
-            Backend backend,
-            bool simplify)
+            Backend backend)
         {
-            expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
             var assignment = modelChecker.ModelCheck(expression);
-            Console.WriteLine($"made the ast");
-
             if (assignment == null)
             {
                 return Option.None<T>();
@@ -74,10 +69,8 @@ namespace ZenLib.ModelChecking
             Zen<bool> expression,
             Zen<T1> input1,
             Zen<T2> input2,
-            Backend backend,
-            bool simplify)
+            Backend backend)
         {
-            expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
 
             var assignment = modelChecker.ModelCheck(expression);
@@ -98,10 +91,8 @@ namespace ZenLib.ModelChecking
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
-            Backend backend,
-            bool simplify)
+            Backend backend)
         {
-            expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
             var assignment = modelChecker.ModelCheck(expression);
 
@@ -123,10 +114,8 @@ namespace ZenLib.ModelChecking
             Zen<T2> input2,
             Zen<T3> input3,
             Zen<T4> input4,
-            Backend backend,
-            bool simplify)
+            Backend backend)
         {
-            expression = simplify ? expression.Simplify() : expression;
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
             var assignment = modelChecker.ModelCheck(expression);
 
