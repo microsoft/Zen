@@ -27,8 +27,8 @@ namespace ZenLibBench
         /// <summary>
         /// The number of ACL lines to benchmark.
         /// </summary>
-        [Params(50, 100, 500)]
-        public int NumLines { get; set; } = 700;
+        [Params(100, 500, 1000)]
+        public int NumLines { get; set; } = 1000;
 
         private Acl acl;
 

@@ -13,16 +13,7 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            // var summary = BenchmarkRunner.Run<AclBench>();
-            var ab = new AclBench();
-            ab.CreateAcl();
-
-            for (int i = 0; i < 50; i++)
-            {
-                var w = System.Diagnostics.Stopwatch.StartNew();
-                ab.VerifyAcl();
-                System.Console.WriteLine($"execute time: {w.ElapsedMilliseconds}ms");
-            }
+            var summary = BenchmarkRunner.Run<AclBench>();
         }
     }
 }
