@@ -13,7 +13,10 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<AclBench>();
+            // var summary = BenchmarkRunner.Run<Example>();
+            var example = new Example();
+            example.InitializeNetwork();
+            example.VerifyConnectivity();
         }
     }
 }

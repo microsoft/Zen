@@ -8,6 +8,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Reflection;
 
     /// <summary>
     /// Class to conservatively estimate which variables
@@ -298,9 +299,15 @@ namespace ZenLib.ModelChecking
             return LookupOrCompute(expression, () =>
             {
                 var set = ImmutableHashSet<object>.Empty;
-                foreach (dynamic value in expression.Fields.Values)
+                foreach (var value in expression.Fields.Values)
                 {
-                    set = set.Union(value.Accept(this, parameter));
+                    var valueType = value.GetType();
+                    var acceptMethod = valueType
+                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(typeof(Unit), typeof(ImmutableHashSet<object>));
+                    var valueResult = (ImmutableHashSet<object>)acceptMethod.Invoke(value, new object[] { this, parameter });
+
+                    set = set.Union(valueResult);
                 }
 
                 return set;

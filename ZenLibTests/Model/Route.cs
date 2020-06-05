@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.Tests
+namespace ZenLib.Tests.Model
 {
     using System;
     using System.Collections.Generic;

@@ -7,6 +7,7 @@ namespace ZenLib.Interpretation
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Reflection;
 
     /// <summary>
     /// Interpret a Zen expression.
@@ -221,9 +222,14 @@ namespace ZenLib.Interpretation
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
-                    dynamic value = fieldValuePair.Value;
+                    var value = fieldValuePair.Value;
+                    var valueType = value.GetType();
+                    var acceptMethod = valueType
+                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(typeof(ExpressionEvaluatorEnvironment), typeof(object));
+                    var valueResult = acceptMethod.Invoke(value, new object[] { this, parameter });
                     fieldNames.Add(field);
-                    parameters.Add(value.Accept(this, parameter));
+                    parameters.Add(valueResult);
                 }
 
                 return ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());
