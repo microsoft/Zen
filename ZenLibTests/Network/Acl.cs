@@ -4,12 +4,14 @@
 
 namespace ZenLib.Tests.Network
 {
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib;
     using static ZenLib.Language;
 
     /// <summary>
     /// An access control list object.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     class Acl
     {
         public AclLine[] Lines { get; set; }

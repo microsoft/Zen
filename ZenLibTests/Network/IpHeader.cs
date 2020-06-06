@@ -4,11 +4,13 @@
 
 namespace ZenLib.Tests.Network
 {
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib;
 
     /// <summary>
     /// An IP header object.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     class IpHeader
     {
         public Ip DstIp { get; set; }

@@ -19,6 +19,22 @@ namespace ZenLib
     {
         private static MethodInfo getFieldMethod = typeof(Language).GetMethod("GetField");
 
+        private static MethodInfo eqMethod = typeof(Language).GetMethod("Eq");
+
+        private static MethodInfo eqBoolMethod = typeof(Language).GetMethod("Eq").MakeGenericMethod(typeof(bool));
+
+        private static MethodInfo hasValueMethod = typeof(Language).GetMethod("HasValue");
+
+        private static MethodInfo valueMethod = typeof(Language).GetMethod("Value");
+
+        private static MethodInfo tupItem1Method = typeof(Language).GetMethod("TupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static MethodInfo tupItem2Method = typeof(Language).GetMethod("TupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static MethodInfo valueTupItem1Method = typeof(Language).GetMethod("ValueTupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
+
         /// <summary>
         /// Whether to simplify expressions recursively. Default true.
         /// </summary>
@@ -426,66 +442,91 @@ namespace ZenLib
             return EqHelper<T>(expr1, expr2);
         }
 
-        private static Zen<bool> EqHelper<T>(dynamic expr1, dynamic expr2)
+        private static Zen<bool> EqHelper<T>(object expr1, object expr2)
         {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
+            try
             {
-                return ZenEqExpr<T>.Create(expr1, expr2);
-            }
+                var type = typeof(T);
 
-            if (ReflectionUtilities.IsOptionType(type))
+                if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
+                {
+                    return ZenEqExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
+                }
+
+                if (ReflectionUtilities.IsOptionType(type))
+                {
+                    var innerType = type.GetGenericArguments()[0];
+
+                    var method = hasValueMethod.MakeGenericMethod(innerType);
+                    var hasValue1 = method.Invoke(null, new object[] { expr1 });
+                    var hasValue2 = method.Invoke(null, new object[] { expr2 });
+                    var eqBool = (Zen<bool>)eqBoolMethod.Invoke(null, new object[] { hasValue1, hasValue2 });
+
+                    method = valueMethod.MakeGenericMethod(innerType);
+                    var equals = eqMethod.MakeGenericMethod(innerType);
+                    var value1 = method.Invoke(null, new object[] { expr1 });
+                    var value2 = method.Invoke(null, new object[] { expr2 });
+
+                    var eqValue = (Zen<bool>)equals.Invoke(null, new object[] { value1, value2 });
+                    return And(eqBool, eqValue);
+                }
+
+                if (ReflectionUtilities.IsSomeTupleType(type))
+                {
+                    var isTuple = ReflectionUtilities.IsTupleType(type);
+                    var item1Method = isTuple ? tupItem1Method : valueTupItem1Method;
+                    var item2Method = isTuple ? tupItem2Method : valueTupItem2Method;
+
+                    var genericArgs = type.GetGenericArguments();
+                    var innerType1 = genericArgs[0];
+                    var innerType2 = genericArgs[1];
+                    var equals1 = eqMethod.MakeGenericMethod(innerType1);
+                    var equals2 = eqMethod.MakeGenericMethod(innerType2);
+                    var method1 = item1Method.MakeGenericMethod(innerType1, innerType2);
+                    var method2 = item2Method.MakeGenericMethod(innerType1, innerType2);
+
+                    var e11 = method1.Invoke(null, new object[] { expr1 });
+                    var e12 = method1.Invoke(null, new object[] { expr2 });
+
+                    var e21 = method2.Invoke(null, new object[] { expr1 });
+                    var e22 = method2.Invoke(null, new object[] { expr2 });
+
+                    var eqItem1 = (Zen<bool>)equals1.Invoke(null, new object[] { e11, e12 });
+                    var eqItem2 = (Zen<bool>)equals2.Invoke(null, new object[] { e21, e22 });
+                    return And(eqItem1, eqItem2);
+                }
+
+                if (ReflectionUtilities.IsIListType(type) || ReflectionUtilities.IsIDictionaryType(type))
+                {
+                    throw new ZenException($"Zen does not support equality of {type} types.");
+                }
+
+                // some class or struct
+                var acc = True();
+                foreach (var field in ReflectionUtilities.GetAllFields(type))
+                {
+                    var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
+                    dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
+                    dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
+                    var emethod = eqMethod.MakeGenericMethod(field.FieldType);
+                    acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
+                }
+
+                foreach (var property in ReflectionUtilities.GetAllProperties(type))
+                {
+                    var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
+                    dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
+                    dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
+                    var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
+                    acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
+                }
+
+                return acc;
+            }
+            catch (TargetInvocationException e)
             {
-                var eqBool = Eq(HasValue(expr1), HasValue(expr2));
-                var eqValue = Eq(Value(expr1), Value(expr2));
-                return And(eqBool, eqValue);
+                throw e.InnerException;
             }
-
-            if (ReflectionUtilities.IsSomeTupleType(type))
-            {
-                var eqItem1 = Eq(Item1(expr1), Item1(expr2));
-                var eqItem2 = Eq(Item2(expr1), Item2(expr2));
-                return And(eqItem1, eqItem2);
-            }
-
-            if (ReflectionUtilities.IsIListType(type) || ReflectionUtilities.IsIDictionaryType(type))
-            {
-                throw new ZenException($"Zen does not support equality of {type} types.");
-            }
-
-            // some class or struct
-            var acc = True();
-            foreach (var field in ReflectionUtilities.GetAllFields(type))
-            {
-                var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
-                dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
-                dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
-                acc = And(acc, Eq(field1, field2));
-            }
-
-            foreach (var property in ReflectionUtilities.GetAllProperties(type))
-            {
-                var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
-                dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
-                dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
-                acc = And(acc, Eq(prop1, prop2));
-            }
-
-            return acc;
-        }
-
-        /// <summary>
-        /// Compute the equality of Zen values.
-        /// </summary>
-        /// <param name="expr1">First Zen expression.</param>
-        /// <param name="expr2">Second Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> Eq(Zen<bool> expr1, Zen<bool> expr2)
-        {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
-            return ZenEqExpr<bool>.Create(expr1, expr2);
         }
 
         /// <summary>
@@ -1564,6 +1605,26 @@ namespace ZenLib
 
             var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
             return ZenAdapterExpr<ValueTuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToValueTuple<T1, T2>);
+        }
+
+        private static Zen<T1> TupleItem1<T1, T2>(this Zen<Tuple<T1, T2>> expr)
+        {
+            return Item1(expr);
+        }
+
+        private static Zen<T2> TupleItem2<T1, T2>(this Zen<Tuple<T1, T2>> expr)
+        {
+            return Item2(expr);
+        }
+
+        private static Zen<T1> ValueTupleItem1<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
+        {
+            return Item1(expr);
+        }
+
+        private static Zen<T2> ValueTupleItem2<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
+        {
+            return Item2(expr);
         }
 
         /// <summary>

@@ -153,7 +153,7 @@ namespace ZenLib.Tests
             var d3 = network.Devices["R3"];
 
             // encoding along a single path approach
-            var f = Function<Packet, bool>(p =>
+            TestHelper.CheckAgreement<Packet>(p =>
             {
                 var pencap = d1.Interfaces[0].Encapsulate(p);
                 var fwd1 = d1.Table.Forward(pencap, 0) == 1;
@@ -163,14 +163,12 @@ namespace ZenLib.Tests
                 return And(fwd1, fwd2, acl);
             });
 
-            var packet = f.Find((p, o) => o);
-            Console.WriteLine($"input: {packet}");
-
-            /* var tfwd1 = Function<Packet, bool>(p => d1.Table.Forward(p, 0) == 1).Transformer();
+            // build transformers
+            var tfwd1 = Function<Packet, bool>(p => d1.Table.Forward(p, 0) == 1).Transformer();
             var tfwd2 = Function<Packet, bool>(p => d2.Table.Forward(p, 0) == 2).Transformer();
             var tencap = Function<Packet, Packet>(d1.Interfaces[0].Encapsulate).Transformer();
             var tdecap = Function<Packet, Packet>(d3.Interfaces[0].Decapsulate).Transformer();
-            var tacl = Function<Packet, bool>(p => d3.Interfaces[0].InboundAcl.Process(p.GetOverlayHeader(), 0)).Transformer(); */
+            var tacl = Function<Packet, bool>(p => d3.Interfaces[0].InboundAcl.Process(p.GetOverlayHeader(), 0)).Transformer();
         }
     }
 }

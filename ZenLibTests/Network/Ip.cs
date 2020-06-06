@@ -4,12 +4,14 @@
 
 namespace ZenLib.Tests.Network
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using ZenLib;
 
     /// <summary>
     /// A simple IP address.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     struct Ip
     {
         public uint Value { get; set; }
