@@ -31,6 +31,7 @@ namespace ZenLib.Tests.Network
     /// <summary>
     /// An ACL line object.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     class AclLine
     {
         public bool Permitted { get; set; }
