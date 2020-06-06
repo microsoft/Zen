@@ -9,7 +9,7 @@ namespace ZenLibBench
     using BenchmarkDotNet.Attributes;
     using ZenLib;
     using ZenLib.ModelChecking;
-    using ZenLib.Tests;
+    using ZenLib.Tests.Model;
 
     using static ZenLib.Language;
 

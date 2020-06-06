@@ -8,6 +8,7 @@ namespace ZenLib.Compilation
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq.Expressions;
+    using System.Reflection;
     using ZenLib.Interpretation;
 
     /// <summary>
@@ -375,9 +376,15 @@ namespace ZenLib.Compilation
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
-                    dynamic value = fieldValuePair.Value;
+                    var value = fieldValuePair.Value;
+                    var valueType = value.GetType();
+                    var acceptMethod = valueType
+                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(typeof(ExpressionConverterEnvironment), typeof(Expression));
+                    var valueResult = (Expression)acceptMethod.Invoke(value, new object[] { this, parameter });
+
                     fieldNames.Add(field);
-                    parameters.Add(value.Accept(this, parameter));
+                    parameters.Add(valueResult);
                 }
 
                 return CreateObject<TObject>(parameters.ToArray(), fieldNames.ToArray());

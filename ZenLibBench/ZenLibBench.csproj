@@ -19,5 +19,4 @@
     <ProjectReference Include="..\ZenLib\ZenLib.csproj" />
   </ItemGroup>
   
-  <Import Project="..\.stylecop\StyleCop.props" />
 </Project>

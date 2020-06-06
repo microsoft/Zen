@@ -9,6 +9,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
+    using ZenLib.Tests.Model;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -255,6 +256,16 @@ namespace ZenLib.Tests
         public void TestEqualityCompositeException3()
         {
             CheckAgreement<Option<IList<int>>, Option<IList<int>>>((l1, l2) => l1 == l2);
+        }
+
+        /// <summary>
+        /// Test equality for composite types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEqualityCompositeException4()
+        {
+            CheckAgreement<(int, IList<int>), (int, IList<int>)>((l1, l2) => l1 == l2);
         }
 
         /// <summary>

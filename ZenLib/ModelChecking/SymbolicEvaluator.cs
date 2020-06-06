@@ -154,7 +154,7 @@ namespace ZenLib.ModelChecking
             var mustInterleave = heuristic.Compute(newExpression);
             var solver = new SolverDD<BDDNode>(transformerManager, mustInterleave);
 
-            // optimization: if there are no dependencies variable ordering dependencies,
+            // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
             var maxDependenciesPerType =
                 mustInterleave.Values.Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).Max()).Max();

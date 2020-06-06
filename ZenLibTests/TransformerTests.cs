@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib.Tests.Model;
     using static ZenLib.Language;
 
     /// <summary>
