@@ -139,6 +139,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The Zen value for a string.
+        /// </summary>
+        /// <param name="s">A string value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> String(string s)
+        {
+            return ZenConstantStringExpr.Create(s);
+        }
+
+        /// <summary>
         /// A Zen object representing some arbitrary value.
         /// </summary>
         /// <param name="listSize">Depth bound on the size of the object.</param>
