@@ -9,7 +9,7 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, SeqExpr>
     {
         private Context context;
 
@@ -129,9 +129,27 @@ namespace ZenLib.ModelChecking
             return (v, (BitVecExpr)v);
         }
 
+        public SeqExpr CreateStringConst(string s)
+        {
+            // TODO
+            throw new NotImplementedException();
+        }
+
+        public (Expr, SeqExpr) CreateStringVar(object e)
+        {
+            // TODO
+            throw new NotImplementedException();
+        }
+
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkEq(x, y);
+        }
+
+        public BoolExpr Eq(SeqExpr x, SeqExpr y)
+        {
+            // TODO
+            throw new NotImplementedException();
         }
 
         public BoolExpr False()
@@ -163,6 +181,12 @@ namespace ZenLib.ModelChecking
             /* var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), t.Sort);
             this.solver.Assert(this.context.MkEq(v, (BitVecExpr)this.context.MkITE(g, t, f)));
             return v; */
+        }
+
+        public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
+        {
+            // TODO
+            throw new NotImplementedException();
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -203,6 +227,12 @@ namespace ZenLib.ModelChecking
         public BitVecExpr Multiply(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkBVMul(x, y);
+        }
+
+        public SeqExpr Concat(SeqExpr x, SeqExpr y)
+        {
+            // TODO
+            throw new NotImplementedException();
         }
 
         public object Get(Model m, Expr v)

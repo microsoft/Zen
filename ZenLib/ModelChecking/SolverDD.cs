@@ -13,7 +13,7 @@ namespace ZenLib.ModelChecking
     /// Implementation of a solver using decision diagrams.
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
-    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>>
+    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit>
         where T : IDDNode
     {
         /// <summary>
@@ -219,9 +219,19 @@ namespace ZenLib.ModelChecking
             throw new ZenException("Decision diagram backend does not support multiplication");
         }
 
+        public Unit Concat(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
         public DD Eq(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Eq(x, y);
+        }
+
+        public DD Eq(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         public DD LessThanOrEqual(BitVector<T> x, BitVector<T> y)
@@ -344,6 +354,16 @@ namespace ZenLib.ModelChecking
             return this.Manager.CreateBitvector(l);
         }
 
+        public (Variable<T>, Unit) CreateStringVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        public Unit CreateStringConst(string s)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
         public object Get(Assignment<T> m, Variable<T> v)
         {
             if (v is VarBool<T> v1)
@@ -377,6 +397,11 @@ namespace ZenLib.ModelChecking
         public BitVector<T> Ite(DD g, BitVector<T> t, BitVector<T> f)
         {
             return this.Manager.Ite(g, t, f);
+        }
+
+        public Unit Ite(DD g, Unit t, Unit f)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         public DD Not(DD x)

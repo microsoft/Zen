@@ -192,10 +192,10 @@ namespace ZenLib.ModelChecking
 
             // get the decision diagram representing the equality.
             var symbolicEvaluator =
-                new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>();
+                new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit>(solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit>();
             var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
-            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>>)symbolicValue;
+            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit>)symbolicValue;
 
             DD result = (DD)(object)symbolicResult.Value;
 

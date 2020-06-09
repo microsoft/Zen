@@ -12,13 +12,13 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Visitor that computes a symbolic representation for the function.
     /// </summary>
-    internal sealed class SymbolicEvaluationVisitor<TModel, TVar, TBool, TInt>
-        : IZenExprVisitor<SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt>, SymbolicValue<TModel, TVar, TBool, TInt>>
+    internal sealed class SymbolicEvaluationVisitor<TModel, TVar, TBool, TInt, TString>
+        : IZenExprVisitor<SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString>, SymbolicValue<TModel, TVar, TBool, TInt, TString>>
     {
         /// <summary>
         /// Gets the decision diagram manager object.
         /// </summary>
-        public ISolver<TModel, TVar, TBool, TInt> Solver { get; }
+        public ISolver<TModel, TVar, TBool, TInt, TString> Solver { get; }
 
         /// <summary>
         /// Gets the set of variables.
@@ -33,20 +33,20 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Cache of results to avoid the cost of common subexpressions.
         /// </summary>
-        private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt>>();
+        private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TInt}"/> class.
         /// </summary>
         /// <param name="solver">The manager object.</param>
-        public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TInt> solver)
+        public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TInt, TString> solver)
         {
             this.Solver = solver;
             this.Variables = new List<TVar>();
             this.ArbitraryVariables = new Dictionary<object, TVar>();
         }
 
-        private SymbolicValue<TModel, TVar, TBool, TInt> LookupOrCompute(object expression, Func<SymbolicValue<TModel, TVar, TBool, TInt>> callback)
+        private SymbolicValue<TModel, TVar, TBool, TInt, TString> LookupOrCompute(object expression, Func<SymbolicValue<TModel, TVar, TBool, TInt, TString>> callback)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -65,7 +65,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -79,13 +79,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.And(v1.Value, v2.Value));
+                var v1 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.And(v1.Value, v2.Value));
             });
         }
 
@@ -95,7 +95,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -105,7 +105,7 @@ namespace ZenLib.ModelChecking
                 {
                     var (variable, expr) = this.Solver.CreateBoolVar(expression);
                     this.Variables.Add(variable);
-                    var result = new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, expr);
+                    var result = new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, expr);
                     this.ArbitraryVariables[expression] = variable;
                     return result;
                 }
@@ -114,7 +114,7 @@ namespace ZenLib.ModelChecking
                 {
                     var (variable, expr) = this.Solver.CreateByteVar(expression);
                     this.Variables.Add(variable);
-                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, expr);
+                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, expr);
                     this.ArbitraryVariables[expression] = variable;
                     return result;
                 }
@@ -123,7 +123,7 @@ namespace ZenLib.ModelChecking
                 {
                     var (variable, expr) = this.Solver.CreateShortVar(expression);
                     this.Variables.Add(variable);
-                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, expr);
+                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, expr);
                     this.ArbitraryVariables[expression] = variable;
                     return result;
                 }
@@ -132,7 +132,7 @@ namespace ZenLib.ModelChecking
                 {
                     var (variable, expr) = this.Solver.CreateIntVar(expression);
                     this.Variables.Add(variable);
-                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, expr);
+                    var result = new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, expr);
                     this.ArbitraryVariables[expression] = variable;
                     return result;
                 }
@@ -140,7 +140,7 @@ namespace ZenLib.ModelChecking
                 // long or ulong
                 var (v, e) = this.Solver.CreateLongVar(expression);
                 this.Variables.Add(v);
-                var r = new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, e);
+                var r = new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, e);
                 this.ArbitraryVariables[expression] = v;
                 return r;
             });
@@ -152,7 +152,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -166,13 +166,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenBitwiseAndExpr<T1>(ZenBitwiseAndExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseAndExpr<T1>(ZenBitwiseAndExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
             });
         }
 
@@ -182,12 +182,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.BitwiseNot(v.Value));
+                var v = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseNot(v.Value));
             });
         }
 
@@ -197,13 +197,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenBitwiseOrExpr<T1>(ZenBitwiseOrExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseOrExpr<T1>(ZenBitwiseOrExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
             });
         }
 
@@ -213,13 +213,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenBitwiseXorExpr<T1>(ZenBitwiseXorExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseXorExpr<T1>(ZenBitwiseXorExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
             });
         }
 
@@ -229,12 +229,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var b = expression.Value ? this.Solver.True() : this.Solver.False();
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, b);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, b);
             });
         }
 
@@ -244,12 +244,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantByteExpr(ZenConstantByteExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantByteExpr(ZenConstantByteExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateByteConst(expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -259,12 +259,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantIntExpr(ZenConstantIntExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantIntExpr(ZenConstantIntExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateIntConst(expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -274,12 +274,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantLongExpr(ZenConstantLongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantLongExpr(ZenConstantLongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateLongConst(expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -289,12 +289,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantShortExpr(ZenConstantShortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantShortExpr(ZenConstantShortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateShortConst(expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -304,12 +304,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantUintExpr(ZenConstantUintExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUintExpr(ZenConstantUintExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateIntConst((int)expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -319,12 +319,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateLongConst((long)expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -334,12 +334,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var bv = this.Solver.CreateShortConst((short)expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, bv);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
             });
         }
 
@@ -349,11 +349,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt>>.Empty;
+                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt, TString>>.Empty;
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
@@ -361,7 +361,7 @@ namespace ZenLib.ModelChecking
                     fields = fields.Add(field, fieldValue.Accept(this, parameter));
                 }
 
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, fields);
+                return new SymbolicClass<TModel, TVar, TBool, TInt, TString>(this.Solver, fields);
             });
         }
 
@@ -371,21 +371,21 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenEqExpr<T1>(ZenEqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenEqExpr<T1>(ZenEqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var v1 = expression.Expr1.Accept(this, parameter);
                 var v2 = expression.Expr2.Accept(this, parameter);
 
-                if (v1 is SymbolicBool<TModel, TVar, TBool, TInt> b1 && v2 is SymbolicBool<TModel, TVar, TBool, TInt> b2)
+                if (v1 is SymbolicBool<TModel, TVar, TBool, TInt, TString> b1 && v2 is SymbolicBool<TModel, TVar, TBool, TInt, TString> b2)
                 {
-                    return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
+                    return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
                 }
 
-                var i1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)v1;
-                var i2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)v2;
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
+                var i1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)v1;
+                var i2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)v2;
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
             });
         }
 
@@ -395,11 +395,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v = (SymbolicClass<TModel, TVar, TBool, TInt>)expression.Expr.Accept(this, parameter);
+                var v = (SymbolicClass<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
                 return v.Fields[expression.FieldName];
             });
         }
@@ -410,11 +410,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.GuardExpr.Accept(this, parameter);
+                var v = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.GuardExpr.Accept(this, parameter);
                 var vtrue = expression.TrueExpr.Accept(this, parameter);
                 var vfalse = expression.FalseExpr.Accept(this, parameter);
                 return vtrue.Merge(v.Value, vfalse);
@@ -427,17 +427,17 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenLeqExpr<T1>(ZenLeqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenLeqExpr<T1>(ZenLeqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
                 var result =
                     ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
                     this.Solver.LessThanOrEqual(v1.Value, v2.Value) :
                     this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value);
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, result);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, result);
             });
         }
 
@@ -447,17 +447,17 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenGeqExpr<T1>(ZenGeqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenGeqExpr<T1>(ZenGeqExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
                 var result =
                     ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
                     this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
                     this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value);
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, result);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, result);
             });
         }
 
@@ -467,23 +467,23 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v = (SymbolicList<TModel, TVar, TBool, TInt>)expression.Expr.Accept(this, parameter);
+                var v = (SymbolicList<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
                 var elt = expression.Element.Accept(this, parameter);
 
-                var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt>>.Empty;
+                var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt, TString>>.Empty;
                 foreach (var kv in v.GuardedListGroup.Mapping)
                 {
                     var guard = kv.Value.Guard;
                     var values = kv.Value.Values.Insert(0, elt);
-                    mapping = mapping.Add(kv.Key + 1, new GuardedList<TModel, TVar, TBool, TInt>(guard, values));
+                    mapping = mapping.Add(kv.Key + 1, new GuardedList<TModel, TVar, TBool, TInt, TString>(guard, values));
                 }
 
-                var listGroup = new GuardedListGroup<TModel, TVar, TBool, TInt>(mapping);
-                return new SymbolicList<TModel, TVar, TBool, TInt>(this.Solver, listGroup);
+                var listGroup = new GuardedListGroup<TModel, TVar, TBool, TInt, TString>(mapping);
+                return new SymbolicList<TModel, TVar, TBool, TInt, TString>(this.Solver, listGroup);
             });
         }
 
@@ -493,15 +493,15 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt>>.Empty;
-                var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TInt>>.Empty;
-                mapping = mapping.Add(0, new GuardedList<TModel, TVar, TBool, TInt>(this.Solver.True(), list));
-                var guardedListGroup = new GuardedListGroup<TModel, TVar, TBool, TInt>(mapping);
-                return new SymbolicList<TModel, TVar, TBool, TInt>(this.Solver, guardedListGroup);
+                var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt, TString>>.Empty;
+                var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TInt, TString>>.Empty;
+                mapping = mapping.Add(0, new GuardedList<TModel, TVar, TBool, TInt, TString>(this.Solver.True(), list));
+                var guardedListGroup = new GuardedListGroup<TModel, TVar, TBool, TInt, TString>(mapping);
+                return new SymbolicList<TModel, TVar, TBool, TInt, TString>(this.Solver, guardedListGroup);
             });
         }
 
@@ -511,11 +511,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
-            var list = (SymbolicList<TModel, TVar, TBool, TInt>)expression.ListExpr.Accept(this, parameter);
+            var list = (SymbolicList<TModel, TVar, TBool, TInt, TString>)expression.ListExpr.Accept(this, parameter);
 
-            SymbolicValue<TModel, TVar, TBool, TInt> result = null;
+            SymbolicValue<TModel, TVar, TBool, TInt, TString> result = null;
 
             foreach (var kv in list.GuardedListGroup.Mapping)
             {
@@ -532,19 +532,19 @@ namespace ZenLib.ModelChecking
                 {
                     // split the symbolic list
                     var (hd, tl) = CommonUtilities.SplitHead(values);
-                    var tlImmutable = CommonUtilities.ToImmutableList<SymbolicValue<TModel, TVar, TBool, TInt>>(tl);
+                    var tlImmutable = CommonUtilities.ToImmutableList<SymbolicValue<TModel, TVar, TBool, TInt, TString>>(tl);
 
                     // push the guard into the tail of the list
-                    var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt>>.Empty;
-                    map = map.Add(length - 1, new GuardedList<TModel, TVar, TBool, TInt>(this.Solver.True(), tlImmutable));
-                    var group = new GuardedListGroup<TModel, TVar, TBool, TInt>(map);
-                    var rest = new SymbolicList<TModel, TVar, TBool, TInt>(this.Solver, group);
+                    var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TInt, TString>>.Empty;
+                    map = map.Add(length - 1, new GuardedList<TModel, TVar, TBool, TInt, TString>(this.Solver.True(), tlImmutable));
+                    var group = new GuardedListGroup<TModel, TVar, TBool, TInt, TString>(map);
+                    var rest = new SymbolicList<TModel, TVar, TBool, TInt, TString>(this.Solver, group);
 
                     // execute the cons case with placeholder values to get a new Zen value.
                     var arg1 = new ZenArgumentExpr<TList>();
                     var arg2 = new ZenArgumentExpr<IList<TList>>();
                     var args = parameter.ArgumentAssignment.Add(arg1.Id, hd).Add(arg2.Id, rest);
-                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt>(args);
+                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString>(args);
                     var newExpression = expression.ConsCase(arg1, arg2);
 
                     // model check the resulting value using the computed values for the placeholders.
@@ -557,10 +557,10 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        private SymbolicValue<TModel, TVar, TBool, TInt> Merge(
+        private SymbolicValue<TModel, TVar, TBool, TInt, TString> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TInt> v1,
-            SymbolicValue<TModel, TVar, TBool, TInt> v2)
+            SymbolicValue<TModel, TVar, TBool, TInt, TString> v1,
+            SymbolicValue<TModel, TVar, TBool, TInt, TString> v2)
         {
             if (v2 == null)
             {
@@ -576,13 +576,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenMinusExpr<T1>(ZenMinusExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenMinusExpr<T1>(ZenMinusExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
             });
         }
 
@@ -592,13 +592,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenMultiplyExpr<T1>(ZenMultiplyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenMultiplyExpr<T1>(ZenMultiplyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
             });
         }
 
@@ -608,12 +608,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Expr.Accept(this, parameter);
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Not(v.Value));
+                var v = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Not(v.Value));
             });
         }
 
@@ -623,13 +623,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicBool<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicBool<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
+                var v1 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
             });
         }
 
@@ -639,13 +639,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenSumExpr<T1>(ZenSumExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenSumExpr<T1>(ZenSumExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
             });
         }
 
@@ -655,13 +655,13 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var o = (SymbolicClass<TModel, TVar, TBool, TInt>)expression.Expr.Accept(this, parameter);
+                var o = (SymbolicClass<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
                 var f = expression.FieldValue.Accept(this, parameter);
-                return new SymbolicClass<TModel, TVar, TBool, TInt>(this.Solver, o.Fields.SetItem(expression.FieldName, f));
+                return new SymbolicClass<TModel, TVar, TBool, TInt, TString>(this.Solver, o.Fields.SetItem(expression.FieldName, f));
             });
         }
     }
