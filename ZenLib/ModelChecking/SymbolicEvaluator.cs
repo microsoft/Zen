@@ -287,6 +287,12 @@ namespace ZenLib.ModelChecking
                 var (v, _) = solver.CreateLongVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
             }
+
+            if (zenExpr is Zen<string>)
+            {
+                var (v, _) = solver.CreateStringVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+            }
         }
     }
 }
