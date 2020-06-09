@@ -11,7 +11,8 @@ namespace ZenLib.ModelChecking
     /// <typeparam name="TVariable">The variable type.</typeparam>
     /// <typeparam name="TBool">The boolean expression type.</typeparam>
     /// <typeparam name="TInteger">The integer type.</typeparam>
-    public interface ISolver<TModel, TVariable, TBool, TInteger>
+    /// <typeparam name="TString">The string type.</typeparam>
+    public interface ISolver<TModel, TVariable, TBool, TInteger, TString>
     {
         /// <summary>
         /// The false expression.
@@ -83,6 +84,19 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <returns></returns>
         TInteger CreateLongConst(long l);
+
+        /// <summary>
+        /// Create a new string expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression</returns>
+        (TVariable, TString) CreateStringVar(object e);
+
+        /// <summary>
+        /// Create a string constant.
+        /// </summary>
+        /// <returns></returns>
+        TString CreateStringConst(string s);
 
         /// <summary>
         /// The 'And' of two expressions.
@@ -171,12 +185,28 @@ namespace ZenLib.ModelChecking
         TInteger Multiply(TInteger x, TInteger y);
 
         /// <summary>
-        /// The 'Equal' of two expressions.
+        /// The 'Concat' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TString Concat(TString x, TString y);
+
+        /// <summary>
+        /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool Eq(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'Equal' of two strings.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TString x, TString y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -220,13 +250,22 @@ namespace ZenLib.ModelChecking
         TBool Ite(TBool g, TBool t, TBool f);
 
         /// <summary>
-        /// The 'Ite' of a guard and two expressions.
+        /// The 'Ite' of a guard and two integers.
         /// </summary>
         /// <param name="g">The guard expression.</param>
         /// <param name="t">The true expression.</param>
         /// <param name="f">The false expression.</param>
         /// <returns></returns>
         TInteger Ite(TBool g, TInteger t, TInteger f);
+
+        /// <summary>
+        /// The 'Ite' of a guard and two integers.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TString Ite(TBool g, TString t, TString f);
 
         /// <summary>
         /// Check whether a boolean expression is satisfiable.
