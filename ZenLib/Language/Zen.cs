@@ -294,7 +294,7 @@ namespace ZenLib
         /// <summary>
         /// Convert an input to the Zen string type.
         /// </summary>
-        /// <param name="o">The object.</param>
+        /// <param name="s">The string.</param>
         /// <returns></returns>
         private static Zen<TZen> ConvertStringConstant<TZen>(string s)
         {

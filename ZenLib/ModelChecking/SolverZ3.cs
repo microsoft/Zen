@@ -132,13 +132,13 @@ namespace ZenLib.ModelChecking
         public SeqExpr CreateStringConst(string s)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new ZenException("Not yet implemented");
         }
 
         public (Expr, SeqExpr) CreateStringVar(object e)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new ZenException("Not yet implemented");
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
@@ -149,7 +149,7 @@ namespace ZenLib.ModelChecking
         public BoolExpr Eq(SeqExpr x, SeqExpr y)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new ZenException("Not yet implemented");
         }
 
         public BoolExpr False()
@@ -186,7 +186,7 @@ namespace ZenLib.ModelChecking
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new ZenException("Not yet implemented");
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -232,7 +232,7 @@ namespace ZenLib.ModelChecking
         public SeqExpr Concat(SeqExpr x, SeqExpr y)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new ZenException("Not yet implemented");
         }
 
         public object Get(Model m, Expr v)

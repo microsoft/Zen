@@ -16,20 +16,20 @@ namespace ZenLib
 
         public static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
         {
-            var x = ReflectionUtilities.GetConstantString(e1);
-            var y = ReflectionUtilities.GetConstantString(e2);
+            string x = ReflectionUtilities.GetConstantString(e1);
+            string y = ReflectionUtilities.GetConstantString(e2);
 
-            if (x.HasValue && y.HasValue)
+            if (x != null && y != null)
             {
-                return ReflectionUtilities.CreateConstantString(x.Value + y.Value);
+                return ReflectionUtilities.CreateConstantString<T>(x + y);
             }
 
-            if (x.HasValue && x.Value.Equals(""))
+            if (x == "")
             {
                 return e2;
             }
 
-            if (y.HasValue && y.Value.Equals(""))
+            if (y == "")
             {
                 return e1;
             }

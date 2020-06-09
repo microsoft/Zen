@@ -734,7 +734,7 @@ namespace ZenLib.Compilation
             {
                 var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
                 var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
-                return Expression.Add(l, r, typeof(string).GetMethod("Concat", new []{typeof(string), typeof(string)}));
+                return Expression.Add(l, r, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
             });
         }
 

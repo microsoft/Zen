@@ -89,7 +89,7 @@ namespace ZenLib.ModelChecking
         /// Create a new string expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
-        /// <returns>The expression</returns>
+        /// <returns>The expression.</returns>
         (TVariable, TString) CreateStringVar(object e);
 
         /// <summary>

@@ -400,7 +400,7 @@ namespace ZenLib.ModelChecking
 
                 if (v1 is SymbolicString<TModel, TVar, TBool, TInt, TString> s1 && v2 is SymbolicString<TModel, TVar, TBool, TInt, TString> s2)
                 {
-                    return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
+                    return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
                 }
 
                 var i1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)v1;
