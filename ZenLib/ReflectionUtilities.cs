@@ -350,10 +350,10 @@ namespace ZenLib
                 return obj;
             }
 
-            /* if (type == typeof(string))
+            if (type == typeof(string))
             {
-                return string.Copy((string)obj);
-            } */
+                return String.Copy((string)obj);
+            }
 
             var result = Activator.CreateInstance(type);
             foreach (var fieldInfo in GetAllFields(type))
@@ -416,6 +416,11 @@ namespace ZenLib
             if (type == UlongType)
             {
                 return visitor.VisitUlong();
+            }
+
+            if (type == StringType)
+            {
+                return visitor.VisitString();
             }
 
             if (IsOptionType(type))

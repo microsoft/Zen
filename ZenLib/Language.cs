@@ -458,7 +458,7 @@ namespace ZenLib
             {
                 var type = typeof(T);
 
-                if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
+                if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
                 {
                     return ZenEqExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
                 }
@@ -610,7 +610,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Compute the sum of Zen values.
+        /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>
         /// <param name="expr2">Second Zen expressions.</param>
