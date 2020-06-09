@@ -564,6 +564,20 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
+        /// Visit a ConcatExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                return (string)expression.Expr1.Accept(this, parameter) + (string)expression.Expr2.Accept(this, parameter);
+            });
+        }
+
+        /// <summary>
         /// Visit a IntConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -625,6 +639,17 @@ namespace ZenLib.Interpretation
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return expression.Value;
+        }
+
+        /// <summary>
+        /// Visit a ConstantStringExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
