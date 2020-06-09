@@ -606,6 +606,13 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.StringType)
+            {
+                return ZenConcatExpr<T>.Create(expr1, expr2);
+            }
+
             return ZenSumExpr<T>.Create(expr1, expr2);
         }
 
