@@ -12,7 +12,7 @@ namespace ZenLib.ModelChecking
     internal class SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolicEvaluationEnvironment{TModel, TVar, TBool, TInt}"/> class.
+        /// Initializes a new instance of the <see cref="SymbolicEvaluationEnvironment{TModel, TVar, TBool, TInt, TString}"/> class.
         /// </summary>
         public SymbolicEvaluationEnvironment()
         {
@@ -20,7 +20,7 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolicEvaluationEnvironment{TModel, TVar, TBool, TInt}"/> class.
+        /// Initializes a new instance of the <see cref="SymbolicEvaluationEnvironment{TModel, TVar, TBool, TInt, TString}"/> class.
         /// </summary>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
         public SymbolicEvaluationEnvironment(ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TInt, TString>> argumentAssignment)

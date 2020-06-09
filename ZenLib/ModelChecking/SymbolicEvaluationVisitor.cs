@@ -36,7 +36,7 @@ namespace ZenLib.ModelChecking
         private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TInt}"/> class.
+        /// Initializes a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TInt, TString}"/> class.
         /// </summary>
         /// <param name="solver">The manager object.</param>
         public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TInt, TString> solver)
