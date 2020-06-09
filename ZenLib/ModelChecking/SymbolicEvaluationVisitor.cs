@@ -344,6 +344,21 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Visit a ConstantStringExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantStringExpr(ZenConstantStringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var bv = this.Solver.CreateStringConst((string)expression.Value);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
+            });
+        }
+
+        /// <summary>
         /// Visit a CreateObjectExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -381,6 +396,11 @@ namespace ZenLib.ModelChecking
                 if (v1 is SymbolicBool<TModel, TVar, TBool, TInt, TString> b1 && v2 is SymbolicBool<TModel, TVar, TBool, TInt, TString> b2)
                 {
                     return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
+                }
+
+                if (v1 is SymbolicString<TModel, TVar, TBool, TInt, TString> s1 && v2 is SymbolicString<TModel, TVar, TBool, TInt, TString> s2)
+                {
+                    return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
                 }
 
                 var i1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)v1;
@@ -646,6 +666,22 @@ namespace ZenLib.ModelChecking
                 var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
                 var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
                 return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
+            });
+        }
+
+        /// <summary>
+        /// Visit a ConcatExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConcatExpr<T1>(ZenConcatExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Concat(v1.Value, v2.Value));
             });
         }
 
