@@ -335,6 +335,17 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
+        /// Convert a constant string expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return Expression.Constant(expression.Value);
+        }
+
+        /// <summary>
         /// Create an object given the fields.
         /// </summary>
         /// <typeparam name="TObject">The object type.</typeparam>
@@ -708,6 +719,22 @@ namespace ZenLib.Compilation
                 return Add<T>(
                     expression.Expr1.Accept(this, parameter),
                     expression.Expr2.Accept(this, parameter));
+            });
+        }
+
+        /// <summary>
+        /// Convert a 'Concat' expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
+                var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
+                return Expression.Add(l, r, typeof(string).GetMethod("Concat", new []{typeof(string), typeof(string)}));
             });
         }
 
