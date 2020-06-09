@@ -150,6 +150,13 @@ namespace ZenLib.Generation
             return e;
         }
 
+        public object VisitString()
+        {
+            var e = new ZenArbitraryExpr<string>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
         public object VisitOption(Func<Type, object> recurse, Type innerType)
         {
             var flag = recurse(ReflectionUtilities.BoolType);
