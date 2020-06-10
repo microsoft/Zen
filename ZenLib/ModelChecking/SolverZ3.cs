@@ -27,6 +27,8 @@ namespace ZenLib.ModelChecking
 
         private Sort LongSort;
 
+        private Sort StringSort;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
@@ -42,6 +44,7 @@ namespace ZenLib.ModelChecking
             this.ShortSort = this.context.MkBitVecSort(16);
             this.IntSort = this.context.MkBitVecSort(32);
             this.LongSort = this.context.MkBitVecSort(64);
+            this.StringSort = this.context.StringSort;
         }
 
         private Symbol FreshSymbol()
@@ -131,14 +134,13 @@ namespace ZenLib.ModelChecking
 
         public SeqExpr CreateStringConst(string s)
         {
-            // TODO
-            throw new ZenException("Not yet implemented");
+            return this.context.MkString(s);
         }
 
         public (Expr, SeqExpr) CreateStringVar(object e)
         {
-            // TODO
-            throw new ZenException("Not yet implemented");
+            var v = this.context.MkConst(FreshSymbol(), this.StringSort);
+            return (v, (SeqExpr)v);
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
@@ -148,8 +150,7 @@ namespace ZenLib.ModelChecking
 
         public BoolExpr Eq(SeqExpr x, SeqExpr y)
         {
-            // TODO
-            throw new ZenException("Not yet implemented");
+            return this.context.MkEq(x, y);
         }
 
         public BoolExpr False()
@@ -185,8 +186,7 @@ namespace ZenLib.ModelChecking
 
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
-            // TODO
-            throw new ZenException("Not yet implemented");
+            return (SeqExpr)this.context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -231,8 +231,7 @@ namespace ZenLib.ModelChecking
 
         public SeqExpr Concat(SeqExpr x, SeqExpr y)
         {
-            // TODO
-            throw new ZenException("Not yet implemented");
+            return this.context.MkConcat(x, y);
         }
 
         public object Get(Model m, Expr v)
