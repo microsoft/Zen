@@ -137,6 +137,15 @@ namespace ZenLib.ModelChecking
                     return result;
                 }
 
+                if (type == ReflectionUtilities.StringType)
+                {
+                    var (variable, expr) = this.Solver.CreateStringVar(expression);
+                    this.Variables.Add(variable);
+                    var result = new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, expr);
+                    this.ArbitraryVariables[expression] = variable;
+                    return result;
+                }
+
                 // long or ulong
                 var (v, e) = this.Solver.CreateLongVar(expression);
                 this.Variables.Add(v);
