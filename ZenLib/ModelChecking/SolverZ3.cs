@@ -268,6 +268,11 @@ namespace ZenLib.ModelChecking
                 return (int)uint.Parse(e.ToString());
             }
 
+            if (e.Sort == this.StringSort)
+            {
+                return e.ToString();
+            }
+
             if (long.TryParse(e.ToString(), out long xl))
             {
                 return xl;
