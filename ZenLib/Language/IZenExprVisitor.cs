@@ -124,12 +124,28 @@ namespace ZenLib
         TReturn VisitZenConstantLongExpr(ZenConstantLongExpr expression, TParam parameter);
 
         /// <summary>
+        /// Visit a StringConstantExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenConstantStringExpr(ZenConstantStringExpr expression, TParam parameter);
+
+        /// <summary>
         /// Visit a SumExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenSumExpr<T>(ZenSumExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ConcatExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenConcatExpr(ZenConcatExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a MultiplyExpr.

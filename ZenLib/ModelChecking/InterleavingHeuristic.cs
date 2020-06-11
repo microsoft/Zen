@@ -180,7 +180,23 @@ namespace ZenLib.ModelChecking
             return emptySet;
         }
 
+        public ImmutableHashSet<object> VisitZenConstantStringExpr(ZenConstantStringExpr expression, Unit parameter)
+        {
+            return emptySet;
+        }
+
         public ImmutableHashSet<object> VisitZenSumExpr<T>(ZenSumExpr<T> expression, Unit parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var x = expression.Expr1.Accept(this, parameter);
+                var y = expression.Expr2.Accept(this, parameter);
+                this.Combine(x, y);
+                return x.Union(y);
+            });
+        }
+
+        public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {

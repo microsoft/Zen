@@ -350,10 +350,10 @@ namespace ZenLib
                 return obj;
             }
 
-            /* if (type == typeof(string))
+            if (type == typeof(string))
             {
-                return string.Copy((string)obj);
-            } */
+                return String.Copy((string)obj);
+            }
 
             var result = Activator.CreateInstance(type);
             foreach (var fieldInfo in GetAllFields(type))
@@ -416,6 +416,11 @@ namespace ZenLib
             if (type == UlongType)
             {
                 return visitor.VisitUlong();
+            }
+
+            if (type == StringType)
+            {
+                return visitor.VisitString();
             }
 
             if (IsOptionType(type))
@@ -520,6 +525,22 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get a constant string value.
+        /// </summary>
+        /// <typeparam name="T">The type.</typeparam>
+        /// <param name="value">The Zen string value.</param>
+        /// <returns>A string.</returns>
+        public static string GetConstantString<T>(Zen<T> value)
+        {
+            if (value is ZenConstantStringExpr xs)
+            {
+                return (string)xs.Value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Create a constant Zen integer value.
         /// </summary>
         /// <typeparam name="T">The integer gype.</typeparam>
@@ -559,6 +580,16 @@ namespace ZenLib
             }
 
             return (Zen<T>)(object)ZenConstantUlongExpr.Create((ulong)value);
+        }
+
+        /// <summary>
+        /// Create a constant Zen string value.
+        /// </summary>
+        /// <param name="value">The Zen string value.</param>
+        /// <returns>A string.</returns>
+        public static Zen<string> CreateConstantString(string value)
+        {
+            return (Zen<string>)(object)ZenConstantStringExpr.Create(value);
         }
 
         /// <summary>

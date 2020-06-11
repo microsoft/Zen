@@ -9,7 +9,7 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, SeqExpr>
     {
         private Context context;
 
@@ -27,6 +27,8 @@ namespace ZenLib.ModelChecking
 
         private Sort LongSort;
 
+        private Sort StringSort;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
@@ -42,6 +44,7 @@ namespace ZenLib.ModelChecking
             this.ShortSort = this.context.MkBitVecSort(16);
             this.IntSort = this.context.MkBitVecSort(32);
             this.LongSort = this.context.MkBitVecSort(64);
+            this.StringSort = this.context.StringSort;
         }
 
         private Symbol FreshSymbol()
@@ -129,7 +132,23 @@ namespace ZenLib.ModelChecking
             return (v, (BitVecExpr)v);
         }
 
+        public SeqExpr CreateStringConst(string s)
+        {
+            return this.context.MkString(s);
+        }
+
+        public (Expr, SeqExpr) CreateStringVar(object e)
+        {
+            var v = this.context.MkConst(FreshSymbol(), this.StringSort);
+            return (v, (SeqExpr)v);
+        }
+
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
+        {
+            return this.context.MkEq(x, y);
+        }
+
+        public BoolExpr Eq(SeqExpr x, SeqExpr y)
         {
             return this.context.MkEq(x, y);
         }
@@ -163,6 +182,11 @@ namespace ZenLib.ModelChecking
             /* var v = (BitVecExpr)this.context.MkConst(FreshSymbol(), t.Sort);
             this.solver.Assert(this.context.MkEq(v, (BitVecExpr)this.context.MkITE(g, t, f)));
             return v; */
+        }
+
+        public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
+        {
+            return (SeqExpr)this.context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -205,6 +229,11 @@ namespace ZenLib.ModelChecking
             return this.context.MkBVMul(x, y);
         }
 
+        public SeqExpr Concat(SeqExpr x, SeqExpr y)
+        {
+            return this.context.MkConcat(x, y);
+        }
+
         public object Get(Model m, Expr v)
         {
             var e = m.Evaluate(v, true);
@@ -237,6 +266,12 @@ namespace ZenLib.ModelChecking
                 }
 
                 return (int)uint.Parse(e.ToString());
+            }
+
+            if (e.Sort == this.StringSort)
+            {
+                // Remove beginning and ending quotation marks
+                return e.ToString().Substring(1, e.ToString().Length - 2);
             }
 
             if (long.TryParse(e.ToString(), out long xl))

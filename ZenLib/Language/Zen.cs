@@ -89,6 +89,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Convert a string to the appropriate Zen type.
+        /// </summary>
+        /// <param name="x">The value.</param>
+        public static implicit operator Zen<T>(string x)
+        {
+            return ConvertStringConstant<T>((string)x);
+        }
+
+        /// <summary>
         /// Equality between two Zen objects.
         /// </summary>
         /// <param name="expr1">First Zen expression.</param>
@@ -162,6 +171,13 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator +(Zen<T> expr1, Zen<T> expr2)
         {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.StringType)
+            {
+                return Language.Concat(expr1 as Zen<string>, expr2 as Zen<string>) as Zen<T>;
+            }
+
             return Language.Plus(expr1, expr2);
         }
 
@@ -280,6 +296,23 @@ namespace ZenLib
             }
 
             throw new ZenException($"Invalid implicit conversion from integer to type: {type}");
+        }
+
+        /// <summary>
+        /// Convert an input to the Zen string type.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns></returns>
+        private static Zen<TZen> ConvertStringConstant<TZen>(string s)
+        {
+            var type = typeof(TZen);
+
+            if (type == ReflectionUtilities.StringType)
+            {
+                return (Zen<TZen>)(object)Language.String(s);
+            }
+
+            throw new ZenException($"Invalid implicit conversion from string to type: {type}");
         }
 
         /// <summary>

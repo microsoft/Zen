@@ -139,6 +139,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The Zen value for a string.
+        /// </summary>
+        /// <param name="s">A string value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> String(string s)
+        {
+            return ZenConstantStringExpr.Create(s);
+        }
+
+        /// <summary>
         /// A Zen object representing some arbitrary value.
         /// </summary>
         /// <param name="listSize">Depth bound on the size of the object.</param>
@@ -448,7 +458,7 @@ namespace ZenLib
             {
                 var type = typeof(T);
 
-                if (type == ReflectionUtilities.BoolType || ReflectionUtilities.IsIntegerType(type))
+                if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
                 {
                     return ZenEqExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
                 }
@@ -600,7 +610,21 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Compute the sum of Zen values.
+        /// Compute the concatenation of two Zen strings.
+        /// </summary>
+        /// <param name="expr1">First Zen expressions.</param>
+        /// <param name="expr2">Second Zen expressions.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> Concat(Zen<string> expr1, Zen<string> expr2)
+        {
+            CommonUtilities.Validate(expr1);
+            CommonUtilities.Validate(expr2);
+
+            return ZenConcatExpr.Create(expr1, expr2);
+        }
+
+        /// <summary>
+        /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>
         /// <param name="expr2">Second Zen expressions.</param>

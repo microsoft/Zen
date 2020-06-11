@@ -100,5 +100,11 @@ namespace ZenLib.Generation
         {
             return ZenConstantUshortExpr.Create(0);
         }
+
+        // FIXME: default value for a c# string is null, not empty. How to represent null strings?
+        public object VisitString()
+        {
+            return ZenConstantStringExpr.Create("");
+        }
     }
 }

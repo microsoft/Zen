@@ -62,6 +62,12 @@ namespace ZenLib
         T VisitUlong();
 
         /// <summary>
+        /// Visit the string type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitString();
+
+        /// <summary>
         /// Visit the option type.
         /// </summary>
         /// <returns>A value.</returns>
