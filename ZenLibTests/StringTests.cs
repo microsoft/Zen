@@ -85,17 +85,6 @@ namespace ZenLib.Tests
         /// Test equality for composite types.
         /// </summary>
         [TestMethod]
-        public void TestStringEqualityComposite()
-        {
-            CheckAgreement<(string, string), (string, string)>((x, y) => x == y);
-            CheckAgreement<Tuple<string, string>, Tuple<string, string>>((x, y) => x == y);
-            CheckAgreement<Option<string>, Option<string>>((x, y) => x == y);
-        }
-
-        /// <summary>
-        /// Test equality for composite types.
-        /// </summary>
-        [TestMethod]
         [ExpectedException(typeof(ZenException))]
         public void TestStringEqualityCompositeException1()
         {
