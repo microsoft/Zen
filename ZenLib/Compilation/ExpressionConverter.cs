@@ -84,6 +84,11 @@ namespace ZenLib.Compilation
         private int maxMatchUnrollingDepth;
 
         /// <summary>
+        /// String concatenation method.
+        /// </summary>
+        private static MethodInfo concatMethod = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -734,7 +739,7 @@ namespace ZenLib.Compilation
             {
                 var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
                 var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
-                return Expression.Add(l, r, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
+                return Expression.Add(l, r, concatMethod);
             });
         }
 
