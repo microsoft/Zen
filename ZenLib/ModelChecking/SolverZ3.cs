@@ -270,7 +270,8 @@ namespace ZenLib.ModelChecking
 
             if (e.Sort == this.StringSort)
             {
-                return e.ToString();
+                // Remove beginning and ending quotation marks
+                return e.ToString().Substring(1, e.ToString().Length - 2);
             }
 
             if (long.TryParse(e.ToString(), out long xl))

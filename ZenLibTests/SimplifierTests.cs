@@ -177,6 +177,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for concatenaion.
+        /// </summary>
+        [TestMethod]
+        public void TestConcatenationSimplification()
+        {
+            Assert.AreEqual(String("hello") + String(""), String("hello"));
+            Assert.AreEqual(String("a") + String("hello"), String("ahello"));
+            CheckValid<string>(x => x + "" == x);
+            CheckValid<string>(x => "" + x == x);
+        }
+
+        /// <summary>
         /// Simplify if conditions.
         /// </summary>
         [TestMethod]
