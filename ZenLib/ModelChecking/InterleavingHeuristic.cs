@@ -196,7 +196,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {

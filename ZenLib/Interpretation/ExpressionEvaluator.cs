@@ -569,7 +569,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
-        public object VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenConcatExpr(ZenConcatExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
             {

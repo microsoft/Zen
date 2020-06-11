@@ -171,6 +171,13 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator +(Zen<T> expr1, Zen<T> expr2)
         {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.StringType)
+            {
+                return Language.Concat(expr1 as Zen<string>, expr2 as Zen<string>) as Zen<T>;
+            }
+
             return Language.Plus(expr1, expr2);
         }
 

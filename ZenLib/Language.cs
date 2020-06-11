@@ -606,14 +606,21 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.StringType)
-            {
-                return ZenConcatExpr<T>.Create(expr1, expr2);
-            }
-
             return ZenSumExpr<T>.Create(expr1, expr2);
+        }
+
+        /// <summary>
+        /// Compute the concatenation of two Zen strings.
+        /// </summary>
+        /// <param name="expr1">First Zen expressions.</param>
+        /// <param name="expr2">Second Zen expressions.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> Concat(Zen<string> expr1, Zen<string> expr2)
+        {
+            CommonUtilities.Validate(expr1);
+            CommonUtilities.Validate(expr2);
+
+            return ZenConcatExpr.Create(expr1, expr2);
         }
 
         /// <summary>

@@ -145,7 +145,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, TParam parameter);
+        TReturn VisitZenConcatExpr(ZenConcatExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a MultiplyExpr.

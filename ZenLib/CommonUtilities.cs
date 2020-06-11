@@ -123,17 +123,5 @@ namespace ZenLib
                 throw new ArgumentException($"Invalid non-integer type {type} used as integer.");
             }
         }
-
-        /// <summary>
-        /// Validate that a type is string.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void ValidateIsStringType(Type type)
-        {
-            if (type != ReflectionUtilities.StringType)
-            {
-                throw new ArgumentException($"Invalid non-string type {type} used as string.");
-            }
-        }
     }
 }

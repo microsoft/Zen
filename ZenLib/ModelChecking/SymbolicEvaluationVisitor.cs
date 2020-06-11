@@ -684,7 +684,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConcatExpr<T1>(ZenConcatExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConcatExpr(ZenConcatExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {

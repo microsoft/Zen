@@ -587,9 +587,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The Zen string value.</param>
         /// <returns>A string.</returns>
-        public static Zen<T> CreateConstantString<T>(string value)
+        public static Zen<string> CreateConstantString(string value)
         {
-            return (Zen<T>)(object)ZenConstantStringExpr.Create(value);
+            return (Zen<string>)(object)ZenConstantStringExpr.Create(value);
         }
 
         /// <summary>

@@ -733,7 +733,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenConcatExpr<T>(ZenConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenConcatExpr(ZenConcatExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {

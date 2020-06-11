@@ -10,18 +10,18 @@ namespace ZenLib
     /// <summary>
     /// Class representing a Concat expression.
     /// </summary>
-    internal sealed class ZenConcatExpr<T> : Zen<T>
+    internal sealed class ZenConcatExpr : Zen<string>
     {
-        private static Dictionary<(object, object), Zen<T>> hashConsTable = new Dictionary<(object, object), Zen<T>>();
+        private static Dictionary<(object, object), Zen<string>> hashConsTable = new Dictionary<(object, object), Zen<string>>();
 
-        public static Zen<T> Simplify(Zen<T> e1, Zen<T> e2)
+        public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
             string y = ReflectionUtilities.GetConstantString(e2);
 
             if (x != null && y != null)
             {
-                return ReflectionUtilities.CreateConstantString<T>(x + y);
+                return ReflectionUtilities.CreateConstantString(x + y);
             }
 
             if (x == "")
@@ -34,14 +34,13 @@ namespace ZenLib
                 return e1;
             }
 
-            return new ZenConcatExpr<T>(e1, e2);
+            return new ZenConcatExpr(e1, e2);
         }
 
-        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2)
+        public static Zen<string> Create(Zen<string> expr1, Zen<string> expr2)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
-            CommonUtilities.ValidateIsStringType(typeof(T));
 
             var key = (expr1, expr2);
             if (hashConsTable.TryGetValue(key, out var value))
@@ -55,11 +54,11 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenConcatExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenConcatExpr"/> class.
         /// </summary>
         /// <param name="expr1">The first expression.</param>
         /// <param name="expr2">The second expression.</param>
-        private ZenConcatExpr(Zen<T> expr1, Zen<T> expr2)
+        private ZenConcatExpr(Zen<string> expr1, Zen<string> expr2)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;
@@ -68,12 +67,12 @@ namespace ZenLib
         /// <summary>
         /// Gets the first expression.
         /// </summary>
-        internal Zen<T> Expr1 { get; }
+        internal Zen<string> Expr1 { get; }
 
         /// <summary>
         /// Gets the second expression.
         /// </summary>
-        internal Zen<T> Expr2 { get; }
+        internal Zen<string> Expr2 { get; }
 
         /// <summary>
         /// Convert the expression to a string.
