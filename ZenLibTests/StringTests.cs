@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Z3;
     using ZenLib;
     using ZenLib.Tests.Model;
     using static ZenLib.Language;
@@ -129,6 +130,39 @@ namespace ZenLib.Tests
         public void TestConcatException()
         {
             _ = EmptyList<string>() + EmptyList<string>();
+        }
+
+        /// <summary>
+        /// Test that DD backend does not work with strings.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestDiagramBackendException1()
+        {
+            var f = Function<string, bool>(s => s == "a");
+            f.Find((x, y) => y, backend: ModelChecking.Backend.DecisionDiagrams);
+        }
+
+        /// <summary>
+        /// Test that DD backend does not work with strings.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestDiagramBackendException2()
+        {
+            var f = Function<string, string>(s => s + "a");
+            f.Find((x, y) => x == y, backend: ModelChecking.Backend.DecisionDiagrams);
+        }
+
+        /// <summary>
+        /// Test that DD backend does not work with strings.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestDiagramBackendException3()
+        {
+            var f = Function<string, string>(s => s + "a");
+            f.Transformer();
         }
     }
 }
