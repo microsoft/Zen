@@ -77,5 +77,26 @@ namespace ZenLib.Tests
             Assert.AreEqual(true, f.Evaluate(new Dictionary<int, int> { { 1, 2 } }));
             Assert.AreEqual(false, f.Evaluate(new Dictionary<int, int> { { 2, 1 } }));
         }
+
+        /// <summary>
+        /// Test that the dictionary works with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestDictionaryStrings()
+        {
+            var f = Function<IDictionary<string, string>, bool>(d => true);
+            var sat = f.Find((d, allowed) =>
+            {
+                return And(
+                    d.Get("k1").Value() == "v1",
+                    d.Get("k2").Value() == "v2",
+                    d.Get("k3").Value() == "v3");
+            });
+
+            Assert.IsTrue(sat.HasValue);
+            Assert.AreEqual("v1", sat.Value["k1"]);
+            Assert.AreEqual("v2", sat.Value["k2"]);
+            Assert.AreEqual("v3", sat.Value["k3"]);
+        }
     }
 }

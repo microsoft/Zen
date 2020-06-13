@@ -1794,7 +1794,7 @@ namespace ZenLib
         {
             var l = (IList<Tuple<T1, T2>>)list;
             var dict = ImmutableDictionary<T1, T2>.Empty;
-            foreach (var elt in l)
+            foreach (var elt in l.Reverse())
             {
                 dict = dict.SetItem(elt.Item1, elt.Item2);
             }

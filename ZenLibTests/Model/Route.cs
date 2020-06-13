@@ -86,7 +86,37 @@ namespace ZenLib.Tests.Model
         /// </summary>
         /// <param name="route">The route.</param>
         /// <returns>A new route and the matching line number.</returns>
-        public Zen<Tuple<Option<Route>, int>> Process(Zen<Route> route)
+        public Zen<Option<Route>> Process(Zen<Route> route)
+        {
+            return TestHelper.ApplyOrderedRules<Route, Option<Route>, RouteMapLine>(
+                input: route,
+                deflt: Null<Route>(),
+                ruleMatch: (l, r, i) => l.Matches(r),
+                ruleAction: (l, r, i) => l.ApplyAction(r),
+                ruleReturn: (l, r, i) =>
+                {
+                    var line = Int(i);
+                    if (l.Disposition == Disposition.Deny)
+                    {
+                        return Some(Null<Route>());
+                    }
+
+                    if (l.Disposition == Disposition.Allow)
+                    {
+                        return Some(Some(r));
+                    }
+
+                    return Null<Option<Route>>();
+                },
+                this.Lines.ToArray());
+        }
+
+        /// <summary>
+        /// Process a route with this route map.
+        /// </summary>
+        /// <param name="route">The route.</param>
+        /// <returns>A new route and the matching line number.</returns>
+        public Zen<Tuple<Option<Route>, int>> ProcessProvenance(Zen<Route> route)
         {
             return TestHelper.ApplyOrderedRules<Route, Tuple<Option<Route>, int>, RouteMapLine>(
                 input: route,
@@ -127,6 +157,16 @@ namespace ZenLib.Tests.Model
         /// A prefix filter for the line.
         /// </summary>
         public (uint, byte, byte) PrefixGuard { get; set; }
+
+        /// <summary>
+        /// Protocol filters.
+        /// </summary>
+        public List<byte> ProtocolGuard { get; set; }
+
+        /// <summary>
+        /// As path filter guard.
+        /// </summary>
+        public List<uint> AsPathContainsGuard { get; set; }
 
         /// <summary>
         /// A community filter for the line.
