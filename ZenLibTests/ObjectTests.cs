@@ -4,12 +4,15 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
+    using ZenLib.ModelChecking;
     using ZenLib.Tests.Model;
+    using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -942,10 +945,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketEncapsulation()
         {
-            var encap = Function<IList<Packet>, IList<Packet>>(headers =>
+            var encap = Function<IList<Model.Packet>, IList<Model.Packet>>(headers =>
             {
                 var currentHeader = headers.At(0);
-                var newHeader = currentHeader.Value().WithField<Packet, uint>("DstIp", 5);
+                var newHeader = currentHeader.Value().WithField<Model.Packet, uint>("DstIp", 5);
                 var newHeaders = headers.AddFront(newHeader);
                 return newHeaders;
             });

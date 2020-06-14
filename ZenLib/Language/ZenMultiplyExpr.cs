@@ -20,9 +20,6 @@ namespace ZenLib
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
-            Console.WriteLine($"x: {x}, {e1}");
-            Console.WriteLine($"y: {y}. {e2}");
-
             if (x.HasValue && y.HasValue)
             {
                 return ReflectionUtilities.CreateConstantValue<T>(x.Value * y.Value);

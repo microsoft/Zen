@@ -8,6 +8,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reflection;
 
     /// <summary>
@@ -16,14 +17,15 @@ namespace ZenLib.ModelChecking
     /// </summary>
     internal sealed class InterleavingHeuristic : IZenExprVisitor<Unit, ImmutableHashSet<object>>
     {
-        /// <summary>
-        /// Disjoint sets data structure.
-        /// </summary>
-        public Dictionary<object, ImmutableHashSet<object>> DisjointSets { get; } = new Dictionary<object, ImmutableHashSet<object>>();
+        private static Type ZenBoolType = typeof(Zen<bool>);
+
+        public Dictionary<object, ImmutableHashSet<object>> DisjointSets { get; } =
+            new Dictionary<object, ImmutableHashSet<object>>();
 
         private ImmutableHashSet<object> emptySet = ImmutableHashSet<object>.Empty;
 
-        private Dictionary<object, ImmutableHashSet<object>> cache = new Dictionary<object, ImmutableHashSet<object>>();
+        private Dictionary<object, ImmutableHashSet<object>> cache =
+            new Dictionary<object, ImmutableHashSet<object>>();
 
         /// <summary>
         /// Lookup an existing cached value or compute it and cache the result.
@@ -43,24 +45,25 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        /// <summary>
-        /// Compute the interleaving heurstics.
-        /// </summary>
-        /// <param name="expr">The expression.</param>
-        /// <returns>Groups of variables that must be interleaved.</returns>
         public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr)
         {
             var _ = expr.Accept(this, new Unit());
             return this.DisjointSets;
         }
 
-        /// <summary>
-        /// Combine two sets by merging them together.
-        /// </summary>
-        /// <param name="set1"></param>
-        /// <param name="set2"></param>
+        private bool IsSafeSet(ImmutableHashSet<object> set)
+        {
+            return set.All(x => ZenBoolType.IsAssignableFrom(x.GetType()));
+        }
+
         private void Combine(ImmutableHashSet<object> set1, ImmutableHashSet<object> set2)
         {
+            // don't need to combine when one side is only a boolean
+            if (IsSafeSet(set1) || IsSafeSet(set2))
+            {
+                return;
+            }
+
             var all = emptySet;
             var allAffected = new HashSet<object>();
 
@@ -235,6 +238,7 @@ namespace ZenLib.ModelChecking
             {
                 var x = expression.Expr1.Accept(this, parameter);
                 var y = expression.Expr2.Accept(this, parameter);
+                this.Combine(x, y);
                 return x.Union(y);
             });
         }
@@ -255,6 +259,7 @@ namespace ZenLib.ModelChecking
             {
                 var x = expression.Expr1.Accept(this, parameter);
                 var y = expression.Expr2.Accept(this, parameter);
+                this.Combine(x, y);
                 return x.Union(y);
             });
         }

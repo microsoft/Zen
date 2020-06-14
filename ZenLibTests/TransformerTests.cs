@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib.ModelChecking;
     using ZenLib.Tests.Model;
     using static ZenLib.Language;
 
@@ -189,6 +190,44 @@ namespace ZenLib.Tests
 
             var inputSet = t.TransformBackwards(outputSet);
             Assert.IsFalse(set.Element().Value.DstIp <= 4 && set.Element().Value.SrcIp <= 5);
+        }
+
+        /// <summary>
+        /// Test packet transformations.
+        /// </summary>
+        [TestMethod]
+        public void TestPacketSet()
+        {
+            var rnd = new System.Random();
+            for (int j = 0; j < 100; j++)
+            {
+                var i = (uint)rnd.Next();
+                var f = Function<Packet, bool>(p =>
+                {
+                    return p.GetField<Packet, uint>("DstIp") == i;
+                });
+
+                StateSetTransformer<Packet, bool> transformer = f.Transformer();
+                var set = transformer.InputSet((pkt, matches) => matches);
+                Assert.AreEqual(i, set.Element().Value.DstIp);
+            }
+        }
+
+        /// <summary>
+        /// Test packet transformations.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleTransformers()
+        {
+            var t1 = Function<Packet, bool>(p => true).Transformer();
+            var set1 = t1.InputSet((p, v) => v);
+            var t2 = Function<Packet, bool>(p => p.GetField<Packet, uint>("DstIp") == 1).Transformer();
+            var set2 = t2.InputSet((p, v) => v);
+            var t3 = Function<uint, bool>(u => u == 2).Transformer();
+            var set3 = t3.InputSet((u, v) => v);
+            Assert.IsTrue(set1.IsFull());
+            Assert.AreEqual(1U, set2.Element().Value.DstIp);
+            Assert.AreEqual(2U, set3.Element().Value);
         }
     }
 }

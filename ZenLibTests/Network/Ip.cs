@@ -36,7 +36,7 @@ namespace ZenLib.Tests.Network
             return $"{x4}.{x3}.{x2}.{x1}";
         }
 
-        private static Ip FromBytes(byte x1, byte x2, byte x3, byte x4)
+        public static Ip FromBytes(byte x1, byte x2, byte x3, byte x4)
         {
             return new Ip { Value = (uint)(x1 << 24) | (uint)(x2 << 16) | (uint)(x3 << 8) | x4 };
         }

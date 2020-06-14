@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -65,6 +66,11 @@ namespace ZenLib.ModelChecking
 
                 foreach (var elt in set)
                 {
+                    if (this.ExistingAssignment.ContainsKey(elt))
+                    {
+                        continue;
+                    }
+
                     var type = elt.GetType();
 
                     if (type == typeof(ZenArbitraryExpr<byte>))

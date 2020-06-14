@@ -152,6 +152,7 @@ namespace ZenLib.ModelChecking
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression);
+
             var solver = new SolverDD<BDDNode>(transformerManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,

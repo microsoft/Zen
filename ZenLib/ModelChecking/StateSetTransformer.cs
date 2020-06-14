@@ -66,7 +66,6 @@ namespace ZenLib.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
-            Console.WriteLine($"is one: {dd.Equals(solver.Manager.True())}");
             var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
         }

@@ -25,7 +25,7 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 }
 ```
 
-This is a function that takes two Zen parameterx (x and y) that represents an integer values and returns a new Zen value of type integer by multiplying x by 3 and adding y to the result. Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between literals and Zen values. 
+This is a function that takes two Zen parameters (x and y) that represents an integer values and returns a new Zen value of type integer by multiplying x by 3 and adding y to the result. Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between literals and Zen values. 
 
 The next step is to create a `ZenFunction`:
 
