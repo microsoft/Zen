@@ -42,7 +42,7 @@ namespace ZenLib
                     return (Zen<T1>)method.Invoke(null, new object[] { param1, param2 });
                 }
             } */
-            if (Language.SimplifyRecursive)
+            if (Settings.SimplifyRecursive)
             {
                 if (e is ZenIfExpr<TFrom> inner2)
                 {

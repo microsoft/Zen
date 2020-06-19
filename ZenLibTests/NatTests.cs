@@ -8,7 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using ZenLib.Tests.Model;
+    using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -30,29 +30,29 @@ namespace ZenLib.Tests
             public (uint, uint, uint)[] Rules { get; set; }
         }
 
-        private Zen<Packet> NatMatch(Nat nat, Zen<Packet> packet)
+        private Zen<IpHeader> NatMatch(Nat nat, Zen<IpHeader> header)
         {
             return TestHelper.ApplyOrderedRules(
-                packet,
-                packet,
+                header,
+                header,
                 ruleMatch: (l, pkt, i) => MatchNatLine(l, pkt),
                 ruleAction: (l, pkt, i) => ApplyNatLine(l, pkt),
                 ruleReturn: (l, pkt, i) => Some(pkt),
                 nat.Rules);
         }
 
-        private Zen<bool> MatchNatLine((uint, uint, uint) rule, Zen<Packet> packet)
+        private Zen<bool> MatchNatLine((uint, uint, uint) rule, Zen<IpHeader> header)
         {
             var lo = rule.Item1;
             var hi = rule.Item2;
-            var dstIp = packet.GetField<Packet, uint>("DstIp");
+            var dstIp = header.GetDstIp().GetValue();
             return And(dstIp >= UInt(lo), dstIp <= UInt(hi));
         }
 
-        private Zen<Packet> ApplyNatLine((uint, uint, uint) rule, Zen<Packet> packet)
+        private Zen<IpHeader> ApplyNatLine((uint, uint, uint) rule, Zen<IpHeader> header)
         {
             var newDstIp = rule.Item3;
-            return packet.WithField("DstIp", UInt(newDstIp));
+            return header.WithField("DstIp", Ip.Create(UInt(newDstIp)));
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace ZenLib.Tests
         {
             var rules = new ValueTuple<uint, uint, uint>[2] { (0, 10, 99), (11, 20, 100) };
             var nat = new Nat { Rules = rules };
-            var function = Function<Packet, Packet>(p => NatMatch(nat, p));
-            Assert.AreEqual(function.Evaluate(new Packet { DstIp = 10 }).DstIp, 99U);
-            Assert.AreEqual(function.Evaluate(new Packet { DstIp = 11 }).DstIp, 100U);
+            var function = Function<IpHeader, IpHeader>(p => NatMatch(nat, p));
+            Assert.AreEqual(function.Evaluate(new IpHeader { DstIp = new Ip { Value = 10 } }).DstIp.Value, 99U);
+            Assert.AreEqual(function.Evaluate(new IpHeader { DstIp = new Ip { Value = 11 } }).DstIp.Value, 100U);
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace ZenLib.Tests
         {
             var rules = new ValueTuple<uint, uint, uint>[2] { (0, 10, 99), (11, 20, 100) };
             var nat = new Nat { Rules = rules };
-            CheckAgreement<Packet>(p => NatMatch(nat, p).GetField<Packet, uint>("DstIp") == UInt(100));
-            CheckAgreement<Packet>(p => NatMatch(nat, p).GetField<Packet, uint>("DstIp") == UInt(99));
+            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == UInt(100));
+            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == UInt(99));
         }
     }
 }

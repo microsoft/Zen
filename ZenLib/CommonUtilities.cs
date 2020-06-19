@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Threading;
 
     /// <summary>
     /// A collection of common utility functions.
@@ -122,6 +123,47 @@ namespace ZenLib
             {
                 throw new ArgumentException($"Invalid non-integer type {type} used as integer.");
             }
+        }
+
+        /// <summary>
+        /// Run a function with a large stack.
+        /// </summary>
+        /// <typeparam name="T">The return type.</typeparam>
+        /// <param name="f">The function to run.</param>
+        /// <returns>The result of the function.</returns>
+        internal static T RunWithLargeStack<T>(Func<T> f)
+        {
+            if (!Settings.UseLargeStack)
+            {
+                return f();
+            }
+
+            T result = default;
+            Exception exn = null;
+
+            // run in another thread with a larger stack.
+            Thread t = new Thread(() =>
+            {
+                try
+                {
+                    result = f();
+                }
+                catch (Exception e)
+                {
+                    exn = e;
+                }
+            }, Settings.LargeStackSize);
+
+            t.Start();
+            t.Join();
+
+            // propagate an internal exception
+            if (exn != null)
+            {
+                throw exn;
+            }
+
+            return result;
         }
     }
 }

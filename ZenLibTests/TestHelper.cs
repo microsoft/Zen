@@ -62,12 +62,12 @@ namespace ZenLib.Tests
 
         private static void Start(TestParameter p)
         {
-            Language.SimplifyRecursive = p.Simplify;
+            Settings.SimplifyRecursive = p.Simplify;
         }
 
         private static void Stop(TestParameter p)
         {
-            Language.SimplifyRecursive = true;
+            Settings.SimplifyRecursive = true;
         }
 
         /// <summary>

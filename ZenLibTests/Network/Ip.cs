@@ -12,21 +12,38 @@ namespace ZenLib.Tests.Network
     /// A simple IP address.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    struct Ip
+    public struct Ip
     {
+        /// <summary>
+        /// The value for the ip.
+        /// </summary>
         public uint Value { get; set; }
 
+        /// <summary>
+        /// Create a Zen ip from a value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The ip.</returns>
         public static Zen<Ip> Create(Zen<uint> value)
         {
             return Language.Create<Ip>(("Value", value));
         }
 
+        /// <summary>
+        /// Parse an ip from a string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>The ip.</returns>
         public static Ip Parse(string s)
         {
             var bytes = IPAddress.Parse(s).GetAddressBytes();
             return FromBytes(bytes[0], bytes[1], bytes[2], bytes[3]);
         }
 
+        /// <summary>
+        /// Convert the ip to a string format.
+        /// </summary>
+        /// <returns>The string.</returns>
         public override string ToString()
         {
             var x1 = (this.Value >> 0) & 0x000000FF;
@@ -36,6 +53,14 @@ namespace ZenLib.Tests.Network
             return $"{x4}.{x3}.{x2}.{x1}";
         }
 
+        /// <summary>
+        /// Create an ip from bytes.
+        /// </summary>
+        /// <param name="x1">The first octet.</param>
+        /// <param name="x2">The second octet.</param>
+        /// <param name="x3">The third octet.</param>
+        /// <param name="x4">The fourth octet.</param>
+        /// <returns>An ip address.</returns>
         public static Ip FromBytes(byte x1, byte x2, byte x3, byte x4)
         {
             return new Ip { Value = (uint)(x1 << 24) | (uint)(x2 << 16) | (uint)(x3 << 8) | x4 };

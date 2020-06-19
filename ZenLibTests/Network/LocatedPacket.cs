@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.Tests.Model
+namespace ZenLib.Tests.Network
 {
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
@@ -22,7 +22,7 @@ namespace ZenLib.Tests.Model
         /// <summary>
         /// Gets the Packet.
         /// </summary>
-        public Packet Packet { get; set; }
+        public IpHeader Header { get; set; }
     }
 
     /// <summary>
@@ -35,11 +35,11 @@ namespace ZenLib.Tests.Model
         /// Create a LocatedPacket.
         /// </summary>
         /// <param name="node">The node.</param>
-        /// <param name="packet">The packet.</param>
+        /// <param name="header">The header.</param>
         /// <returns>A LocatedPacket.</returns>
-        public static Zen<LocatedPacket> Create(Zen<byte> node, Zen<Packet> packet)
+        public static Zen<LocatedPacket> Create(Zen<byte> node, Zen<IpHeader> header)
         {
-            return Create<LocatedPacket>(("Node", node), ("Packet", packet));
+            return Create<LocatedPacket>(("Node", node), ("Header", header));
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace ZenLib.Tests.Model
         /// </summary>
         /// <param name="lp">The LocatedPacket.</param>
         /// <returns>The packet.</returns>
-        public static Zen<Packet> GetPacket(this Zen<LocatedPacket> lp)
+        public static Zen<IpHeader> GetHeader(this Zen<LocatedPacket> lp)
         {
-            return lp.GetField<LocatedPacket, Packet>("Packet");
+            return lp.GetField<LocatedPacket, IpHeader>("Header");
         }
     }
 }

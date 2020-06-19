@@ -25,7 +25,7 @@ namespace ZenLib
                 return consCase(l2.Element, l2.Expr);
             }
 
-            if (Language.SimplifyRecursive)
+            if (Settings.SimplifyRecursive)
             {
                 if (e is ZenIfExpr<IList<T>> l3)
                 {

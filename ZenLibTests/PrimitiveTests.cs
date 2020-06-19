@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -397,8 +398,16 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplicationException()
         {
-            var f = Function<int, int, bool>((a, b) => a * b == 10);
-            var inputs = f.Find((a, b, res) => res, backend: ModelChecking.Backend.DecisionDiagrams);
+            try
+            {
+                var f = Function<int, int, bool>((a, b) => a * b == 10);
+                var inputs = f.Find((a, b, res) => res, backend: ModelChecking.Backend.DecisionDiagrams);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         /// <summary>

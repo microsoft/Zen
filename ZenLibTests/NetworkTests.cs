@@ -46,10 +46,8 @@ namespace ZenLib.Tests
                 {
                     new AclLine
                     {
-                        DstLow = Ip.Parse("172.0.0.0"),
-                        DstHigh = Ip.Parse("172.255.255.255"),
-                        SrcLow = Ip.Parse("63.1.0.0"),
-                        SrcHigh = Ip.Parse("63.2.255.255"),
+                        DstIp = new Prefix { Address = Ip.Parse("172.0.0.0").Value, Length = 24 },
+                        SrcIp = new Prefix { Address = Ip.Parse("63.1.0.0").Value, Length = 16 },
                         Permitted = true,
                         DstPortLow = 53,
                         DstPortHigh = 53,
@@ -153,7 +151,7 @@ namespace ZenLib.Tests
             var d3 = network.Devices["R3"];
 
             // encoding along a single path approach
-            TestHelper.CheckAgreement<Packet>(p =>
+            var f = Function<Packet, bool>(p =>
             {
                 var pencap = d1.Interfaces[0].Encapsulate(p);
                 var fwd1 = d1.Table.Forward(pencap, 0) == 1;
@@ -162,6 +160,8 @@ namespace ZenLib.Tests
                 var acl = d3.Interfaces[0].InboundAcl.Process(pdecap.GetOverlayHeader(), 0);
                 return And(fwd1, fwd2, acl);
             });
+
+            // Console.WriteLine(f.Find((x, y) => y));
 
             // build transformers
             var tfwd1 = Function<Packet, bool>(p => d1.Table.Forward(p, 0) == 1).Transformer();
