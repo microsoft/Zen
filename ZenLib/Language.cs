@@ -36,11 +36,6 @@ namespace ZenLib
         private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Whether to simplify expressions recursively. Default true.
-        /// </summary>
-        public static bool SimplifyRecursive { get; set; } = true;
-
-        /// <summary>
         /// The Zen value for false.
         /// </summary>
         /// <returns>Zen value.</returns>

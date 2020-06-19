@@ -12,19 +12,37 @@ namespace ZenLib.Tests.Network
     /// Packet struct that contains IP headers.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    struct Packet
+    public struct Packet
     {
+        /// <summary>
+        /// The overlay header.
+        /// </summary>
         public IpHeader OverlayHeader { get; set; }
 
+        /// <summary>
+        /// The underlay header.
+        /// </summary>
         public Option<IpHeader> UnderlayHeader { get; set; }
 
-        public static Zen<Packet> Create(Zen<IpHeader> overlayHeader, Zen<Option<IpHeader>> underlayHeader)
+        /// <summary>
+        /// Create a Zen packet from headers.
+        /// </summary>
+        /// <param name="overlayHeader">Overlay header.</param>
+        /// <param name="underlayHeader">Underlay header.</param>
+        /// <returns>Zen packet.</returns>
+        public static Zen<Packet> Create(
+            Zen<IpHeader> overlayHeader,
+            Zen<Option<IpHeader>> underlayHeader)
         {
             return Language.Create<Packet>(
                 ("OverlayHeader", overlayHeader),
                 ("UnderlayHeader", underlayHeader));
         }
 
+        /// <summary>
+        /// Convert a packet to a string.
+        /// </summary>
+        /// <returns>The string.</returns>
         public override string ToString()
         {
             return $"packet({this.OverlayHeader}, {this.UnderlayHeader})";

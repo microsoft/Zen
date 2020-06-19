@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using ZenLib.Tests.Model;
+    using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -22,8 +22,12 @@ namespace ZenLib.Tests
     {
         private Acl ExampleAcl()
         {
-            var aclLine1 = new AclLine { DstIpLow = 10, DstIpHigh = 20, SrcIpLow = 7, SrcIpHigh = 39, Permitted = true };
-            var aclLine2 = new AclLine { DstIpLow = 0, DstIpHigh = 100, SrcIpLow = 0, SrcIpHigh = 100, Permitted = false };
+            var p1 = new Prefix { Length = 24, Address = Ip.Parse("72.1.2.0").Value };
+            var p2 = new Prefix { Length = 24, Address = Ip.Parse("1.2.3.0").Value };
+            var p3 = new Prefix { Length = 32, Address = Ip.Parse("8.8.8.8").Value };
+            var p4 = new Prefix { Length = 32, Address = Ip.Parse("9.9.9.9").Value };
+            var aclLine1 = new AclLine { DstIp = p1, SrcIp = p2, Permitted = true };
+            var aclLine2 = new AclLine { DstIp = p3, SrcIp = p4, Permitted = false };
             var lines = new AclLine[2] { aclLine1, aclLine2 };
             return new Acl { Lines = lines };
         }
@@ -43,10 +47,8 @@ namespace ZenLib.Tests
 
                 var line = new AclLine
                 {
-                    DstIpLow = dlow,
-                    DstIpHigh = dhigh,
-                    SrcIpLow = slow,
-                    SrcIpHigh = shigh,
+                    DstIp = Prefix.Random(24, 32),
+                    SrcIp = Prefix.Random(24, 32),
                     Permitted = perm,
                 };
 
@@ -62,8 +64,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclEvaluate()
         {
-            var function = Function<Packet, bool>(p => ExampleAcl().Match(p));
-            var result = function.Evaluate(new Packet { DstIp = 12, SrcIp = 8 });
+            var function = Function<IpHeader, bool>(p => ExampleAcl().Process(p, 0));
+            var result = function.Evaluate(new IpHeader { DstIp = Ip.Parse("72.1.2.1"), SrcIp = Ip.Parse("1.2.3.4") });
             Assert.IsTrue(result);
         }
 
@@ -73,7 +75,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclVerify()
         {
-            CheckAgreement<Packet>(p => ExampleAcl().Match(p));
+            CheckAgreement<IpHeader>(p => ExampleAcl().Process(p, 0));
         }
 
         /// <summary>
@@ -82,8 +84,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclWithLinesEvaluate()
         {
-            var function = Function<Packet, Tuple<bool, ushort>>(p => ExampleAcl().MatchProvenance(p));
-            var result = function.Evaluate(new Packet { DstIp = 12, SrcIp = 6 });
+            var function = Function<IpHeader, (bool, ushort)>(p => ExampleAcl().ProcessProvenance(p, 0));
+            var result = function.Evaluate(new IpHeader { DstIp = Ip.Parse("8.8.8.8"), SrcIp = Ip.Parse("9.9.9.9") });
             Assert.AreEqual(result.Item1, false);
             Assert.AreEqual(result.Item2, (ushort)2);
             var packet = function.Find((p, l) => l.Item2() == 3);
@@ -96,38 +98,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclWithLinesVerify()
         {
-            CheckAgreement<Packet>(p => ExampleAcl().MatchProvenance(p).Item2() == 2);
-        }
-
-        /// <summary>
-        /// benchmark.
-        /// </summary>
-        [TestMethod]
-        public void TestAclEvaluatePerformance()
-        {
-            var acl = ExampleAcl2();
-
-            var function = Function<Packet, bool>(p => acl.Match(p));
-            function.Compile();
-
-            var packet = new Packet { DstIp = 200, SrcIp = 0 };
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-
-            for (int i = 0; i < 10000000; i++)
-            {
-                function.Evaluate(packet);
-            }
-
-            Console.WriteLine($"compiled took: {watch.ElapsedMilliseconds}");
-            watch.Restart();
-
-            for (int i = 0; i < 10000000; i++)
-            {
-                acl.MatchLoop(packet);
-            }
-
-            Console.WriteLine($"manual took: {watch.ElapsedMilliseconds}");
-            watch.Restart();
+            CheckAgreement<IpHeader>(p => ExampleAcl().ProcessProvenance(p, 0).Item2() == 2);
         }
 
         /// <summary>
@@ -141,7 +112,7 @@ namespace ZenLib.Tests
             var input = function.Find((inputLp, outputLp) =>
                 And(inputLp.GetNode() == 0,
                     outputLp.GetNode() == 2,
-                    outputLp.GetPacket().GetDstIp() == 4));
+                    outputLp.GetHeader().GetDstIp().GetValue() == 4));
 
             Assert.IsTrue(input.HasValue);
         }
@@ -149,7 +120,7 @@ namespace ZenLib.Tests
         private Zen<Option<LocatedPacket>> StepOnce(Zen<LocatedPacket> lp)
         {
             var location = lp.GetNode();
-            var packet = lp.GetPacket();
+            var packet = lp.GetHeader();
             return If(location == 0,
                     Some(LocatedPacketHelper.Create(1, packet)),
                     If(location == 1,

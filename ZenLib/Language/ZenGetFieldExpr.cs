@@ -34,7 +34,7 @@ namespace ZenLib
             }
 
             // get(if e1 then e2 else e3, name) = if e1 then get(e2, name) else get(e3, name)
-            if (Language.SimplifyRecursive)
+            if (Settings.SimplifyRecursive)
             {
                 if (expr is ZenIfExpr<T1> e2)
                 {

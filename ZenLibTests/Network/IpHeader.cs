@@ -11,18 +11,42 @@ namespace ZenLib.Tests.Network
     /// An IP header object.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    class IpHeader
+    public class IpHeader
     {
+        /// <summary>
+        /// The destination Ip.
+        /// </summary>
         public Ip DstIp { get; set; }
 
+        /// <summary>
+        /// The source Ip.
+        /// </summary>
         public Ip SrcIp { get; set; }
 
+        /// <summary>
+        /// The destination port.
+        /// </summary>
         public ushort DstPort { get; set; }
 
+        /// <summary>
+        /// The source port.
+        /// </summary>
         public ushort SrcPort { get; set; }
 
+        /// <summary>
+        /// The IP protocol.
+        /// </summary>
         public byte Protocol { get; set; }
 
+        /// <summary>
+        /// Create a Zen packet from a five tuple.
+        /// </summary>
+        /// <param name="dstIp">The destination Ip.</param>
+        /// <param name="srcIp">The source Ip.</param>
+        /// <param name="dstPort">The destination port.</param>
+        /// <param name="srcPort">The source port.</param>
+        /// <param name="protocol">The protocol.</param>
+        /// <returns>A Zen packet.</returns>
         public static Zen<IpHeader> Create(
             Zen<Ip> dstIp,
             Zen<Ip> srcIp,
@@ -38,6 +62,10 @@ namespace ZenLib.Tests.Network
                 ("Protocol", protocol));
         }
 
+        /// <summary>
+        /// Convert a packet to a string.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return $"header(src={SrcIp}, dst={DstIp}, srcPort={SrcPort}, dstPort={DstPort}, proto={Protocol})";

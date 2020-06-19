@@ -8,7 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using ZenLib.Tests.Model;
+    using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -151,11 +151,11 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
             {
-                var x = Null<Packet>();
+                var x = Null<IpHeader>();
                 return x.Value();
             });
 
-            Assert.AreEqual(0U, f.Evaluate().DstIp);
+            Assert.AreEqual(0U, f.Evaluate().DstIp.Value);
         }
     }
 }

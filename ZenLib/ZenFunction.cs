@@ -44,7 +44,7 @@ namespace ZenLib
                 return compiledFunction();
             }
 
-            return Interpreter.Run(this.function);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function));
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace ZenLib
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant = null, Backend backend = Backend.Z3)
         {
             var result = invariant(this.function());
-            return SymbolicEvaluator.Find(result, backend);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, backend));
         }
     }
 
@@ -114,7 +114,7 @@ namespace ZenLib
                 return compiledFunction(value);
             }
 
-            return Interpreter.Run(this.function, value);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value));
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace ZenLib
         {
             input = (input is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input;
             var result = invariant(input, this.function(input));
-            return SymbolicEvaluator.Find(result, input, backend);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input, backend));
         }
     }
 
@@ -204,7 +204,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2);
             }
 
-            return Interpreter.Run(this.function, value1, value2);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2));
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace ZenLib
             input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
             input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
             var result = invariant(input1, input2, this.function(input1, input2));
-            return SymbolicEvaluator.Find(result, input1, input2, backend);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, backend));
         }
     }
 
@@ -290,7 +290,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3);
             }
 
-            return Interpreter.Run(this.function, value1, value2, value3);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3));
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace ZenLib
             input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
             input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
             var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
-            return SymbolicEvaluator.Find(result, input1, input2, input3, backend);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, backend));
         }
     }
 
@@ -381,7 +381,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3, value4);
             }
 
-            return Interpreter.Run(this.function, value1, value2, value3, value4);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3, value4));
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace ZenLib
             input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
             input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
             var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
-            return SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend));
         }
     }
 }

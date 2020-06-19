@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.Tests.Model
+namespace ZenLib.Tests.Network
 {
     using System;
     using System.Collections.Generic;
@@ -41,32 +41,6 @@ namespace ZenLib.Tests.Model
             var comms = string.Join(",", Communities);
             var aspath = string.Join(",", AsPath);
             return $"Route(Prefix={Prefix}, Communities=[{comms}], AsPath=[{aspath}])";
-        }
-    }
-
-    /// <summary>
-    /// Simple packet class for testing.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class Prefix
-    {
-        /// <summary>
-        /// The destination IP address.
-        /// </summary>
-        public uint DstIp { get; set; }
-
-        /// <summary>
-        /// The length of the prefix.
-        /// </summary>
-        public byte Length { get; set; }
-
-        /// <summary>
-        /// Convert the prefix to a string.
-        /// </summary>
-        /// <returns>The string representation.</returns>
-        public override string ToString()
-        {
-            return $"{DstIp}/{Length}";
         }
     }
 
@@ -196,7 +170,7 @@ namespace ZenLib.Tests.Model
         public Zen<bool> Matches(Zen<Route> route)
         {
             var prefix = route.GetField<Route, Prefix>("Prefix");
-            var dstIp = prefix.GetField<Prefix, uint>("DstIp");
+            var dstIp = prefix.GetField<Prefix, uint>("Address");
             var prefixLen = prefix.GetField<Prefix, byte>("Length");
             var communities = route.GetField<Route, IList<uint>>("Communities");
 
