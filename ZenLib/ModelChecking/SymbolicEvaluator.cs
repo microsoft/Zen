@@ -263,37 +263,38 @@ namespace ZenLib.ModelChecking
             {
                 var (v, _) = solver.CreateBoolVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
+                return;
             }
 
             if (zenExpr is Zen<byte>)
             {
                 var (v, _) = solver.CreateByteVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
+                return;
             }
 
             if (zenExpr is Zen<short> || zenExpr is Zen<ushort>)
             {
                 var (v, _) = solver.CreateShortVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
+                return;
             }
 
             if (zenExpr is Zen<int> || zenExpr is Zen<uint>)
             {
                 var (v, _) = solver.CreateIntVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
+                return;
             }
 
             if (zenExpr is Zen<long> || zenExpr is Zen<ulong>)
             {
                 var (v, _) = solver.CreateLongVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
+                return;
             }
 
-            if (zenExpr is Zen<string>)
-            {
-                var (v, _) = solver.CreateStringVar(zenExpr);
-                zenExprToVariable[zenExpr] = v;
-            }
+            throw new ZenException($"Unsupported type: {zenExpr.GetType()} in transformer.");
         }
     }
 }
