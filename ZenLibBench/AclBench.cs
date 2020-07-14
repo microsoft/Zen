@@ -18,6 +18,7 @@ namespace ZenLibBench
     /// Benchmark for encoding ACLs of various sizes.
     /// </summary>
     [CsvExporter]
+    [SimpleJob(targetCount: 30)]
     public class AclBench
     {
         /// <summary>
@@ -29,7 +30,7 @@ namespace ZenLibBench
         /// <summary>
         /// The number of ACL lines to benchmark.
         /// </summary>
-        [Params(250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000)]
+        [Params(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000)]
         public int NumLines { get; set; }
 
         private Acl acl;
@@ -69,16 +70,7 @@ namespace ZenLibBench
         {
             var f = Function<IpHeader, (bool, ushort)>(h => this.acl.ProcessProvenance(h));
             var packet = f.Find((p, o) => o.Item2() == (this.acl.Lines.Length + 1), backend: this.Backend);
-        }
-
-        /// <summary>
-        /// Find a packet that does not match any line of the ACL.
-        /// </summary>
-        [Benchmark]
-        public void VerifyAcl()
-        {
-            var f = Function<IpHeader, bool>(h => this.acl.Process(h, 0));
-            var packet = f.Find((p, o) => o, backend: this.Backend);
+            f.Evaluate(packet.Value);
         }
     }
 }
