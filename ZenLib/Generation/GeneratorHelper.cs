@@ -55,7 +55,7 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { left, right });
         }
 
-        public static object ApplyToObject(Func<Type, object> recurse, Type objectType, Dictionary<string, Type> fields)
+        public static object ApplyToObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {
             var asList = fields.ToArray();
 

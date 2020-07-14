@@ -117,7 +117,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitObject(Func<Type, object> recurse, Type objectType, Dictionary<string, Type> fields)
+        public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {
             return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
         }
