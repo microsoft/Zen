@@ -17,7 +17,7 @@ namespace ZenLibBench
     /// Benchmark for encoding ACLs of various sizes.
     /// </summary>
     [CsvExporter]
-    [SimpleJob(targetCount: 20)]
+    [SimpleJob(targetCount: 30)]
     public class RouteBench
     {
         /// <summary>
@@ -35,7 +35,7 @@ namespace ZenLibBench
         /// <summary>
         /// The number of ACL lines to benchmark.
         /// </summary>
-        [Params(10, 20, 30, 40, 50, 60, 70)]
+        [Params(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)]
         public int NumLines { get; set; }
 
         private RouteMap routeMap;

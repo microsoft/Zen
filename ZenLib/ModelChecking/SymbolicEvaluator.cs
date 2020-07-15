@@ -206,24 +206,21 @@ namespace ZenLib.ModelChecking
             }
 
             // collect information about input and output manager variables
-            var inputArbitraryExprs = new HashSet<object>(arbitrariesForInput);
-            var outputArbitraryExprs = new HashSet<object>(arbitrariesForOutput);
             var inputVariables = new List<Variable<BDDNode>>();
             var outputVariables = new List<Variable<BDDNode>>();
 
-            foreach (var kv in arbitraryToVariable)
+            foreach (var arbitrary in arbitrariesForInput)
             {
-                arbitraryMapping[kv.Key] = kv.Value;
+                var variable = arbitraryToVariable[arbitrary];
+                arbitraryMapping[arbitrary] = variable;
+                inputVariables.Add(variable);
+            }
 
-                if (outputArbitraryExprs.Contains(kv.Key))
-                {
-                    outputVariables.Add(kv.Value);
-                }
-
-                if (inputArbitraryExprs.Contains(kv.Key))
-                {
-                    inputVariables.Add(kv.Value);
-                }
+            foreach (var arbitrary in arbitrariesForOutput)
+            {
+                var variable = arbitraryToVariable[arbitrary];
+                arbitraryMapping[arbitrary] = variable;
+                outputVariables.Add(variable);
             }
 
             // create variable sets for easy quantification

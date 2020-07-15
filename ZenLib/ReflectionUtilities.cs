@@ -463,7 +463,7 @@ namespace ZenLib
             }
 
             // some class or struct
-            var dict = new Dictionary<string, Type>();
+            var dict = new SortedDictionary<string, Type>();
 
             foreach (var field in GetAllFields(type))
             {

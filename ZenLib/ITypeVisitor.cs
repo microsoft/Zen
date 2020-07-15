@@ -101,6 +101,6 @@ namespace ZenLib
         /// Visit a class/struct type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitObject(Func<Type, T> recurse, Type objectType, Dictionary<string, Type> fields);
+        T VisitObject(Func<Type, T> recurse, Type objectType, SortedDictionary<string, Type> fields);
     }
 }
