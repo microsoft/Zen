@@ -195,13 +195,45 @@ namespace ZenLib.Compilation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenBitwiseAndExpr<T>(ZenBitwiseAndExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                return BitwiseAnd<T>(
-                    expression.Expr1.Accept(this, parameter),
-                    expression.Expr2.Accept(this, parameter));
+                switch (expression.Operation)
+                {
+                    case Op.BitwiseAnd:
+                        return BitwiseAnd<T>(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case Op.BitwiseOr:
+                        return BitwiseOr<T>(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case Op.BitwiseXor:
+                        return BitwiseXor<T>(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case Op.Addition:
+                        return Add<T>(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case Op.Subtraction:
+                        return Subtract<T>(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case Op.Multiplication:
+                        return Expression.Multiply(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    default:
+                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                }
             });
         }
 
@@ -216,38 +248,6 @@ namespace ZenLib.Compilation
             return LookupOrCompute(expression, () =>
             {
                 return BitwiseNot<T>(expression.Expr.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
-        /// Convert a 'BitwiseOr' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenBitwiseOrExpr<T>(ZenBitwiseOrExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return BitwiseOr<T>(
-                    expression.Expr1.Accept(this, parameter),
-                    expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
-        /// Convert a 'BitwiseXor' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenBitwiseXorExpr<T>(ZenBitwiseXorExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return BitwiseXor<T>(
-                    expression.Expr1.Accept(this, parameter),
-                    expression.Expr2.Accept(this, parameter));
             });
         }
 
@@ -408,22 +408,6 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert an 'Eq' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenEqExpr<T>(ZenEqExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Expression.Equal(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
         /// Convert an 'GetField' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -469,34 +453,35 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert a 'Leq' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenLeqExpr<T>(ZenLeqExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Expression.LessThanOrEqual(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
         /// Convert a 'Geq' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenGeqExpr<T>(ZenGeqExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                return Expression.GreaterThanOrEqual(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
+                switch (expression.ComparisonType)
+                {
+                    case ComparisonType.Geq:
+                        return Expression.GreaterThanOrEqual(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case ComparisonType.Leq:
+                        return Expression.LessThanOrEqual(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case ComparisonType.Eq:
+                        return Expression.Equal(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    default:
+                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
+                }
             });
         }
 
@@ -638,38 +623,6 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert a 'Minus' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenMinusExpr<T>(ZenMinusExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Subtract<T>(
-                    expression.Expr1.Accept(this, parameter),
-                    expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
-        /// Convert a 'Multiply' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenMultiplyExpr<T>(ZenMultiplyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Expression.Multiply(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
         /// Convert a 'Not' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -708,22 +661,6 @@ namespace ZenLib.Compilation
                     this.maxMatchUnrollingDepth);
 
                 return Expression.OrElse(left, right);
-            });
-        }
-
-        /// <summary>
-        /// Convert an 'Add' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenSumExpr<T>(ZenSumExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Add<T>(
-                    expression.Expr1.Accept(this, parameter),
-                    expression.Expr2.Accept(this, parameter));
             });
         }
 
