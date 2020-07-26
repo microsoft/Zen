@@ -67,35 +67,18 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 if (parameter.ArbitraryAssignment == null)
-                {
                     return default(T);
-                }
-
                 if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
-                {
                     return default(T);
-                }
-
                 // the library doesn't distinguish between signed and unsigned,
                 // so we must perform this conversion manually.
-
                 var type = typeof(T);
-
                 if (type == ReflectionUtilities.UshortType)
-                {
                     return (ushort)(short)value;
-                }
-
                 if (type == ReflectionUtilities.UintType)
-                {
                     return (uint)(int)value;
-                }
-
                 if (type == ReflectionUtilities.UlongType)
-                {
                     return (ulong)(long)value;
-                }
-
                 return value;
             });
         }
@@ -128,13 +111,69 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
-        public object VisitZenBitwiseAndExpr<T>(ZenBitwiseAndExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
-                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
-                return ReflectionUtilities.Specialize<T>(x & y);
+                var e1 = expression.Expr1.Accept(this, parameter);
+                var e2 = expression.Expr2.Accept(this, parameter);
+                var x = ReflectionUtilities.ToLong(e1);
+                var y = ReflectionUtilities.ToLong(e2);
+                var type = typeof(T);
+
+                switch (expression.Operation)
+                {
+                    case Op.BitwiseAnd:
+                        return ReflectionUtilities.Specialize<T>(x & y);
+                    case Op.BitwiseOr:
+                        return ReflectionUtilities.Specialize<T>(x | y);
+                    case Op.BitwiseXor:
+                        return ReflectionUtilities.Specialize<T>(x ^ y);
+                    case Op.Addition:
+                        if (type == ReflectionUtilities.ByteType)
+                            return (byte)((byte)e1 + (byte)e2);
+                        if (type == ReflectionUtilities.ShortType)
+                            return (short)((short)e1 + (short)e2);
+                        if (type == ReflectionUtilities.UshortType)
+                            return (ushort)((ushort)e1 + (ushort)e2);
+                        if (type == ReflectionUtilities.IntType)
+                            return (int)e1 + (int)e2;
+                        if (type == ReflectionUtilities.UintType)
+                            return (uint)e1 + (uint)e2;
+                        if (type == ReflectionUtilities.LongType)
+                            return (long)e1 + (long)e2;
+                        return (ulong)e1 + (ulong)e2;
+                    case Op.Subtraction:
+                        if (type == ReflectionUtilities.ByteType)
+                            return (byte)((byte)e1 - (byte)e2);
+                        if (type == ReflectionUtilities.ShortType)
+                            return (short)((short)e1 - (short)e2);
+                        if (type == ReflectionUtilities.UshortType)
+                            return (ushort)((ushort)e1 - (ushort)e2);
+                        if (type == ReflectionUtilities.IntType)
+                            return (int)e1 - (int)e2;
+                        if (type == ReflectionUtilities.UintType)
+                            return (uint)e1 - (uint)e2;
+                        if (type == ReflectionUtilities.LongType)
+                            return (long)e1 - (long)e2;
+                        return (ulong)e1 - (ulong)e2;
+                    case Op.Multiplication:
+                        if (type == ReflectionUtilities.ByteType)
+                            return (byte)((byte)e1 * (byte)e2);
+                        if (type == ReflectionUtilities.ShortType)
+                            return (short)((short)e1 * (short)e2);
+                        if (type == ReflectionUtilities.UshortType)
+                            return (ushort)((ushort)e1 * (ushort)e2);
+                        if (type == ReflectionUtilities.IntType)
+                            return (int)e1 * (int)e2;
+                        if (type == ReflectionUtilities.UintType)
+                            return (uint)e1 * (uint)e2;
+                        if (type == ReflectionUtilities.LongType)
+                            return (long)e1 * (long)e2;
+                        return (ulong)e1 * (ulong)e2;
+                    default:
+                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                }
             });
         }
 
@@ -150,38 +189,6 @@ namespace ZenLib.Interpretation
             {
                 var x = ReflectionUtilities.ToLong(expression.Expr.Accept(this, parameter));
                 return ReflectionUtilities.Specialize<T>(~x);
-            });
-        }
-
-        /// <summary>
-        /// Visit a BitwiseOrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenBitwiseOrExpr<T>(ZenBitwiseOrExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
-                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
-                return ReflectionUtilities.Specialize<T>(x | y);
-            });
-        }
-
-        /// <summary>
-        /// Visit a BitwiseXorExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenBitwiseXorExpr<T>(ZenBitwiseXorExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var x = ReflectionUtilities.ToLong(expression.Expr1.Accept(this, parameter));
-                var y = ReflectionUtilities.ToLong(expression.Expr2.Accept(this, parameter));
-                return ReflectionUtilities.Specialize<T>(x ^ y);
             });
         }
 
@@ -420,47 +427,6 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
-        /// Visit a MinusExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenMinusExpr<T>(ZenMinusExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) - (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) - (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) - (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) - (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) - (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) - (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) - (ulong)expression.Expr2.Accept(this, parameter);
-            });
-        }
-
-        /// <summary>
         /// Visit a NotExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -480,87 +446,6 @@ namespace ZenLib.Interpretation
         public object VisitZenOrExpr(ZenOrExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return (bool)expression.Expr1.Accept(this, parameter) || (bool)expression.Expr2.Accept(this, parameter);
-        }
-
-        /// <summary>
-        /// Visit a SumExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenSumExpr<T>(ZenSumExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) + (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) + (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) + (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) + (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) + (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) + (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) + (ulong)expression.Expr2.Accept(this, parameter);
-            });
-        }
-
-        /// <summary>
-        /// Visit a MultiplyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenMultiplyExpr<T>(ZenMultiplyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var type = typeof(T);
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)((byte)expression.Expr1.Accept(this, parameter) * (byte)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)((short)expression.Expr1.Accept(this, parameter) * (short)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)((ushort)expression.Expr1.Accept(this, parameter) * (ushort)expression.Expr2.Accept(this, parameter));
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) * (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) * (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) * (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) * (ulong)expression.Expr2.Accept(this, parameter);
-            });
         }
 
         /// <summary>

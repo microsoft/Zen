@@ -639,27 +639,27 @@ namespace ZenLib
         {
             var type = value.GetType();
 
-            if (type == ReflectionUtilities.ByteType)
+            if (type == ByteType)
             {
                 return (byte)value;
             }
-            if (type == ReflectionUtilities.ShortType)
+            if (type == ShortType)
             {
                 return (short)value;
             }
-            if (type == ReflectionUtilities.UshortType)
+            if (type == UshortType)
             {
                 return (ushort)value;
             }
-            if (type == ReflectionUtilities.IntType)
+            if (type == IntType)
             {
                 return (int)value;
             }
-            if (type == ReflectionUtilities.UintType)
+            if (type == UintType)
             {
                 return (uint)value;
             }
-            if (type == ReflectionUtilities.LongType)
+            if (type == LongType)
             {
                 return (long)value;
             }

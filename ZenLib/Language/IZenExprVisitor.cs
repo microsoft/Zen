@@ -132,14 +132,6 @@ namespace ZenLib
         TReturn VisitZenConstantStringExpr(ZenConstantStringExpr expression, TParam parameter);
 
         /// <summary>
-        /// Visit a SumExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenSumExpr<T>(ZenSumExpr<T> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a ConcatExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -148,44 +140,12 @@ namespace ZenLib
         TReturn VisitZenConcatExpr(ZenConcatExpr expression, TParam parameter);
 
         /// <summary>
-        /// Visit a MultiplyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenMultiplyExpr<T>(ZenMultiplyExpr<T> expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a MinusExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenMinusExpr<T>(ZenMinusExpr<T> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a BitwiseAndExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenBitwiseAndExpr<T>(ZenBitwiseAndExpr<T> expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a BitwiseOrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenBitwiseOrExpr<T>(ZenBitwiseOrExpr<T> expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a BitwiseXorExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenBitwiseXorExpr<T>(ZenBitwiseXorExpr<T> expression, TParam parameter);
+        TReturn VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a BitwiseNotExpr.

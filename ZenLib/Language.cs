@@ -601,7 +601,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenSumExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Addition);
         }
 
         /// <summary>
@@ -629,7 +629,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMinusExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Subtraction);
         }
 
         /// <summary>
@@ -643,7 +643,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenMultiplyExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Multiplication);
         }
 
         /// <summary>
@@ -853,7 +853,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenBitwiseAndExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseAnd);
         }
 
         /// <summary>
@@ -879,7 +879,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenBitwiseOrExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseOr);
         }
 
         /// <summary>
@@ -917,7 +917,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenBitwiseXorExpr<T>.Create(expr1, expr2);
+            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseXor);
         }
 
         /// <summary>

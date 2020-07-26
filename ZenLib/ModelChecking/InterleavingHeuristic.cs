@@ -188,72 +188,31 @@ namespace ZenLib.ModelChecking
             return emptySet;
         }
 
-        public ImmutableHashSet<object> VisitZenSumExpr<T>(ZenSumExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var x = expression.Expr1.Accept(this, parameter);
                 var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
+
+                switch (expression.Operation)
+                {
+                    case Op.Addition:
+                    case Op.Multiplication:
+                    case Op.Subtraction:
+                    case Op.BitwiseAnd:
+                    case Op.BitwiseXor:
+                        this.Combine(x, y);
+                        return x.Union(y);
+                    case Op.BitwiseOr:
+                        return x.Union(y);
+                    default:
+                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                }
             });
         }
 
         public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenMultiplyExpr<T>(ZenMultiplyExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenMinusExpr<T>(ZenMinusExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenBitwiseAndExpr<T>(ZenBitwiseAndExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenBitwiseOrExpr<T>(ZenBitwiseOrExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenBitwiseXorExpr<T>(ZenBitwiseXorExpr<T> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {

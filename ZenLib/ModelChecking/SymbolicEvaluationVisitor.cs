@@ -175,13 +175,30 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseAndExpr<T1>(ZenBitwiseAndExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenIntegerBinopExpr<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
                 var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
+
+                switch (expression.Operation)
+                {
+                    case Op.BitwiseAnd:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
+                    case Op.BitwiseOr:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
+                    case Op.BitwiseXor:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
+                    case Op.Addition:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
+                    case Op.Subtraction:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
+                    case Op.Multiplication:
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
+                    default:
+                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                }
             });
         }
 
@@ -197,38 +214,6 @@ namespace ZenLib.ModelChecking
             {
                 var v = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
                 return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseNot(v.Value));
-            });
-        }
-
-        /// <summary>
-        /// Visit a BitwiseOrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseOrExpr<T1>(ZenBitwiseOrExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
-            });
-        }
-
-        /// <summary>
-        /// Visit a BitwiseXorExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseXorExpr<T1>(ZenBitwiseXorExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
             });
         }
 
@@ -600,38 +585,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Visit a MinusExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenMinusExpr<T1>(ZenMinusExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
-            });
-        }
-
-        /// <summary>
-        /// Visit a MultiplyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenMultiplyExpr<T1>(ZenMultiplyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
-            });
-        }
-
-        /// <summary>
         /// Visit a NotExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -659,22 +612,6 @@ namespace ZenLib.ModelChecking
                 var v1 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
                 var v2 = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
                 return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
-            });
-        }
-
-        /// <summary>
-        /// Visit a SumExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenSumExpr<T1>(ZenSumExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
-                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
             });
         }
 
