@@ -26,17 +26,6 @@ namespace ZenLib
             (x, y) => x * y,
         };
 
-        private static Func<ulong, ulong, ulong>[] constantFuncsUnsigned =
-            new Func<ulong, ulong, ulong>[]
-        {
-            (x, y) => x & y,
-            (x, y) => x | y,
-            (x, y) => x ^ y,
-            (x, y) => x + y,
-            (x, y) => x - y,
-            (x, y) => x * y,
-        };
-
         private static Dictionary<(object, object, int), Zen<T>> hashConsTable = new Dictionary<(object, object, int), Zen<T>>();
 
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, Op op)
@@ -54,38 +43,23 @@ namespace ZenLib
             {
                 case Op.Addition:
                     if (x.HasValue && x.Value == 0)
-                    {
                         return e2;
-                    }
-
                     if (y.HasValue && y.Value == 0)
-                    {
                         return e1;
-                    }
                     break;
 
                 case Op.Subtraction:
                     if (y.HasValue && y.Value == 0)
-                    {
                         return e1;
-                    }
                     break;
 
                 case Op.Multiplication:
                     if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
-                    {
                         return ReflectionUtilities.CreateConstantValue<T>(0);
-                    }
-
                     if (x.HasValue && x.Value == 1)
-                    {
                         return e2;
-                    }
-
                     if (y.HasValue && y.Value == 1)
-                    {
                         return e1;
-                    }
                     break;
             }
 

@@ -132,17 +132,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenEqExpr<T>(ZenEqExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
         public ImmutableHashSet<object> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, Unit parameter)
         {
             return emptySet;
@@ -294,18 +283,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenLeqExpr<T>(ZenLeqExpr<T> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var x = expression.Expr1.Accept(this, parameter);
-                var y = expression.Expr2.Accept(this, parameter);
-                this.Combine(x, y);
-                return x.Union(y);
-            });
-        }
-
-        public ImmutableHashSet<object> VisitZenGeqExpr<T>(ZenGeqExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>
             {

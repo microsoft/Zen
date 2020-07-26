@@ -255,19 +255,6 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
-        /// Visit an EqExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenEqExpr<T>(ZenEqExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            var e1 = (T)expression.Expr1.Accept(this, parameter);
-            var e2 = (T)expression.Expr2.Accept(this, parameter);
-            return e1.Equals(e2);
-        }
-
-        /// <summary>
         /// Visit a GetFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -299,84 +286,57 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
-        /// Visit a LeqExpr.
+        /// Visit a ComparisonExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
-        public object VisitZenLeqExpr<T>(ZenLeqExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
             {
+                var e1 = expression.Expr1.Accept(this, parameter);
+                var e2 = expression.Expr2.Accept(this, parameter);
                 var type = typeof(T);
 
-                if (type == ReflectionUtilities.ByteType)
+                switch (expression.ComparisonType)
                 {
-                    return (byte)expression.Expr1.Accept(this, parameter) <= (byte)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)expression.Expr1.Accept(this, parameter) <= (short)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)expression.Expr1.Accept(this, parameter) <= (ushort)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) <= (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) <= (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) <= (long)expression.Expr2.Accept(this, parameter);
-                }
+                    case ComparisonType.Geq:
+                        if (type == ReflectionUtilities.ByteType)
+                            return (byte)e1 >= (byte)e2;
+                        if (type == ReflectionUtilities.ShortType)
+                            return (short)e1 >= (short)e2;
+                        if (type == ReflectionUtilities.UshortType)
+                            return (ushort)e1 >= (ushort)e2;
+                        if (type == ReflectionUtilities.IntType)
+                            return (int)e1 >= (int)e2;
+                        if (type == ReflectionUtilities.UintType)
+                            return (uint)e1 >= (uint)e2;
+                        if (type == ReflectionUtilities.LongType)
+                            return (long)e1 >= (long)e2;
+                        return (ulong)e1 >= (ulong)e2;
 
-                return (ulong)expression.Expr1.Accept(this, parameter) <= (ulong)expression.Expr2.Accept(this, parameter);
-            });
-        }
+                    case ComparisonType.Leq:
+                        if (type == ReflectionUtilities.ByteType)
+                            return (byte)e1 <= (byte)e2;
+                        if (type == ReflectionUtilities.ShortType)
+                            return (short)e1 <= (short)e2;
+                        if (type == ReflectionUtilities.UshortType)
+                            return (ushort)e1 <= (ushort)e2;
+                        if (type == ReflectionUtilities.IntType)
+                            return (int)e1 <= (int)e2;
+                        if (type == ReflectionUtilities.UintType)
+                            return (uint)e1 <= (uint)e2;
+                        if (type == ReflectionUtilities.LongType)
+                            return (long)e1 <= (long)e2;
+                        return (ulong)e1 <= (ulong)e2;
 
-        /// <summary>
-        /// Visit a GeqExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
-        public object VisitZenGeqExpr<T>(ZenGeqExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var type = typeof(T);
+                    case ComparisonType.Eq:
+                        return ((T)e1).Equals((T)e2);
 
-                if (type == ReflectionUtilities.ByteType)
-                {
-                    return (byte)expression.Expr1.Accept(this, parameter) >= (byte)expression.Expr2.Accept(this, parameter);
+                    default:
+                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
                 }
-                if (type == ReflectionUtilities.ShortType)
-                {
-                    return (short)expression.Expr1.Accept(this, parameter) >= (short)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UshortType)
-                {
-                    return (ushort)expression.Expr1.Accept(this, parameter) >= (ushort)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.IntType)
-                {
-                    return (int)expression.Expr1.Accept(this, parameter) >= (int)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.UintType)
-                {
-                    return (uint)expression.Expr1.Accept(this, parameter) >= (uint)expression.Expr2.Accept(this, parameter);
-                }
-                if (type == ReflectionUtilities.LongType)
-                {
-                    return (long)expression.Expr1.Accept(this, parameter) >= (long)expression.Expr2.Accept(this, parameter);
-                }
-
-                return (ulong)expression.Expr1.Accept(this, parameter) >= (ulong)expression.Expr2.Accept(this, parameter);
             });
         }
 

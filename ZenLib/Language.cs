@@ -455,7 +455,7 @@ namespace ZenLib
 
                 if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
                 {
-                    return ZenEqExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
+                    return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
                 }
 
                 if (ReflectionUtilities.IsOptionType(type))
@@ -545,7 +545,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenLeqExpr<T>.Create(expr1, expr2);
+            return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
         }
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace ZenLib
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            return ZenGeqExpr<T>.Create(expr1, expr2);
+            return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
         }
 
         /// <summary>

@@ -408,22 +408,6 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert an 'Eq' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenEqExpr<T>(ZenEqExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Expression.Equal(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
         /// Convert an 'GetField' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -469,34 +453,35 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert a 'Leq' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
-        public Expression VisitZenLeqExpr<T>(ZenLeqExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return Expression.LessThanOrEqual(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
-            });
-        }
-
-        /// <summary>
         /// Convert a 'Geq' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenGeqExpr<T>(ZenGeqExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                return Expression.GreaterThanOrEqual(
-                expression.Expr1.Accept(this, parameter),
-                expression.Expr2.Accept(this, parameter));
+                switch (expression.ComparisonType)
+                {
+                    case ComparisonType.Geq:
+                        return Expression.GreaterThanOrEqual(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case ComparisonType.Leq:
+                        return Expression.LessThanOrEqual(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    case ComparisonType.Eq:
+                        return Expression.Equal(
+                            expression.Expr1.Accept(this, parameter),
+                            expression.Expr2.Accept(this, parameter));
+
+                    default:
+                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
+                }
             });
         }
 
