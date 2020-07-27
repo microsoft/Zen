@@ -81,8 +81,29 @@ compiled function time: 2ms
 
 # Supported Types
 
-Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`.
-It also supports values of type `Tuple<T1, T2>`, `ValueTuple<T1, T2>`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor.
+Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong, string`.
+It also supports values of type `Tuple<T1, T2>`, `(T1, T2)`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor.
+
+# APIs and Backends
+
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified:
+
+```csharp
+function.Find((x, y, result) => result == 11, Backend.DecisionDiagrams);
+```
+
+The binary decision diagram backend has an additional limitation that it does not support the `string` type. On the other hand, it provides an expressive transformer API that allows for directly computing and transforming sets of solutions:
+
+```csharp
+ZenFunction<uint, uint> f = Function<uint, uint>(i => i + 1);
+StateSetTransformer<uint, uint> t = f.Transformer();
+StateSet<uint> set1 = t.InputSet((x, y) => y == 10);
+StateSet<uint> set2 = t.InputSet((x, y) => y == 11);
+StateSet<uint> set3 = inSet1.Union(inSet2);
+StateSet<uint> set4 = t.TransformForward(set1);
+StateSet<uint> set5 = t.TransformBackwards(set4);
+Option<uint> value = set1.Element();
+```
 
 # Examples
 
@@ -188,7 +209,7 @@ public class AclLine
 # Implementation
 Zen builds an abstract syntax tree (AST) for the function it is representing and then leverages C#'s reflection capabilities to interpret, compile, and symbolically evaluate the AST.
 
-The `Find` function uses symbolic model checking to exhaustively search for inputs that lead to a desired result. In the backend it supports two solvers, one based on SMT solvers such as [Z3](https://github.com/Z3Prover/z3) and another based on binary decision diagrams.
+The `Find` function uses symbolic model checking to exhaustively search for inputs that lead to a desired result.
 
 # Contributing
 
