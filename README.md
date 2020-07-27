@@ -99,7 +99,7 @@ ZenFunction<uint, uint> f = Function<uint, uint>(i => i + 1);
 StateSetTransformer<uint, uint> t = f.Transformer();
 StateSet<uint> set1 = t.InputSet((x, y) => y == 10);
 StateSet<uint> set2 = t.InputSet((x, y) => y == 11);
-StateSet<uint> set3 = inSet1.Union(inSet2);
+StateSet<uint> set3 = set1.Union(set2);
 StateSet<uint> set4 = t.TransformForward(set1);
 StateSet<uint> set5 = t.TransformBackwards(set4);
 Option<uint> value = set1.Element();
