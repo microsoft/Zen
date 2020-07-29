@@ -94,7 +94,7 @@ namespace ZenLib
         /// <param name="x">The value.</param>
         public static implicit operator Zen<T>(string x)
         {
-            return ConvertStringConstant<T>((string)x);
+            return ConvertStringConstant<T>(x);
         }
 
         /// <summary>
@@ -310,6 +310,11 @@ namespace ZenLib
             if (type == ReflectionUtilities.StringType)
             {
                 return (Zen<TZen>)(object)Language.String(s);
+            }
+
+            if (type == ReflectionUtilities.FiniteStringType)
+            {
+                return (Zen<TZen>)(object)FiniteString.Constant(s);
             }
 
             throw new ZenException($"Invalid implicit conversion from string to type: {type}");

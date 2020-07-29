@@ -23,6 +23,8 @@ namespace ZenLib
 
         private static MethodInfo eqBoolMethod = typeof(Language).GetMethod("Eq").MakeGenericMethod(typeof(bool));
 
+        private static MethodInfo eqListsMethod = typeof(Language).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
+
         private static MethodInfo hasValueMethod = typeof(Language).GetMethod("HasValue");
 
         private static MethodInfo valueMethod = typeof(Language).GetMethod("Value");
@@ -447,6 +449,14 @@ namespace ZenLib
             return EqHelper<T>(expr1, expr2);
         }
 
+        private static Zen<bool> EqLists<T>(Zen<IList<T>> expr1, Zen<IList<T>> expr2)
+        {
+            return expr1.Case(
+                empty: expr2.IsEmpty(),
+                cons: (hd1, tl1) =>
+                    expr2.Case(empty: false, cons: (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
+        }
+
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
         {
             try
@@ -501,7 +511,14 @@ namespace ZenLib
                     return And(eqItem1, eqItem2);
                 }
 
-                if (ReflectionUtilities.IsIListType(type) || ReflectionUtilities.IsIDictionaryType(type))
+                if (ReflectionUtilities.IsIListType(type))
+                {
+                    var innerType = type.GetGenericArguments()[0];
+                    var method = eqListsMethod.MakeGenericMethod(innerType);
+                    return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
+                }
+
+                if (ReflectionUtilities.IsIDictionaryType(type))
                 {
                     throw new ZenException($"Zen does not support equality of {type} types.");
                 }

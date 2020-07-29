@@ -45,7 +45,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            Repeat(x => CheckAgreement<IDictionary<int, int>>(d => Not(EmptyDict<int, int>().Get(x).HasValue())));
+            RandomBytes(x => CheckAgreement<IDictionary<int, int>>(d => Not(EmptyDict<int, int>().Get(x).HasValue())));
         }
 
         /// <summary>

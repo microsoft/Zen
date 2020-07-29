@@ -41,13 +41,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAdditionCommutative()
         {
-            Repeat(x => CheckValid<byte>(y => x + y == y + x));
-            Repeat(x => CheckValid<short>(y => x + y == y + x));
-            Repeat(x => CheckValid<ushort>(y => x + y == y + x));
-            Repeat(x => CheckValid<int>(y => x + y == y + x));
-            Repeat(x => CheckValid<uint>(y => x + y == y + x));
-            Repeat(x => CheckValid<long>(y => x + y == y + x));
-            Repeat(x => CheckValid<ulong>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<byte>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<short>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<ushort>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<int>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<uint>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<long>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<ulong>(y => x + y == y + x));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAdditionSubtraction()
         {
-            Repeat(r => CheckValid<byte>(x => x + r - x == r));
+            RandomBytes(r => CheckValid<byte>(x => x + r - x == r));
         }
 
         /// <summary>
@@ -233,39 +233,9 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestEqualityCompositeException1()
-        {
-            CheckAgreement<IList<int>, IList<int>>((l1, l2) => l1 == l2);
-        }
-
-        /// <summary>
-        /// Test equality for composite types.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestEqualityCompositeException2()
         {
             CheckAgreement<IDictionary<byte, byte>, IDictionary<byte, byte>>((l1, l2) => l1 == l2);
-        }
-
-        /// <summary>
-        /// Test equality for composite types.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestEqualityCompositeException3()
-        {
-            CheckAgreement<Option<IList<int>>, Option<IList<int>>>((l1, l2) => l1 == l2);
-        }
-
-        /// <summary>
-        /// Test equality for composite types.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestEqualityCompositeException4()
-        {
-            CheckAgreement<(int, IList<int>), (int, IList<int>)>((l1, l2) => l1 == l2);
         }
 
         /// <summary>
