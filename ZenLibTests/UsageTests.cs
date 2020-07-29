@@ -1322,16 +1322,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Exception thrown for non-integer/bool parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInvalidEquality()
-        {
-            _ = EmptyList<int>() == EmptyList<int>();
-        }
-
-        /// <summary>
         /// Pass explicit input.
         /// </summary>
         [TestMethod]

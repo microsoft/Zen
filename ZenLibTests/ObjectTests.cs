@@ -128,7 +128,7 @@ namespace ZenLib.Tests
         /// <param name="field">The field.</param>
         private void CheckGetWithForField<T>(string field)
         {
-            Repeat(x => CheckValid<T>(o => o
+            RandomBytes(x => CheckValid<T>(o => o
                 .WithField(field, Int(x))
                 .GetField<T, int>(field) == Int(x)));
         }

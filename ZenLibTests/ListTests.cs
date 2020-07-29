@@ -25,7 +25,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListContains()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => And(l.Contains(x), l.Contains(7))));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => And(l.Contains(x), l.Contains(7))));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListAll()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.All(e => e == x)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.All(e => e == x)));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListAny()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.Any(e => e >= x)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Any(e => e >= x)));
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListMap()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.Select(e => e + 1).Contains(x)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Select(e => e + 1).Contains(x)));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListFilter()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.Where(e => e < (x + 1)).Contains(x)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Where(e => e < (x + 1)).Contains(x)));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListContainsFind()
         {
-            Repeat(x => CheckValid<IList<byte>>(l =>
+            RandomBytes(x => CheckValid<IList<byte>>(l =>
                 Implies(l.Contains(Byte(x)), l.Find(v => v == x).HasValue())));
         }
 
@@ -89,7 +89,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListIndexOf()
         {
-            Repeat(x => CheckValid<IList<byte>>(l =>
+            RandomBytes(x => CheckValid<IList<byte>>(l =>
                 Implies(l.Contains(Byte(x)), l.IndexOf(x).HasValue())));
         }
 
@@ -112,7 +112,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListLength()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.AddFront(x).Length() > 0));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.AddFront(x).Length() > 0));
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListLength2()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.AddBack(x).Length() > 0));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.AddBack(x).Length() > 0));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListReverse()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.Reverse().Contains(x)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Reverse().Contains(x)));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListIntersperse()
         {
-            Repeat(x => CheckAgreement<IList<int>>(l => l.Intersperse(Int(x)).Contains(3)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Intersperse(Int(x)).Contains(3)));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListRemoveAllNotContains()
         {
-            Repeat(x => CheckValid<IList<int>>(l => Not(l.RemoveAll(Int(x)).Contains(x))));
+            RandomBytes(x => CheckValid<IList<int>>(l => Not(l.RemoveAll(Int(x)).Contains(x))));
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListRemoveAllSmaller()
         {
-            Repeat(x => CheckValid<IList<int>>(l => l.RemoveAll(x).Length() <= l.Length()));
+            RandomBytes(x => CheckValid<IList<int>>(l => l.RemoveAll(x).Length() <= l.Length()));
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListRemoveFirstCount()
         {
-            Repeat(x => CheckValid<IList<int>>(l => l.RemoveFirst(x).Duplicates(x) == l.Duplicates(x)));
+            RandomBytes(x => CheckValid<IList<int>>(l => l.RemoveFirst(x).Duplicates(x) == l.Duplicates(x)));
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListTakeSmaller()
         {
-            Repeat(x => CheckValid<IList<int>>(l =>
+            RandomBytes(x => CheckValid<IList<int>>(l =>
                 l.Take(x).Length() <= l.Length()));
         }
 
@@ -203,7 +203,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListTakeExact()
         {
-            Repeat(x =>
+            RandomBytes(x =>
             {
                 var len = x % 4;
                 CheckValid<IList<int>>(l =>
@@ -217,7 +217,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListDropSmaller()
         {
-            Repeat(x => CheckValid<IList<int>>(l =>
+            RandomBytes(x => CheckValid<IList<int>>(l =>
                 l.Drop(x).Length() <= l.Length()));
         }
 

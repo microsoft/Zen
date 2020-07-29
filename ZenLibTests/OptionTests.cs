@@ -34,7 +34,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionSomeInt()
         {
-            Repeat(x => CheckAgreement<Option<int>>(o => And(o.HasValue(), o.Value() == Int(x))));
+            RandomBytes(x => CheckAgreement<Option<int>>(o => And(o.HasValue(), o.Value() == Int(x))));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionSomeTuple()
         {
-            Repeat(x =>
+            RandomBytes(x =>
             {
                 CheckAgreement<Option<Tuple<byte, byte>>>(o =>
                 {

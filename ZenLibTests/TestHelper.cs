@@ -51,13 +51,38 @@ namespace ZenLib.Tests
         /// Repeat an action multiple times.
         /// </summary>
         /// <param name="action">The action.</param>
-        public static void Repeat(Action<byte> action)
+        public static void RandomBytes(Action<byte> action)
         {
             for (int i = 0; i < numRandomTests; i++)
             {
                 var r = (byte)random.Next(0, 255);
                 action(r);
             }
+        }
+
+        /// <summary>
+        /// Repeat an action multiple times.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        public static void RandomStrings(Action<string> action)
+        {
+            for (int i = 0; i < numRandomTests; i++)
+            {
+                action(RandomString());
+            }
+        }
+
+        private static string RandomString()
+        {
+            string s = string.Empty;
+            var len = random.Next(0, 5);
+            for (int j = 0; j < len; j++)
+            {
+                var c = (char)random.Next(0, 255);
+                s = s + c;
+            }
+
+            return s;
         }
 
         private static void Start(TestParameter p)
