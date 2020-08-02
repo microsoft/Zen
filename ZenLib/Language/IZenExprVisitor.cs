@@ -132,6 +132,14 @@ namespace ZenLib
         TReturn VisitZenConcatExpr(ZenConcatExpr expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ContainmentExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenContainmentExpr(ZenContainmentExpr expression, TParam parameter);
+
+        /// <summary>
         /// Visit a BitwiseAndExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

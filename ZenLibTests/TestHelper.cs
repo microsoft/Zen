@@ -20,7 +20,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// Number of random inputs to try per test.
         /// </summary>
-        private static int numRandomTests = 10;
+        private static int numRandomTests = 20;
 
         /// <summary>
         /// Deterministic random number generator.
@@ -72,14 +72,18 @@ namespace ZenLib.Tests
             }
         }
 
-        private static string RandomString()
+        /// <summary>
+        /// Generates a random string.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public static string RandomString()
         {
             string s = string.Empty;
             var len = random.Next(0, 5);
             for (int j = 0; j < len; j++)
             {
                 var c = (char)random.Next(0, 255);
-                s = s + c;
+                s += c;
             }
 
             return s;

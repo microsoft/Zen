@@ -937,6 +937,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test object update with string.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectWith1Field3()
+        {
+            // avoid warning with unused field
+            StructWithString s;
+            s.Field = "";
+
+            CheckValid<StructWithString, string>((o, i) =>
+                o.WithField("Field", i).GetField<StructWithString, string>("Field") == i);
+        }
+
+        /// <summary>
         /// Test encapsulating a packet.
         /// </summary>
         [TestMethod]
@@ -992,6 +1006,11 @@ namespace ZenLib.Tests
         private struct StructField1
         {
             public int Field1;
+        }
+
+        private struct StructWithString
+        {
+            public string Field;
         }
 
         private class Matrix3x3
