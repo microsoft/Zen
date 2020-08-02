@@ -680,6 +680,22 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Replace a substring with another string.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="substr">The substring Zen expression.</param>
+        /// <param name="replace">The replacement string.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> ReplaceFirst(this Zen<string> str, Zen<string> substr, Zen<string> replace)
+        {
+            CommonUtilities.Validate(str);
+            CommonUtilities.Validate(substr);
+            CommonUtilities.Validate(replace);
+
+            return ZenStringReplaceExpr.Create(str, substr, replace);
+        }
+
+        /// <summary>
         /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>

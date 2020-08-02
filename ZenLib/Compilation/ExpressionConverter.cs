@@ -104,6 +104,11 @@ namespace ZenLib.Compilation
         private static MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
 
         /// <summary>
+        /// String contains method.
+        /// </summary>
+        private static MethodInfo replaceMethod = typeof(CommonUtilities).GetMethod("ReplaceFirst");
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -711,6 +716,23 @@ namespace ZenLib.Compilation
                     default:
                         return Expression.Call(l, containsMethod, new Expression[] { r });
                 }
+            });
+        }
+
+        /// <summary>
+        /// Convert a 'Containment' expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
+                var e2 = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
+                var e3 = Expression.Convert(expression.Expr3.Accept(this, parameter), typeof(string));
+                return Expression.Call(null, replaceMethod, new Expression[] { e1, e2, e3 });
             });
         }
 

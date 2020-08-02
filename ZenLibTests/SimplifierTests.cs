@@ -237,6 +237,23 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string replace.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceSimplification()
+        {
+            var s1 = String("hello");
+            var s2 = String("ll");
+            var s3 = String("ll");
+
+            Assert.AreEqual(String("abc").ReplaceFirst("b", "c"), String("acc"));
+            Assert.AreEqual(String("abc").ReplaceFirst("", "d"), String("abcd"));
+
+            CheckValid<string, string>((s1, s2) => s1.ReplaceFirst("", s2) == s1 + s2);
+            CheckValid<string, string>((s1, s2) => String("").ReplaceFirst(s1, s2) == "");
+        }
+
+        /// <summary>
         /// Test hash consing of concat.
         /// </summary>
         [TestMethod]
@@ -260,6 +277,20 @@ namespace ZenLib.Tests
             var e1 = s.Contains("ll");
             var e2 = s.Contains("ll");
             var e3 = s.EndsWith("ll");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of replacement.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.ReplaceFirst("xx", "yy");
+            var e2 = s.ReplaceFirst("xx", "yy");
+            var e3 = s.ReplaceFirst("xx", "zz");
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
         }

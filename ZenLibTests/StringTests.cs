@@ -127,6 +127,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test startswith and replace interactions.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceStartsWith()
+        {
+            RandomStrings(sub =>
+            {
+                if (sub != "")
+                {
+                    CheckValid<string, string>((s1, s2) =>
+                        Implies(s1.StartsWith(sub), s1.ReplaceFirst(sub, s2).StartsWith(s2)));
+                }
+            });
+        }
+
+        /// <summary>
         /// Test concatenating multiple values is solved correctly.
         /// </summary>
         [TestMethod]
@@ -209,6 +225,37 @@ namespace ZenLib.Tests
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
+        }
+
+        /// <summary>
+        /// Test string replace first.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", "fox", "brown fox")]
+        [DataRow("aabbcc", "b", "d", "aadbcc")]
+        [DataRow("hello", "ll", "rrr", "herrro")]
+        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("abc", "b", "", "ac")]
+        public void TestReplaceFirst(string s, string sub, string replace, string expected)
+        {
+            Assert.AreEqual(expected, CommonUtilities.ReplaceFirst(s, sub, replace));
+        }
+
+        /// <summary>
+        /// Test contains replace first.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", "fox", "brown fox")]
+        [DataRow("aabbcc", "b", "d", "aadbcc")]
+        [DataRow("hello", "ll", "rrr", "herrro")]
+        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("abc", "b", "", "ac")]
+        public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
+        {
+            var f = Function<string, string>(s => s.ReplaceFirst(sub, replace));
+            Assert.AreEqual(expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s));
         }
 
         /// <summary>

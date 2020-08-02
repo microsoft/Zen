@@ -159,6 +159,7 @@ namespace ZenLib.Tests
 
                 // compare input with evaluation
                 result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
+                Console.WriteLine($"{result.Value}");
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));

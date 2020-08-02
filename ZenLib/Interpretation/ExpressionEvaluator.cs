@@ -443,6 +443,23 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
+        /// Visit a StringReplaceExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e1 = (string)expression.Expr1.Accept(this, parameter);
+                var e2 = (string)expression.Expr2.Accept(this, parameter);
+                var e3 = (string)expression.Expr3.Accept(this, parameter);
+                return CommonUtilities.ReplaceFirst(e1, e2, e3);
+            });
+        }
+
+        /// <summary>
         /// Visit a IntConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

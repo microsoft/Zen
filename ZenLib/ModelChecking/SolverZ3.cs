@@ -245,6 +245,11 @@ namespace ZenLib.ModelChecking
             return this.context.MkContains(x, y);
         }
 
+        public SeqExpr ReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
+        {
+            return this.context.MkReplace(x, y, z);
+        }
+
         public object Get(Model m, Expr v)
         {
             var e = m.Evaluate(v, true);

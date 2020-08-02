@@ -268,5 +268,29 @@ namespace ZenLib
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Replace the first instance of a substring in a string with a new string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="sub">The substring.</param>
+        /// <param name="replace">The replacement string.</param>
+        /// <returns>A new string.</returns>
+        public static string ReplaceFirst(string s, string sub, string replace)
+        {
+            if (sub == string.Empty)
+            {
+                return s + replace;
+            }
+
+            var idx = s.IndexOf(sub);
+            if (idx < 0)
+            {
+                return s;
+            }
+
+            var afterMatch = idx + sub.Length;
+            return s.Substring(0, idx) + replace + s.Substring(afterMatch, s.Length - afterMatch);
+        }
     }
 }

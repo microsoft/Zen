@@ -217,6 +217,15 @@ namespace ZenLib.ModelChecking
         TBool Contains(TString x, TString y);
 
         /// <summary>
+        /// The 'Contains' of two expressions.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The substring expression.</param>
+        /// <param name="z">The replacement expression.</param>
+        /// <returns></returns>
+        TString ReplaceFirst(TString x, TString y, TString z);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

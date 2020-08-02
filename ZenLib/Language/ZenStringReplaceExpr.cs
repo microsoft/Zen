@@ -9,50 +9,40 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a string Containment expression.
+    /// Class representing a string Replacement expression.
     /// </summary>
-    internal sealed class ZenContainmentExpr : Zen<bool>
+    internal sealed class ZenStringReplaceExpr : Zen<string>
     {
-        private static Dictionary<(object, object, int), Zen<bool>> hashConsTable = new Dictionary<(object, object, int), Zen<bool>>();
+        private static Dictionary<(object, object, object), Zen<string>> hashConsTable =
+            new Dictionary<(object, object, object), Zen<string>>();
 
-        private static Func<string, string, bool>[] constantFuncs = new Func<string, string, bool>[]
-        {
-            (s1, s2) => s1.StartsWith(s2),
-            (s1, s2) => s1.EndsWith(s2),
-            (s1, s2) => s1.Contains(s2),
-        };
-
-        public static Zen<bool> Simplify(Zen<string> e1, Zen<string> e2, ContainmentType containmentType)
+        public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2, Zen<string> e3)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
             string y = ReflectionUtilities.GetConstantString(e2);
-
-            if (x != null && y != null)
-            {
-                var f = constantFuncs[(int)containmentType];
-                return f(x, y);
-            }
-
-            if (y == "")
-                return true;
+            string z = ReflectionUtilities.GetConstantString(e3);
+            if (x != null && y != null && z != null)
+                return CommonUtilities.ReplaceFirst(x, y, z);
             if (x == "")
-                return false;
-
-            return new ZenContainmentExpr(e1, e2, containmentType);
+                return "";
+            if (y == "")
+                return e1 + e3;
+            return new ZenStringReplaceExpr(e1, e2, e3);
         }
 
-        public static Zen<bool> Create(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
+        public static Zen<string> Create(Zen<string> expr1, Zen<string> expr2, Zen<string> expr3)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
+            CommonUtilities.Validate(expr3);
 
-            var key = (expr1, expr2, (int)containmentType);
+            var key = (expr1, expr2, expr3);
             if (hashConsTable.TryGetValue(key, out var value))
             {
                 return value;
             }
 
-            var ret = Simplify(expr1, expr2, containmentType);
+            var ret = Simplify(expr1, expr2, expr3);
             hashConsTable[key] = ret;
             return ret;
         }
@@ -60,14 +50,14 @@ namespace ZenLib
         /// <summary>
         /// Initializes a new instance of the <see cref="ZenContainmentExpr"/> class.
         /// </summary>
-        /// <param name="expr1">The first expression.</param>
-        /// <param name="expr2">The second expression.</param>
-        /// <param name="containmentType">The containment type.</param>
-        private ZenContainmentExpr(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
+        /// <param name="expr1">The string expression.</param>
+        /// <param name="expr2">The subtring match.</param>
+        /// <param name="expr3">The substituted string.</param>
+        private ZenStringReplaceExpr(Zen<string> expr1, Zen<string> expr2, Zen<string> expr3)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;
-            this.ContainmentType = containmentType;
+            this.Expr3 = expr3;
         }
 
         /// <summary>
@@ -83,7 +73,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the containment type.
         /// </summary>
-        internal ContainmentType ContainmentType { get; }
+        internal Zen<string> Expr3 { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -92,7 +82,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Containment({this.Expr1}, {this.Expr2}, {this.ContainmentType})";
+            return $"Replace({this.Expr1}, {this.Expr2}, {this.Expr3})";
         }
 
         /// <summary>
@@ -105,14 +95,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenContainmentExpr(this, parameter);
+            return visitor.VisitZenStringReplaceExpr(this, parameter);
         }
-    }
-
-    internal enum ContainmentType
-    {
-        PrefixOf,
-        SuffixOf,
-        Contains,
     }
 }

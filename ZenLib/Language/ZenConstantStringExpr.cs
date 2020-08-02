@@ -53,7 +53,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return this.UnescapedValue;
+            return $"\"{this.UnescapedValue}\"";
         }
 
         /// <summary>
