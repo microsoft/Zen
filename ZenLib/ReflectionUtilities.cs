@@ -539,7 +539,7 @@ namespace ZenLib
         {
             if (value is ZenConstantStringExpr xs)
             {
-                return (string)xs.Value;
+                return xs.UnescapedValue;
             }
 
             return null;

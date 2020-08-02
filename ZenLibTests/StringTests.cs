@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
@@ -19,6 +20,49 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class StringTests
     {
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        [DataRow("")]
+        [DataRow("AaBb")]
+        [DataRow("\t")]
+        [DataRow("\r")]
+        [DataRow("\n")]
+        [DataRow("\a")]
+        [DataRow("\b")]
+        [DataRow("\v")]
+        [DataRow("\f")]
+        [DataRow("\t")]
+        [DataRow("\"")]
+        [DataRow("\\")]
+        [DataRow("\\x5C\\x6E")]
+        [DataRow("endline\n")]
+        [DataRow("\x01\\x01")]
+        public void TestStringConversions(string s)
+        {
+            var context = new Context();
+            var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+            Assert.AreEqual(s, tocs);
+        }
+
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversionsRandom()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                string s = RandomString();
+                var context = new Context();
+                var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+                Assert.AreEqual(s, tocs);
+            }
+        }
+
         /// <summary>
         /// Test concatenation with empty string.
         /// </summary>
@@ -47,6 +91,42 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test endswith agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestEndsWithAgreement()
+        {
+            RandomStrings(sub =>
+            {
+                CheckAgreement<string>(s => s.EndsWith(sub));
+            });
+        }
+
+        /// <summary>
+        /// Test startswith agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestStartsWithAgreement()
+        {
+            RandomStrings(sub =>
+            {
+                CheckAgreement<string>(s => s.StartsWith(sub));
+            });
+        }
+
+        /// <summary>
+        /// Test contains agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestContainsAgreement()
+        {
+            RandomStrings(sub =>
+            {
+                CheckAgreement<string>(s => s.Contains(sub));
+            });
+        }
+
+        /// <summary>
         /// Test concatenating multiple values is solved correctly.
         /// </summary>
         [TestMethod]
@@ -63,9 +143,9 @@ namespace ZenLib.Tests
             Assert.IsTrue(r2.HasValue);
             Assert.IsTrue(r3.HasValue);
 
-            string s1 = (string)r1.Value.Item1 + (string)r1.Value.Item2;
-            string s2 = (string)r2.Value.Item1 + (string)r2.Value.Item2 + (string)r2.Value.Item3;
-            string s3 = (string)r3.Value.Item1 + (string)r3.Value.Item2 + (string)r3.Value.Item3 + (string)r3.Value.Item4;
+            string s1 = r1.Value.Item1 + r1.Value.Item2;
+            string s2 = r2.Value.Item1 + r2.Value.Item2 + r2.Value.Item3;
+            string s3 = r3.Value.Item1 + r3.Value.Item2 + r3.Value.Item3 + r3.Value.Item4;
             Assert.AreEqual("hello", s1);
             Assert.AreEqual("hello", s2);
             Assert.AreEqual("hello", s3);
@@ -81,6 +161,86 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test startswith evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", false)]
+        [DataRow("brown cow", "ow", false)]
+        [DataRow("brown cow", "brown", true)]
+        [DataRow("brown cow", "bro", true)]
+        [DataRow("quick fox", "", true)]
+        [DataRow("quick fox", "uick", false)]
+        public void TestStartsWithEvaluation(string s, string sub, bool expected)
+        {
+            var f = Function<string, string, bool>((s1, s2) => s1.StartsWith(s2));
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+        }
+
+        /// <summary>
+        /// Test endswith evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", true)]
+        [DataRow("brown cow", "ow", true)]
+        [DataRow("brown cow", "brown", false)]
+        [DataRow("quick fox", "", true)]
+        public void TestEndsWithEvaluation(string s, string sub, bool expected)
+        {
+            var f = Function<string, string, bool>((s1, s2) => s1.EndsWith(s2));
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+        }
+
+        /// <summary>
+        /// Test contains evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", true)]
+        [DataRow("brown cow", "brown", true)]
+        [DataRow("hello", "ell", true)]
+        [DataRow("hello", "", true)]
+        [DataRow("hello", "b", false)]
+        public void TestContainsEvaluation(string s, string sub, bool expected)
+        {
+            var f = Function<string, string, bool>((s1, s2) => s1.Contains(s2));
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s, sub));
+        }
+
+        /// <summary>
+        /// Test endswith implies contains.
+        /// </summary>
+        [TestMethod]
+        public void TestEndsWithContains()
+        {
+            RandomStrings(sub => CheckValid<string>(s => Implies(s.EndsWith(sub), s.Contains(sub))));
+        }
+
+        /// <summary>
+        /// Test startswith implies contains.
+        /// </summary>
+        [TestMethod]
+        public void TestStartsWithContains()
+        {
+            RandomStrings(sub => CheckValid<string>(s => Implies(s.StartsWith(sub), s.Contains(sub))));
+        }
+
+        /// <summary>
+        /// Test invalid implicit conversion.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidImplicitConversion()
+        {
+            Zen<bool> b = true;
+            Or(b, "");
+        }
+
+        /// <summary>
         /// Test equality for composite types.
         /// </summary>
         [TestMethod]
@@ -88,6 +248,27 @@ namespace ZenLib.Tests
         public void TestStringEqualityCompositeException1()
         {
             CheckAgreement<IList<string>, IList<string>>((l1, l2) => l1 == l2);
+        }
+
+        /// <summary>
+        /// Test invalid null string literal.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestInvalidStringLiteralNull()
+        {
+            String(null);
+        }
+
+        /// <summary>
+        /// Test invalid string literal.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestInvalidStringLiteral2()
+        {
+            char c = (char)960; // greek pi
+            String(c.ToString());
         }
 
         /// <summary>

@@ -29,16 +29,22 @@ namespace ZenLib
         /// <summary>
         /// Initializes a new instance of the <see cref="ZenConstantStringExpr"/> class.
         /// </summary>
-        /// <param name="value">The value.</param>
-        private ZenConstantStringExpr(string value)
+        /// <param name="unescapedValue">The unescaped value.</param>
+        private ZenConstantStringExpr(string unescapedValue)
         {
-            this.Value = value;
+            this.UnescapedValue = unescapedValue;
+            this.EscapedValue = CommonUtilities.ConvertCSharpStringToZ3(unescapedValue);
         }
 
         /// <summary>
-        /// Gets the value.
+        /// Gets the escaped value.
         /// </summary>
-        internal string Value { get; }
+        internal string EscapedValue { get; }
+
+        /// <summary>
+        /// Gets the unescaped value.
+        /// </summary>
+        internal string UnescapedValue { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -47,7 +53,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return this.Value;
+            return this.UnescapedValue;
         }
 
         /// <summary>

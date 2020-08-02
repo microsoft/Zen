@@ -89,6 +89,21 @@ namespace ZenLib.Compilation
         private static MethodInfo concatMethod = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
 
         /// <summary>
+        /// String prefix of method.
+        /// </summary>
+        private static MethodInfo prefixOfMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
+
+        /// <summary>
+        /// String suffix of method.
+        /// </summary>
+        private static MethodInfo suffixOfMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
+
+        /// <summary>
+        /// String contains method.
+        /// </summary>
+        private static MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -226,13 +241,10 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case Op.Multiplication:
+                    default:
                         return Expression.Multiply(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenException($"Invalid operation: {expression.Operation}");
                 }
             });
         }
@@ -347,7 +359,7 @@ namespace ZenLib.Compilation
         /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionConverterEnvironment parameter)
         {
-            return Expression.Constant(expression.Value);
+            return Expression.Constant(expression.UnescapedValue);
         }
 
         /// <summary>
@@ -474,13 +486,10 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case ComparisonType.Eq:
+                    default:
                         return Expression.Equal(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
                 }
             });
         }
@@ -677,6 +686,31 @@ namespace ZenLib.Compilation
                 var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
                 var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
                 return Expression.Add(l, r, concatMethod);
+            });
+        }
+
+        /// <summary>
+        /// Convert a 'Containment' expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenContainmentExpr(ZenContainmentExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
+                var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
+
+                switch (expression.ContainmentType)
+                {
+                    case ContainmentType.PrefixOf:
+                        return Expression.Call(l, prefixOfMethod, new Expression[] { r });
+                    case ContainmentType.SuffixOf:
+                        return Expression.Call(l, suffixOfMethod, new Expression[] { r });
+                    default:
+                        return Expression.Call(l, containsMethod, new Expression[] { r });
+                }
             });
         }
 

@@ -142,6 +142,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> String(string s)
         {
+            CommonUtilities.Validate(s);
+            CommonUtilities.ValidateStringLiteral(s);
             return ZenConstantStringExpr.Create(s);
         }
 
@@ -633,6 +635,48 @@ namespace ZenLib
             CommonUtilities.Validate(expr2);
 
             return ZenConcatExpr.Create(expr1, expr2);
+        }
+
+        /// <summary>
+        /// Check if one string starts with another.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="substr">The substring Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> StartsWith(this Zen<string> str, Zen<string> substr)
+        {
+            CommonUtilities.Validate(str);
+            CommonUtilities.Validate(substr);
+
+            return ZenContainmentExpr.Create(str, substr, ContainmentType.PrefixOf);
+        }
+
+        /// <summary>
+        /// Check if one string ends with another.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="substr">The substring Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> EndsWith(this Zen<string> str, Zen<string> substr)
+        {
+            CommonUtilities.Validate(str);
+            CommonUtilities.Validate(substr);
+
+            return ZenContainmentExpr.Create(str, substr, ContainmentType.SuffixOf);
+        }
+
+        /// <summary>
+        /// Check if one string contains another.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="substr">The substring Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> Contains(this Zen<string> str, Zen<string> substr)
+        {
+            CommonUtilities.Validate(str);
+            CommonUtilities.Validate(substr);
+
+            return ZenContainmentExpr.Create(str, substr, ContainmentType.Contains);
         }
 
         /// <summary>

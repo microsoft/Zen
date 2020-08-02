@@ -194,10 +194,8 @@ namespace ZenLib.ModelChecking
                         return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
                     case Op.Subtraction:
                         return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
-                    case Op.Multiplication:
-                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                     default:
-                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                        return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                 }
             });
         }
@@ -347,8 +345,8 @@ namespace ZenLib.ModelChecking
         {
             return LookupOrCompute(expression, () =>
             {
-                var bv = this.Solver.CreateStringConst((string)expression.Value);
-                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, bv);
+                var v = this.Solver.CreateStringConst(expression.EscapedValue);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, v);
             });
         }
 
@@ -428,7 +426,7 @@ namespace ZenLib.ModelChecking
                             (expression.ComparisonType == ComparisonType.Geq ? this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value) : this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value));
                         return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, result);
 
-                    case ComparisonType.Eq:
+                    default:
                         var e1 = expression.Expr1.Accept(this, parameter);
                         var e2 = expression.Expr2.Accept(this, parameter);
 
@@ -445,9 +443,6 @@ namespace ZenLib.ModelChecking
                         var i1 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)e1;
                         var i2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)e2;
                         return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
-
-                    default:
-                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
                 }
             });
         }
@@ -605,6 +600,31 @@ namespace ZenLib.ModelChecking
                 var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
                 var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
                 return new SymbolicString<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Concat(v1.Value, v2.Value));
+            });
+        }
+
+        /// <summary>
+        /// Visit a ContainmentExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenContainmentExpr(ZenContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
+                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+
+                switch (expression.ContainmentType)
+                {
+                    case ContainmentType.PrefixOf:
+                        return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.PrefixOf(v1.Value, v2.Value));
+                    case ContainmentType.SuffixOf:
+                        return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
+                    default:
+                        return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
+                }
             });
         }
 

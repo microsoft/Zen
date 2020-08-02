@@ -49,7 +49,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Creates an empty string.
+        /// Creates an FiniteString.
         /// </summary>
         /// <returns>The empty string.</returns>
         public static Zen<FiniteString> Create(Zen<IList<ushort>> values)
@@ -76,7 +76,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Gets a value indicating whether this option has a value.
+        /// Gets the underlying characters.
         /// </summary>
         public IList<ushort> Characters { get; set; }
 
