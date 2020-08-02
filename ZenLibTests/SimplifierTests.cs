@@ -189,6 +189,82 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string starts with.
+        /// </summary>
+        [TestMethod]
+        public void TestStartsWithSimplification()
+        {
+            var s1 = String("hello");
+            var s2 = String("he");
+            var s3 = String("lo");
+
+            Assert.AreEqual(s1.StartsWith(s2), True());
+            Assert.AreEqual(s1.StartsWith(s3), False());
+            CheckValid<string>(s => s.StartsWith(""));
+            CheckValid<string>(s => Not(String("").StartsWith(s)));
+        }
+
+        /// <summary>
+        /// Simplify for string ends with.
+        /// </summary>
+        [TestMethod]
+        public void TestEndsWithSimplification()
+        {
+            var s1 = String("hello");
+            var s2 = String("he");
+            var s3 = String("lo");
+
+            Assert.AreEqual(s1.EndsWith(s2), False());
+            Assert.AreEqual(s1.EndsWith(s3), True());
+            CheckValid<string>(s => s.EndsWith(""));
+            CheckValid<string>(s => Not(String("").EndsWith(s)));
+        }
+
+        /// <summary>
+        /// Simplify for string contains.
+        /// </summary>
+        [TestMethod]
+        public void TestContainsSimplification()
+        {
+            var s1 = String("hello");
+            var s2 = String("elo");
+            var s3 = String("ll");
+
+            Assert.AreEqual(s1.Contains(s2), False());
+            Assert.AreEqual(s1.Contains(s3), True());
+            CheckValid<string>(s => s.Contains(""));
+            CheckValid<string>(s => Not(String("").Contains(s1)));
+        }
+
+        /// <summary>
+        /// Test hash consing of concat.
+        /// </summary>
+        [TestMethod]
+        public void TestConcatHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s + "ll";
+            var e2 = s + "ll";
+            var e3 = s + "lll";
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of containment.
+        /// </summary>
+        [TestMethod]
+        public void TestContainsHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.Contains("ll");
+            var e2 = s.Contains("ll");
+            var e3 = s.EndsWith("ll");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
         /// Simplify if conditions.
         /// </summary>
         [TestMethod]

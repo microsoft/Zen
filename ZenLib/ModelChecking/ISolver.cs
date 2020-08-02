@@ -193,6 +193,30 @@ namespace ZenLib.ModelChecking
         TString Concat(TString x, TString y);
 
         /// <summary>
+        /// The 'PrefixOf' of two expressions.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The substring expression.</param>
+        /// <returns></returns>
+        TBool PrefixOf(TString x, TString y);
+
+        /// <summary>
+        /// The 'SuffixOf' of two expressions.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The substring expression.</param>
+        /// <returns></returns>
+        TBool SuffixOf(TString x, TString y);
+
+        /// <summary>
+        /// The 'Contains' of two expressions.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The substring expression.</param>
+        /// <returns></returns>
+        TBool Contains(TString x, TString y);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

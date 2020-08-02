@@ -4,6 +4,8 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System.Globalization;
+    using System.Text;
     using Microsoft.Z3;
 
     /// <summary>
@@ -228,6 +230,21 @@ namespace ZenLib.ModelChecking
             return this.context.MkConcat(x, y);
         }
 
+        public BoolExpr PrefixOf(SeqExpr x, SeqExpr y)
+        {
+            return this.context.MkPrefixOf(y, x);
+        }
+
+        public BoolExpr SuffixOf(SeqExpr x, SeqExpr y)
+        {
+            return this.context.MkSuffixOf(y, x);
+        }
+
+        public BoolExpr Contains(SeqExpr x, SeqExpr y)
+        {
+            return this.context.MkContains(x, y);
+        }
+
         public object Get(Model m, Expr v)
         {
             var e = m.Evaluate(v, true);
@@ -265,7 +282,7 @@ namespace ZenLib.ModelChecking
             if (e.Sort == this.StringSort)
             {
                 // Remove beginning and ending quotation marks
-                return e.ToString().Substring(1, e.ToString().Length - 2);
+                return CommonUtilities.ConvertZ3StringToCSharp(e.ToString());
             }
 
             if (long.TryParse(e.ToString(), out long xl))

@@ -157,7 +157,7 @@ namespace ZenLib.Interpretation
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 - (long)e2;
                         return (ulong)e1 - (ulong)e2;
-                    case Op.Multiplication:
+                    default:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 * (byte)e2);
                         if (type == ReflectionUtilities.ShortType)
@@ -171,8 +171,6 @@ namespace ZenLib.Interpretation
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 * (long)e2;
                         return (ulong)e1 * (ulong)e2;
-                    default:
-                        throw new ZenException($"Invalid operation: {expression.Operation}");
                 }
             });
         }
@@ -331,11 +329,8 @@ namespace ZenLib.Interpretation
                             return (long)e1 <= (long)e2;
                         return (ulong)e1 <= (ulong)e2;
 
-                    case ComparisonType.Eq:
-                        return ((T)e1).Equals((T)e2);
-
                     default:
-                        throw new ZenException($"Invalid comparison type: {expression.ComparisonType}");
+                        return ((T)e1).Equals((T)e2);
                 }
             });
         }
@@ -423,6 +418,31 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
+        /// Visit a ContainmentExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenContainmentExpr(ZenContainmentExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e1 = (string)expression.Expr1.Accept(this, parameter);
+                var e2 = (string)expression.Expr2.Accept(this, parameter);
+
+                switch (expression.ContainmentType)
+                {
+                    case ContainmentType.PrefixOf:
+                        return e1.StartsWith(e2);
+                    case ContainmentType.SuffixOf:
+                        return e1.EndsWith(e2);
+                    default:
+                        return e1.Contains(e2);
+                }
+            });
+        }
+
+        /// <summary>
         /// Visit a IntConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -496,7 +516,7 @@ namespace ZenLib.Interpretation
         /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return expression.Value;
+            return expression.UnescapedValue;
         }
 
         /// <summary>

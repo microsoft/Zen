@@ -224,7 +224,26 @@ namespace ZenLib.ModelChecking
             throw new ZenException("Decision diagram backend does not support multiplication");
         }
 
+        [ExcludeFromCodeCoverage]
         public Unit Concat(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD PrefixOf(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD SuffixOf(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD Contains(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
@@ -234,6 +253,7 @@ namespace ZenLib.ModelChecking
             return this.Manager.Eq(x, y);
         }
 
+        [ExcludeFromCodeCoverage]
         public DD Eq(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
@@ -364,6 +384,7 @@ namespace ZenLib.ModelChecking
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        [ExcludeFromCodeCoverage]
         public Unit CreateStringConst(string s)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
@@ -404,6 +425,7 @@ namespace ZenLib.ModelChecking
             return this.Manager.Ite(g, t, f);
         }
 
+        [ExcludeFromCodeCoverage]
         public Unit Ite(DD g, Unit t, Unit f)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");

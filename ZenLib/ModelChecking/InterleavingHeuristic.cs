@@ -193,10 +193,8 @@ namespace ZenLib.ModelChecking
                     case Op.BitwiseXor:
                         this.Combine(x, y);
                         return x.Union(y);
-                    case Op.BitwiseOr:
-                        return x.Union(y);
                     default:
-                        throw new ZenException($"Invalid operation: {expression.Operation}");
+                        return x.Union(y);
                 }
             });
         }
@@ -210,6 +208,12 @@ namespace ZenLib.ModelChecking
                 this.Combine(x, y);
                 return x.Union(y);
             });
+        }
+
+        [ExcludeFromCodeCoverage]
+        public ImmutableHashSet<object> VisitZenContainmentExpr(ZenContainmentExpr expression, Unit parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         public ImmutableHashSet<object> VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)

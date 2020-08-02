@@ -21,7 +21,7 @@ namespace ZenLib
 
         /// <summary>
         /// Whether to use a large stack.
-        /// </summary>4
+        /// </summary>
         public static bool UseLargeStack = true;
     }
 }

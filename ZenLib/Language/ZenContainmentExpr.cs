@@ -1,4 +1,4 @@
-// <copyright file="ZenConcatExpr.cs" company="Microsoft">
+// <copyright file="ZenContainmentExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -9,61 +9,70 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a Concat expression.
+    /// Class representing a string Containment expression.
     /// </summary>
-    internal sealed class ZenConcatExpr : Zen<string>
+    internal sealed class ZenContainmentExpr : Zen<bool>
     {
-        private static Dictionary<(object, object), Zen<string>> hashConsTable = new Dictionary<(object, object), Zen<string>>();
+        private static Dictionary<(object, object, int), Zen<bool>> hashConsTable = new Dictionary<(object, object, int), Zen<bool>>();
 
-        public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2)
+        private static Func<string, string, bool>[] constantFuncs = new Func<string, string, bool>[]
+        {
+            (s1, s2) => s1.StartsWith(s2),
+            (s1, s2) => s1.EndsWith(s2),
+            (s1, s2) => s1.Contains(s2),
+        };
+
+        public static Zen<bool> Simplify(Zen<string> e1, Zen<string> e2, ContainmentType containmentType)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
             string y = ReflectionUtilities.GetConstantString(e2);
 
             if (x != null && y != null)
             {
-                Console.WriteLine($"got: {x + y}");
-                return ReflectionUtilities.CreateConstantString(x + y);
-            }
-
-            if (x == "")
-            {
-                return e2;
+                var f = constantFuncs[(int)containmentType];
+                return f(x, y);
             }
 
             if (y == "")
             {
-                return e1;
+                return true;
             }
 
-            return new ZenConcatExpr(e1, e2);
+            if (x == "")
+            {
+                return false;
+            }
+
+            return new ZenContainmentExpr(e1, e2, containmentType);
         }
 
-        public static Zen<string> Create(Zen<string> expr1, Zen<string> expr2)
+        public static Zen<bool> Create(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
 
-            var key = (expr1, expr2);
+            var key = (expr1, expr2, (int)containmentType);
             if (hashConsTable.TryGetValue(key, out var value))
             {
                 return value;
             }
 
-            var ret = Simplify(expr1, expr2);
+            var ret = Simplify(expr1, expr2, containmentType);
             hashConsTable[key] = ret;
             return ret;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenConcatExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenContainmentExpr"/> class.
         /// </summary>
         /// <param name="expr1">The first expression.</param>
         /// <param name="expr2">The second expression.</param>
-        private ZenConcatExpr(Zen<string> expr1, Zen<string> expr2)
+        /// <param name="containmentType">The containment type.</param>
+        private ZenContainmentExpr(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;
+            this.ContainmentType = containmentType;
         }
 
         /// <summary>
@@ -77,13 +86,18 @@ namespace ZenLib
         internal Zen<string> Expr2 { get; }
 
         /// <summary>
+        /// Gets the containment type.
+        /// </summary>
+        internal ContainmentType ContainmentType { get; }
+
+        /// <summary>
         /// Convert the expression to a string.
         /// </summary>
         /// <returns>The string representation.</returns>
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"ZenConcatExpr({this.Expr1}, {this.Expr2})";
+            return $"ZenContainmentExpr({this.Expr1}, {this.Expr2}, {this.ContainmentType})";
         }
 
         /// <summary>
@@ -96,7 +110,14 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenConcatExpr(this, parameter);
+            return visitor.VisitZenContainmentExpr(this, parameter);
         }
+    }
+
+    internal enum ContainmentType
+    {
+        PrefixOf,
+        SuffixOf,
+        Contains,
     }
 }
