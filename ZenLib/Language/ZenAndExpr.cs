@@ -31,8 +31,8 @@ namespace ZenLib
 
         public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
             var key = (expr1, expr2);
             if (hashConsTable.TryGetValue(key, out var value))
             {

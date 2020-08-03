@@ -609,12 +609,12 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting symbolic value.</returns>
-        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenContainmentExpr(ZenContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr1.Accept(this, parameter);
-                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr2.Accept(this, parameter);
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.StringExpr.Accept(this, parameter);
+                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.SubstringExpr.Accept(this, parameter);
 
                 switch (expression.ContainmentType)
                 {
@@ -625,6 +625,42 @@ namespace ZenLib.ModelChecking
                     default:
                         return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
                 }
+            });
+        }
+
+        /// <summary>
+        /// Visit a StringReplaceExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.StringExpr.Accept(this, parameter);
+                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.SubstringExpr.Accept(this, parameter);
+                var v3 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.ReplaceExpr.Accept(this, parameter);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(
+                    this.Solver, this.Solver.ReplaceFirst(v1.Value, v2.Value, v3.Value));
+            });
+        }
+
+        /// <summary>
+        /// Visit a StringSubstringExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.StringExpr.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
+                var v3 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.LengthExpr.Accept(this, parameter);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(
+                    this.Solver, this.Solver.Substring(v1.Value, v2.Value, v3.Value));
             });
         }
 

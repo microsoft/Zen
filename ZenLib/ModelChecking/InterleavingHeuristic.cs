@@ -211,7 +211,19 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenContainmentExpr(ZenContainmentExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Unit parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public ImmutableHashSet<object> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Unit parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public ImmutableHashSet<object> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Unit parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }

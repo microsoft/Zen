@@ -40,8 +40,8 @@ namespace ZenLib
 
         public static Zen<bool> Create(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             if (comparisonType != ComparisonType.Eq)
             {

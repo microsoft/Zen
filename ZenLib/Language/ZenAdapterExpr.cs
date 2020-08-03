@@ -63,7 +63,7 @@ namespace ZenLib
 
         public static Zen<TTo> CreateMulti(Zen<TFrom> expr, ImmutableList<Func<object, object>> converters)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
             var key = (expr, converters);
             if (hashConsTable.TryGetValue(key, out var value))
             {

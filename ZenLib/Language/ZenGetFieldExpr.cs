@@ -55,7 +55,8 @@ namespace ZenLib
 
         public static Zen<T2> Create(Zen<T1> expr, string fieldName)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(fieldName);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), fieldName);
 
             var key = (expr, fieldName);

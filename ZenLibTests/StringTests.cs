@@ -127,6 +127,44 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test startswith and replace interactions.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceStartsWith()
+        {
+            RandomStrings(sub =>
+            {
+                if (sub != "")
+                {
+                    CheckValid<string, string>((s1, s2) =>
+                        Implies(s1.StartsWith(sub), s1.ReplaceFirst(sub, s2).StartsWith(s2)));
+                }
+            });
+        }
+
+        /// <summary>
+        /// Test that a string contains its substring.
+        /// </summary>
+        [TestMethod]
+        public void TestContainsSubstring()
+        {
+            RandomBytes(offset =>
+            RandomBytes(length =>
+                CheckValid<string>(s => s.Contains(s.Substring(offset, length)))));
+        }
+
+        /// <summary>
+        /// Test substring agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestSubstringAgreement()
+        {
+            var offset = RandomByte();
+            var length = RandomByte();
+            CheckAgreement<string>(s => s.Substring(offset, length).EndsWith("ab"));
+        }
+
+        /// <summary>
         /// Test concatenating multiple values is solved correctly.
         /// </summary>
         [TestMethod]
@@ -209,6 +247,54 @@ namespace ZenLib.Tests
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
+        }
+
+        /// <summary>
+        /// Test string replace first.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", "fox", "brown fox")]
+        [DataRow("aabbcc", "b", "d", "aadbcc")]
+        [DataRow("hello", "ll", "rrr", "herrro")]
+        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("abc", "b", "", "ac")]
+        [DataRow("abcd", "e", "f", "abcd")]
+        public void TestReplaceFirst(string s, string sub, string replace, string expected)
+        {
+            Assert.AreEqual(expected, CommonUtilities.ReplaceFirst(s, sub, replace));
+        }
+
+        /// <summary>
+        /// Test contains replace first.
+        /// </summary>
+        [TestMethod]
+        [DataRow("brown cow", "cow", "fox", "brown fox")]
+        [DataRow("aabbcc", "b", "d", "aadbcc")]
+        [DataRow("hello", "ll", "rrr", "herrro")]
+        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("abc", "b", "", "ac")]
+        public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
+        {
+            var f = Function<string, string>(s => s.ReplaceFirst(sub, replace));
+            Assert.AreEqual(expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s));
+        }
+
+        /// <summary>
+        /// Test substring evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("hello", 0, 3, "hel")]
+        [DataRow("hello", 1, 3, "ell")]
+        [DataRow("hello", 10, 3, "")]
+        [DataRow("hello", 0, 20, "hello")]
+        public void TestSubstringEvaluation(string s, int offset, int length, string expected)
+        {
+            var f = Function<string, string>(s => s.Substring(offset, length));
+            Assert.AreEqual(expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s));
         }
 
         /// <summary>

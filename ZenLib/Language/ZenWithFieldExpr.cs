@@ -18,8 +18,9 @@ namespace ZenLib
 
         public static ZenWithFieldExpr<T1, T2> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(fieldValue);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(fieldName);
+            CommonUtilities.ValidateNotNull(fieldValue);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), fieldName);
 
             var key = (expr, fieldName, fieldValue);
