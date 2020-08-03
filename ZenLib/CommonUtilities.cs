@@ -108,7 +108,7 @@ namespace ZenLib
         /// Validate that an argument is not null.
         /// </summary>
         /// <param name="obj">The argument.</param>
-        public static void Validate(object obj)
+        public static void ValidateNotNull(object obj)
         {
             if (obj is null)
             {

@@ -19,7 +19,7 @@ namespace ZenLib
 
         public static Zen<TObject> Create(params (string, object)[] fields)
         {
-            CommonUtilities.Validate(fields);
+            CommonUtilities.ValidateNotNull(fields);
             foreach (var field in fields)
             {
                 ReflectionUtilities.ValidateFieldOrProperty(typeof(TObject), field.Item1);

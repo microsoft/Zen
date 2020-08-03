@@ -33,7 +33,7 @@ namespace ZenLib
 
         public static Zen<T> Create(Zen<T> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
             if (hashConsTable.TryGetValue(expr, out var value))

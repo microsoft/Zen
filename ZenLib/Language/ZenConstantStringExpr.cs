@@ -16,6 +16,9 @@ namespace ZenLib
 
         public static Zen<string> Create(string value)
         {
+            CommonUtilities.ValidateNotNull(value);
+            CommonUtilities.ValidateStringLiteral(value);
+
             if (hashConsTable.TryGetValue(value, out var v))
             {
                 return v;

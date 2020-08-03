@@ -27,9 +27,9 @@ namespace ZenLib
 
         public static Zen<string> Create(Zen<string> expr1, Zen<ushort> expr2, Zen<ushort> expr3)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
-            CommonUtilities.Validate(expr3);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
+            CommonUtilities.ValidateNotNull(expr3);
 
             var key = (expr1, expr2, expr3);
             if (hashConsTable.TryGetValue(key, out var value))

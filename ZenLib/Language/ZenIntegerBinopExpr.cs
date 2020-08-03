@@ -68,8 +68,8 @@ namespace ZenLib
 
         public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2, Op op)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
             var key = (expr1, expr2, (int)op);

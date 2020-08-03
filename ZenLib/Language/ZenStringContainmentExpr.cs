@@ -43,8 +43,8 @@ namespace ZenLib
 
         public static Zen<bool> Create(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             var key = (expr1, expr2, (int)containmentType);
             if (hashConsTable.TryGetValue(key, out var value))
