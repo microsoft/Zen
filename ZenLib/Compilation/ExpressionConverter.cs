@@ -109,6 +109,11 @@ namespace ZenLib.Compilation
         private static MethodInfo replaceMethod = typeof(CommonUtilities).GetMethod("ReplaceFirst");
 
         /// <summary>
+        /// String contains method.
+        /// </summary>
+        private static MethodInfo substringMethod = typeof(CommonUtilities).GetMethod("Substring");
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -688,8 +693,8 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
-                var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
+                var l = expression.Expr1.Accept(this, parameter);
+                var r = expression.Expr2.Accept(this, parameter);
                 return Expression.Add(l, r, concatMethod);
             });
         }
@@ -700,12 +705,12 @@ namespace ZenLib.Compilation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The compilable expression.</returns>
-        public Expression VisitZenContainmentExpr(ZenContainmentExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var l = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
-                var r = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
+                var l = expression.StringExpr.Accept(this, parameter);
+                var r = expression.SubstringExpr.Accept(this, parameter);
 
                 switch (expression.ContainmentType)
                 {
@@ -720,7 +725,7 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Convert a 'Containment' expression.
+        /// Convert a 'Replace' expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
@@ -729,10 +734,27 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var e1 = Expression.Convert(expression.Expr1.Accept(this, parameter), typeof(string));
-                var e2 = Expression.Convert(expression.Expr2.Accept(this, parameter), typeof(string));
-                var e3 = Expression.Convert(expression.Expr3.Accept(this, parameter), typeof(string));
+                var e1 = expression.StringExpr.Accept(this, parameter);
+                var e2 = expression.SubstringExpr.Accept(this, parameter);
+                var e3 = expression.ReplaceExpr.Accept(this, parameter);
                 return Expression.Call(null, replaceMethod, new Expression[] { e1, e2, e3 });
+            });
+        }
+
+        /// <summary>
+        /// Convert a 'Substring' expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.StringExpr.Accept(this, parameter);
+                var e2 = expression.OffsetExpr.Accept(this, parameter);
+                var e3 = expression.LengthExpr.Accept(this, parameter);
+                return Expression.Call(null, substringMethod, new Expression[] { e1, e2, e3 });
             });
         }
 

@@ -254,6 +254,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string substring.
+        /// </summary>
+        [TestMethod]
+        public void TestSubstringSimplification()
+        {
+            Assert.AreEqual(String("abc").Substring(0, 1), String("a"));
+            Assert.AreEqual(String("abc").Substring(0, 2), String("ab"));
+            Assert.AreEqual(String("abc").Substring(0, 3), String("abc"));
+            Assert.AreEqual(String("abc").Substring(0, 4), String("abc"));
+        }
+
+        /// <summary>
         /// Test hash consing of concat.
         /// </summary>
         [TestMethod]
@@ -293,6 +305,22 @@ namespace ZenLib.Tests
             var e3 = s.ReplaceFirst("xx", "zz");
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of substring.
+        /// </summary>
+        [TestMethod]
+        public void TestSubstringHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.Substring(0, 1);
+            var e2 = s.Substring(0, 1);
+            var e3 = s.Substring(0, 2);
+            var e4 = s.Substring(1, 1);
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+            Assert.IsFalse(ReferenceEquals(e1, e4));
         }
 
         /// <summary>

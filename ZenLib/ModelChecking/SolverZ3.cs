@@ -250,6 +250,13 @@ namespace ZenLib.ModelChecking
             return this.context.MkReplace(x, y, z);
         }
 
+        public SeqExpr Substring(SeqExpr x, BitVecExpr y, BitVecExpr z)
+        {
+            var offset = this.context.MkBV2Int(y, false);
+            var length = this.context.MkBV2Int(z, false);
+            return this.context.MkExtract(x, offset, length);
+        }
+
         public object Get(Model m, Expr v)
         {
             var e = m.Evaluate(v, true);

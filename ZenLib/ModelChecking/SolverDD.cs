@@ -254,6 +254,12 @@ namespace ZenLib.ModelChecking
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        [ExcludeFromCodeCoverage]
+        public Unit Substring(Unit x, BitVector<T> y, BitVector<T> z)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
         public DD Eq(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Eq(x, y);

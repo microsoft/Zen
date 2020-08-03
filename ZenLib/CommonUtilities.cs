@@ -151,11 +151,6 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
-            if (!Settings.UseLargeStack)
-            {
-                return f();
-            }
-
             T result = default;
             Exception exn = null;
 
@@ -291,6 +286,24 @@ namespace ZenLib
 
             var afterMatch = idx + sub.Length;
             return s.Substring(0, idx) + replace + s.Substring(afterMatch, s.Length - afterMatch);
+        }
+
+        /// <summary>
+        /// Get the substring at an offset and length. Follows SMT-LIB semantics.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>A substring.</returns>
+        public static string Substring(string s, ushort offset, ushort length)
+        {
+            if (offset >= s.Length)
+            {
+                return string.Empty;
+            }
+
+            var len = offset + length > s.Length ? s.Length - offset : length;
+            return s.Substring(offset, len);
         }
     }
 }

@@ -137,7 +137,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenContainmentExpr(ZenContainmentExpr expression, TParam parameter);
+        TReturn VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a StringReplaceExpr.
@@ -146,6 +146,14 @@ namespace ZenLib
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a StringSubstringExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a BitwiseAndExpr.

@@ -1,36 +1,31 @@
-// <copyright file="ZenContainmentExpr.cs" company="Microsoft">
+// <copyright file="ZenStringSubstringExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a string Replacement expression.
+    /// Class representing a substring expression.
     /// </summary>
-    internal sealed class ZenStringReplaceExpr : Zen<string>
+    internal sealed class ZenStringSubstringExpr : Zen<string>
     {
         private static Dictionary<(object, object, object), Zen<string>> hashConsTable =
             new Dictionary<(object, object, object), Zen<string>>();
 
-        public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2, Zen<string> e3)
+        public static Zen<string> Simplify(Zen<string> e1, Zen<ushort> e2, Zen<ushort> e3)
         {
-            string x = ReflectionUtilities.GetConstantString(e1);
-            string y = ReflectionUtilities.GetConstantString(e2);
-            string z = ReflectionUtilities.GetConstantString(e3);
-            if (x != null && y != null && z != null)
-                return CommonUtilities.ReplaceFirst(x, y, z);
-            if (x == "")
-                return "";
-            if (y == "")
-                return e1 + e3;
-            return new ZenStringReplaceExpr(e1, e2, e3);
+            var x = ReflectionUtilities.GetConstantString(e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+            var z = ReflectionUtilities.GetConstantIntegerValue(e3);
+            if (x != null && y.HasValue && z.HasValue)
+                return CommonUtilities.Substring(x, (ushort)y.Value, (ushort)z.Value);
+            return new ZenStringSubstringExpr(e1, e2, e3);
         }
 
-        public static Zen<string> Create(Zen<string> expr1, Zen<string> expr2, Zen<string> expr3)
+        public static Zen<string> Create(Zen<string> expr1, Zen<ushort> expr2, Zen<ushort> expr3)
         {
             CommonUtilities.Validate(expr1);
             CommonUtilities.Validate(expr2);
@@ -48,16 +43,16 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenStringContainmentExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenStringSubstringExpr"/> class.
         /// </summary>
         /// <param name="expr1">The string expression.</param>
         /// <param name="expr2">The subtring match.</param>
         /// <param name="expr3">The substituted string.</param>
-        private ZenStringReplaceExpr(Zen<string> expr1, Zen<string> expr2, Zen<string> expr3)
+        private ZenStringSubstringExpr(Zen<string> expr1, Zen<ushort> expr2, Zen<ushort> expr3)
         {
             this.StringExpr = expr1;
-            this.SubstringExpr = expr2;
-            this.ReplaceExpr = expr3;
+            this.OffsetExpr = expr2;
+            this.LengthExpr = expr3;
         }
 
         /// <summary>
@@ -68,12 +63,12 @@ namespace ZenLib
         /// <summary>
         /// Gets the second expression.
         /// </summary>
-        internal Zen<string> SubstringExpr { get; }
+        internal Zen<ushort> OffsetExpr { get; }
 
         /// <summary>
-        /// Gets the containment type.
+        /// Gets the third expression.
         /// </summary>
-        internal Zen<string> ReplaceExpr { get; }
+        internal Zen<ushort> LengthExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -82,7 +77,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Replace({this.StringExpr}, {this.SubstringExpr}, {this.ReplaceExpr})";
+            return $"Substring({this.StringExpr}, {this.OffsetExpr}, {this.LengthExpr})";
         }
 
         /// <summary>
@@ -95,7 +90,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenStringReplaceExpr(this, parameter);
+            return visitor.VisitZenStringSubstringExpr(this, parameter);
         }
     }
 }

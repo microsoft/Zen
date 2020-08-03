@@ -89,6 +89,15 @@ namespace ZenLib.Tests
             return s;
         }
 
+        /// <summary>
+        /// Generates a random byte.
+        /// </summary>
+        /// <returns>The byte.</returns>
+        public static byte RandomByte()
+        {
+            return (byte)random.Next(0, 255);
+        }
+
         private static void Start(TestParameter p)
         {
             Settings.SimplifyRecursive = p.Simplify;

@@ -1,4 +1,4 @@
-// <copyright file="ZenContainmentExpr.cs" company="Microsoft">
+// <copyright file="ZenStringContainmentExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -11,7 +11,7 @@ namespace ZenLib
     /// <summary>
     /// Class representing a string Containment expression.
     /// </summary>
-    internal sealed class ZenContainmentExpr : Zen<bool>
+    internal sealed class ZenStringContainmentExpr : Zen<bool>
     {
         private static Dictionary<(object, object, int), Zen<bool>> hashConsTable = new Dictionary<(object, object, int), Zen<bool>>();
 
@@ -38,7 +38,7 @@ namespace ZenLib
             if (x == "")
                 return false;
 
-            return new ZenContainmentExpr(e1, e2, containmentType);
+            return new ZenStringContainmentExpr(e1, e2, containmentType);
         }
 
         public static Zen<bool> Create(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
@@ -58,27 +58,27 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenContainmentExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenStringContainmentExpr"/> class.
         /// </summary>
         /// <param name="expr1">The first expression.</param>
         /// <param name="expr2">The second expression.</param>
         /// <param name="containmentType">The containment type.</param>
-        private ZenContainmentExpr(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
+        private ZenStringContainmentExpr(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
         {
-            this.Expr1 = expr1;
-            this.Expr2 = expr2;
+            this.StringExpr = expr1;
+            this.SubstringExpr = expr2;
             this.ContainmentType = containmentType;
         }
 
         /// <summary>
         /// Gets the first expression.
         /// </summary>
-        internal Zen<string> Expr1 { get; }
+        internal Zen<string> StringExpr { get; }
 
         /// <summary>
         /// Gets the second expression.
         /// </summary>
-        internal Zen<string> Expr2 { get; }
+        internal Zen<string> SubstringExpr { get; }
 
         /// <summary>
         /// Gets the containment type.
@@ -92,7 +92,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Containment({this.Expr1}, {this.Expr2}, {this.ContainmentType})";
+            return $"Containment({this.StringExpr}, {this.SubstringExpr}, {this.ContainmentType})";
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenContainmentExpr(this, parameter);
+            return visitor.VisitZenStringContainmentExpr(this, parameter);
         }
     }
 

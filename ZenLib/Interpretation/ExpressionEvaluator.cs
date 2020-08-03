@@ -423,12 +423,12 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The resulting C# value.</returns>
-        public object VisitZenContainmentExpr(ZenContainmentExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var e1 = (string)expression.Expr1.Accept(this, parameter);
-                var e2 = (string)expression.Expr2.Accept(this, parameter);
+                var e1 = (string)expression.StringExpr.Accept(this, parameter);
+                var e2 = (string)expression.SubstringExpr.Accept(this, parameter);
 
                 switch (expression.ContainmentType)
                 {
@@ -452,10 +452,27 @@ namespace ZenLib.Interpretation
         {
             return LookupOrCompute(expression, parameter, () =>
             {
-                var e1 = (string)expression.Expr1.Accept(this, parameter);
-                var e2 = (string)expression.Expr2.Accept(this, parameter);
-                var e3 = (string)expression.Expr3.Accept(this, parameter);
+                var e1 = (string)expression.StringExpr.Accept(this, parameter);
+                var e2 = (string)expression.SubstringExpr.Accept(this, parameter);
+                var e3 = (string)expression.ReplaceExpr.Accept(this, parameter);
                 return CommonUtilities.ReplaceFirst(e1, e2, e3);
+            });
+        }
+
+        /// <summary>
+        /// Visit a StringSubstringExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e1 = (string)expression.StringExpr.Accept(this, parameter);
+                var e2 = (ushort)expression.OffsetExpr.Accept(this, parameter);
+                var e3 = (ushort)expression.LengthExpr.Accept(this, parameter);
+                return CommonUtilities.Substring(e1, e2, e3);
             });
         }
 
