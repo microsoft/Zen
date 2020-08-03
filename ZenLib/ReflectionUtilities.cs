@@ -355,11 +355,6 @@ namespace ZenLib
                 return obj;
             }
 
-            if (type == typeof(string))
-            {
-                return String.Copy((string)obj);
-            }
-
             var result = Activator.CreateInstance(type);
             foreach (var fieldInfo in GetAllFields(type))
             {

@@ -940,14 +940,18 @@ namespace ZenLib.Tests
         /// Test object update with string.
         /// </summary>
         [TestMethod]
-        public void TestObjectWith1Field3()
+        public void TestObjectUpdateStringField()
         {
             // avoid warning with unused field
             StructWithString s;
             s.Field = "";
 
-            CheckValid<StructWithString, string>((o, i) =>
-                o.WithField("Field", i).GetField<StructWithString, string>("Field") == i);
+            var f = Function<StructWithString, StructWithString>(o =>
+                o.WithField<StructWithString, string>("Field", "hello"));
+
+            var input = new StructWithString { Field = "hola" };
+            var output = f.Evaluate(input);
+            Assert.IsTrue(output.Field == "hello");
         }
 
         /// <summary>

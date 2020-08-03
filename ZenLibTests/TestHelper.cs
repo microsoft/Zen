@@ -89,6 +89,15 @@ namespace ZenLib.Tests
             return s;
         }
 
+        /// <summary>
+        /// Generates a random byte.
+        /// </summary>
+        /// <returns>The byte.</returns>
+        public static byte RandomByte()
+        {
+            return (byte)random.Next(0, 255);
+        }
+
         private static void Start(TestParameter p)
         {
             Settings.SimplifyRecursive = p.Simplify;
@@ -159,6 +168,7 @@ namespace ZenLib.Tests
 
                 // compare input with evaluation
                 result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
+                Console.WriteLine($"{result.Value}");
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));

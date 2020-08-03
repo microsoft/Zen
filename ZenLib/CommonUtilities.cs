@@ -108,7 +108,7 @@ namespace ZenLib
         /// Validate that an argument is not null.
         /// </summary>
         /// <param name="obj">The argument.</param>
-        public static void Validate(object obj)
+        public static void ValidateNotNull(object obj)
         {
             if (obj is null)
             {
@@ -151,11 +151,6 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
-            if (!Settings.UseLargeStack)
-            {
-                return f();
-            }
-
             T result = default;
             Exception exn = null;
 
@@ -267,6 +262,48 @@ namespace ZenLib
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Replace the first instance of a substring in a string with a new string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="sub">The substring.</param>
+        /// <param name="replace">The replacement string.</param>
+        /// <returns>A new string.</returns>
+        public static string ReplaceFirst(string s, string sub, string replace)
+        {
+            if (sub == string.Empty)
+            {
+                return s + replace;
+            }
+
+            var idx = s.IndexOf(sub);
+            if (idx < 0)
+            {
+                return s;
+            }
+
+            var afterMatch = idx + sub.Length;
+            return s.Substring(0, idx) + replace + s.Substring(afterMatch, s.Length - afterMatch);
+        }
+
+        /// <summary>
+        /// Get the substring at an offset and length. Follows SMT-LIB semantics.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>A substring.</returns>
+        public static string Substring(string s, ushort offset, ushort length)
+        {
+            if (offset >= s.Length)
+            {
+                return string.Empty;
+            }
+
+            var len = offset + length > s.Length ? s.Length - offset : length;
+            return s.Substring(offset, len);
         }
     }
 }

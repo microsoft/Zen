@@ -16,6 +16,9 @@ namespace ZenLib
 
         public static Zen<string> Create(string value)
         {
+            CommonUtilities.ValidateNotNull(value);
+            CommonUtilities.ValidateStringLiteral(value);
+
             if (hashConsTable.TryGetValue(value, out var v))
             {
                 return v;
@@ -53,7 +56,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return this.UnescapedValue;
+            return $"\"{this.UnescapedValue}\"";
         }
 
         /// <summary>

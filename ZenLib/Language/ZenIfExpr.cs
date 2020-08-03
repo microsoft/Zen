@@ -56,9 +56,9 @@ namespace ZenLib
 
         public static Zen<T> Create(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
-            CommonUtilities.Validate(guardExpr);
-            CommonUtilities.Validate(trueExpr);
-            CommonUtilities.Validate(falseExpr);
+            CommonUtilities.ValidateNotNull(guardExpr);
+            CommonUtilities.ValidateNotNull(trueExpr);
+            CommonUtilities.ValidateNotNull(falseExpr);
 
             var key = (guardExpr, trueExpr, falseExpr);
             if (hashConsTable.TryGetValue(key, out var value))

@@ -17,8 +17,8 @@ namespace ZenLib
 
         public static ZenListAddFrontExpr<T> Create(Zen<IList<T>> expr, Zen<T> element)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(element);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(element);
 
             var key = (expr, element);
             if (hashConsTable.TryGetValue(key, out var value))

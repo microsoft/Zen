@@ -43,9 +43,9 @@ namespace ZenLib
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(empty);
-            CommonUtilities.Validate(cons);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(empty);
+            CommonUtilities.ValidateNotNull(cons);
 
             return Simplify(listExpr, empty, cons);
         }

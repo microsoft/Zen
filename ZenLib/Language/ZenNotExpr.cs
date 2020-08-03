@@ -32,7 +32,7 @@ namespace ZenLib
 
         public static Zen<bool> Create(Zen<bool> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             if (hashConsTable.TryGetValue(expr, out var value))
             {

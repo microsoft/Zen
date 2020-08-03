@@ -142,7 +142,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> String(string s)
         {
-            CommonUtilities.Validate(s);
+            CommonUtilities.ValidateNotNull(s);
             CommonUtilities.ValidateStringLiteral(s);
             return ZenConstantStringExpr.Create(s);
         }
@@ -183,7 +183,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Some<T>(Zen<T> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
                 ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", True()), ("Item2", expr)),
@@ -199,8 +199,8 @@ namespace ZenLib
         /// <returns></returns>
         public static Zen<Option<T>> TupleToOption<T>(Zen<bool> flag, Zen<T> value)
         {
-            CommonUtilities.Validate(flag);
-            CommonUtilities.Validate(value);
+            CommonUtilities.ValidateNotNull(flag);
+            CommonUtilities.ValidateNotNull(value);
 
             return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
                 ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", flag), ("Item2", value)),
@@ -216,9 +216,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Case<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T2>> none, Func<Zen<T1>, Zen<T2>> some)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(none);
-            CommonUtilities.Validate(some);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(none);
+            CommonUtilities.ValidateNotNull(some);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T1>, Option<T1>>.Create(expr, OptionToCustomTuple<T1>);
             return If(
@@ -234,7 +234,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> HasValue<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             return tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1");
@@ -247,7 +247,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> ToList<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             var emptyList = EmptyList<T>();
@@ -264,7 +264,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Value<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             return tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2");
@@ -278,8 +278,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> ValueOrDefault<T>(this Zen<Option<T>> expr, Zen<T> deflt)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(deflt);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(deflt);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             return If(
@@ -296,8 +296,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T2>> Select<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(function);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T1>, Option<T1>>.Create(expr, OptionToCustomTuple<T1>);
             return If(
@@ -314,8 +314,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Where<T>(this Zen<Option<T>> expr, Func<Zen<T>, Zen<bool>> function)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(function);
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             return If(
@@ -352,8 +352,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> And(Zen<bool> expr1, Zen<bool> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenAndExpr.Create(expr1, expr2);
         }
@@ -366,8 +366,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Or(Zen<bool> expr1, Zen<bool> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenOrExpr.Create(expr1, expr2);
         }
@@ -379,7 +379,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> And(params Zen<bool>[] exprs)
         {
-            CommonUtilities.Validate(exprs);
+            CommonUtilities.ValidateNotNull(exprs);
 
             return exprs.Aggregate(And);
         }
@@ -391,7 +391,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Or(params Zen<bool>[] exprs)
         {
-            CommonUtilities.Validate(exprs);
+            CommonUtilities.ValidateNotNull(exprs);
 
             return exprs.Aggregate(Or);
         }
@@ -403,7 +403,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Not(Zen<bool> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return ZenNotExpr.Create(expr);
         }
@@ -416,8 +416,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Implies(Zen<bool> guardExpr, Zen<bool> thenExpr)
         {
-            CommonUtilities.Validate(guardExpr);
-            CommonUtilities.Validate(thenExpr);
+            CommonUtilities.ValidateNotNull(guardExpr);
+            CommonUtilities.ValidateNotNull(thenExpr);
 
             return ZenIfExpr<bool>.Create(guardExpr, thenExpr, True());
         }
@@ -431,9 +431,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> If<T>(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
-            CommonUtilities.Validate(guardExpr);
-            CommonUtilities.Validate(trueExpr);
-            CommonUtilities.Validate(falseExpr);
+            CommonUtilities.ValidateNotNull(guardExpr);
+            CommonUtilities.ValidateNotNull(trueExpr);
+            CommonUtilities.ValidateNotNull(falseExpr);
 
             return ZenIfExpr<T>.Create(guardExpr, trueExpr, falseExpr);
         }
@@ -446,8 +446,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Eq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
             return EqHelper<T>(expr1, expr2);
         }
 
@@ -461,96 +461,89 @@ namespace ZenLib
 
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
         {
-            try
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
             {
-                var type = typeof(T);
-
-                if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
-                {
-                    return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
-                }
-
-                if (ReflectionUtilities.IsOptionType(type))
-                {
-                    var innerType = type.GetGenericArguments()[0];
-
-                    var method = hasValueMethod.MakeGenericMethod(innerType);
-                    var hasValue1 = method.Invoke(null, new object[] { expr1 });
-                    var hasValue2 = method.Invoke(null, new object[] { expr2 });
-                    var eqBool = (Zen<bool>)eqBoolMethod.Invoke(null, new object[] { hasValue1, hasValue2 });
-
-                    method = valueMethod.MakeGenericMethod(innerType);
-                    var equals = eqMethod.MakeGenericMethod(innerType);
-                    var value1 = method.Invoke(null, new object[] { expr1 });
-                    var value2 = method.Invoke(null, new object[] { expr2 });
-
-                    var eqValue = (Zen<bool>)equals.Invoke(null, new object[] { value1, value2 });
-                    return And(eqBool, eqValue);
-                }
-
-                if (ReflectionUtilities.IsSomeTupleType(type))
-                {
-                    var isTuple = ReflectionUtilities.IsTupleType(type);
-                    var item1Method = isTuple ? tupItem1Method : valueTupItem1Method;
-                    var item2Method = isTuple ? tupItem2Method : valueTupItem2Method;
-
-                    var genericArgs = type.GetGenericArguments();
-                    var innerType1 = genericArgs[0];
-                    var innerType2 = genericArgs[1];
-                    var equals1 = eqMethod.MakeGenericMethod(innerType1);
-                    var equals2 = eqMethod.MakeGenericMethod(innerType2);
-                    var method1 = item1Method.MakeGenericMethod(innerType1, innerType2);
-                    var method2 = item2Method.MakeGenericMethod(innerType1, innerType2);
-
-                    var e11 = method1.Invoke(null, new object[] { expr1 });
-                    var e12 = method1.Invoke(null, new object[] { expr2 });
-
-                    var e21 = method2.Invoke(null, new object[] { expr1 });
-                    var e22 = method2.Invoke(null, new object[] { expr2 });
-
-                    var eqItem1 = (Zen<bool>)equals1.Invoke(null, new object[] { e11, e12 });
-                    var eqItem2 = (Zen<bool>)equals2.Invoke(null, new object[] { e21, e22 });
-                    return And(eqItem1, eqItem2);
-                }
-
-                if (ReflectionUtilities.IsIListType(type))
-                {
-                    var innerType = type.GetGenericArguments()[0];
-                    var method = eqListsMethod.MakeGenericMethod(innerType);
-                    return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
-                }
-
-                if (ReflectionUtilities.IsIDictionaryType(type))
-                {
-                    throw new ZenException($"Zen does not support equality of {type} types.");
-                }
-
-                // some class or struct
-                var acc = True();
-                foreach (var field in ReflectionUtilities.GetAllFields(type))
-                {
-                    var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
-                    dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
-                    dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
-                    var emethod = eqMethod.MakeGenericMethod(field.FieldType);
-                    acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
-                }
-
-                foreach (var property in ReflectionUtilities.GetAllProperties(type))
-                {
-                    var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
-                    dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
-                    dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
-                    var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
-                    acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
-                }
-
-                return acc;
+                return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
             }
-            catch (TargetInvocationException e)
+
+            if (ReflectionUtilities.IsOptionType(type))
             {
-                throw e.InnerException;
+                var innerType = type.GetGenericArguments()[0];
+
+                var method = hasValueMethod.MakeGenericMethod(innerType);
+                var hasValue1 = method.Invoke(null, new object[] { expr1 });
+                var hasValue2 = method.Invoke(null, new object[] { expr2 });
+                var eqBool = (Zen<bool>)eqBoolMethod.Invoke(null, new object[] { hasValue1, hasValue2 });
+
+                method = valueMethod.MakeGenericMethod(innerType);
+                var equals = eqMethod.MakeGenericMethod(innerType);
+                var value1 = method.Invoke(null, new object[] { expr1 });
+                var value2 = method.Invoke(null, new object[] { expr2 });
+
+                var eqValue = (Zen<bool>)equals.Invoke(null, new object[] { value1, value2 });
+                return And(eqBool, eqValue);
             }
+
+            if (ReflectionUtilities.IsSomeTupleType(type))
+            {
+                var isTuple = ReflectionUtilities.IsTupleType(type);
+                var item1Method = isTuple ? tupItem1Method : valueTupItem1Method;
+                var item2Method = isTuple ? tupItem2Method : valueTupItem2Method;
+
+                var genericArgs = type.GetGenericArguments();
+                var innerType1 = genericArgs[0];
+                var innerType2 = genericArgs[1];
+                var equals1 = eqMethod.MakeGenericMethod(innerType1);
+                var equals2 = eqMethod.MakeGenericMethod(innerType2);
+                var method1 = item1Method.MakeGenericMethod(innerType1, innerType2);
+                var method2 = item2Method.MakeGenericMethod(innerType1, innerType2);
+
+                var e11 = method1.Invoke(null, new object[] { expr1 });
+                var e12 = method1.Invoke(null, new object[] { expr2 });
+
+                var e21 = method2.Invoke(null, new object[] { expr1 });
+                var e22 = method2.Invoke(null, new object[] { expr2 });
+
+                var eqItem1 = (Zen<bool>)equals1.Invoke(null, new object[] { e11, e12 });
+                var eqItem2 = (Zen<bool>)equals2.Invoke(null, new object[] { e21, e22 });
+                return And(eqItem1, eqItem2);
+            }
+
+            if (ReflectionUtilities.IsIListType(type))
+            {
+                var innerType = type.GetGenericArguments()[0];
+                var method = eqListsMethod.MakeGenericMethod(innerType);
+                return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
+            }
+
+            if (ReflectionUtilities.IsIDictionaryType(type))
+            {
+                throw new ZenException($"Zen does not support equality of {type} types.");
+            }
+
+            // some class or struct
+            var acc = True();
+            foreach (var field in ReflectionUtilities.GetAllFields(type))
+            {
+                var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
+                dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
+                dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
+                var emethod = eqMethod.MakeGenericMethod(field.FieldType);
+                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
+            }
+
+            foreach (var property in ReflectionUtilities.GetAllProperties(type))
+            {
+                var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
+                dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
+                dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
+                var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
+                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
+            }
+
+            return acc;
         }
 
         /// <summary>
@@ -561,8 +554,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Leq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
         }
@@ -575,8 +568,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Lt<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return And(Leq(expr1, expr2), expr1 != expr2);
         }
@@ -589,8 +582,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Gt<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return Not(Leq(expr1, expr2));
         }
@@ -603,8 +596,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Geq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
         }
@@ -617,8 +610,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Plus<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Addition);
         }
@@ -631,8 +624,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> Concat(Zen<string> expr1, Zen<string> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenConcatExpr.Create(expr1, expr2);
         }
@@ -645,10 +638,10 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> StartsWith(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.Validate(str);
-            CommonUtilities.Validate(substr);
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(substr);
 
-            return ZenContainmentExpr.Create(str, substr, ContainmentType.PrefixOf);
+            return ZenStringContainmentExpr.Create(str, substr, ContainmentType.PrefixOf);
         }
 
         /// <summary>
@@ -659,10 +652,10 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> EndsWith(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.Validate(str);
-            CommonUtilities.Validate(substr);
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(substr);
 
-            return ZenContainmentExpr.Create(str, substr, ContainmentType.SuffixOf);
+            return ZenStringContainmentExpr.Create(str, substr, ContainmentType.SuffixOf);
         }
 
         /// <summary>
@@ -673,10 +666,42 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.Validate(str);
-            CommonUtilities.Validate(substr);
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(substr);
 
-            return ZenContainmentExpr.Create(str, substr, ContainmentType.Contains);
+            return ZenStringContainmentExpr.Create(str, substr, ContainmentType.Contains);
+        }
+
+        /// <summary>
+        /// Replace a substring with another string.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="substr">The substring Zen expression.</param>
+        /// <param name="replace">The replacement string.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> ReplaceFirst(this Zen<string> str, Zen<string> substr, Zen<string> replace)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(substr);
+            CommonUtilities.ValidateNotNull(replace);
+
+            return ZenStringReplaceExpr.Create(str, substr, replace);
+        }
+
+        /// <summary>
+        /// Get a substring from a string.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="offset">The offset Zen expression.</param>
+        /// <param name="length">The length Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> Substring(this Zen<string> str, Zen<ushort> offset, Zen<ushort> length)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(offset);
+            CommonUtilities.ValidateNotNull(length);
+
+            return ZenStringSubstringExpr.Create(str, offset, length);
         }
 
         /// <summary>
@@ -687,8 +712,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Minus<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Subtraction);
         }
@@ -701,8 +726,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Multiply<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Multiplication);
         }
@@ -715,8 +740,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<byte> Max(Zen<byte> expr1, Zen<byte> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -729,8 +754,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<short> Max(Zen<short> expr1, Zen<short> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -743,8 +768,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Max(Zen<ushort> expr1, Zen<ushort> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -757,8 +782,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<int> Max(Zen<int> expr1, Zen<int> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -771,8 +796,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<uint> Max(Zen<uint> expr1, Zen<uint> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -785,8 +810,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<long> Max(Zen<long> expr1, Zen<long> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -799,8 +824,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Max(Zen<ulong> expr1, Zen<ulong> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -813,8 +838,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<byte> Min(Zen<byte> expr1, Zen<byte> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -827,8 +852,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<short> Min(Zen<short> expr1, Zen<short> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -841,8 +866,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Min(Zen<ushort> expr1, Zen<ushort> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -855,8 +880,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<int> Min(Zen<int> expr1, Zen<int> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -869,8 +894,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<uint> Min(Zen<uint> expr1, Zen<uint> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -883,8 +908,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<long> Min(Zen<long> expr1, Zen<long> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -897,8 +922,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Min(Zen<ulong> expr1, Zen<ulong> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -911,8 +936,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseAnd<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseAnd);
         }
@@ -924,7 +949,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseAnd<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.Validate(exprs);
+            CommonUtilities.ValidateNotNull(exprs);
 
             return exprs.Aggregate(BitwiseAnd);
         }
@@ -937,8 +962,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseOr<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseOr);
         }
@@ -950,7 +975,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseOr<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.Validate(exprs);
+            CommonUtilities.ValidateNotNull(exprs);
 
             return exprs.Aggregate(BitwiseOr);
         }
@@ -962,7 +987,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseNot<T>(Zen<T> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return ZenBitwiseNotExpr<T>.Create(expr);
         }
@@ -975,8 +1000,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseXor<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseXor);
         }
@@ -988,7 +1013,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseXor<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.Validate(exprs);
+            CommonUtilities.ValidateNotNull(exprs);
 
             return exprs.Aggregate(BitwiseXor);
         }
@@ -1001,8 +1026,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> AddBack<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             return listExpr.Case(
                 empty: Singleton(valueExpr),
@@ -1017,8 +1042,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> AddFront<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             return ZenListAddFrontExpr<T>.Create(listExpr, valueExpr);
         }
@@ -1031,8 +1056,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Duplicates<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             return listExpr.Case(
                 empty: UShort(0),
@@ -1048,8 +1073,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> RemoveFirst<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             return listExpr.Case(
                 empty: EmptyList<T>(),
@@ -1064,8 +1089,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> RemoveAll<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             return listExpr.Case(
                 empty: EmptyList<T>(),
@@ -1088,9 +1113,9 @@ namespace ZenLib
             Zen<TResult> empty,
             Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(empty);
-            CommonUtilities.Validate(cons);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(empty);
+            CommonUtilities.ValidateNotNull(cons);
 
             return ZenListCaseExpr<T, TResult>.Create(listExpr, empty, cons);
         }
@@ -1103,8 +1128,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T2>> Select<T1, T2>(this Zen<IList<T1>> listExpr, Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(function);
 
             return listExpr.Case(
                 empty: EmptyList<T2>(),
@@ -1119,8 +1144,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Where<T>(this Zen<IList<T>> listExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return listExpr.Case(
                 empty: EmptyList<T>(),
@@ -1139,8 +1164,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Find<T>(this Zen<IList<T>> listExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return listExpr.Case(
                 empty: Null<T>(),
@@ -1154,7 +1179,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Length<T>(this Zen<IList<T>> listExpr)
         {
-            CommonUtilities.Validate(listExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
 
             return listExpr.Case(
                 empty: UShort(0),
@@ -1169,8 +1194,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<IList<T>> listExpr, Zen<T> element)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(element);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(element);
 
             return listExpr.Any((x) => Eq(x, element));
         }
@@ -1183,8 +1208,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Append<T>(this Zen<IList<T>> expr1, Zen<IList<T>> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             return expr1.Case(
                 empty: expr2,
@@ -1198,7 +1223,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsEmpty<T>(this Zen<IList<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return expr.Case(empty: True(), cons: (hd, tl) => False());
         }
@@ -1210,7 +1235,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Singleton<T>(this Zen<T> element)
         {
-            CommonUtilities.Validate(element);
+            CommonUtilities.ValidateNotNull(element);
 
             return EmptyList<T>().AddFront(element);
         }
@@ -1222,7 +1247,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> List<T>(params Zen<T>[] elements)
         {
-            CommonUtilities.Validate(elements);
+            CommonUtilities.ValidateNotNull(elements);
 
             Zen<T>[] copy = new Zen<T>[elements.Length];
             Array.Copy(elements, copy, elements.Length);
@@ -1243,7 +1268,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Reverse<T>(this Zen<IList<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return Reverse(expr, EmptyList<T>());
         }
@@ -1263,8 +1288,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Intersperse<T>(this Zen<IList<T>> expr, Zen<T> element)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(element);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(element);
 
             return expr.Case(
                 empty: EmptyList<T>(),
@@ -1280,9 +1305,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Fold<T1, T2>(this Zen<IList<T1>> expr, Zen<T2> init, Func<Zen<T1>, Zen<T2>, Zen<T2>> function)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(init);
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(init);
+            CommonUtilities.ValidateNotNull(function);
 
             return expr.Case(
                 empty: init,
@@ -1297,8 +1322,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Any<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return expr.Fold(False(), (x, y) => Or(predicate(x), y));
         }
@@ -1311,8 +1336,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> All<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return expr.Fold(True(), (x, y) => And(predicate(x), y));
         }
@@ -1325,8 +1350,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Take<T>(this Zen<IList<T>> expr, Zen<ushort> numElements)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(numElements);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(numElements);
 
             return Take(expr, numElements, 0);
         }
@@ -1353,8 +1378,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> TakeWhile<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return expr.Case(
                 empty: EmptyList<T>(),
@@ -1369,8 +1394,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Drop<T>(this Zen<IList<T>> expr, Zen<ushort> numElements)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(numElements);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(numElements);
 
             return Drop(expr, numElements, 0);
         }
@@ -1397,8 +1422,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> DropWhile<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(predicate);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(predicate);
 
             return expr.Case(
                 empty: EmptyList<T>(),
@@ -1413,8 +1438,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Tuple<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(index);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(index);
 
             return SplitAt(expr, index, 0);
         }
@@ -1450,8 +1475,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> At<T>(this Zen<IList<T>> listExpr, Zen<ushort> index)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(index);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(index);
 
             return At(listExpr, index, 0);
         }
@@ -1478,8 +1503,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<ushort>> IndexOf<T>(this Zen<IList<T>> listExpr, Zen<T> value)
         {
-            CommonUtilities.Validate(listExpr);
-            CommonUtilities.Validate(value);
+            CommonUtilities.ValidateNotNull(listExpr);
+            CommonUtilities.ValidateNotNull(value);
 
             return listExpr.IndexOf(value, 0);
         }
@@ -1505,7 +1530,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsSorted<T>(this Zen<IList<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return expr.Case(
                 empty: True(),
@@ -1521,7 +1546,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Sort<T>(this Zen<IList<T>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             return expr.Case(empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
         }
@@ -1534,8 +1559,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IList<T>> Insert<T>(Zen<T> element, Zen<IList<T>> expr)
         {
-            CommonUtilities.Validate(element);
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(element);
+            CommonUtilities.ValidateNotNull(expr);
 
             return expr.Case(
                 empty: Singleton(element),
@@ -1551,9 +1576,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IDictionary<TKey, TValue>> Add<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
-            CommonUtilities.Validate(mapExpr);
-            CommonUtilities.Validate(keyExpr);
-            CommonUtilities.Validate(valueExpr);
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
 
             var list = ZenAdapterExpr<IList<Tuple<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
             var result = list.AddFront(Tuple(keyExpr, valueExpr));
@@ -1568,8 +1593,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.Validate(mapExpr);
-            CommonUtilities.Validate(keyExpr);
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
 
             var list = ZenAdapterExpr<IList<Tuple<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
             return list.ListGet(keyExpr);
@@ -1583,8 +1608,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.Validate(mapExpr);
-            CommonUtilities.Validate(keyExpr);
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
 
             return mapExpr.Get(keyExpr).HasValue();
         }
@@ -1596,7 +1621,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IDictionary<TKey, TValue>> ListToDictionary<TKey, TValue>(this Zen<IList<Tuple<TKey, TValue>>> listExpr)
         {
-            CommonUtilities.Validate(listExpr);
+            CommonUtilities.ValidateNotNull(listExpr);
 
             return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Tuple<TKey, TValue>>>.Create(listExpr, ListToDict<TKey, TValue>);
         }
@@ -1609,8 +1634,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         private static Zen<Option<TValue>> ListGet<TKey, TValue>(this Zen<IList<Tuple<TKey, TValue>>> expr, Zen<TKey> key)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(key);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(key);
 
             return expr.Case(
                 empty: Null<TValue>(),
@@ -1625,8 +1650,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> GetField<T1, T2>(this Zen<T1> expr, string fieldName)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(fieldName);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(fieldName);
 
             return ZenGetFieldExpr<T1, T2>.Create(expr, fieldName);
         }
@@ -1640,9 +1665,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> WithField<T1, T2>(this Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
-            CommonUtilities.Validate(expr);
-            CommonUtilities.Validate(fieldName);
-            CommonUtilities.Validate(fieldValue);
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(fieldName);
+            CommonUtilities.ValidateNotNull(fieldValue);
 
             return ZenWithFieldExpr<T1, T2>.Create(expr, fieldName, fieldValue);
         }
@@ -1665,8 +1690,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Tuple<T1, T2>> Tuple<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
             return ZenAdapterExpr<Tuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToTuple<T1, T2>);
@@ -1680,8 +1705,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ValueTuple<T1, T2>> ValueTuple<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
         {
-            CommonUtilities.Validate(expr1);
-            CommonUtilities.Validate(expr2);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
 
             var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
             return ZenAdapterExpr<ValueTuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToValueTuple<T1, T2>);
@@ -1714,7 +1739,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2>(this Zen<Tuple<T1, T2>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tup = ZenAdapterExpr<CustomTuple<T1, T2>, Tuple<T1, T2>>.Create(expr, TupleToCustomTuple<T1, T2>);
             return tup.GetField<CustomTuple<T1, T2>, T1>("Item1");
@@ -1727,7 +1752,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2>(this Zen<Tuple<T1, T2>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tup = ZenAdapterExpr<CustomTuple<T1, T2>, Tuple<T1, T2>>.Create(expr, TupleToCustomTuple<T1, T2>);
             return tup.GetField<CustomTuple<T1, T2>, T2>("Item2");
@@ -1740,7 +1765,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tup = ZenAdapterExpr<CustomTuple<T1, T2>, ValueTuple<T1, T2>>.Create(expr, ValueTupleToCustomTuple<T1, T2>);
             return tup.GetField<CustomTuple<T1, T2>, T1>("Item1");
@@ -1753,7 +1778,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
         {
-            CommonUtilities.Validate(expr);
+            CommonUtilities.ValidateNotNull(expr);
 
             var tup = ZenAdapterExpr<CustomTuple<T1, T2>, ValueTuple<T1, T2>>.Create(expr, ValueTupleToCustomTuple<T1, T2>);
             return tup.GetField<CustomTuple<T1, T2>, T2>("Item2");
@@ -1767,7 +1792,7 @@ namespace ZenLib
         /// <returns>The Zen function.</returns>
         public static ZenFunction<T> Function<T>(Func<Zen<T>> function)
         {
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(function);
 
             return new ZenFunction<T>(function);
         }
@@ -1781,7 +1806,7 @@ namespace ZenLib
         /// <returns>The Zen function.</returns>
         public static ZenFunction<T1, T2> Function<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(function);
 
             return new ZenFunction<T1, T2>(function);
         }
@@ -1796,7 +1821,7 @@ namespace ZenLib
         /// <returns>The Zen function.</returns>
         public static ZenFunction<T1, T2, T3> Function<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(function);
 
             return new ZenFunction<T1, T2, T3>(function);
         }
@@ -1812,7 +1837,7 @@ namespace ZenLib
         /// <returns>The Zen function.</returns>
         public static ZenFunction<T1, T2, T3, T4> Function<T1, T2, T3,  T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(function);
 
             return new ZenFunction<T1, T2, T3, T4>(function);
         }
@@ -1829,7 +1854,7 @@ namespace ZenLib
         /// <returns>The Zen function.</returns>
         public static ZenFunction<T1, T2, T3, T4, T5> Function<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
-            CommonUtilities.Validate(function);
+            CommonUtilities.ValidateNotNull(function);
 
             return new ZenFunction<T1, T2, T3, T4, T5>(function);
         }
