@@ -165,6 +165,21 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test length agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestLengthAgreement()
+        {
+            CheckAgreement<string>(s => s.Length() == 0);
+            CheckAgreement<string>(s => s.Length() == 1);
+            CheckAgreement<string>(s => s.Length() == 2);
+            CheckAgreement<string>(s => s.Length() == 3);
+            CheckAgreement<string>(s => s.Length() == 4);
+            CheckAgreement<string>(s => s.Length() == 5);
+            CheckAgreement<string>(s => s.Length() == 10);
+        }
+
+        /// <summary>
         /// Test concatenating multiple values is solved correctly.
         /// </summary>
         [TestMethod]
@@ -295,6 +310,115 @@ namespace ZenLib.Tests
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
+        }
+
+        /// <summary>
+        /// Test string at evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abcde", 0, "a")]
+        [DataRow("abcde", 1, "b")]
+        [DataRow("abcde", 2, "c")]
+        [DataRow("abcde", 3, "d")]
+        [DataRow("abcde", 4, "e")]
+        [DataRow("abcde", 5, "")]
+        [DataRow("", 0, "")]
+        [DataRow("", 1, "")]
+        [DataRow("", 2, "")]
+        public void TestAtEvaluation(string s, int index, string expected)
+        {
+            var f = Function<string, ushort, string>((s, idx) => s.At(idx));
+            Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
+
+            if (expected != "")
+            {
+                var x = f.Find((str, idx, o) => And(str == s, o == expected));
+                Assert.AreEqual(x.Value.Item2, (ushort)index);
+            }
+        }
+
+        /// <summary>
+        /// Test string length evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("", 0)]
+        [DataRow("a", 1)]
+        [DataRow("ab", 2)]
+        [DataRow("abc", 3)]
+        [DataRow("abcd", 4)]
+        [DataRow("abcde", 5)]
+        [DataRow("\x01\x02", 2)]
+        public void TestLengthEvaluation(string s, int expected)
+        {
+            var f = Function<string, ushort>(s => s.Length());
+            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+        }
+
+        /// <summary>
+        /// Test string indexof evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abcda", "", 0, 0)]
+        [DataRow("abcda", "", 3, 3)]
+        [DataRow("abcda", "", 10, -1)]
+        [DataRow("abcda", "a", 0, 0)]
+        [DataRow("abcda", "a", 1, 4)]
+        [DataRow("abcda", "b", 0, 1)]
+        [DataRow("abcda", "b", 1, 1)]
+        [DataRow("abcda", "b", 2, -1)]
+        [DataRow("abcda", "e", 0, -1)]
+        public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
+        {
+            var f = Function<string, short>(s => s.IndexOf(sub, offset));
+            Assert.AreEqual((short)expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual((short)expected, f.Evaluate(s));
+        }
+
+        /// <summary>
+        /// Test indexof find.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfFind()
+        {
+            var f = Function<string, short>(s => s.IndexOf("a", 0));
+            var input = f.Find((s, o) => o == 5);
+            Assert.AreEqual((short)5, f.Evaluate(input.Value));
+        }
+
+        /// <summary>
+        /// Test multiple operations.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleOperations()
+        {
+            var f = Function<string, bool>(s =>
+            {
+                var c = s.At(3);
+                var s2 = s.Substring(5, 2);
+                return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == 10);
+            });
+
+            var x = f.Find((i, o) => o);
+            Assert.IsTrue(x.HasValue);
+            Assert.IsTrue(f.Evaluate(x.Value));
+        }
+
+        /// <summary>
+        /// Test at is substring.
+        /// </summary>
+        [TestMethod]
+        public void TestAtIsSubstring()
+        {
+            CheckValid<string>(s => s.At(0) == s.Substring(0, 1));
+            CheckValid<string>(s => s.At(1) == s.Substring(1, 1));
+            CheckValid<string>(s => s.At(2) == s.Substring(2, 1));
+            CheckValid<string>(s => s.At(3) == s.Substring(3, 1));
+            CheckValid<string>(s => s.At(4) == s.Substring(4, 1));
         }
 
         /// <summary>

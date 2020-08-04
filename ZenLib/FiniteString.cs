@@ -146,32 +146,32 @@ namespace ZenLib
         /// <summary>
         /// Whether a string is a prefix of another.
         /// </summary>
-        /// <param name="pre">The prefix.</param>
         /// <param name="s">The string.</param>
+        /// <param name="pre">The prefix.</param>
         /// <returns>A boolean.</returns>
-        public static Zen<bool> PrefixOf(this Zen<FiniteString> pre, Zen<FiniteString> s)
+        public static Zen<bool> StartsWith(this Zen<FiniteString> s, Zen<FiniteString> pre)
         {
-            return PrefixOf(pre.GetCharacters(), s.GetCharacters());
+            return StartsWith(s.GetCharacters(), pre.GetCharacters());
         }
 
-        private static Zen<bool> PrefixOf(Zen<IList<ushort>> pre, Zen<IList<ushort>> s)
+        private static Zen<bool> StartsWith(Zen<IList<ushort>> s, Zen<IList<ushort>> pre)
         {
             return pre.Case(
                 empty: true,
                 cons: (hd1, tl1) => s.Case(
                     empty: false,
-                    cons: (hd2, tl2) => And(hd1 == hd2, PrefixOf(tl1, tl2))));
+                    cons: (hd2, tl2) => And(hd1 == hd2, StartsWith(tl2, tl1))));
         }
 
         /// <summary>
         /// Whether a string is a suffix of another.
         /// </summary>
-        /// <param name="suf">The suffix.</param>
         /// <param name="s">The string.</param>
+        /// <param name="suf">The suffix.</param>
         /// <returns>A boolean.</returns>
-        public static Zen<bool> SuffixOf(this Zen<FiniteString> suf, Zen<FiniteString> s)
+        public static Zen<bool> EndsWith(this Zen<FiniteString> s, Zen<FiniteString> suf)
         {
-            return PrefixOf(suf.GetCharacters().Reverse(), s.GetCharacters().Reverse());
+            return StartsWith(s.GetCharacters().Reverse(), suf.GetCharacters().Reverse());
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace ZenLib
         {
             return s.Case(
                 empty: sub.IsEmpty(),
-                cons: (hd, tl) => Or(PrefixOf(sub, s), Contains(tl, sub)));
+                cons: (hd, tl) => Or(StartsWith(s, sub), Contains(tl, sub)));
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace ZenLib
         {
             return s.Case(
                 empty: If(sub.IsEmpty(), Some<ushort>(current), Null<ushort>()),
-                cons: (hd, tl) => If(PrefixOf(sub, s), Some<ushort>(current), IndexOf(tl, sub, current + 1)));
+                cons: (hd, tl) => If(StartsWith(s, sub), Some<ushort>(current), IndexOf(tl, sub, current + 1)));
         }
 
         /// <summary>

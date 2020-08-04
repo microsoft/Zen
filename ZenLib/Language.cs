@@ -705,6 +705,60 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the character for a string at a given index.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="index">The index Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> At(this Zen<string> str, Zen<ushort> index)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(index);
+
+            return ZenStringAtExpr.Create(str, index);
+        }
+
+        /// <summary>
+        /// Get the length of a string.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<ushort> Length(this Zen<string> str)
+        {
+            CommonUtilities.ValidateNotNull(str);
+
+            return ZenStringLengthExpr.Create(str);
+        }
+
+        /// <summary>
+        /// Get the index of a substring from an offset.
+        /// If the substring is empty and the offset is in bounds then returns the offset.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="sub">The substring Zen expression.</param>
+        /// <param name="offset">The offset Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub, Zen<ushort> offset)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(sub);
+            CommonUtilities.ValidateNotNull(offset);
+
+            return ZenStringIndexOfExpr.Create(str, sub, offset);
+        }
+
+        /// <summary>
+        /// Get the index of a substring.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="sub">The substring Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub)
+        {
+            return IndexOf(str, sub, 0);
+        }
+
+        /// <summary>
         /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>

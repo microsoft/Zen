@@ -266,6 +266,45 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string at.
+        /// </summary>
+        [TestMethod]
+        public void TestAtSimplification()
+        {
+            Assert.AreEqual(String("abc").At(0), String("a"));
+            Assert.AreEqual(String("abc").At(1), String("b"));
+            Assert.AreEqual(String("abc").At(2), String("c"));
+            Assert.AreEqual(String("abc").At(3), String(""));
+            var x = Arbitrary<ushort>();
+            Assert.AreEqual(String("").At(x), String(""));
+        }
+
+        /// <summary>
+        /// Simplify for string length.
+        /// </summary>
+        [TestMethod]
+        public void TestLengthSimplification()
+        {
+            Assert.AreEqual(String("a").Length(), UShort(1));
+            Assert.AreEqual(String("ab").Length(), UShort(2));
+            Assert.AreEqual(String("abc").Length(), UShort(3));
+            Assert.AreEqual(String("").Length(), UShort(0));
+        }
+
+        /// <summary>
+        /// Simplify for string indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfSimplification()
+        {
+            Assert.AreEqual(String("abc").IndexOf(""), Short(0));
+            Assert.AreEqual(String("abc").IndexOf("a"), Short(0));
+            Assert.AreEqual(String("abc").IndexOf("b"), Short(1));
+            Assert.AreEqual(String("abc").IndexOf("c"), Short(2));
+            Assert.AreEqual(String("abc").IndexOf("d"), Short(-1));
+        }
+
+        /// <summary>
         /// Test hash consing of concat.
         /// </summary>
         [TestMethod]
@@ -318,6 +357,48 @@ namespace ZenLib.Tests
             var e2 = s.Substring(0, 1);
             var e3 = s.Substring(0, 2);
             var e4 = s.Substring(1, 1);
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+            Assert.IsFalse(ReferenceEquals(e1, e4));
+        }
+
+        /// <summary>
+        /// Test hash consing of substring.
+        /// </summary>
+        [TestMethod]
+        public void TestAtHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.At(0);
+            var e2 = s.At(0);
+            var e3 = s.At(1);
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of length.
+        /// </summary>
+        [TestMethod]
+        public void TestLengthHashCons()
+        {
+            var e1 = Language.Length("abc");
+            var e2 = Language.Length("abc");
+            var e3 = Language.Length("ab");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfHashCons()
+        {
+            var e1 = Language.IndexOf("abc", "a", 0);
+            var e2 = Language.IndexOf("abc", "a", 0);
+            var e3 = Language.IndexOf("abc", "a", 1);
+            var e4 = Language.IndexOf("abc", "b", 0);
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
             Assert.IsFalse(ReferenceEquals(e1, e4));
