@@ -228,6 +228,12 @@ namespace ZenLib.ModelChecking
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
+        [ExcludeFromCodeCoverage]
+        public ImmutableHashSet<object> VisitZenStringAtExpr(ZenStringAtExpr expression, Unit parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
         public ImmutableHashSet<object> VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>

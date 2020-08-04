@@ -477,6 +477,22 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
+        /// Visit a StringAtExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting C# value.</returns>
+        public object VisitZenStringAtExpr(ZenStringAtExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e1 = (string)expression.StringExpr.Accept(this, parameter);
+                var e2 = (ushort)expression.IndexExpr.Accept(this, parameter);
+                return CommonUtilities.At(e1, e2);
+            });
+        }
+
+        /// <summary>
         /// Visit a IntConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

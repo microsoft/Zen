@@ -665,6 +665,23 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Visit a StringAtExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringAtExpr(ZenStringAtExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.StringExpr.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.IndexExpr.Accept(this, parameter);
+                return new SymbolicString<TModel, TVar, TBool, TInt, TString>(
+                    this.Solver, this.Solver.At(v1.Value, v2.Value));
+            });
+        }
+
+        /// <summary>
         /// Visit a WithFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

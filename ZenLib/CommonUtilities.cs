@@ -305,5 +305,22 @@ namespace ZenLib
             var len = offset + length > s.Length ? s.Length - offset : length;
             return s.Substring(offset, len);
         }
+
+        /// <summary>
+        /// Get the substring character at an index.
+        /// Returns the empty string if out of bounds.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="index">The index.</param>
+        /// <returns>A substring at that character.</returns>
+        public static string At(string s, ushort index)
+        {
+            if (index >= s.Length)
+            {
+                return string.Empty;
+            }
+
+            return s[index].ToString();
+        }
     }
 }

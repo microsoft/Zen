@@ -705,6 +705,20 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the character for a string at a given index.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="index">The index Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> At(this Zen<string> str, Zen<ushort> index)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(index);
+
+            return ZenStringAtExpr.Create(str, index);
+        }
+
+        /// <summary>
         /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>

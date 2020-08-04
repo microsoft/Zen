@@ -114,6 +114,11 @@ namespace ZenLib.Compilation
         private static MethodInfo substringMethod = typeof(CommonUtilities).GetMethod("Substring");
 
         /// <summary>
+        /// String at method.
+        /// </summary>
+        private static MethodInfo atMethod = typeof(CommonUtilities).GetMethod("At");
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -755,6 +760,22 @@ namespace ZenLib.Compilation
                 var e2 = expression.OffsetExpr.Accept(this, parameter);
                 var e3 = expression.LengthExpr.Accept(this, parameter);
                 return Expression.Call(null, substringMethod, new Expression[] { e1, e2, e3 });
+            });
+        }
+
+        /// <summary>
+        /// Convert a 'At' expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenStringAtExpr(ZenStringAtExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.StringExpr.Accept(this, parameter);
+                var e2 = expression.IndexExpr.Accept(this, parameter);
+                return Expression.Call(null, atMethod, new Expression[] { e1, e2 });
             });
         }
 

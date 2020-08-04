@@ -298,6 +298,64 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test string at evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abcde", 0, "a")]
+        [DataRow("abcde", 1, "b")]
+        [DataRow("abcde", 2, "c")]
+        [DataRow("abcde", 3, "d")]
+        [DataRow("abcde", 4, "e")]
+        [DataRow("abcde", 5, "")]
+        [DataRow("", 0, "")]
+        [DataRow("", 1, "")]
+        [DataRow("", 2, "")]
+        public void TestAtEvaluation(string s, int index, string expected)
+        {
+            var f = Function<string, ushort, string>((s, idx) => s.At(idx));
+            Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
+            f.Compile();
+            Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
+
+            if (expected != "")
+            {
+                var x = f.Find((str, idx, o) => And(str == s, o == expected));
+                Assert.AreEqual(x.Value.Item2, (ushort)index);
+            }
+        }
+
+        /// <summary>
+        /// Test multiple operations.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleOperations()
+        {
+            var f = Function<string, bool>(s =>
+            {
+                var c = s.At(3);
+                var s2 = s.Substring(5, 2);
+                return And(s.StartsWith("a"), c == "b", s2 == "cd");
+            });
+
+            var x = f.Find((i, o) => o);
+            Assert.IsTrue(x.HasValue);
+            Assert.IsTrue(f.Evaluate(x.Value));
+        }
+
+        /// <summary>
+        /// Test at is substring.
+        /// </summary>
+        [TestMethod]
+        public void TestAtIsSubstring()
+        {
+            CheckValid<string>(s => s.At(0) == s.Substring(0, 1));
+            CheckValid<string>(s => s.At(1) == s.Substring(1, 1));
+            CheckValid<string>(s => s.At(2) == s.Substring(2, 1));
+            CheckValid<string>(s => s.At(3) == s.Substring(3, 1));
+            CheckValid<string>(s => s.At(4) == s.Substring(4, 1));
+        }
+
+        /// <summary>
         /// Test endswith implies contains.
         /// </summary>
         [TestMethod]

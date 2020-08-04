@@ -235,6 +235,14 @@ namespace ZenLib.ModelChecking
         TString Substring(TString x, TInteger y, TInteger z);
 
         /// <summary>
+        /// The string 'At' operation.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
+        TString At(TString x, TInteger y);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

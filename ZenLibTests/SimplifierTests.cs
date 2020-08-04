@@ -266,6 +266,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string at.
+        /// </summary>
+        [TestMethod]
+        public void TestAtSimplification()
+        {
+            Assert.AreEqual(String("abc").At(0), String("a"));
+            Assert.AreEqual(String("abc").At(1), String("b"));
+            Assert.AreEqual(String("abc").At(2), String("c"));
+            Assert.AreEqual(String("abc").At(3), String(""));
+            var x = Arbitrary<ushort>();
+            Assert.AreEqual(String("").At(x), String(""));
+        }
+
+        /// <summary>
         /// Test hash consing of concat.
         /// </summary>
         [TestMethod]
@@ -321,6 +335,20 @@ namespace ZenLib.Tests
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
             Assert.IsFalse(ReferenceEquals(e1, e4));
+        }
+
+        /// <summary>
+        /// Test hash consing of substring.
+        /// </summary>
+        [TestMethod]
+        public void TestAtHashCons()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.At(0);
+            var e2 = s.At(0);
+            var e3 = s.At(1);
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
         }
 
         /// <summary>
