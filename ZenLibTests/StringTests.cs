@@ -359,6 +359,38 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test string indexof evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abcda", "", 0, 0)]
+        [DataRow("abcda", "", 3, 3)]
+        [DataRow("abcda", "", 10, -1)]
+        [DataRow("abcda", "a", 0, 0)]
+        [DataRow("abcda", "a", 1, 4)]
+        [DataRow("abcda", "b", 0, 1)]
+        [DataRow("abcda", "b", 1, 1)]
+        [DataRow("abcda", "b", 2, -1)]
+        [DataRow("abcda", "e", 0, -1)]
+        public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
+        {
+            var f = Function<string, short>(s => s.IndexOf(sub, offset));
+            Assert.AreEqual((short)expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual((short)expected, f.Evaluate(s));
+        }
+
+        /// <summary>
+        /// Test indexof find.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfFind()
+        {
+            var f = Function<string, short>(s => s.IndexOf("a", 0));
+            var input = f.Find((s, o) => o == 5);
+            Assert.AreEqual((short)5, f.Evaluate(input.Value));
+        }
+
+        /// <summary>
         /// Test multiple operations.
         /// </summary>
         [TestMethod]

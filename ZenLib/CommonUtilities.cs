@@ -307,6 +307,29 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the index of a substring starting at an offset.
+        /// If the substring is the empty string, returns the offset if in bounds.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="sub">The substring.</param>
+        /// <param name="offset">The offset.</param>
+        /// <returns>The index and a match.</returns>
+        public static short IndexOf(string s, string sub, ushort offset)
+        {
+            if (offset >= s.Length)
+            {
+                return -1;
+            }
+
+            if (sub == string.Empty)
+            {
+                return (short)offset;
+            }
+
+            return (short)s.IndexOf(sub, offset);
+        }
+
+        /// <summary>
         /// Get the substring character at an index.
         /// Returns the empty string if out of bounds.
         /// </summary>

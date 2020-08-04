@@ -513,6 +513,18 @@ namespace ZenLib.ModelChecking
             });
         }
 
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v1 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.StringExpr.Accept(this, parameter);
+                var v2 = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.SubstringExpr.Accept(this, parameter);
+                var v3 = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(
+                    this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
+            });
+        }
+
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>

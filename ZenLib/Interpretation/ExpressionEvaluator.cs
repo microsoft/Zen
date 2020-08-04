@@ -369,6 +369,17 @@ namespace ZenLib.Interpretation
             });
         }
 
+        public object VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e1 = (string)expression.StringExpr.Accept(this, parameter);
+                var e2 = (string)expression.SubstringExpr.Accept(this, parameter);
+                var e3 = (ushort)expression.OffsetExpr.Accept(this, parameter);
+                return CommonUtilities.IndexOf(e1, e2, e3);
+            });
+        }
+
         public object VisitZenConstantIntExpr(ZenConstantIntExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;

@@ -138,7 +138,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestPrefixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.PrefixOf(sub, fs));
+            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.StartsWith(fs, sub));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -151,7 +151,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, bool>(fs => fs.PrefixOf(s));
+                var f = Function<FiniteString, bool>(fs => FiniteString.Constant(s).StartsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.StartsWith(ex));
             });
@@ -167,7 +167,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestSuffixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.SuffixOf(sub, fs));
+            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.EndsWith(fs, sub));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -180,7 +180,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, bool>(fs => fs.SuffixOf(s));
+                var f = Function<FiniteString, bool>(fs => FiniteString.Constant(s).EndsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.EndsWith(ex));
             });
@@ -322,7 +322,7 @@ namespace ZenLib.Tests
         public void TestPrefixImpliesContains()
         {
             var f = Function<FiniteString, FiniteString, bool>(
-                (fs1, fs2) => Implies(fs1.PrefixOf(fs2), fs2.Contains(fs1)));
+                (fs1, fs2) => Implies(fs2.StartsWith(fs1), fs2.Contains(fs1)));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);
@@ -335,7 +335,7 @@ namespace ZenLib.Tests
         public void TestSuffixImpliesContains()
         {
             var f = Function<FiniteString, FiniteString, bool>(
-                (fs1, fs2) => Implies(fs1.SuffixOf(fs2), fs2.Contains(fs1)));
+                (fs1, fs2) => Implies(fs2.EndsWith(fs1), fs2.Contains(fs1)));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);

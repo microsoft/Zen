@@ -250,6 +250,15 @@ namespace ZenLib.ModelChecking
         TInteger Length(TString x);
 
         /// <summary>
+        /// The string 'IndexOf' operation.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="y">The substring expression.</param>
+        /// <param name="z">The offset expression.</param>
+        /// <returns></returns>
+        TInteger IndexOf(TString x, TString y, TInteger z);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

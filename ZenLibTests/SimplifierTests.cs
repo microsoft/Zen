@@ -292,6 +292,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for string indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfSimplification()
+        {
+            Assert.AreEqual(String("abc").IndexOf(""), Short(0));
+            Assert.AreEqual(String("abc").IndexOf("a"), Short(0));
+            Assert.AreEqual(String("abc").IndexOf("b"), Short(1));
+            Assert.AreEqual(String("abc").IndexOf("c"), Short(2));
+            Assert.AreEqual(String("abc").IndexOf("d"), Short(-1));
+        }
+
+        /// <summary>
         /// Test hash consing of concat.
         /// </summary>
         [TestMethod]
@@ -374,6 +387,21 @@ namespace ZenLib.Tests
             var e3 = Language.Length("ab");
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfHashCons()
+        {
+            var e1 = Language.IndexOf("abc", "a", 0);
+            var e2 = Language.IndexOf("abc", "a", 0);
+            var e3 = Language.IndexOf("abc", "a", 1);
+            var e4 = Language.IndexOf("abc", "b", 0);
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+            Assert.IsFalse(ReferenceEquals(e1, e4));
         }
 
         /// <summary>

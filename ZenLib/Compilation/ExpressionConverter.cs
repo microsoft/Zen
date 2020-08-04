@@ -119,6 +119,11 @@ namespace ZenLib.Compilation
         private static MethodInfo atMethod = typeof(CommonUtilities).GetMethod("At");
 
         /// <summary>
+        /// String indexof method.
+        /// </summary>
+        private static MethodInfo indexOfMethod = typeof(CommonUtilities).GetMethod("IndexOf");
+
+        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -584,6 +589,16 @@ namespace ZenLib.Compilation
             {
                 var e = expression.Expr.Accept(this, parameter);
                 return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(ushort));
+            });
+        }
+        public Expression VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.StringExpr.Accept(this, parameter);
+                var e2 = expression.SubstringExpr.Accept(this, parameter);
+                var e3 = expression.OffsetExpr.Accept(this, parameter);
+                return Expression.Call(null, indexOfMethod, new Expression[] { e1, e2, e3 });
             });
         }
 

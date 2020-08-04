@@ -172,6 +172,14 @@ namespace ZenLib
         TReturn VisitZenStringAtExpr(ZenStringAtExpr expression, TParam parameter);
 
         /// <summary>
+        /// Visit a StringIndexOfExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, TParam parameter);
+
+        /// <summary>
         /// Visit a BitwiseAndExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
