@@ -35,10 +35,6 @@ namespace ZenLib.ModelChecking
         /// </summary>
         private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TInt, TString>>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TInt, TString}"/> class.
-        /// </summary>
-        /// <param name="solver">The manager object.</param>
         public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TInt, TString> solver)
         {
             this.Solver = solver;
@@ -59,12 +55,6 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        /// <summary>
-        /// Visit an AdapterExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -73,12 +63,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit an AndExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -89,12 +73,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit an ArbitraryExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -155,12 +133,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit an ArgumentExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -169,12 +141,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a BitwiseAndExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenIntegerBinopExpr<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -200,12 +166,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a BitwiseNotExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -215,12 +175,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantBoolExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -230,12 +184,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantByteExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantByteExpr(ZenConstantByteExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -245,12 +193,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantIntExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantIntExpr(ZenConstantIntExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -260,12 +202,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantLongExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantLongExpr(ZenConstantLongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -275,12 +211,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantShortExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantShortExpr(ZenConstantShortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -290,12 +220,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantUintExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUintExpr(ZenConstantUintExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -305,12 +229,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantUlongExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -320,12 +238,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantUshortExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -335,12 +247,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConstantStringExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConstantStringExpr(ZenConstantStringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -350,12 +256,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -372,12 +272,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a GetFieldExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -387,12 +281,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit an IfExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -404,12 +292,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ComparisonExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenComparisonExpr<T1>(ZenComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -447,12 +329,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ListAddFrontExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -473,12 +349,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ListEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -491,12 +361,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ListMatchExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             var list = (SymbolicList<TModel, TVar, TBool, TInt, TString>)expression.ListExpr.Accept(this, parameter);
@@ -556,12 +420,6 @@ namespace ZenLib.ModelChecking
             return v1.Merge(guard, v2);
         }
 
-        /// <summary>
-        /// Visit a NotExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -571,12 +429,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit an OrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -587,12 +439,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ConcatExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenConcatExpr(ZenConcatExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -603,12 +449,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a ContainmentExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -628,12 +468,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a StringReplaceExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -646,12 +480,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a StringSubstringExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -664,12 +492,6 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a StringAtExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringAtExpr(ZenStringAtExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -681,12 +503,16 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        /// <summary>
-        /// Visit a WithFieldExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting symbolic value.</returns>
+        public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenStringLengthExpr(ZenStringLengthExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var v = (SymbolicString<TModel, TVar, TBool, TInt, TString>)expression.Expr.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(
+                    this.Solver, this.Solver.Length(v.Value));
+            });
+        }
+
         public SymbolicValue<TModel, TVar, TBool, TInt, TString> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>

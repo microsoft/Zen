@@ -156,6 +156,14 @@ namespace ZenLib
         TReturn VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, TParam parameter);
 
         /// <summary>
+        /// Visit a StringLengthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenStringLengthExpr(ZenStringLengthExpr expression, TParam parameter);
+
+        /// <summary>
         /// Visit a StringAtExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

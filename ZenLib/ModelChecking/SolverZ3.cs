@@ -263,6 +263,11 @@ namespace ZenLib.ModelChecking
             return this.context.MkAt(x, index);
         }
 
+        public BitVecExpr Length(SeqExpr x)
+        {
+            return this.context.MkInt2BV(16, this.context.MkLength(x));
+        }
+
         public object Get(Model m, Expr v)
         {
             var e = m.Evaluate(v, true);

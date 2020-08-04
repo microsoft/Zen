@@ -142,12 +142,6 @@ namespace ZenLib.Compilation
             return variable;
         }
 
-        /// <summary>
-        /// Convert an 'Adapter' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenAdapterExpr<T1, T2>(ZenAdapterExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -166,12 +160,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'And' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenAndExpr(ZenAndExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -194,12 +182,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'Arbitrary' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -208,23 +190,11 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'Argument' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.Id];
         }
 
-        /// <summary>
-        /// Convert a 'BitwiseAnd' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -264,12 +234,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'BitwiseNot' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -278,138 +242,51 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'BoolConstant' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant byte expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantByteExpr(ZenConstantByteExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant int expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantIntExpr(ZenConstantIntExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant long expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantLongExpr(ZenConstantLongExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant short expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantShortExpr(ZenConstantShortExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant uint expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantUintExpr(ZenConstantUintExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant ulong expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant ushort expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        /// <summary>
-        /// Convert a constant string expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.UnescapedValue);
         }
 
-        /// <summary>
-        /// Create an object given the fields.
-        /// </summary>
-        /// <typeparam name="TObject">The object type.</typeparam>
-        /// <param name="objects"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
-        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
-        {
-            Expression[] exprs = new Expression[fields.Length + 2];
-
-            // first use new default constructor.
-            var variable = FreshVariable(typeof(TObject));
-            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
-
-            // assign each field
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var field = Expression.PropertyOrField(variable, fields[i]);
-                exprs[i + 1] = Expression.Assign(field, objects[i]);
-            }
-
-            // return a block with the variable.
-            exprs[fields.Length + 1] = variable;
-            return Expression.Block(new ParameterExpression[] { variable }, exprs);
-        }
-
-        /// <summary>
-        /// Convert a 'CreateObject' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -434,12 +311,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'GetField' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -449,12 +320,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'If' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenIfExpr<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -479,12 +344,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Geq' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -509,12 +368,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'ListAddFront' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -533,12 +386,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'ListEmpty' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -548,12 +395,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Match' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -646,12 +487,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Not' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenNotExpr(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -660,12 +495,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert an 'Or' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenOrExpr(ZenOrExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -688,12 +517,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Concat' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenConcatExpr(ZenConcatExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -704,12 +527,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Containment' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -729,12 +546,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Replace' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -746,12 +557,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'Substring' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -763,12 +568,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'At' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
         public Expression VisitZenStringAtExpr(ZenStringAtExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -779,12 +578,15 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Convert a 'WithField' expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The compilable expression.</returns>
+        public Expression VisitZenStringLengthExpr(ZenStringLengthExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e = expression.Expr.Accept(this, parameter);
+                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(ushort));
+            });
+        }
+
         public Expression VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -793,6 +595,33 @@ namespace ZenLib.Compilation
                 var value = expression.FieldValue.Accept(this, parameter);
                 return WithField<T1>(obj, expression.FieldName, value);
             });
+        }
+
+        /// <summary>
+        /// Create an object given the fields.
+        /// </summary>
+        /// <typeparam name="TObject">The object type.</typeparam>
+        /// <param name="objects"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
+        {
+            Expression[] exprs = new Expression[fields.Length + 2];
+
+            // first use new default constructor.
+            var variable = FreshVariable(typeof(TObject));
+            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
+
+            // assign each field
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = Expression.PropertyOrField(variable, fields[i]);
+                exprs[i + 1] = Expression.Assign(field, objects[i]);
+            }
+
+            // return a block with the variable.
+            exprs[fields.Length + 1] = variable;
+            return Expression.Block(new ParameterExpression[] { variable }, exprs);
         }
 
         /// <summary>

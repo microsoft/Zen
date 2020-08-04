@@ -243,6 +243,13 @@ namespace ZenLib.ModelChecking
         TString At(TString x, TInteger y);
 
         /// <summary>
+        /// The string 'Length' operation.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <returns></returns>
+        TInteger Length(TString x);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

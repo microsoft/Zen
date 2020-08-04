@@ -165,6 +165,21 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test length agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestLengthAgreement()
+        {
+            CheckAgreement<string>(s => s.Length() == 0);
+            CheckAgreement<string>(s => s.Length() == 1);
+            CheckAgreement<string>(s => s.Length() == 2);
+            CheckAgreement<string>(s => s.Length() == 3);
+            CheckAgreement<string>(s => s.Length() == 4);
+            CheckAgreement<string>(s => s.Length() == 5);
+            CheckAgreement<string>(s => s.Length() == 10);
+        }
+
+        /// <summary>
         /// Test concatenating multiple values is solved correctly.
         /// </summary>
         [TestMethod]
@@ -325,6 +340,25 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test string length evaluation.
+        /// </summary>
+        [TestMethod]
+        [DataRow("", 0)]
+        [DataRow("a", 1)]
+        [DataRow("ab", 2)]
+        [DataRow("abc", 3)]
+        [DataRow("abcd", 4)]
+        [DataRow("abcde", 5)]
+        [DataRow("\x01\x02", 2)]
+        public void TestLengthEvaluation(string s, int expected)
+        {
+            var f = Function<string, ushort>(s => s.Length());
+            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+            f.Compile();
+            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+        }
+
+        /// <summary>
         /// Test multiple operations.
         /// </summary>
         [TestMethod]
@@ -334,7 +368,7 @@ namespace ZenLib.Tests
             {
                 var c = s.At(3);
                 var s2 = s.Substring(5, 2);
-                return And(s.StartsWith("a"), c == "b", s2 == "cd");
+                return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == 10);
             });
 
             var x = f.Find((i, o) => o);

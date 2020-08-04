@@ -36,12 +36,6 @@ namespace ZenLib.Interpretation
             return result;
         }
 
-        /// <summary>
-        /// Visit an AdapterExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -56,12 +50,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit an ArbitraryExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -83,34 +71,16 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit an AndExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenAndExpr(ZenAndExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return (bool)expression.Expr1.Accept(this, parameter) && (bool)expression.Expr2.Accept(this, parameter);
         }
 
-        /// <summary>
-        /// Visit an ArgumentExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.Id];
         }
 
-        /// <summary>
-        /// Visit a BitwiseAndExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -175,12 +145,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a BitwiseNotExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -190,34 +154,16 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a BoolConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a ByteConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantByteExpr(ZenConstantByteExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a CreateObjectExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -241,23 +187,11 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit an EmptyListExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return ImmutableList<T>.Empty;
         }
 
-        /// <summary>
-        /// Visit a GetFieldExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -267,12 +201,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit an IfExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenIfExpr<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -283,12 +211,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a ComparisonExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -335,12 +257,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a ListAddFrontExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -351,12 +267,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a ListMatchExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenListCaseExpr<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -381,34 +291,16 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a NotExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenNotExpr(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return !(bool)expression.Expr.Accept(this, parameter);
         }
 
-        /// <summary>
-        /// Visit an OrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenOrExpr(ZenOrExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return (bool)expression.Expr1.Accept(this, parameter) || (bool)expression.Expr2.Accept(this, parameter);
         }
 
-        /// <summary>
-        /// Visit a ConcatExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConcatExpr(ZenConcatExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -417,12 +309,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a ContainmentExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -442,12 +328,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a StringReplaceExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -459,12 +339,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a StringSubstringExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -476,12 +350,6 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a StringAtExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenStringAtExpr(ZenStringAtExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
@@ -492,89 +360,50 @@ namespace ZenLib.Interpretation
             });
         }
 
-        /// <summary>
-        /// Visit a IntConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
+        public object VisitZenStringLengthExpr(ZenStringLengthExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return LookupOrCompute(expression, parameter, () =>
+            {
+                var e = (string)expression.Expr.Accept(this, parameter);
+                return (ushort)e.Length;
+            });
+        }
+
         public object VisitZenConstantIntExpr(ZenConstantIntExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a UintConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantUintExpr(ZenConstantUintExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a LongConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantLongExpr(ZenConstantLongExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a UlongConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a ShortConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantShortExpr(ZenConstantShortExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a UshortConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        /// <summary>
-        /// Visit a ConstantStringExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.UnescapedValue;
         }
 
-        /// <summary>
-        /// Visit a WithFieldExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The resulting C# value.</returns>
         public object VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>

@@ -719,6 +719,18 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the length of a string.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<ushort> Length(this Zen<string> str)
+        {
+            CommonUtilities.ValidateNotNull(str);
+
+            return ZenStringLengthExpr.Create(str);
+        }
+
+        /// <summary>
         /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>
