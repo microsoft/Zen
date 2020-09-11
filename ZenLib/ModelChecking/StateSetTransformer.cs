@@ -14,20 +14,44 @@ namespace ZenLib.ModelChecking
     /// </summary>
     public class StateSetTransformer<T1, T2>
     {
+        /// <summary>
+        /// The underlying solver to use.
+        /// </summary>
         private SolverDD<BDDNode> solver;
 
+        /// <summary>
+        /// The transformation as a single decision diagram.
+        /// </summary>
         private DD setTransformer;
 
+        /// <summary>
+        /// A zen expression for the input variables.
+        /// </summary>
         private Zen<T1> zenInput;
 
+        /// <summary>
+        /// A zen expression for the output variables.
+        /// </summary>
         private Zen<T2> zenOutput;
 
+        /// <summary>
+        /// The decision diagram input variables.
+        /// </summary>
         private VariableSet<BDDNode> inputVariables;
 
+        /// <summary>
+        /// The decision diagram output variables.
+        /// </summary>
         private VariableSet<BDDNode> outputVariables;
 
+        /// <summary>
+        /// Cache of canonical variable values for different types.
+        /// </summary>
         private Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues;
 
+        /// <summary>
+        /// Cache from zen expression to variables for that expression.
+        /// </summary>
         private Dictionary<object, Variable<BDDNode>> arbitraryMapping;
 
         internal StateSetTransformer(
@@ -51,6 +75,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Compute the input set for the transformer.
         /// </summary>
+        /// <param name="invariant">The function constraining the inputs.</param>
         public StateSet<T1> InputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant = null)
         {
             DD set = setTransformer;
@@ -71,21 +96,10 @@ namespace ZenLib.ModelChecking
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
         }
 
-        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>) conversionData)
-        {
-            var x = new HashSet<Variable<BDDNode>>(sourceStateSet.VariableSet.Variables);
-            var y = new HashSet<Variable<BDDNode>>(conversionData.Item2.Variables);
-            if (x.SetEquals(y))
-            {
-                return sourceStateSet;
-            }
-
-            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1);
-        }
-
         /// <summary>
         /// Compute the input set for the transformer.
         /// </summary>
+        /// <param name="invariant">The invariant constraining the outputs.</param>
         public StateSet<T2> OutputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant = null)
         {
             DD set = setTransformer;
@@ -109,6 +123,8 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Compute the input set for the transformer.
         /// </summary>
+        /// <param name="input">The input set.</param>
+        /// <returns>The post image output set of the input.</returns>
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
             input = ConvertTo(input, (this.zenInput, this.inputVariables));
@@ -122,6 +138,8 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Compute the input set for the transformer.
         /// </summary>
+        /// <param name="output">The output set.</param>
+        /// <returns>The pre image set of the output.</returns>
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
             output = ConvertTo(output, (this.zenOutput, this.outputVariables));
@@ -130,6 +148,24 @@ namespace ZenLib.ModelChecking
             dd = this.solver.Manager.Exists(dd, this.outputVariables);
             var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
+        }
+
+        /// <summary>
+        /// Covert a state set to contain the desired decision diagram variables.
+        /// </summary>
+        /// <param name="sourceStateSet">The source state set.</param>
+        /// <param name="conversionData">The conversion variables.</param>
+        /// <returns>A converted state set.</returns>
+        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>) conversionData)
+        {
+            var x = new HashSet<Variable<BDDNode>>(sourceStateSet.VariableSet.Variables);
+            var y = new HashSet<Variable<BDDNode>>(conversionData.Item2.Variables);
+            if (x.SetEquals(y))
+            {
+                return sourceStateSet;
+            }
+
+            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1);
         }
     }
 }

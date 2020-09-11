@@ -11,20 +11,43 @@ namespace ZenLib.ModelChecking
     using ZenLib.Solver;
 
     /// <summary>
-    /// An input-output set transformer.
+    /// An set of values of a given type.
     /// </summary>
     public class StateSet<T>
     {
+        /// <summary>
+        /// The underlying decision diagram solver.
+        /// </summary>
         internal SolverDD<BDDNode> Solver { get; }
 
+        /// <summary>
+        /// The set of values as a decision diagram.
+        /// </summary>
         internal DD Set { get; }
 
+        /// <summary>
+        /// The cache from zen expression to decision diagram variables.
+        /// </summary>
         internal Dictionary<object, Variable<BDDNode>> ArbitraryMapping { get; }
 
+        /// <summary>
+        /// The zen expression for the variables in the type of the set.
+        /// </summary>
         internal Zen<T> ZenExpression { get; }
 
+        /// <summary>
+        /// The set of decision diagram variables.
+        /// </summary>
         internal VariableSet<BDDNode> VariableSet { get; }
 
+        /// <summary>
+        /// Create a new instance of a <see cref="StateSet{T}"/>.
+        /// </summary>
+        /// <param name="solver">The solver.</param>
+        /// <param name="stateSet">The state set as a decision diagram.</param>
+        /// <param name="arbitraryMapping">The variable cache.</param>
+        /// <param name="zenExpression">The Zen expression for variables.</param>
+        /// <param name="variableSet">The decision diagram variable set.</param>
         internal StateSet(
             SolverDD<BDDNode> solver,
             DD stateSet,
@@ -39,6 +62,12 @@ namespace ZenLib.ModelChecking
             this.VariableSet = variableSet;
         }
 
+        /// <summary>
+        /// Converts between a the decision diagram variables used to represent the set.
+        /// </summary>
+        /// <param name="newVariableSet">The new decision diagram variables.</param>
+        /// <param name="newZenExpression">The new Zen expression for the Zen variables.</param>
+        /// <returns>A new state set with the underlying variables replaced.</returns>
         internal StateSet<T> ConvertSetVariables(VariableSet<BDDNode> newVariableSet, Zen<T> newZenExpression)
         {
             var a1 = this.VariableSet.Variables;
