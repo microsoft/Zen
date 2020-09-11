@@ -8,6 +8,7 @@ namespace ZenLib.ModelChecking
     using System.Diagnostics.CodeAnalysis;
     using DecisionDiagrams;
     using ZenLib.Interpretation;
+    using ZenLib.Solver;
 
     /// <summary>
     /// An input-output set transformer.

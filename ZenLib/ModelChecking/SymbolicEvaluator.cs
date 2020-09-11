@@ -10,6 +10,7 @@ namespace ZenLib.ModelChecking
     using DecisionDiagrams;
     using ZenLib.Generation;
     using ZenLib.Interpretation;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Helper class to perform symbolic reasoning.
@@ -41,6 +42,12 @@ namespace ZenLib.ModelChecking
         private static Dictionary<Type, VariableSet<BDDNode>> dependencyFreeOutput =
             new Dictionary<Type, VariableSet<BDDNode>>();
 
+        /// <summary>
+        /// Determine if an expression has a satisfying assignment.
+        /// </summary>
+        /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>True or false.</returns>
         public static bool Find(Zen<bool> expression, Backend backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
@@ -48,6 +55,13 @@ namespace ZenLib.ModelChecking
             return assignment != null;
         }
 
+        /// <summary>
+        /// Find an input to a function satisfying some condition.
+        /// </summary>
+        /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="input">The Zen expression for the input to the function.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>An optional input value.</returns>
         public static Option<T> Find<T>(
             Zen<bool> expression,
             Zen<T> input,
@@ -65,6 +79,14 @@ namespace ZenLib.ModelChecking
             return Option.Some((T)result);
         }
 
+        /// <summary>
+        /// Find an input to a function satisfying some condition.
+        /// </summary>
+        /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="input1">The first Zen expression for the input to the function.</param>
+        /// <param name="input2">The second Zen expression for the input to the function.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>An optional input value.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
             Zen<bool> expression,
             Zen<T1> input1,
@@ -86,6 +108,15 @@ namespace ZenLib.ModelChecking
             return Option.Some(((T1)result1, (T2)result2));
         }
 
+        /// <summary>
+        /// Find an input to a function satisfying some condition.
+        /// </summary>
+        /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="input1">The first Zen expression for the input to the function.</param>
+        /// <param name="input2">The second Zen expression for the input to the function.</param>
+        /// <param name="input3">The third Zen expression for the input to the function.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
             Zen<bool> expression,
             Zen<T1> input1,
@@ -108,6 +139,16 @@ namespace ZenLib.ModelChecking
             return Option.Some(((T1)result1, (T2)result2, (T3)result3));
         }
 
+        /// <summary>
+        /// Find an input to a function satisfying some condition.
+        /// </summary>
+        /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="input1">The first Zen expression for the input to the function.</param>
+        /// <param name="input2">The second Zen expression for the input to the function.</param>
+        /// <param name="input3">The third Zen expression for the input to the function.</param>
+        /// <param name="input4">The fourth Zen expression for the input to the function.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
             Zen<bool> expression,
             Zen<T1> input1,
@@ -132,6 +173,11 @@ namespace ZenLib.ModelChecking
             return Option.Some(((T1)result1, (T2)result2, (T3)result3, (T4)result4));
         }
 
+        /// <summary>
+        /// Create a state set transformer from a zen function.
+        /// </summary>
+        /// <param name="function">The Zen function to make into a transformer.</param>
+        /// <returns>A state set transformer between input and output types.</returns>
         public static StateSetTransformer<T1, T2> StateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
         {
             // create an arbitrary input and invoke the function
@@ -251,6 +297,13 @@ namespace ZenLib.ModelChecking
                 canonicalValues);
         }
 
+        /// <summary>
+        /// Forces an assignment to variables that may not be referenced
+        /// in the user's Zen expression.
+        /// </summary>
+        /// <param name="solver">The solver to force the assignment with.</param>
+        /// <param name="zenExprToVariable">Mapping from zen expression to variables.</param>
+        /// <param name="zenExpr">The zen expression to force an assignement to.</param>
         private static void ForceVariableAssignment(
             SolverDD<BDDNode> solver,
             Dictionary<object, Variable<BDDNode>> zenExprToVariable,

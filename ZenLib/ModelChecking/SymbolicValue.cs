@@ -4,6 +4,8 @@
 
 namespace ZenLib.ModelChecking
 {
+    using ZenLib.Solver;
+
     /// <summary>
     /// Representation of a symbolic value.
     /// </summary>

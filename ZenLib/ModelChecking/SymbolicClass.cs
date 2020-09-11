@@ -7,6 +7,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Representation of a symbolic boolean value.

@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.ModelChecking
+namespace ZenLib.Solver
 {
     /// <summary>
     /// Solver interface for a model checker backend.

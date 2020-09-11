@@ -5,6 +5,7 @@
 namespace ZenLib.ModelChecking
 {
     using System.Diagnostics.CodeAnalysis;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Representation of a symbolic boolean value.

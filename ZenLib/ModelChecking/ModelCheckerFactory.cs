@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using DecisionDiagrams;
     using Microsoft.Z3;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Model checker factory class.

@@ -8,6 +8,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Visitor that computes a symbolic representation for the function.

@@ -7,6 +7,7 @@ namespace ZenLib.ModelChecking
     using System;
     using System.Collections.Generic;
     using DecisionDiagrams;
+    using ZenLib.Solver;
 
     /// <summary>
     /// An input-output set transformer.

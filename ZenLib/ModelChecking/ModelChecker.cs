@@ -4,8 +4,8 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Implementaiton of a bounded model checker, which is
