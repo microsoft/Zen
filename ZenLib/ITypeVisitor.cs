@@ -71,19 +71,19 @@ namespace ZenLib
         /// Visit the option type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitOption(Func<Type, T> recurse, Type innerType);
+        T VisitOption(Func<Type, T> recurse, Type optionType, Type innerType);
 
         /// <summary>
         /// Visit the tuple type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitTuple(Func<Type, T> recurse, Type innerTypeLeft, Type innerTypeRight);
+        T VisitTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
 
         /// <summary>
         /// Visit the value tuple type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitValueTuple(Func<Type, T> recurse, Type innerTypeLeft, Type innerTypeRight);
+        T VisitValueTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
 
         /// <summary>
         /// Visit the list type.

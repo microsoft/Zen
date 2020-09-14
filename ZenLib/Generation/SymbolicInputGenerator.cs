@@ -157,7 +157,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitOption(Func<Type, object> recurse, Type innerType)
+        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
         {
             var flag = recurse(ReflectionUtilities.BoolType);
             var value = recurse(innerType);
@@ -165,12 +165,12 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { flag, value });
         }
 
-        public object VisitTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
+        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
         {
             return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
         }
 
-        public object VisitValueTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
+        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
         {
             return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
         }
