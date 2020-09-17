@@ -28,6 +28,11 @@ namespace ZenLib
 
         private static Dictionary<(object, object, int), Zen<T>> hashConsTable = new Dictionary<(object, object, int), Zen<T>>();
 
+        internal override Zen<T> Unroll()
+        {
+            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
+        }
+
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, Op op)
         {
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);

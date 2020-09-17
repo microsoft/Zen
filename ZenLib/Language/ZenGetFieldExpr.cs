@@ -12,9 +12,14 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenGetFieldExpr<T1, T2> : Zen<T2>
     {
-        private static Dictionary<(object, object), Zen<T2>> hashConsTable = new Dictionary<(object, object), Zen<T2>>();
+        private static Dictionary<object, Zen<T2>> hashConsTable = new Dictionary<object, Zen<T2>>();
 
-        private static Zen<T2> Simplify(Zen<T1> expr, string fieldName)
+        internal override Zen<T2> Unroll()
+        {
+            return Create(this.Expr.Unroll(), this.FieldName, true);
+        }
+
+        private static Zen<T2> Simplify(Zen<T1> expr, string fieldName, bool unroll)
         {
             // get(with(o, name, f), name) == f
             // get(with(o, name', f), name) == get(o, name)
@@ -22,26 +27,15 @@ namespace ZenLib
             {
                 return (e1.FieldName == fieldName) ?
                         e1.FieldValue :
-                        ZenGetFieldExpr<T1, T2>.Create(e1.Expr, fieldName); // recurse
-            }
-
-            var type = expr.GetType();
-
-            if (type.GetGenericTypeDefinition() == typeof(ZenWithFieldExpr<,>))
-            {
-                var property = type.GetProperty("Expr");
-                return ZenGetFieldExpr<T1, T2>.Create((Zen<T1>)property.GetValue(expr), fieldName);
+                        Create(e1.Expr, fieldName); // recurse
             }
 
             // get(if e1 then e2 else e3, name) = if e1 then get(e2, name) else get(e3, name)
-            if (Settings.SimplifyRecursive)
+            if (unroll && expr is ZenIfExpr<T1> e2)
             {
-                if (expr is ZenIfExpr<T1> e2)
-                {
-                    var trueBranch = ZenGetFieldExpr<T1, T2>.Create(e2.TrueExpr, fieldName);
-                    var falseBranch = ZenGetFieldExpr<T1, T2>.Create(e2.FalseExpr, fieldName);
-                    return ZenIfExpr<T2>.Create(e2.GuardExpr, trueBranch, falseBranch);
-                }
+                var trueBranch = Create(e2.TrueExpr, fieldName);
+                var falseBranch = Create(e2.FalseExpr, fieldName);
+                return ZenIfExpr<T2>.Create(e2.GuardExpr, trueBranch.Unroll(), falseBranch.Unroll());
             }
 
             // get(createobject(p1, ..., pn), namei) == pi
@@ -53,19 +47,19 @@ namespace ZenLib
             return new ZenGetFieldExpr<T1, T2>(expr, fieldName);
         }
 
-        public static Zen<T2> Create(Zen<T1> expr, string fieldName)
+        public static Zen<T2> Create(Zen<T1> expr, string fieldName, bool unroll = false)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), fieldName);
 
-            var key = (expr, fieldName);
+            var key = (expr, fieldName, unroll);
             if (hashConsTable.TryGetValue(key, out var value))
             {
                 return value;
             }
 
-            var ret = Simplify(expr, fieldName);
+            var ret = Simplify(expr, fieldName, unroll);
             hashConsTable[key] = ret;
             return ret;
         }

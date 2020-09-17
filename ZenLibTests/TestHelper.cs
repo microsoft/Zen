@@ -98,14 +98,9 @@ namespace ZenLib.Tests
             return (byte)random.Next(0, 255);
         }
 
-        private static void Start(TestParameter p)
+        private static Zen<T> Simplify<T>(Zen<T> expr, TestParameter p)
         {
-            Settings.SimplifyRecursive = p.Simplify;
-        }
-
-        private static void Stop(TestParameter p)
-        {
-            Settings.SimplifyRecursive = true;
+            return p.Simplify ? expr.Simplify() : expr;
         }
 
         /// <summary>
@@ -123,11 +118,9 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
@@ -137,8 +130,6 @@ namespace ZenLib.Tests
                 Assert.IsTrue(f.Evaluate(result.Value));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value));
-
-                Stop(p);
             }
         }
 
@@ -159,23 +150,18 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
-                Console.WriteLine($"{result.Value}");
+                result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
-
-                Stop(p);
             }
         }
 
@@ -198,22 +184,18 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, i3, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => o, listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
-
-                Stop(p);
             }
         }
 
@@ -238,22 +220,18 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 // prove that it is valid
                 var f = Function(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => o, listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
-
-                Stop(p);
             }
         }
 
@@ -271,19 +249,15 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 // prove that it is not valid
                 var f = Function(function);
-                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
                 Assert.IsTrue(f.Evaluate(result.Value));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value));
-
-                Stop(p);
             }
         }
 
@@ -303,18 +277,14 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 f.Compile();
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
-
-                Stop(p);
             }
         }
 
@@ -326,16 +296,12 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
-                Start(p);
-
                 var f = Function(function);
-                var result = f.Assert(o => o, backend: p.Backend);
+                var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
 
                 Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
                 Assert.AreEqual(f.Evaluate(), result);
-
-                Stop(p);
             }
         }
 
@@ -352,10 +318,8 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 var f = Function(function);
-                var result = f.Find((i1, o) => o, listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
@@ -363,8 +327,6 @@ namespace ZenLib.Tests
                     f.Compile();
                     Assert.IsTrue(f.Evaluate(result.Value));
                 }
-
-                Stop(p);
             }
         }
 
@@ -384,10 +346,8 @@ namespace ZenLib.Tests
             }
             foreach (var p in selectedParams)
             {
-                Start(p);
-
                 var f = Function(function);
-                var result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
@@ -395,8 +355,6 @@ namespace ZenLib.Tests
                     f.Compile();
                     Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
                 }
-
-                Stop(p);
             }
         }
 
@@ -452,6 +410,13 @@ namespace ZenLib.Tests
             var applyRest = ApplyOrderedRules(modifiedInput, deflt, ruleMatch, ruleAction, ruleReturn, rules, i + 1);
 
             return If(And(match, ret.HasValue()), ret.Value(), applyRest);
+        }
+
+        /// <summary>
+        /// An object with no fields.
+        /// </summary>
+        internal class Object0
+        {
         }
 
         /// <summary>

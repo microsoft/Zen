@@ -19,6 +19,11 @@ namespace ZenLib
         {
         }
 
+        internal override Zen<T> Unroll()
+        {
+            return this;
+        }
+
         /// <summary>
         /// Convert the expression to a string.
         /// </summary>

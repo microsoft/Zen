@@ -14,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<(object, object), Zen<bool>> hashConsTable = new Dictionary<(object, object), Zen<bool>>();
 
+        internal override Zen<bool> Unroll()
+        {
+            return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
+        }
+
         private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
         {
             if (e1 is ZenConstantBoolExpr x)
@@ -24,6 +29,11 @@ namespace ZenLib
             if (e2 is ZenConstantBoolExpr y)
             {
                 return (y.Value ? e1 : e2);
+            }
+
+            if (ReferenceEquals(e1, e2))
+            {
+                return e1;
             }
 
             return new ZenAndExpr(e1, e2);

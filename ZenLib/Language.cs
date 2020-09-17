@@ -17,24 +17,54 @@ namespace ZenLib
     /// </summary>
     public static class Language
     {
+        /// <summary>
+        /// Get field method for reflection.
+        /// </summary>
         private static MethodInfo getFieldMethod = typeof(Language).GetMethod("GetField");
 
+        /// <summary>
+        /// Equality method for reflection.
+        /// </summary>
         private static MethodInfo eqMethod = typeof(Language).GetMethod("Eq");
 
+        /// <summary>
+        /// Boolean equality method for reflection.
+        /// </summary>
         private static MethodInfo eqBoolMethod = typeof(Language).GetMethod("Eq").MakeGenericMethod(typeof(bool));
 
+        /// <summary>
+        /// List equality method for reflection.
+        /// </summary>
         private static MethodInfo eqListsMethod = typeof(Language).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
+        /// <summary>
+        /// Option has value method for reflection.
+        /// </summary>
         private static MethodInfo hasValueMethod = typeof(Language).GetMethod("HasValue");
 
+        /// <summary>
+        /// Option value method for reflection.
+        /// </summary>
         private static MethodInfo valueMethod = typeof(Language).GetMethod("Value");
 
+        /// <summary>
+        /// Tuple item one method for reflection.
+        /// </summary>
         private static MethodInfo tupItem1Method = typeof(Language).GetMethod("TupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
 
+        /// <summary>
+        /// Tuple item two method for reflection.
+        /// </summary>
         private static MethodInfo tupItem2Method = typeof(Language).GetMethod("TupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
 
+        /// <summary>
+        /// Value tuple item one method for reflection.
+        /// </summary>
         private static MethodInfo valueTupItem1Method = typeof(Language).GetMethod("ValueTupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
 
+        /// <summary>
+        /// Value tuple item two method for reflection.
+        /// </summary>
         private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
@@ -381,7 +411,18 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            return exprs.Aggregate(And);
+            if (exprs.Length == 0)
+            {
+                return True();
+            }
+
+            var result = True();
+            for (int i = exprs.Length - 1; i >= 0; i--)
+            {
+                result = And(exprs[i], result);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -393,7 +434,18 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            return exprs.Aggregate(Or);
+            if (exprs.Length == 0)
+            {
+                return False();
+            }
+
+            var result = False();
+            for (int i = exprs.Length - 1; i >= 0; i--)
+            {
+                result = Or(exprs[i], result);
+            }
+
+            return result;
         }
 
         /// <summary>

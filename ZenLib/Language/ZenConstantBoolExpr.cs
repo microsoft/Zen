@@ -16,6 +16,11 @@ namespace ZenLib
 
         public static ZenConstantBoolExpr True = new ZenConstantBoolExpr(true);
 
+        internal override Zen<bool> Unroll()
+        {
+            return this;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ZenConstantBoolExpr"/> class.
         /// </summary>

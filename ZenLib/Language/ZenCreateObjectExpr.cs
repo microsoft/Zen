@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Text;
 
     /// <summary>
@@ -16,6 +17,12 @@ namespace ZenLib
     {
         private static Dictionary<(string, object)[], Zen<TObject>> hashConsTable =
             new Dictionary<(string, object)[], Zen<TObject>>(new ArrayComparer());
+
+        internal override Zen<TObject> Unroll()
+        {
+            var fields = this.Fields.Select(kv => (kv.Key, ((dynamic)kv.Value).Unroll()));
+            return new ZenCreateObjectExpr<TObject>(fields.ToArray());
+        }
 
         public static Zen<TObject> Create(params (string, object)[] fields)
         {

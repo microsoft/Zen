@@ -24,6 +24,11 @@ namespace ZenLib
             (x, y) => x == y ? 1L : 0L,
         };
 
+        internal override Zen<bool> Unroll()
+        {
+            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.ComparisonType);
+        }
+
         private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2, ComparisonType comparisonType)
         {
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);

@@ -41,6 +41,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(ReferenceEquals(~Int(10), ~Int(10)));
             Assert.IsTrue(ReferenceEquals(Int(10) - Int(10), Int(10) - Int(10)));
             Assert.IsTrue(ReferenceEquals(Int(10) * Int(10), Int(10) * Int(10)));
+            Assert.IsTrue(ReferenceEquals(Some<int>(1), Some<int>(1)));
         }
 
         /// <summary>
@@ -53,6 +54,27 @@ namespace ZenLib.Tests
             Assert.AreEqual(And(true, false), false);
             Assert.AreEqual(And(false, true), false);
             Assert.AreEqual(And(false, false), false);
+        }
+
+        /// <summary>
+        /// Simplify And, Or idempotent.
+        /// </summary>
+        [TestMethod]
+        public void TestAndOrIdempotent()
+        {
+            var x = Arbitrary<bool>();
+            Assert.AreEqual(And(x, x), x);
+            Assert.AreEqual(Or(x, x), x);
+        }
+
+        /// <summary>
+        /// Simplify And, Or with empty arguments.
+        /// </summary>
+        [TestMethod]
+        public void TestAndOrEmpty()
+        {
+            Assert.AreEqual(And(new Zen<bool>[] { }), True());
+            Assert.AreEqual(Or(new Zen<bool>[] { }), False());
         }
 
         /// <summary>
@@ -419,6 +441,18 @@ namespace ZenLib.Tests
             Assert.AreEqual(If(x == 0, false, b), And(Not(x == 0), b));
             Assert.AreEqual(If(x == 0, b, true), Or(Not(x == 0), b));
             Assert.AreEqual(If(x == 0, b, false), And(x == 0, b));
+        }
+
+        /// <summary>
+        /// Simplify get field.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectGetSimplification()
+        {
+            var x = Create<Object2>(("Field1", Int(1)), ("Field2", Int(2)));
+            var y = x.WithField("Field1", Int(3));
+            Assert.AreEqual(y.GetField<Object2, int>("Field1"), Int(3));
+            Assert.AreEqual(y.GetField<Object2, int>("Field2"), x.GetField<Object2, int>("Field2"));
         }
 
         /// <summary>

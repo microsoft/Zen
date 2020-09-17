@@ -75,6 +75,7 @@ namespace ZenLib.Tests.Network
     /// <summary>
     /// IP header extension methods.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     static class IpHeaderExtensions
     {
         public static Zen<Ip> GetDstIp(this Zen<IpHeader> hdr)

@@ -44,6 +44,8 @@ namespace ZenLib.Tests
         [DataRow(typeof(IDictionary<int, bool>))]
         [DataRow(typeof(IDictionary<byte, short>))]
         [DataRow(typeof(Option<int>))]
+        [DataRow(typeof(Option<int>))]
+        [DataRow(typeof(Option<int>))]
         [DataRow(typeof(IList<Option<ulong>>))]
         [DataRow(typeof(Tuple<bool, ushort>))]
         [DataRow(typeof((int, int)))]

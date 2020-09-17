@@ -14,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<short, Zen<short>> hashConsTable = new Dictionary<short, Zen<short>>();
 
+        internal override Zen<short> Unroll()
+        {
+            return this;
+        }
+
         public static Zen<short> Create(short value)
         {
             if (hashConsTable.TryGetValue(value, out var v))

@@ -70,6 +70,7 @@ namespace ZenLib.Tests.Network
     /// <summary>
     /// Ip extension methods.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     static class IpExtensions
     {
         public static Zen<uint> GetValue(this Zen<Ip> ip)

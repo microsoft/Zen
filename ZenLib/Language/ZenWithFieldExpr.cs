@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -15,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>> hashConsTable =
             new Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>>();
+
+        internal override Zen<T1> Unroll()
+        {
+            return new ZenWithFieldExpr<T1, T2>(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
+        }
 
         public static ZenWithFieldExpr<T1, T2> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {

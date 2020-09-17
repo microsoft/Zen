@@ -22,6 +22,11 @@ namespace ZenLib
             (s1, s2) => s1.Contains(s2),
         };
 
+        internal override Zen<bool> Unroll()
+        {
+            return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ContainmentType);
+        }
+
         public static Zen<bool> Simplify(Zen<string> e1, Zen<string> e2, ContainmentType containmentType)
         {
             string x = ReflectionUtilities.GetConstantString(e1);

@@ -9,11 +9,16 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a True expression.
+    /// Class representing a list case expression.
     /// </summary>
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
-        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase)
+        internal override Zen<TResult> Unroll()
+        {
+            return Create(this.ListExpr.Unroll(), this.EmptyCase.Unroll(), this.ConsCase, true);
+        }
+
+        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase, bool unroll)
         {
             if (e is ZenListEmptyExpr<T> l1)
             {
@@ -25,14 +30,11 @@ namespace ZenLib
                 return consCase(l2.Element, l2.Expr);
             }
 
-            if (Settings.SimplifyRecursive)
+            if (unroll && e is ZenIfExpr<IList<T>> l3)
             {
-                if (e is ZenIfExpr<IList<T>> l3)
-                {
-                    var tbranch = ZenListCaseExpr<T, TResult>.Create(l3.TrueExpr, emptyCase, consCase);
-                    var fbranch = ZenListCaseExpr<T, TResult>.Create(l3.FalseExpr, emptyCase, consCase);
-                    return ZenIfExpr<TResult>.Create(l3.GuardExpr, tbranch, fbranch);
-                }
+                var tbranch = Create(l3.TrueExpr, emptyCase, consCase);
+                var fbranch = Create(l3.FalseExpr, emptyCase, consCase);
+                return ZenIfExpr<TResult>.Create(l3.GuardExpr, tbranch.Unroll(), fbranch.Unroll());
             }
 
             return new ZenListCaseExpr<T, TResult>(e, emptyCase, consCase);
@@ -41,13 +43,14 @@ namespace ZenLib
         public static Zen<TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
+            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons,
+            bool unroll = false)
         {
             CommonUtilities.ValidateNotNull(listExpr);
             CommonUtilities.ValidateNotNull(empty);
             CommonUtilities.ValidateNotNull(cons);
 
-            return Simplify(listExpr, empty, cons);
+            return Simplify(listExpr, empty, cons, unroll);
         }
 
         /// <summary>

@@ -11,10 +11,25 @@ namespace ZenLib
     public abstract class Zen<T>
     {
         /// <summary>
+        /// Simplify an expression by unrolling.
+        /// </summary>
+        /// <returns></returns>
+        internal abstract Zen<T> Unroll();
+
+        /// <summary>
         /// Accept a visitor for the ZenExpr object.
         /// </summary>
         /// <returns>A value of the return type.</returns>
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
+
+        /// <summary>
+        /// Simplify an expression recursively.
+        /// </summary>
+        /// <returns></returns>
+        public Zen<T> Simplify()
+        {
+            return CommonUtilities.RunWithLargeStack(() => this.Unroll());
+        }
 
         /// <summary>
         /// Convert a bool to the appropriate Zen type.
