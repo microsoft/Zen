@@ -21,13 +21,7 @@ namespace ZenLib.SymbolicExecution
 
         public NestedEnumerable<PathConstraint> VisitZenAndExpr(ZenAndExpr expression, PathConstraint parameter)
         {
-            // e1 && e2 is treated as (if !e1 then false else if !e2 then false else true)
-            return Fork2(ZenNotExpr.Create(expression.Expr1),
-                         ZenNotExpr.Create(expression.Expr2),
-                         ZenConstantBoolExpr.False,
-                         ZenConstantBoolExpr.False,
-                         ZenConstantBoolExpr.True,
-                         parameter);
+            return Compose2(expression.Expr1, expression.Expr2, parameter);
         }
 
         public NestedEnumerable<PathConstraint> VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, PathConstraint parameter)
@@ -163,13 +157,7 @@ namespace ZenLib.SymbolicExecution
 
         public NestedEnumerable<PathConstraint> VisitZenOrExpr(ZenOrExpr expression, PathConstraint parameter)
         {
-            // e1 || e2 is treated as (if e1 then true else if e2 then true else false)
-            return Fork2(expression.Expr1,
-                         expression.Expr2,
-                         ZenConstantBoolExpr.True,
-                         ZenConstantBoolExpr.True,
-                         ZenConstantBoolExpr.False,
-                         parameter);
+            return Compose2(expression.Expr1, expression.Expr2, parameter);
         }
 
         public NestedEnumerable<PathConstraint> VisitZenStringAtExpr(ZenStringAtExpr expression, PathConstraint parameter)
@@ -263,31 +251,6 @@ namespace ZenLib.SymbolicExecution
 
             result.AddNested(Compose2(enumerable, trueExpr, trueEnv));
             result.AddNested(Compose2(enumerable, falseExpr, falseEnv));
-            return result;
-        }
-
-        private NestedEnumerable<PathConstraint> Fork2<T>(
-            Zen<bool> guardExpr1,
-            Zen<bool> guardExpr2,
-            Zen<T> caseExpr1,
-            Zen<T> caseExpr2,
-            Zen<T> caseExpr3,
-            PathConstraint parameter)
-        {
-            var result = new NestedEnumerable<PathConstraint>();
-
-            var case1Env = parameter.AddPathConstraint(guardExpr1);
-            var not1Env = parameter.AddPathConstraint(ZenNotExpr.Create(guardExpr1));
-            var case2Env = not1Env.AddPathConstraint(guardExpr2);
-            var case3Env = not1Env.AddPathConstraint(ZenNotExpr.Create(guardExpr2));
-
-            var enumerable = guardExpr1.Accept(this, parameter);
-
-            result.AddNested(Compose2(enumerable, caseExpr1, case1Env));
-            enumerable = Compose2(enumerable, guardExpr2, not1Env);
-            result.AddNested(Compose2(enumerable, caseExpr2, case2Env));
-            result.AddNested(Compose2(enumerable, caseExpr3, case3Env));
-
             return result;
         }
     }

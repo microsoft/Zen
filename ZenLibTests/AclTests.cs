@@ -4,8 +4,6 @@
 
 namespace ZenLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -30,32 +28,6 @@ namespace ZenLib.Tests
             var aclLine2 = new AclLine { DstIp = p3, SrcIp = p4, Permitted = false };
             var lines = new AclLine[2] { aclLine1, aclLine2 };
             return new Acl { Lines = lines };
-        }
-
-        private Acl ExampleAcl2()
-        {
-            var random = new Random(7);
-            var lines = new List<AclLine>();
-
-            for (int i = 0; i < 10; i++)
-            {
-                var dlow = (uint)random.Next();
-                var dhigh = (uint)random.Next((int)dlow, int.MaxValue);
-                var slow = (uint)random.Next();
-                var shigh = (uint)random.Next((int)slow, int.MaxValue);
-                var perm = random.Next() % 2 == 0;
-
-                var line = new AclLine
-                {
-                    DstIp = Prefix.Random(24, 32),
-                    SrcIp = Prefix.Random(24, 32),
-                    Permitted = perm,
-                };
-
-                lines.Add(line);
-            }
-
-            return new Acl { Lines = lines.ToArray() };
         }
 
         /// <summary>
