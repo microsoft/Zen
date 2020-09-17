@@ -61,5 +61,15 @@ namespace ZenLib.Tests
             var result = ReflectionUtilities.ApplyTypeVisitor(generator, type);
             Assert.IsTrue(type.IsAssignableFrom(result.GetType()));
         }
+
+        /// <summary>
+        /// Test that random generation returns the right type.
+        /// </summary>
+        [TestMethod]
+        public void TestRandomGenerationHelper()
+        {
+            var o2 = RandomGenerator.Generate<TestHelper.Object2>();
+            Assert.IsTrue(o2 is TestHelper.Object2);
+        }
     }
 }

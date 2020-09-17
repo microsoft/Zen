@@ -387,7 +387,7 @@ namespace ZenLib
         /// <param name="type">The type.</param>
         /// <typeparam name="T">The return type.</typeparam>
         /// <returns>A value.</returns>
-        public static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
+        internal static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
         {
             if (type == BoolType)
             {

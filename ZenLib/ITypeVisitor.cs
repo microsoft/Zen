@@ -11,7 +11,7 @@ namespace ZenLib
     /// Visitor class for building objects from a type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITypeVisitor<T>
+    internal interface ITypeVisitor<T>
     {
         /// <summary>
         /// Visit the boolean type.

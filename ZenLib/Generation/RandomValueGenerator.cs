@@ -10,9 +10,27 @@ namespace ZenLib.Generation
     using System.Reflection;
 
     /// <summary>
+    /// Class to generate random values of a given type.
+    /// </summary>
+    public static class RandomGenerator
+    {
+        /// <summary>
+        /// Generates a new random value of a given type.
+        /// </summary>
+        /// <param name="magicConstants">Magic constants to use.</param>
+        /// <param name="sizeBound">The bound on the size of objects.</param>
+        /// <returns>A random value of a given type.</returns>
+        public static T Generate<T>(Dictionary<Type, ISet<object>> magicConstants = null, int sizeBound = 20)
+        {
+            var generator = new RandomValueGenerator(magicConstants, sizeBound);
+            return (T)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T));
+        }
+    }
+
+    /// <summary>
     /// Class to help generate a random value for a type.
     /// </summary>
-    internal class RandomValueGenerator : ITypeVisitor<object>
+    internal sealed class RandomValueGenerator : ITypeVisitor<object>
     {
         /// <summary>
         /// None method for options.
@@ -37,7 +55,7 @@ namespace ZenLib.Generation
         /// <summary>
         /// Collection of magic constants to draw from.
         /// </summary>
-        private Dictionary<Type, ISet<object>> magicConstants;
+        internal Dictionary<Type, ISet<object>> magicConstants;
 
         /// <summary>
         /// Creates a new instance of a random value generator.
