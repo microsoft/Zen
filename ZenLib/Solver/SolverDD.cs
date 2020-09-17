@@ -447,6 +447,26 @@ namespace ZenLib.Solver
 
         public DD Ite(DD g, DD t, DD f)
         {
+            if (t.Equals(this.Manager.True()))
+            {
+                return this.Or(g, f);
+            }
+
+            if (t.Equals(this.Manager.False()))
+            {
+                return this.And(this.Not(g), f);
+            }
+
+            if (f.Equals(this.Manager.False()))
+            {
+                return this.And(g, t);
+            }
+
+            if (f.Equals(this.Manager.True()))
+            {
+                this.Or(this.Not(g), f);
+            }
+
             return this.Manager.Ite(g, t, f);
         }
 

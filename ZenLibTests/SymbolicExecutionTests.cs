@@ -41,10 +41,10 @@ namespace ZenLib.Tests
             var f2 = Function<int, int, bool>((x, y) => Or(x == 1, y == 2));
             var f3 = Function<int, int, bool>((x, y) => Not(Or(x == 1, y == 2)));
             var f4 = Function<int, bool>(x => Or(x == 1, x == 2, x == 3));
-            Assert.AreEqual(3, f1.GenerateInputs().Count());
-            Assert.AreEqual(3, f2.GenerateInputs().Count());
-            Assert.AreEqual(3, f3.GenerateInputs().Count());
-            Assert.AreEqual(4, f4.GenerateInputs().Count());
+            Assert.AreEqual(1, f1.GenerateInputs().Count());
+            Assert.AreEqual(1, f2.GenerateInputs().Count());
+            Assert.AreEqual(1, f3.GenerateInputs().Count());
+            Assert.AreEqual(1, f4.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringOperations()
         {
-            var f = Function<string, string, string, string, bool>((w, x, y, z) => Or(w.EndsWith(x), w.StartsWith(y), w.Contains(z)));
-            Assert.AreEqual(4, f.GenerateInputs().Count());
+            var f = Function<string, string, string, string, bool>((w, x, y, z) => If(w.EndsWith(x), True(), If(w.StartsWith(y), True(), w.Contains(z))));
+            Assert.AreEqual(3, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             var f = Function<IList<int>, bool>(x => x.Contains(3));
-            Assert.AreEqual(20, f.GenerateInputs().Count());
+            Assert.AreEqual(21, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace ZenLib.Tests
             var acl = new Acl { Lines = lines };
 
             var f = Function<IpHeader, bool>(h => acl.Process(h, 0));
-            Assert.AreEqual(5, f.GenerateInputs().Count());
+            Assert.AreEqual(3, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -274,6 +274,39 @@ namespace ZenLib.Tests
             }
 
             Assert.AreEqual(6, count);
+        }
+
+        /// <summary>
+        /// Test symbolic execution for ACLs.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionAcl()
+        {
+            var random = new Random(7);
+            var lines = new List<AclLine>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var dlow = (uint)random.Next();
+                var dhigh = (uint)random.Next((int)dlow, int.MaxValue);
+                var slow = (uint)random.Next();
+                var shigh = (uint)random.Next((int)slow, int.MaxValue);
+                var perm = random.Next() % 2 == 0;
+
+                var line = new AclLine
+                {
+                    DstIp = Prefix.Random(24, 32),
+                    SrcIp = Prefix.Random(24, 32),
+                    Permitted = perm,
+                };
+
+                lines.Add(line);
+            }
+
+            var acl =  new Acl { Lines = lines.ToArray() };
+
+            var function = Function<IpHeader, bool>(p => acl.Process(p, 0));
+            Assert.AreEqual(20, function.GenerateInputs().Count());
         }
     }
 }

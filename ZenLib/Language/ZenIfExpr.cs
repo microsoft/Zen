@@ -35,7 +35,7 @@ namespace ZenLib
                 return t;
             }
 
-            if (typeof(T) == ReflectionUtilities.BoolType)
+            /* if (typeof(T) == ReflectionUtilities.BoolType)
             {
                 // if e1 then true else e2 = Or(e1, e2)
                 // if e1 then false else e2 = And(Not(e1), e2)
@@ -54,7 +54,7 @@ namespace ZenLib
                         ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :
                         ZenAndExpr.Create((dynamic)g, (dynamic)t);
                 }
-            }
+            } */
 
             return new ZenIfExpr<T>(g, t, f);
         }
