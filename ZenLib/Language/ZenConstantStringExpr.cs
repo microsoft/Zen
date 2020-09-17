@@ -14,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<string, Zen<string>> hashConsTable = new Dictionary<string, Zen<string>>();
 
+        internal override Zen<string> Unroll()
+        {
+            return this;
+        }
+
         public static Zen<string> Create(string value)
         {
             CommonUtilities.ValidateNotNull(value);

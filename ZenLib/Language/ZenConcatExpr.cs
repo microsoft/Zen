@@ -15,6 +15,11 @@ namespace ZenLib
     {
         private static Dictionary<(object, object), Zen<string>> hashConsTable = new Dictionary<(object, object), Zen<string>>();
 
+        internal override Zen<string> Unroll()
+        {
+            return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
+        }
+
         public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
@@ -22,7 +27,6 @@ namespace ZenLib
 
             if (x != null && y != null)
             {
-                Console.WriteLine($"got: {x + y}");
                 return ReflectionUtilities.CreateConstantString(x + y);
             }
 

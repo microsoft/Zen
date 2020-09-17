@@ -16,7 +16,12 @@ namespace ZenLib
     {
         private static Dictionary<object, Zen<TTo>> hashConsTable = new Dictionary<object, Zen<TTo>>();
 
-        private static Zen<TTo> Simplify(Zen<TFrom> e, ImmutableList<Func<object, object>> converters)
+        internal override Zen<TTo> Unroll()
+        {
+            return CreateMulti(this.Expr.Unroll(), this.Converters, true);
+        }
+
+        private static Zen<TTo> Simplify(Zen<TFrom> e, ImmutableList<Func<object, object>> converters, bool unroll)
         {
             // adapt(t1, t2, adapt(t2, t1, e)) == e
             if (e is ZenAdapterExpr<TFrom, TTo> inner1)
@@ -42,14 +47,12 @@ namespace ZenLib
                     return (Zen<T1>)method.Invoke(null, new object[] { param1, param2 });
                 }
             } */
-            if (Settings.SimplifyRecursive)
+
+            if (unroll && e is ZenIfExpr<TFrom> inner2)
             {
-                if (e is ZenIfExpr<TFrom> inner2)
-                {
-                    var trueBranch = ZenAdapterExpr<TTo, TFrom>.CreateMulti(inner2.TrueExpr, converters);
-                    var falseBranch = ZenAdapterExpr<TTo, TFrom>.CreateMulti(inner2.FalseExpr, converters);
-                    return ZenIfExpr<TTo>.Create(inner2.GuardExpr, trueBranch, falseBranch);
-                }
+                var trueBranch = CreateMulti(inner2.TrueExpr, converters);
+                var falseBranch = CreateMulti(inner2.FalseExpr, converters);
+                return ZenIfExpr<TTo>.Create(inner2.GuardExpr, trueBranch.Unroll(), falseBranch.Unroll());
             }
 
             return new ZenAdapterExpr<TTo, TFrom>(e, converters);
@@ -61,18 +64,29 @@ namespace ZenLib
             return CreateMulti(expr, converters);
         }
 
-        public static Zen<TTo> CreateMulti(Zen<TFrom> expr, ImmutableList<Func<object, object>> converters)
+        public static Zen<TTo> CreateMulti(Zen<TFrom> expr, ImmutableList<Func<object, object>> converters, bool unroll = false)
         {
             CommonUtilities.ValidateNotNull(expr);
-            var key = (expr, converters);
+            var key = (expr, ConvertersHashCode(converters), unroll);
             if (hashConsTable.TryGetValue(key, out var value))
             {
                 return value;
             }
 
-            var ret = Simplify(expr, converters);
+            var ret = Simplify(expr, converters, unroll);
             hashConsTable[key] = ret;
             return ret;
+        }
+
+        private static int ConvertersHashCode(ImmutableList<Func<object, object>> converters)
+        {
+            int hash = 7;
+            foreach (var converter in converters)
+            {
+                hash = 31 * hash + converter.GetHashCode();
+            }
+
+            return hash;
         }
 
         /// <summary>

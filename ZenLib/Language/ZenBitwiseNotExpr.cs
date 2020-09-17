@@ -14,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<object, Zen<T>> hashConsTable = new Dictionary<object, Zen<T>>();
 
+        internal override Zen<T> Unroll()
+        {
+            return Create(this.Expr.Unroll());
+        }
+
         private static Zen<T> Simplify(Zen<T> e)
         {
             var x = ReflectionUtilities.GetConstantIntegerValue(e);

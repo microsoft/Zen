@@ -5,9 +5,11 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using ZenLib.Compilation;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
+    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// Zen function representation.
@@ -163,6 +165,25 @@ namespace ZenLib
             var result = invariant(input, this.function(input));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input, backend));
         }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="input">Default input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<T1> GenerateInputs(
+            Zen<T1> input = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input = (input is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input;
+            var result = this.function(input).Simplify();
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input, result, backend));
+        }
     }
 
     /// <summary>
@@ -246,6 +267,28 @@ namespace ZenLib
             input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
             var result = invariant(input1, input2, this.function(input1, input2));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, backend));
+        }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="input1">Default first input that captures structural constraints.</param>
+        /// <param name="input2">Default second input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2)> GenerateInputs(
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
+            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
+            var result = this.function(input1, input2).Simplify();
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, result, backend));
         }
     }
 
@@ -335,6 +378,31 @@ namespace ZenLib
             input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
             var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, backend));
+        }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="input1">Default first input that captures structural constraints.</param>
+        /// <param name="input2">Default second input that captures structural constraints.</param>
+        /// <param name="input3">Default third input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2, T3)> GenerateInputs(
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
+            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
+            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
+            var result = this.function(input1, input2, input3).Simplify();
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, result, backend));
         }
     }
 
@@ -429,6 +497,34 @@ namespace ZenLib
             input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
             var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend));
+        }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="input1">Default first input that captures structural constraints.</param>
+        /// <param name="input2">Default second input that captures structural constraints.</param>
+        /// <param name="input3">Default third input that captures structural constraints.</param>
+        /// <param name="input4">Default fourth input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2, T3, T4)> GenerateInputs(
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            Zen<T4> input4 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
+            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
+            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
+            input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
+            var result = this.function(input1, input2, input3, input4).Simplify();
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, input4, result, backend));
         }
     }
 }

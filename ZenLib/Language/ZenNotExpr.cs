@@ -15,6 +15,11 @@ namespace ZenLib
     {
         private static Dictionary<object, Zen<bool>> hashConsTable = new Dictionary<object, Zen<bool>>();
 
+        internal override Zen<bool> Unroll()
+        {
+            return Create(this.Expr.Unroll());
+        }
+
         private static Zen<bool> Simplify(Zen<bool> e)
         {
             if (e is ZenConstantBoolExpr x)

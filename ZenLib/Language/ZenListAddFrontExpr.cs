@@ -15,6 +15,11 @@ namespace ZenLib
         private static Dictionary<(object, object), ZenListAddFrontExpr<T>> hashConsTable =
             new Dictionary<(object, object), ZenListAddFrontExpr<T>>();
 
+        internal override Zen<IList<T>> Unroll()
+        {
+            return new ZenListAddFrontExpr<T>(this.Expr.Unroll(), this.Element.Unroll());
+        }
+
         public static ZenListAddFrontExpr<T> Create(Zen<IList<T>> expr, Zen<T> element)
         {
             CommonUtilities.ValidateNotNull(expr);

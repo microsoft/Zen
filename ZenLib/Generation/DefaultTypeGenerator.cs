@@ -65,7 +65,7 @@ namespace ZenLib.Generation
             return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
         }
 
-        public object VisitOption(Func<Type, object> recurse, Type innerType)
+        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
         {
             var method = nullMethod.MakeGenericMethod(innerType);
             return method.Invoke(null, new object[] { });
@@ -76,12 +76,12 @@ namespace ZenLib.Generation
             return ZenConstantShortExpr.Create(0);
         }
 
-        public object VisitTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
+        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
         {
             return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
         }
 
-        public object VisitValueTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
+        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
         {
             return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
         }

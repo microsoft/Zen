@@ -297,7 +297,18 @@ namespace ZenLib
         /// <returns>An instance of the object.</returns>
         public static T CreateInstance<T>(string[] fieldNames, object[] values)
         {
-            var type = typeof(T);
+            return (T)CreateInstance(typeof(T), fieldNames, values);
+        }
+
+        /// <summary>
+        /// Create an instance of an object using reflection.
+        /// </summary>
+        /// <param name="type">The type of the object to create.</param>
+        /// <param name="fieldNames">The field names.</param>
+        /// <param name="values">The field values.</param>
+        /// <returns>An instance of the object.</returns>
+        public static object CreateInstance(Type type, string[] fieldNames, object[] values)
+        {
             var obj = Activator.CreateInstance(type);
             for (int i = 0; i < fieldNames.Length; i++)
             {
@@ -306,7 +317,7 @@ namespace ZenLib
                 SetFieldOrProperty(obj, fieldName, value);
             }
 
-            return (T)obj;
+            return obj;
         }
 
         /// <summary>
@@ -376,7 +387,7 @@ namespace ZenLib
         /// <param name="type">The type.</param>
         /// <typeparam name="T">The return type.</typeparam>
         /// <returns>A value.</returns>
-        public static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
+        internal static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
         {
             if (type == BoolType)
             {
@@ -426,21 +437,21 @@ namespace ZenLib
             if (IsOptionType(type))
             {
                 var t = type.GetGenericArguments()[0];
-                return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), t);
+                return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), type, t);
             }
 
             if (IsTupleType(type))
             {
                 var tleft = type.GetGenericArguments()[0];
                 var tright = type.GetGenericArguments()[1];
-                return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
+                return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
             }
 
             if (IsValueTupleType(type))
             {
                 var tleft = type.GetGenericArguments()[0];
                 var tright = type.GetGenericArguments()[1];
-                return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), tleft, tright);
+                return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
             }
 
             if (IsIListType(type))

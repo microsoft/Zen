@@ -14,6 +14,11 @@ namespace ZenLib
     {
         private static Dictionary<byte, Zen<byte>> hashConsTable = new Dictionary<byte, Zen<byte>>();
 
+        internal override Zen<byte> Unroll()
+        {
+            return this;
+        }
+
         public static Zen<byte> Create(byte value)
         {
             if (hashConsTable.TryGetValue(value, out var v))
