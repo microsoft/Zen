@@ -9,6 +9,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib.SymbolicExecution;
     using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
@@ -238,6 +239,41 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionEmptyObject()
         {
             Assert.AreEqual(0, Function<Object0, Object0>(o => o).GenerateInputs().Count());
+        }
+
+        /// <summary>
+        /// Test the nested enumerator implementation.
+        /// </summary>
+        [TestMethod]
+        public void TestNestedEnumerator()
+        {
+            var ne1 = new NestedEnumerable<int>();
+            ne1.Add(new List<int>() { 1, 2, 3 });
+
+            var ne2 = new NestedEnumerable<int>();
+            ne2.Add(new List<int>() { 4, 5, 6 });
+
+            ne1.AddNested(ne2);
+
+            Assert.IsTrue(ne1.Contains(1));
+            Assert.IsTrue(ne1.Contains(2));
+            Assert.IsTrue(ne1.Contains(3));
+            Assert.IsTrue(ne1.Contains(4));
+            Assert.IsTrue(ne1.Contains(5));
+            Assert.IsTrue(ne1.Contains(6));
+
+            var e = ne1.GetEnumerator();
+            e.MoveNext();
+            e.MoveNext();
+            e.Reset();
+
+            int count = 0;
+            while (e.MoveNext())
+            {
+                count++;
+            }
+
+            Assert.AreEqual(6, count);
         }
     }
 }
