@@ -195,7 +195,7 @@ The test generation approach uses [symbolic execution](https://en.wikipedia.org/
 
 ### Supported data types
 
-Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong, string`. It also supports values of type `Tuple<T1, T2>`, `(T1, T2)`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor.
+Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong, string`. There is a library-defined type `FiniteString` for reasoning about strings with bounded size. It also supports values with type `Tuple<T1, T2>`, `(T1, T2)`, `Option<T>`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. Zen has some limited support for `class` and `struct` types; it will attempt to model all public fields and properties. The class/struct must also have a default constructor.
 
 ### Supported solver backends
 
