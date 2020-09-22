@@ -1563,11 +1563,8 @@ namespace ZenLib
                 empty: Tuple(EmptyList<T>(), EmptyList<T>()),
                 cons: (hd, tl) =>
                 {
-                    // splitat([x,y,z], 1)
-                    // ([x,y], [z])
-                    //
                     var tup = tl.SplitAt(index, i + 1);
-                    return If(i <= index,
+                    return If((ushort)i <= index,
                               Tuple(tup.Item1().AddFront(hd), tup.Item2()),
                               Tuple(tup.Item1(), tup.Item2().AddFront(hd)));
                 });

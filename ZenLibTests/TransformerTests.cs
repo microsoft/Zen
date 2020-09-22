@@ -135,13 +135,13 @@ namespace ZenLib.Tests
         public void TestTransformerArgTypes()
         {
             Assert.IsTrue(Function<bool, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<byte, byte>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<short, short>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<ushort, ushort>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<int, int>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<uint, uint>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<long, long>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(Function<ulong, ulong>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<byte, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<short, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<ushort, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<int, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<uint, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<long, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(Function<ulong, bool>(b => true).Transformer().InputSet().IsFull());
         }
 
         /// <summary>

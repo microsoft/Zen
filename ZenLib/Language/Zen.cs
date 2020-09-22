@@ -35,81 +35,9 @@ namespace ZenLib
         /// Convert a bool to the appropriate Zen type.
         /// </summary>
         /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(bool x)
+        public static implicit operator Zen<T>(T x)
         {
-            return ConvertIntegerConstant<T>(x ? 1L : 0L);
-        }
-
-        /// <summary>
-        /// Convert a byte to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(byte x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a short to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(short x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a ushort to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(ushort x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a int to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(int x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a uint to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(uint x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a long to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(long x)
-        {
-            return ConvertIntegerConstant<T>(x);
-        }
-
-        /// <summary>
-        /// Convert a ulong to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(ulong x)
-        {
-            return ConvertIntegerConstant<T>((long)x);
-        }
-
-        /// <summary>
-        /// Convert a string to the appropriate Zen type.
-        /// </summary>
-        /// <param name="x">The value.</param>
-        public static implicit operator Zen<T>(string x)
-        {
-            return ConvertStringConstant<T>(x);
+            return (Zen<T>)ReflectionUtilities.CreateZenConstant(x);
         }
 
         /// <summary>
@@ -259,80 +187,6 @@ namespace ZenLib
         public static Zen<T> operator ~(Zen<T> expr)
         {
             return Language.BitwiseNot(expr);
-        }
-
-        /// <summary>
-        /// Convert an input to the correct integer type.
-        /// </summary>
-        /// <param name="o">The object.</param>
-        /// <returns></returns>
-        private static Zen<TZen> ConvertIntegerConstant<TZen>(long o)
-        {
-            var type = typeof(TZen);
-
-            if (type == ReflectionUtilities.BoolType)
-            {
-                return (Zen<TZen>)(object)Language.Bool(o == 0 ? false : true);
-            }
-
-            if (type == ReflectionUtilities.ByteType)
-            {
-                return (Zen<TZen>)(object)Language.Byte((byte)o);
-            }
-
-            if (type == ReflectionUtilities.ShortType)
-            {
-                return (Zen<TZen>)(object)Language.Short((short)o);
-            }
-
-            if (type == ReflectionUtilities.UshortType)
-            {
-                return (Zen<TZen>)(object)Language.UShort((ushort)o);
-            }
-
-            if (type == ReflectionUtilities.IntType)
-            {
-                return (Zen<TZen>)(object)Language.Int((int)o);
-            }
-
-            if (type == ReflectionUtilities.UintType)
-            {
-                return (Zen<TZen>)(object)Language.UInt((uint)o);
-            }
-
-            if (type == ReflectionUtilities.LongType)
-            {
-                return (Zen<TZen>)(object)Language.Long(o);
-            }
-
-            if (type == ReflectionUtilities.UlongType)
-            {
-                return (Zen<TZen>)(object)Language.ULong((ulong)o);
-            }
-
-            throw new ZenException($"Invalid implicit conversion from integer to type: {type}");
-        }
-
-        /// <summary>
-        /// Convert an input to the Zen string type.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <returns></returns>
-        private static Zen<TZen> ConvertStringConstant<TZen>(string s)
-        {
-            var type = typeof(TZen);
-
-            if (type == ReflectionUtilities.StringType)
-            {
-                return (Zen<TZen>)(object)Language.String(s);
-            }
-
-            if (type == ReflectionUtilities.FiniteStringType)
-            {
-                return (Zen<TZen>)(object)FiniteString.Constant(s);
-            }
-
-            throw new ZenException($"Invalid implicit conversion from string to type: {type}");
         }
 
         /// <summary>

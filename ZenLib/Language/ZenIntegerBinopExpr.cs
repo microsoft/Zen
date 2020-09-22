@@ -41,7 +41,7 @@ namespace ZenLib
             if (x.HasValue && y.HasValue)
             {
                 var f = constantFuncs[(int)op];
-                return ReflectionUtilities.CreateConstantValue<T>(f(x.Value, y.Value));
+                return ReflectionUtilities.CreateConstantIntegerValue<T>(f(x.Value, y.Value));
             }
 
             switch (op)
@@ -60,7 +60,7 @@ namespace ZenLib
 
                 case Op.Multiplication:
                     if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
-                        return ReflectionUtilities.CreateConstantValue<T>(0);
+                        return ReflectionUtilities.CreateConstantIntegerValue<T>(0);
                     if (x.HasValue && x.Value == 1)
                         return e2;
                     if (y.HasValue && y.Value == 1)

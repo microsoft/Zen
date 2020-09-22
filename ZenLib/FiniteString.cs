@@ -22,15 +22,22 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         public static implicit operator FiniteString(string s)
         {
-            FiniteString fs = new FiniteString();
+            return new FiniteString(s);
+        }
+
+        /// <summary>
+        /// Create a new finite string from a string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        public FiniteString(string s)
+        {
             var chars = new List<ushort>();
             foreach (var c in s)
             {
                 chars.Add(c);
             }
 
-            fs.Characters = chars;
-            return fs;
+            this.Characters = chars;
         }
 
         /// <summary>
@@ -226,8 +233,8 @@ namespace ZenLib
         private static Zen<Option<ushort>> IndexOf(Zen<IList<ushort>> s, Zen<IList<ushort>> sub, int current)
         {
             return s.Case(
-                empty: If(sub.IsEmpty(), Some<ushort>(current), Null<ushort>()),
-                cons: (hd, tl) => If(StartsWith(s, sub), Some<ushort>(current), IndexOf(tl, sub, current + 1)));
+                empty: If(sub.IsEmpty(), Some<ushort>((ushort)current), Null<ushort>()),
+                cons: (hd, tl) => If(StartsWith(s, sub), Some<ushort>((ushort)current), IndexOf(tl, sub, current + 1)));
         }
 
         /// <summary>

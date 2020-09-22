@@ -25,7 +25,7 @@ namespace ZenLib
 
             if (x.HasValue)
             {
-                return ReflectionUtilities.CreateConstantValue<T>(~x.Value);
+                return ReflectionUtilities.CreateConstantIntegerValue<T>(~x.Value);
             }
 
             if (e is ZenBitwiseNotExpr<T> y)

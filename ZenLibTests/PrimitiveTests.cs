@@ -298,20 +298,20 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerSumConstant()
         {
-            RandomBytes(x => CheckAgreement<byte>(i => i + (byte)4 == (x + 4)));
-            RandomBytes(x => CheckAgreement<byte>(i => (byte)4 + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<short>(i => i + (short)4 == (x + 4)));
-            RandomBytes(x => CheckAgreement<short>(i => (short)4 + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<ushort>(i => i + (ushort)4 == (x + 4)));
-            RandomBytes(x => CheckAgreement<ushort>(i => (ushort)4 + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<int>(i => i + (int)4 == (x + 4)));
-            RandomBytes(x => CheckAgreement<int>(i => (int)4 + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<uint>(i => i + 4U == (x + 4)));
-            RandomBytes(x => CheckAgreement<uint>(i => 4U + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<long>(i => i + 4L == (x + 4)));
-            RandomBytes(x => CheckAgreement<long>(i => 4L + i == (x + 4)));
-            RandomBytes(x => CheckAgreement<ulong>(i => i + 4UL == (x + 4)));
-            RandomBytes(x => CheckAgreement<ulong>(i => 4UL + i == (x + 4)));
+            RandomBytes(x => CheckAgreement<byte>(i => i + Byte(4) == (x + Byte(4))));
+            RandomBytes(x => CheckAgreement<byte>(i => Byte(4) + i == (x + Byte(4))));
+            RandomBytes(x => CheckAgreement<short>(i => i + Short(4) == (x + Short(4))));
+            RandomBytes(x => CheckAgreement<short>(i => Short(4) + i == (x + Short(4))));
+            RandomBytes(x => CheckAgreement<ushort>(i => i + UShort(4) == (x + UShort(4))));
+            RandomBytes(x => CheckAgreement<ushort>(i => UShort(4) + i == (x + UShort(4))));
+            RandomBytes(x => CheckAgreement<int>(i => i + Int(4) == (x + Int(4))));
+            RandomBytes(x => CheckAgreement<int>(i => Int(4) + i == (x + Int(4))));
+            RandomBytes(x => CheckAgreement<uint>(i => i + UInt(4) == (x + UInt(4))));
+            RandomBytes(x => CheckAgreement<uint>(i => UInt(4) + i == (x + UInt(4))));
+            RandomBytes(x => CheckAgreement<long>(i => i + Long(4) == (x + Long(4))));
+            RandomBytes(x => CheckAgreement<long>(i => Long(4) + i == (x + Long(4))));
+            RandomBytes(x => CheckAgreement<ulong>(i => i + ULong(4) == (x + ULong(4))));
+            RandomBytes(x => CheckAgreement<ulong>(i => ULong(4) + i == (x + ULong(4))));
         }
 
         /// <summary>

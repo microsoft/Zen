@@ -205,7 +205,7 @@ namespace ZenLib.Tests
         {
             RandomBytes(x =>
             {
-                var len = x % 4;
+                var len = (ushort)(x % 4);
                 CheckValid<IList<int>>(l =>
                     If(len <= l.Length(), l.Take(len).Length() == len, true));
             });

@@ -53,7 +53,7 @@ namespace ZenLib.Tests
         {
             var fs = FiniteString.Constant(s);
             var f = Function(() => fs);
-            Assert.IsTrue(f.Assert(x => x == s));
+            Assert.IsTrue(f.Assert(x => x == fs));
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEmptyString()
         {
-            CheckValid<FiniteString>(fs => (fs.Length() == 0) == (fs == ""));
-            CheckValid<FiniteString>(fs => (fs == "") == fs.IsEmpty());
+            CheckValid<FiniteString>(fs => (fs.Length() == 0) == (fs == new FiniteString("")));
+            CheckValid<FiniteString>(fs => (fs == new FiniteString("")) == fs.IsEmpty());
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ZenLib.Tests
             var f = Function<FiniteString, ushort>(fs => fs.Length());
             RandomStrings(s =>
             {
-                var ex = f.Find((fs, l) => l == s.Length).Value.ToString();
+                var ex = f.Find((fs, l) => l == (ushort)s.Length).Value.ToString();
                 Assert.AreEqual(s.Length, ex.Length);
             });
         }
@@ -107,7 +107,7 @@ namespace ZenLib.Tests
         [DataRow("hello", "b", false)]
         public void TestContains(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => fs.Contains(sub));
+            var f = Function<FiniteString, bool>(fs => fs.Contains(new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -120,7 +120,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, bool>(fs => fs.Contains(s));
+                var f = Function<FiniteString, bool>(fs => fs.Contains(new FiniteString(s)));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(ex.Contains(s));
             });
@@ -138,7 +138,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestPrefixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.StartsWith(fs, sub));
+            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.StartsWith(fs, new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -167,7 +167,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestSuffixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.EndsWith(fs, sub));
+            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.EndsWith(fs, new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -196,7 +196,7 @@ namespace ZenLib.Tests
         [DataRow("abc", 3, "")]
         public void TestAt(string s, int idx, string expected)
         {
-            var f = Function<FiniteString, FiniteString>(fs => fs.At(idx));
+            var f = Function<FiniteString, FiniteString>(fs => fs.At((ushort)idx));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -228,7 +228,7 @@ namespace ZenLib.Tests
         [DataRow("abcde", "ab", 3, -1)]
         public void TestIndexOf(string s, string sub, int offset, int expected)
         {
-            var f = Function<FiniteString, Option<ushort>>(fs => fs.IndexOf(sub, offset));
+            var f = Function<FiniteString, Option<ushort>>(fs => fs.IndexOf(new FiniteString(sub), (ushort)offset));
             var idx = f.Evaluate(s);
             var actual = idx.HasValue ? (int)idx.Value : -1;
             Assert.AreEqual(expected, actual);
@@ -242,7 +242,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, Option<ushort>>(fs => fs.IndexOf(s));
+                var f = Function<FiniteString, Option<ushort>>(fs => fs.IndexOf(new FiniteString(s)));
                 var ex = f.Find((fs, i) => i.HasValue()).Value.ToString();
                 var idx = f.Evaluate(ex);
                 Assert.IsTrue(ex.Contains(s));
@@ -263,7 +263,7 @@ namespace ZenLib.Tests
         [DataRow("abcdefg", 0, 100, "abcdefg")]
         public void TestSubstring(string s, int offset, int len, string expected)
         {
-            var f = Function<FiniteString, FiniteString>(fs => fs.SubString(offset, len));
+            var f = Function<FiniteString, FiniteString>(fs => fs.SubString((ushort)offset, (ushort)len));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -310,7 +310,7 @@ namespace ZenLib.Tests
         [DataRow("quick", " brown", "quick brown")]
         public void TestConcat(string s1, string s2, string expected)
         {
-            var f = Function<FiniteString, FiniteString>(fs => fs.Concat(s2));
+            var f = Function<FiniteString, FiniteString>(fs => fs.Concat(new FiniteString(s2)));
             var actual = f.Evaluate(s1).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -348,7 +348,7 @@ namespace ZenLib.Tests
         public void TestAtWithinBounds()
         {
             var f = Function<FiniteString, ushort, bool>(
-                (fs, i) => Implies(i < fs.Length(), fs.At(i) != ""));
+                (fs, i) => Implies(i < fs.Length(), fs.At(i) != new FiniteString("")));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);
