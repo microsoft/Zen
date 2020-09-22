@@ -35,6 +35,7 @@ namespace ZenLib.Tests
             CheckAgreement<Tuple<int, int>>(x => x == new Tuple<int, int>(1, 2));
             CheckAgreement<(int, int)>(x => x == (1, 2));
             CheckAgreement<IList<int>>(x => x == new List<int>() { 1, 2, 3 });
+            CheckAgreement<IList<IList<int>>>(x => x == new List<IList<int>>() { new List<int>() { 1 } });
             CheckAgreement<FiniteString>(x => x == new FiniteString("hello"));
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
 
