@@ -32,7 +32,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Convert a bool to the appropriate Zen type.
+        /// Convert a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
         public static implicit operator Zen<T>(T x)

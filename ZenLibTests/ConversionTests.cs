@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>
@@ -44,6 +45,55 @@ namespace ZenLib.Tests
                 Zen<IDictionary<int, int>> y = new Dictionary<int, int>() { { 1, 2 } };
                 return y.ContainsKey(4);
             });
+        }
+
+        /// <summary>
+        /// Test that we can evaluate values correctly..
+        /// </summary>
+        [TestMethod]
+        public void TestEvaluation()
+        {
+            CheckEqual(true);
+            CheckEqual((byte)1);
+            CheckEqual((short)2);
+            CheckEqual((ushort)3);
+            CheckEqual(4);
+            CheckEqual(5U);
+            CheckEqual(6L);
+            CheckEqual(7UL);
+            CheckEqual(Option.None<int>());
+            CheckEqual(Option.Some(8));
+            CheckEqual(new Tuple<int, int>(9, 10));
+            CheckEqual((9, 10));
+            CheckEqual(new FiniteString("hello"));
+            CheckEqualLists(new List<int>() { 1, 2, 3 });
+        }
+
+        /// <summary>
+        /// Check we convert a value correctly.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        private void CheckEqual<T>(T value)
+        {
+            var f = Function<T>(() => value);
+            Assert.AreEqual(value, f.Evaluate());
+        }
+
+        /// <summary>
+        /// Check we convert a list correctly.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        private void CheckEqualLists<T>(IList<T> value)
+        {
+            var f = Function(() => Lift(value));
+            var result = f.Evaluate();
+
+            Assert.AreEqual(value.Count, result.Count);
+
+            for (int i = 0; i < value.Count; i++)
+            {
+                Assert.AreEqual(value[i], result[i]);
+            }
         }
     }
 }

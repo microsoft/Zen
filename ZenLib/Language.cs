@@ -68,6 +68,15 @@ namespace ZenLib
         private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// Lift a C# value to a Zen value.
+        /// </summary>
+        /// <param name="x">The value.</param>
+        public static Zen<T> Lift<T>(T x)
+        {
+            return (Zen<T>)ReflectionUtilities.CreateZenConstant(x);
+        }
+
+        /// <summary>
         /// The Zen value for false.
         /// </summary>
         /// <returns>Zen value.</returns>

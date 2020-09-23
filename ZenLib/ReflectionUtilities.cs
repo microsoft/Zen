@@ -495,7 +495,7 @@ namespace ZenLib
         {
             if (value.HasValue)
             {
-                Language.Some<T>(value.Value);
+                return Language.Some<T>(value.Value);
             }
 
             return Language.Null<T>();

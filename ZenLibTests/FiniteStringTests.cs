@@ -19,6 +19,28 @@ namespace ZenLib.Tests
     public class FiniteStringTests
     {
         /// <summary>
+        /// Test FiniteString equality and hashing.
+        /// </summary>
+        [TestMethod]
+        [DataRow("hello", "hello", true)]
+        [DataRow("hello", "hell", false)]
+        [DataRow("", "", true)]
+        [DataRow("", "x", false)]
+        [DataRow("CaPiTaLs", "capitals", false)]
+        [DataRow("endline\r\n", "endline\r\n", true)]
+        public void TestEqualityAndHashing(string s1, string s2, bool equal)
+        {
+            FiniteString fs1 = s1;
+            FiniteString fs2 = s2;
+            Assert.IsFalse(fs1.Equals(new object()));
+            Assert.IsFalse(fs2.Equals(new object()));
+            Assert.AreEqual(equal, fs1.Equals(fs2));
+            Assert.AreEqual(equal, fs1 == fs2);
+            Assert.AreEqual(!equal, fs1 != fs2);
+            Assert.AreEqual(equal, fs1.GetHashCode() == fs2.GetHashCode());
+        }
+
+        /// <summary>
         /// Test FiniteString to string conversions.
         /// </summary>
         [TestMethod]
