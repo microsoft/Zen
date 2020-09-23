@@ -229,7 +229,7 @@ namespace ZenLib
                 empty: true,
                 cons: (hd1, tl1) => s.Case(
                     empty: false,
-                    cons: (hd2, tl2) => And(hd1 == hd2, StartsWith(tl2, tl1))));
+                    cons: (hd2, tl2) => AndIf(hd1 == hd2, StartsWith(tl2, tl1))));
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace ZenLib
         {
             return s.Case(
                 empty: sub.IsEmpty(),
-                cons: (hd, tl) => Or(StartsWith(s, sub), Contains(tl, sub)));
+                cons: (hd, tl) => OrIf(StartsWith(s, sub), Contains(tl, sub)));
         }
 
         /// <summary>

@@ -1971,12 +1971,24 @@ namespace ZenLib
             return new ZenFunction<T1, T2, T3, T4, T5>(function);
         }
 
-        private static Zen<bool> OrIf(Zen<bool> expr1, Zen<bool> expr2)
+        /// <summary>
+        /// Logical or, implemented as an if to allow better test generation.
+        /// </summary>
+        /// <param name="expr1">The first expression.</param>
+        /// <param name="expr2">The second expression.</param>
+        /// <returns>The logical or of the two expressions.</returns>
+        public static Zen<bool> OrIf(Zen<bool> expr1, Zen<bool> expr2)
         {
             return If(expr1, True(), expr2);
         }
 
-        private static Zen<bool> AndIf(Zen<bool> expr1, Zen<bool> expr2)
+        /// <summary>
+        /// Logical and, implemented as an if to allow better test generation.
+        /// </summary>
+        /// <param name="expr1">The first expression.</param>
+        /// <param name="expr2">The second expression.</param>
+        /// <returns>The logical and of the two expressions.</returns>
+        public static Zen<bool> AndIf(Zen<bool> expr1, Zen<bool> expr2)
         {
             return If(Not(expr1), False(), expr2);
         }
