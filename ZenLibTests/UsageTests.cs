@@ -1312,16 +1312,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Exception thrown for non-integer parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInvalidIntegerConversion()
-        {
-            Zen<IList<int>> x = 0;
-        }
-
-        /// <summary>
         /// Pass explicit input.
         /// </summary>
         [TestMethod]

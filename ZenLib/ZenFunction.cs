@@ -10,6 +10,7 @@ namespace ZenLib
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
     using ZenLib.SymbolicExecution;
+    using static ZenLib.Language;
 
     /// <summary>
     /// Zen function representation.
@@ -72,7 +73,7 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
-        public bool Assert(Func<Zen<T>, Zen<bool>> invariant = null, Backend backend = Backend.Z3)
+        public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
         {
             var result = invariant(this.function());
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, backend));
@@ -155,15 +156,50 @@ namespace ZenLib
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<T1> Find(
-            Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant = null,
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input = (input is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input;
+            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var result = invariant(input, this.function(input));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input, backend));
+        }
+
+        /// <summary>
+        /// Find all inputs leading to a condition being true.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input">Default input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<T1> FindAll(
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
+            Zen<T1> input = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
+            var result = invariant(input, this.function(input));
+
+            Zen<bool> blocking = false;
+
+            while (true)
+            {
+                var expr = And(result, Not(blocking));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, input, backend));
+                if (!example.HasValue)
+                {
+                    yield break;
+                }
+
+                yield return example.Value;
+                blocking = Or(blocking, input == example.Value);
+            }
         }
 
         /// <summary>
@@ -180,7 +216,7 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input = (input is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input;
+            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var result = this.function(input).Simplify();
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input, result, backend));
         }
@@ -256,17 +292,55 @@ namespace ZenLib
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2)> Find(
-            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant = null,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var result = invariant(input1, input2, this.function(input1, input2));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, backend));
+        }
+
+        /// <summary>
+        /// Find all inputs leading to a condition being true.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">First input that captures structural constraints.</param>
+        /// <param name="input2">Second input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2)> FindAll(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            var result = invariant(input1, input2, this.function(input1, input2));
+
+            Zen<bool> blocking = false;
+
+            while (true)
+            {
+                var expr = And(result, Not(blocking));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, input1, input2, backend));
+                if (!example.HasValue)
+                {
+                    yield break;
+                }
+
+                yield return example.Value;
+                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2));
+            }
         }
 
         /// <summary>
@@ -285,8 +359,8 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var result = this.function(input1, input2).Simplify();
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, result, backend));
         }
@@ -373,11 +447,52 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
-            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, backend));
+        }
+
+        /// <summary>
+        /// Find all inputs leading to a condition being true.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">First input that captures structural constraints.</param>
+        /// <param name="input2">Second input that captures structural constraints.</param>
+        /// <param name="input3">Third input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2, T3)> FindAll(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
+
+            Zen<bool> blocking = false;
+
+            while (true)
+            {
+                var expr = And(result, Not(blocking));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, input1, input2, input3, backend));
+                if (!example.HasValue)
+                {
+                    yield break;
+                }
+
+                yield return example.Value;
+                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2, input3 == example.Value.Item3));
+            }
         }
 
         /// <summary>
@@ -398,9 +513,9 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
-            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var result = this.function(input1, input2, input3).Simplify();
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, result, backend));
         }
@@ -491,12 +606,56 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
-            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
-            input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, input1, input2, input3, input4, backend));
+        }
+
+        /// <summary>
+        /// Find all inputs leading to a condition being true.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">First input that captures structural constraints.</param>
+        /// <param name="input2">Second input that captures structural constraints.</param>
+        /// <param name="input3">Third input that captures structural constraints.</param>
+        /// <param name="input4">Fourth input that captures structural constraints.</param>
+        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public IEnumerable<(T1, T2, T3, T4)> FindAll(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            Zen<T4> input4 = null,
+            int listSize = 5,
+            bool checkSmallerLists = true,
+            Backend backend = Backend.Z3)
+        {
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
+            var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
+
+            Zen<bool> blocking = false;
+
+            while (true)
+            {
+                var expr = And(result, Not(blocking));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, input1, input2, input3, input4, backend));
+                if (!example.HasValue)
+                {
+                    yield break;
+                }
+
+                yield return example.Value;
+                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2, input3 == example.Value.Item3, input4 == example.Value.Item4));
+            }
         }
 
         /// <summary>
@@ -519,10 +678,10 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            input1 = (input1 is null) ? Language.Arbitrary<T1>(listSize, checkSmallerLists) : input1;
-            input2 = (input2 is null) ? Language.Arbitrary<T2>(listSize, checkSmallerLists) : input2;
-            input3 = (input3 is null) ? Language.Arbitrary<T3>(listSize, checkSmallerLists) : input3;
-            input4 = (input4 is null) ? Language.Arbitrary<T4>(listSize, checkSmallerLists) : input4;
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var result = this.function(input1, input2, input3, input4).Simplify();
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, input4, result, backend));
         }

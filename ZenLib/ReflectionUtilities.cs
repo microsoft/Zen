@@ -6,13 +6,15 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
+    using static ZenLib.Language;
 
     /// <summary>
     /// A collection of helper functions for manipulating Zen
     /// objects through C#'s reflection runtime.
     /// </summary>
-    public static class ReflectionUtilities
+    internal static class ReflectionUtilities
     {
         /// <summary>
         /// The type of string values.
@@ -98,6 +100,11 @@ namespace ZenLib
         /// Type of an Dictionary.
         /// </summary>
         public readonly static Type DictType = typeof(Dictionary<,>);
+
+        /// <summary>
+        /// The object creation method.
+        /// </summary>
+        public static MethodInfo CreateMethod = typeof(Language).GetMethod("Create");
 
         /// <summary>
         /// Check if a type is a kind of integer.
@@ -390,49 +397,23 @@ namespace ZenLib
         internal static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
         {
             if (type == BoolType)
-            {
                 return visitor.VisitBool();
-            }
-
             if (type == ByteType)
-            {
                 return visitor.VisitByte();
-            }
-
             if (type == ShortType)
-            {
                 return visitor.VisitShort();
-            }
-
             if (type == UshortType)
-            {
                 return visitor.VisitUshort();
-            }
-
             if (type == IntType)
-            {
                 return visitor.VisitInt();
-            }
-
             if (type == UintType)
-            {
                 return visitor.VisitUint();
-            }
-
             if (type == LongType)
-            {
                 return visitor.VisitLong();
-            }
-
             if (type == UlongType)
-            {
                 return visitor.VisitUlong();
-            }
-
             if (type == StringType)
-            {
                 return visitor.VisitString();
-            }
 
             if (IsOptionType(type))
             {
@@ -490,6 +471,116 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Create a constant Zen list value.
+        /// </summary>
+        /// <param name="value">The list value.</param>
+        /// <returns>The Zen value representing the list.</returns>
+        internal static Zen<IList<T>> CreateZenListConstant<T>(IList<T> value)
+        {
+            var list = EmptyList<T>();
+            foreach (var elt in value.Reverse())
+            {
+                list = list.AddFront(elt);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Create a constant Zen option value.
+        /// </summary>
+        /// <param name="value">The option value.</param>
+        /// <returns>The Zen value representing the option.</returns>
+        internal static Zen<Option<T>> CreateZenOptionConstant<T>(Option<T> value)
+        {
+            if (value.HasValue)
+            {
+                return Language.Some<T>(value.Value);
+            }
+
+            return Language.Null<T>();
+        }
+
+        /// <summary>
+        /// Create a constant Zen dict value.
+        /// </summary>
+        /// <param name="value">The dictionary.</param>
+        /// <returns>The Zen value representing the constant dictinary.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(IDictionary<TKey, TValue> value)
+        {
+            var dict = EmptyDict<TKey, TValue>();
+            foreach (var kv in value)
+            {
+                dict = dict.Add(kv.Key, kv.Value);
+            }
+
+            return dict;
+        }
+
+        /// <summary>
+        /// Create a constant Zen value.
+        /// </summary>
+        /// <param name="value">The type.</param>
+        /// <returns>The Zen value representing the constant.</returns>
+        internal static object CreateZenConstant<T>(T value)
+        {
+            var type = typeof(T);
+            dynamic v = value;
+
+            if (value is bool)
+                return Bool(v);
+            if (value is byte)
+                return Byte(v);
+            if (value is short)
+                return Short(v);
+            if (value is ushort)
+                return UShort(v);
+            if (value is int)
+                return Int(v);
+            if (value is uint)
+                return UInt(v);
+            if (value is long)
+                return Long(v);
+            if (value is ulong)
+                return ULong(v);
+            if (value is string)
+                return String(v);
+            if (IsOptionType(type))
+                return CreateZenOptionConstant(v);
+            if (IsTupleType(type))
+                return Tuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
+            if (IsValueTupleType(type))
+                return ValueTuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
+            if (type.IsGenericType && IListType.MakeGenericType(type.GetGenericArguments()[0]).IsAssignableFrom(type))
+                return CreateZenListConstant(v);
+            if (type.IsGenericType && IDictType.MakeGenericType(type.GetGenericArguments()[0], type.GetGenericArguments()[1]).IsAssignableFrom(type))
+                return CreateZenDictConstant(v);
+
+            // some class or struct
+            var fields = new SortedDictionary<string, dynamic>();
+            foreach (var field in GetAllFields(type))
+            {
+                fields[field.Name] = field.GetValue(value);
+            }
+
+            foreach (var property in GetAllProperties(type))
+            {
+                fields[property.Name] = property.GetValue(value);
+            }
+
+            var asList = fields.ToArray();
+            var createMethod = CreateMethod.MakeGenericMethod(type);
+
+            var args = new (string, object)[asList.Length];
+            for (int i = 0; i < asList.Length; i++)
+            {
+                args[i] = (asList[i].Key, CreateZenConstant(asList[i].Value));
+            }
+
+            return createMethod.Invoke(null, new object[] { args });
+        }
+
+        /// <summary>
         /// Get an integer value as a long.
         /// </summary>
         /// <typeparam name="T">The integer gype.</typeparam>
@@ -498,40 +589,19 @@ namespace ZenLib
         public static long? GetConstantIntegerValue<T>(Zen<T> value)
         {
             if (value is ZenConstantByteExpr xb)
-            {
                 return xb.Value;
-            }
-
             if (value is ZenConstantShortExpr xs)
-            {
                 return xs.Value;
-            }
-
             if (value is ZenConstantUshortExpr xus)
-            {
                 return xus.Value;
-            }
-
             if (value is ZenConstantIntExpr xi)
-            {
                 return xi.Value;
-            }
-
             if (value is ZenConstantUintExpr xui)
-            {
                 return xui.Value;
-            }
-
             if (value is ZenConstantLongExpr xl)
-            {
                 return xl.Value;
-            }
-
             if (value is ZenConstantUlongExpr xul)
-            {
                 return (long?)xul.Value;
-            }
-
             return null;
         }
 
@@ -557,38 +627,24 @@ namespace ZenLib
         /// <typeparam name="T">The integer gype.</typeparam>
         /// <param name="value">The Zen integer value.</param>
         /// <returns>A long.</returns>
-        public static Zen<T> CreateConstantValue<T>(long value)
+        public static Zen<T> CreateConstantIntegerValue<T>(long value)
         {
             var type = typeof(T);
 
-            if (type == ReflectionUtilities.BoolType)
-            {
-                return (Zen<T>)(object)(value == 0L ? Language.False() : Language.True());
-            }
-            if (type == ReflectionUtilities.ByteType)
-            {
+            if (type == BoolType)
+                return (Zen<T>)(object)(value == 0L ? False() : True());
+            if (type == ByteType)
                 return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)value);
-            }
-            if (type == ReflectionUtilities.ShortType)
-            {
+            if (type == ShortType)
                 return (Zen<T>)(object)ZenConstantShortExpr.Create((short)value);
-            }
-            if (type == ReflectionUtilities.UshortType)
-            {
+            if (type == UshortType)
                 return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)value);
-            }
-            if (type == ReflectionUtilities.IntType)
-            {
+            if (type == IntType)
                 return (Zen<T>)(object)ZenConstantIntExpr.Create((int)value);
-            }
-            if (type == ReflectionUtilities.UintType)
-            {
+            if (type == UintType)
                 return (Zen<T>)(object)ZenConstantUintExpr.Create((uint)value);
-            }
-            if (type == ReflectionUtilities.LongType)
-            {
+            if (type == LongType)
                 return (Zen<T>)(object)ZenConstantLongExpr.Create(value);
-            }
 
             return (Zen<T>)(object)ZenConstantUlongExpr.Create((ulong)value);
         }
@@ -613,31 +669,18 @@ namespace ZenLib
         {
             var type = typeof(T);
 
-            if (type == ReflectionUtilities.ByteType)
-            {
+            if (type == ByteType)
                 return (byte)value;
-            }
-            if (type == ReflectionUtilities.ShortType)
-            {
+            if (type == ShortType)
                 return (short)value;
-            }
-            if (type == ReflectionUtilities.UshortType)
-            {
+            if (type == UshortType)
                 return (ushort)value;
-            }
-            if (type == ReflectionUtilities.IntType)
-            {
+            if (type == IntType)
                 return (int)value;
-            }
-            if (type == ReflectionUtilities.UintType)
-            {
+            if (type == UintType)
                 return (uint)value;
-            }
-            if (type == ReflectionUtilities.LongType)
-            {
+            if (type == LongType)
                 return (long)value;
-            }
-
             return (ulong)value;
         }
 
@@ -651,30 +694,17 @@ namespace ZenLib
             var type = value.GetType();
 
             if (type == ByteType)
-            {
                 return (byte)value;
-            }
             if (type == ShortType)
-            {
                 return (short)value;
-            }
             if (type == UshortType)
-            {
                 return (ushort)value;
-            }
             if (type == IntType)
-            {
                 return (int)value;
-            }
             if (type == UintType)
-            {
                 return (uint)value;
-            }
             if (type == LongType)
-            {
                 return (long)value;
-            }
-
             return (long)(ulong)value;
         }
     }

@@ -306,7 +306,7 @@ namespace ZenLib.Tests
         [DataRow("hello", 0, 20, "hello")]
         public void TestSubstringEvaluation(string s, int offset, int length, string expected)
         {
-            var f = Function<string, string>(s => s.Substring(offset, length));
+            var f = Function<string, string>(s => s.Substring((ushort)offset, (ushort)length));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -373,7 +373,7 @@ namespace ZenLib.Tests
         [DataRow("abcda", "e", 0, -1)]
         public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
         {
-            var f = Function<string, short>(s => s.IndexOf(sub, offset));
+            var f = Function<string, short>(s => s.IndexOf(sub, (ushort)offset));
             Assert.AreEqual((short)expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual((short)expected, f.Evaluate(s));
@@ -437,17 +437,6 @@ namespace ZenLib.Tests
         public void TestStartsWithContains()
         {
             RandomStrings(sub => CheckValid<string>(s => Implies(s.StartsWith(sub), s.Contains(sub))));
-        }
-
-        /// <summary>
-        /// Test invalid implicit conversion.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInvalidImplicitConversion()
-        {
-            Zen<bool> b = true;
-            Or(b, "");
         }
 
         /// <summary>

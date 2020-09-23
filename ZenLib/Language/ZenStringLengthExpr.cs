@@ -23,7 +23,10 @@ namespace ZenLib
         {
             var x = ReflectionUtilities.GetConstantString(e1);
             if (x != null)
-                return x.Length;
+            {
+                return (ushort)x.Length;
+            }
+
             return new ZenStringLengthExpr(e1);
         }
 

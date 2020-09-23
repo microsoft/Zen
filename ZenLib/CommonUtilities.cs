@@ -9,13 +9,15 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Runtime.InteropServices.ComTypes;
     using System.Text;
     using System.Threading;
+    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// A collection of common utility functions.
     /// </summary>
-    public static class CommonUtilities
+    internal static class CommonUtilities
     {
         /// <summary>
         /// Merge two immutable dictionaries together by key.
@@ -177,6 +179,18 @@ namespace ZenLib
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Creates an arbitrary value if the input is null.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="listSize">The list size.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller lists.</param>
+        /// <returns>An arbitrary Zen value.</returns>
+        public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
+        {
+            return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
         }
 
         /// <summary>

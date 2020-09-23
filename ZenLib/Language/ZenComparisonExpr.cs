@@ -37,7 +37,7 @@ namespace ZenLib
             if (x.HasValue && y.HasValue)
             {
                 var f = constantFuncs[(int)comparisonType];
-                return ReflectionUtilities.CreateConstantValue<bool>(f(x.Value, y.Value));
+                return ReflectionUtilities.CreateConstantIntegerValue<bool>(f(x.Value, y.Value));
             }
 
             return new ZenComparisonExpr<T>(e1, e2, comparisonType);
