@@ -6,31 +6,33 @@ namespace ZenLib
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a string length expression.
     /// </summary>
-    internal sealed class ZenStringLengthExpr : Zen<ushort>
+    internal sealed class ZenStringLengthExpr : Zen<BigInteger>
     {
-        private static Dictionary<object, Zen<ushort>> hashConsTable = new Dictionary<object, Zen<ushort>>();
+        private static Dictionary<object, Zen<BigInteger>> hashConsTable = new Dictionary<object, Zen<BigInteger>>();
 
-        internal override Zen<ushort> Unroll()
+        internal override Zen<BigInteger> Unroll()
         {
             return Create(this.Expr.Unroll());
         }
 
-        public static Zen<ushort> Simplify(Zen<string> e1)
+        public static Zen<BigInteger> Simplify(Zen<string> e1)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
+
             if (x != null)
             {
-                return (ushort)x.Length;
+                return new BigInteger(x.Length);
             }
 
             return new ZenStringLengthExpr(e1);
         }
 
-        public static Zen<ushort> Create(Zen<string> expr)
+        public static Zen<BigInteger> Create(Zen<string> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 

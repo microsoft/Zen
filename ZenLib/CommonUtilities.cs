@@ -9,10 +9,9 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-    using System.Runtime.InteropServices.ComTypes;
+    using System.Numerics;
     using System.Text;
     using System.Threading;
-    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// A collection of common utility functions.
@@ -233,8 +232,8 @@ namespace ZenLib
         /// <summary>
         /// Unescape a Z3 string.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
+        /// <param name="s">The string.</param>
+        /// <returns>An unescaped string.</returns>
         public static string ConvertZ3StringToCSharp(string s)
         {
             // strip outer quotation marks
@@ -309,7 +308,7 @@ namespace ZenLib
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
         /// <returns>A substring.</returns>
-        public static string Substring(string s, ushort offset, ushort length)
+        public static string Substring(string s, BigInteger offset, BigInteger length)
         {
             if (offset >= s.Length)
             {
@@ -317,7 +316,7 @@ namespace ZenLib
             }
 
             var len = offset + length > s.Length ? s.Length - offset : length;
-            return s.Substring(offset, len);
+            return s.Substring((int)offset, (int)len);
         }
 
         /// <summary>
@@ -328,7 +327,7 @@ namespace ZenLib
         /// <param name="sub">The substring.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>The index and a match.</returns>
-        public static short IndexOf(string s, string sub, ushort offset)
+        public static BigInteger IndexOf(string s, string sub, BigInteger offset)
         {
             if (offset >= s.Length)
             {
@@ -340,7 +339,7 @@ namespace ZenLib
                 return (short)offset;
             }
 
-            return (short)s.IndexOf(sub, offset);
+            return (short)s.IndexOf(sub, (int)offset);
         }
 
         /// <summary>
@@ -350,14 +349,14 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         /// <param name="index">The index.</param>
         /// <returns>A substring at that character.</returns>
-        public static string At(string s, ushort index)
+        public static string At(string s, BigInteger index)
         {
             if (index >= s.Length)
             {
                 return string.Empty;
             }
 
-            return s[index].ToString();
+            return s[(int)index].ToString();
         }
     }
 }

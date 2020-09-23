@@ -80,14 +80,14 @@ namespace ZenLib.Tests
             CheckEqual(x >= y, x >= y);
             CheckEqual(bigint1 + bigint2, bigint1 + bigint2);
             CheckEqual(string1 + string2, string1 + string2);
-            CheckEqual(string1.At(ushort1), string1.At(ushort1));
+            CheckEqual(string1.At(bigint1), string1.At(bigint1));
             CheckEqual(string1.Contains(string2), string1.Contains(string2));
             CheckEqual(string1.StartsWith(string2), string1.StartsWith(string2));
             CheckEqual(string1.EndsWith(string2), string1.EndsWith(string2));
-            CheckEqual(string1.IndexOf(string2, ushort1), string1.IndexOf(string2, ushort1));
+            CheckEqual(string1.IndexOf(string2, bigint1), string1.IndexOf(string2, bigint1));
             CheckEqual(string1.Length(), string1.Length());
             CheckEqual(string1.ReplaceFirst(string2, string3), string1.ReplaceFirst(string2, string3));
-            CheckEqual(string1.Substring(ushort1, ushort2), string1.Substring(ushort1, ushort2));
+            CheckEqual(string1.Substring(bigint1, bigint2), string1.Substring(bigint1, bigint2));
             CheckEqual(opt.HasValue(), opt.HasValue());
             CheckEqual(arg, arg);
             CheckEqual(If(a, x, y), If(a, x, y));

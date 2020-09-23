@@ -540,8 +540,8 @@ namespace ZenLib.ModelChecking
             return LookupOrCompute(expression, () =>
             {
                 var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.StringExpr.Accept(this, parameter);
-                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
-                var v3 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.LengthExpr.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
+                var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.LengthExpr.Accept(this, parameter);
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>(
                     this.Solver, this.Solver.Substring(v1.Value, v2.Value, v3.Value));
             });
@@ -552,7 +552,7 @@ namespace ZenLib.ModelChecking
             return LookupOrCompute(expression, () =>
             {
                 var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.StringExpr.Accept(this, parameter);
-                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.IndexExpr.Accept(this, parameter);
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.IndexExpr.Accept(this, parameter);
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>(
                     this.Solver, this.Solver.At(v1.Value, v2.Value));
             });
@@ -563,7 +563,7 @@ namespace ZenLib.ModelChecking
             return LookupOrCompute(expression, () =>
             {
                 var v = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Expr.Accept(this, parameter);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(
+                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(
                     this.Solver, this.Solver.Length(v.Value));
             });
         }
@@ -574,8 +574,8 @@ namespace ZenLib.ModelChecking
             {
                 var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.StringExpr.Accept(this, parameter);
                 var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.SubstringExpr.Accept(this, parameter);
-                var v3 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(
+                var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.OffsetExpr.Accept(this, parameter);
+                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(
                     this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
             });
         }

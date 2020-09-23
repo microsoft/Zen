@@ -19,7 +19,7 @@ namespace ZenLib.Solver
     {
         /// <summary>
         /// Gets the manger object.
-        /// </summary>
+        /// </summary>A
         internal DDManager<T> Manager { get; }
 
         /// <summary>
@@ -256,25 +256,25 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit Substring(Unit x, BitVector<T> y, BitVector<T> z)
+        public Unit Substring(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit At(Unit x, BitVector<T> y)
+        public Unit At(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public BitVector<T> Length(Unit x)
+        public Unit Length(Unit x)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public BitVector<T> IndexOf(Unit x, Unit y, BitVector<T> z)
+        public Unit IndexOf(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }

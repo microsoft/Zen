@@ -298,29 +298,24 @@ namespace ZenLib.Solver
             return this.context.MkReplace(x, y, z);
         }
 
-        public SeqExpr Substring(SeqExpr x, BitVecExpr y, BitVecExpr z)
+        public SeqExpr Substring(SeqExpr x, IntExpr y, IntExpr z)
         {
-            var offset = this.context.MkBV2Int(y, false);
-            var length = this.context.MkBV2Int(z, false);
-            return this.context.MkExtract(x, offset, length);
+            return this.context.MkExtract(x, y, z);
         }
 
-        public SeqExpr At(SeqExpr x, BitVecExpr y)
+        public SeqExpr At(SeqExpr x, IntExpr y)
         {
-            var index = this.context.MkBV2Int(y, false);
-            return this.context.MkAt(x, index);
+            return this.context.MkAt(x, y);
         }
 
-        public BitVecExpr Length(SeqExpr x)
+        public IntExpr Length(SeqExpr x)
         {
-            return this.context.MkInt2BV(16, this.context.MkLength(x));
+            return this.context.MkLength(x);
         }
 
-        public BitVecExpr IndexOf(SeqExpr x, SeqExpr y, BitVecExpr z)
+        public IntExpr IndexOf(SeqExpr x, SeqExpr y, IntExpr z)
         {
-            var offset = this.context.MkBV2Int(z, false);
-            var index = this.context.MkIndexOf(x, y, offset);
-            return this.context.MkInt2BV(16, index);
+            return this.context.MkIndexOf(x, y, z);
         }
 
         public object Get(Model m, Expr v)

@@ -8,6 +8,7 @@ namespace ZenLib.Compilation
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq.Expressions;
+    using System.Numerics;
     using System.Reflection;
     using ZenLib.Interpretation;
 
@@ -593,7 +594,7 @@ namespace ZenLib.Compilation
             return LookupOrCompute(expression, () =>
             {
                 var e = expression.Expr.Accept(this, parameter);
-                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(ushort));
+                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(BigInteger));
             });
         }
         public Expression VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ExpressionConverterEnvironment parameter)

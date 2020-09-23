@@ -358,8 +358,8 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
-                var e2 = (ushort)expression.OffsetExpr.Accept(this, parameter);
-                var e3 = (ushort)expression.LengthExpr.Accept(this, parameter);
+                var e2 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
+                var e3 = (BigInteger)expression.LengthExpr.Accept(this, parameter);
                 return CommonUtilities.Substring(e1, e2, e3);
             });
         }
@@ -369,7 +369,7 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
-                var e2 = (ushort)expression.IndexExpr.Accept(this, parameter);
+                var e2 = (BigInteger)expression.IndexExpr.Accept(this, parameter);
                 return CommonUtilities.At(e1, e2);
             });
         }
@@ -379,7 +379,7 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e = (string)expression.Expr.Accept(this, parameter);
-                return (ushort)e.Length;
+                return (BigInteger)e.Length;
             });
         }
 
@@ -389,7 +389,7 @@ namespace ZenLib.Interpretation
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
                 var e2 = (string)expression.SubstringExpr.Accept(this, parameter);
-                var e3 = (ushort)expression.OffsetExpr.Accept(this, parameter);
+                var e3 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
                 return CommonUtilities.IndexOf(e1, e2, e3);
             });
         }

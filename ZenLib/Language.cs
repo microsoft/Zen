@@ -767,7 +767,7 @@ namespace ZenLib
         /// <param name="offset">The offset Zen expression.</param>
         /// <param name="length">The length Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> Substring(this Zen<string> str, Zen<ushort> offset, Zen<ushort> length)
+        public static Zen<string> Substring(this Zen<string> str, Zen<BigInteger> offset, Zen<BigInteger> length)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(offset);
@@ -782,7 +782,7 @@ namespace ZenLib
         /// <param name="str">The string Zen expression.</param>
         /// <param name="index">The index Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> At(this Zen<string> str, Zen<ushort> index)
+        public static Zen<string> At(this Zen<string> str, Zen<BigInteger> index)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(index);
@@ -795,7 +795,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="str">The string Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ushort> Length(this Zen<string> str)
+        public static Zen<BigInteger> Length(this Zen<string> str)
         {
             CommonUtilities.ValidateNotNull(str);
 
@@ -810,7 +810,7 @@ namespace ZenLib
         /// <param name="sub">The substring Zen expression.</param>
         /// <param name="offset">The offset Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub, Zen<ushort> offset)
+        public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub, Zen<BigInteger> offset)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(sub);
@@ -825,9 +825,9 @@ namespace ZenLib
         /// <param name="str">The string Zen expression.</param>
         /// <param name="sub">The substring Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub)
+        public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub)
         {
-            return IndexOf(str, sub, 0);
+            return IndexOf(str, sub, new BigInteger(0));
         }
 
         /// <summary>

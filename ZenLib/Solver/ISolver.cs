@@ -272,7 +272,7 @@ namespace ZenLib.Solver
         /// <param name="y">The offset expression.</param>
         /// <param name="z">The length expression.</param>
         /// <returns></returns>
-        TString Substring(TString x, TBitvec y, TBitvec z);
+        TString Substring(TString x, TInteger y, TInteger z);
 
         /// <summary>
         /// The string 'At' operation.
@@ -280,14 +280,14 @@ namespace ZenLib.Solver
         /// <param name="x">The string expression.</param>
         /// <param name="y">The index expression.</param>
         /// <returns></returns>
-        TString At(TString x, TBitvec y);
+        TString At(TString x, TInteger y);
 
         /// <summary>
         /// The string 'Length' operation.
         /// </summary>
         /// <param name="x">The string expression.</param>
         /// <returns></returns>
-        TBitvec Length(TString x);
+        TInteger Length(TString x);
 
         /// <summary>
         /// The string 'IndexOf' operation.
@@ -296,7 +296,7 @@ namespace ZenLib.Solver
         /// <param name="y">The substring expression.</param>
         /// <param name="z">The offset expression.</param>
         /// <returns></returns>
-        TBitvec IndexOf(TString x, TString y, TBitvec z);
+        TInteger IndexOf(TString x, TString y, TInteger z);
 
         /// <summary>
         /// The 'Equal' of two integers.
