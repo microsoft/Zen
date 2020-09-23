@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
@@ -33,6 +34,7 @@ namespace ZenLib.Tests
             CheckValid<uint>(x => x + 0 == x);
             CheckValid<long>(x => x + 0 == x);
             CheckValid<ulong>(x => x + 0 == x);
+            CheckValid<BigInteger>(x => x + new BigInteger(0) == x);
         }
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckValid<uint>(y => x + y == y + x));
             RandomBytes(x => CheckValid<long>(y => x + y == y + x));
             RandomBytes(x => CheckValid<ulong>(y => x + y == y + x));
+            RandomBytes(x => CheckValid<BigInteger>(y => new BigInteger(x) + y == y + new BigInteger(x)));
         }
 
         /// <summary>
@@ -63,6 +66,7 @@ namespace ZenLib.Tests
             CheckValid<uint>(x => x - 0 == x);
             CheckValid<long>(x => x - 0 == x);
             CheckValid<ulong>(x => x - 0 == x);
+            CheckValid<BigInteger>(x => x - new BigInteger(0) == x);
         }
 
         /// <summary>
@@ -145,6 +149,7 @@ namespace ZenLib.Tests
             var f5 = Function<uint, uint>(x => x * 6);
             var f6 = Function<long, long>(x => x * 7L);
             var f7 = Function<ulong, ulong>(x => x * 8L);
+            var f8 = Function<BigInteger, BigInteger>(x => x * new BigInteger(9));
 
             Assert.AreEqual((byte)4, f1.Evaluate(2));
             Assert.AreEqual((short)9, f2.Evaluate(3));
@@ -153,6 +158,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(36U, f5.Evaluate(6));
             Assert.AreEqual(49L, f6.Evaluate(7));
             Assert.AreEqual(64UL, f7.Evaluate(8));
+            Assert.AreEqual(new BigInteger(72), f8.Evaluate(8));
         }
 
         /// <summary>
@@ -168,6 +174,7 @@ namespace ZenLib.Tests
             CheckValid<uint, uint>((x, y) => And(Max(x, y) >= x, Max(x, y) >= y));
             CheckValid<long, long>((x, y) => And(Max(x, y) >= x, Max(x, y) >= y));
             CheckValid<ulong, ulong>((x, y) => And(Max(x, y) >= x, Max(x, y) >= y));
+            CheckValid<BigInteger, BigInteger>((x, y) => And(Max(x, y) >= x, Max(x, y) >= y));
         }
 
         /// <summary>
@@ -183,6 +190,7 @@ namespace ZenLib.Tests
             CheckValid<uint, uint>((x, y) => And(Min(x, y) <= x, Min(x, y) <= y));
             CheckValid<long, long>((x, y) => And(Min(x, y) <= x, Min(x, y) <= y));
             CheckValid<ulong, ulong>((x, y) => And(Min(x, y) <= x, Min(x, y) <= y));
+            CheckValid<BigInteger, BigInteger>((x, y) => And(Min(x, y) <= x, Min(x, y) <= y));
         }
 
         /// <summary>
@@ -198,6 +206,7 @@ namespace ZenLib.Tests
             CheckValid<uint, uint>((x, y) => Or(Max(x, y) == x, Max(x, y) == y));
             CheckValid<long, long>((x, y) => Or(Max(x, y) == x, Max(x, y) == y));
             CheckValid<ulong, ulong>((x, y) => Or(Max(x, y) == x, Max(x, y) == y));
+            CheckValid<BigInteger, BigInteger>((x, y) => Or(Max(x, y) == x, Max(x, y) == y));
         }
 
         /// <summary>
@@ -213,6 +222,7 @@ namespace ZenLib.Tests
             CheckValid<uint, uint>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
             CheckValid<long, long>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
             CheckValid<ulong, ulong>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
+            CheckValid<BigInteger, BigInteger>((x, y) => Or(Min(x, y) == x, Min(x, y) == y));
         }
 
         /// <summary>

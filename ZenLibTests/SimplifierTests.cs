@@ -140,6 +140,8 @@ namespace ZenLib.Tests
             Assert.AreEqual((Long(1) <= Long(0)), False());
             Assert.AreEqual((ULong(1) <= ULong(1)), True());
             Assert.AreEqual((ULong(1) <= ULong(0)), False());
+            Assert.AreEqual((BigInt(1) <= BigInt(1)), True());
+            Assert.AreEqual((BigInt(1) <= BigInt(0)), False());
         }
 
         /// <summary>
@@ -162,6 +164,8 @@ namespace ZenLib.Tests
             Assert.AreEqual((Long(0) >= Long(1)), False());
             Assert.AreEqual((ULong(1) >= ULong(1)), True());
             Assert.AreEqual((ULong(0) >= ULong(1)), False());
+            Assert.AreEqual((BigInt(1) >= BigInt(1)), True());
+            Assert.AreEqual((BigInt(0) >= BigInt(1)), False());
         }
 
         /// <summary>
@@ -172,6 +176,8 @@ namespace ZenLib.Tests
         {
             Assert.AreEqual((Byte(1) + Byte(0)), Byte(1));
             Assert.AreEqual((Byte(0) + Byte(1)), Byte(1));
+            Assert.AreEqual((BigInt(1) + BigInt(0)), BigInt(1));
+            Assert.AreEqual((BigInt(0) + BigInt(1)), BigInt(1));
             CheckValid<byte>(x => x + 0 == x);
             CheckValid<byte>(x => 0 + x == x);
         }
@@ -183,6 +189,7 @@ namespace ZenLib.Tests
         public void TestMinusSimplification()
         {
             Assert.AreEqual((Byte(1) - Byte(0)), Byte(1));
+            Assert.AreEqual((BigInt(1) - BigInt(0)), BigInt(1));
         }
 
         /// <summary>
@@ -192,6 +199,7 @@ namespace ZenLib.Tests
         public void TestMultiplicationSimplification()
         {
             Assert.AreEqual((Byte(2) * Byte(2)), Byte(4));
+            Assert.AreEqual((BigInt(2) * BigInt(2)), BigInt(4));
             CheckValid<byte>(x => x * 1 == x);
             CheckValid<byte>(x => 1 * x == x);
             CheckValid<byte>(x => x * 0 == 0);

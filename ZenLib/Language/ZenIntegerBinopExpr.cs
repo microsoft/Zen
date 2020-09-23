@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a binary operation expression.
@@ -15,12 +16,18 @@ namespace ZenLib
     {
         private static string[] opStrings = new string[] { "&", "|", "^", "+", "-", "*" };
 
-        private static Func<long, long, long>[] constantFuncs =
-            new Func<long, long, long>[]
+        private static Func<long, long, long>[] constantFuncs = new Func<long, long, long>[]
         {
             (x, y) => x & y,
             (x, y) => x | y,
             (x, y) => x ^ y,
+            (x, y) => x + y,
+            (x, y) => x - y,
+            (x, y) => x * y,
+        };
+
+        private static Func<BigInteger, BigInteger, BigInteger>[] constantBigIntFuncs = new Func<BigInteger, BigInteger, BigInteger>[]
+        {
             (x, y) => x + y,
             (x, y) => x - y,
             (x, y) => x * y,
@@ -35,6 +42,11 @@ namespace ZenLib
 
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, Op op)
         {
+            if (e1 is ZenConstantBigIntExpr be1 && e2 is ZenConstantBigIntExpr be2)
+            {
+                return (Zen<T>)(object)ZenConstantBigIntExpr.Create(constantBigIntFuncs[(int)op - 3](be1.Value, be2.Value));
+            }
+
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
@@ -77,6 +89,11 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
+            if (typeof(T) == ReflectionUtilities.BigIntType && IsBitwiseOp(op))
+            {
+                throw new ArgumentException($"Operation: {op} is not supported for type BigInteger");
+            }
+
             var key = (expr1, expr2, (int)op);
             if (hashConsTable.TryGetValue(key, out var value))
             {
@@ -86,6 +103,16 @@ namespace ZenLib
             var ret = Simplify(expr1, expr2, op);
             hashConsTable[key] = ret;
             return ret;
+        }
+
+        /// <summary>
+        /// Whether an op is a bitwise operation.
+        /// </summary>
+        /// <param name="op">The operation.</param>
+        /// <returns>True or false.</returns>
+        private static bool IsBitwiseOp(Op op)
+        {
+            return op == Op.BitwiseAnd || op == Op.BitwiseOr || op == Op.BitwiseXor;
         }
 
         /// <summary>

@@ -4,15 +4,18 @@
 
 namespace ZenLib.Solver
 {
+    using System.Numerics;
+
     /// <summary>
     /// Solver interface for a model checker backend.
     /// </summary>
     /// <typeparam name="TModel">The model type..</typeparam>
     /// <typeparam name="TVariable">The variable type.</typeparam>
     /// <typeparam name="TBool">The boolean expression type.</typeparam>
+    /// <typeparam name="TBitvec">The finite integer type.</typeparam>
     /// <typeparam name="TInteger">The integer type.</typeparam>
     /// <typeparam name="TString">The string type.</typeparam>
-    public interface ISolver<TModel, TVariable, TBool, TInteger, TString>
+    public interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString>
     {
         /// <summary>
         /// The false expression.
@@ -38,52 +41,65 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
         /// <returns>The expression.</returns>
-        (TVariable, TInteger) CreateByteVar(object e);
+        (TVariable, TBitvec) CreateByteVar(object e);
 
         /// <summary>
         /// Create a byte constant.
         /// </summary>
         /// <returns></returns>
-        TInteger CreateByteConst(byte b);
+        TBitvec CreateByteConst(byte b);
 
         /// <summary>
         /// Create a new short expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
         /// <returns>The expression.</returns>
-        (TVariable, TInteger) CreateShortVar(object e);
+        (TVariable, TBitvec) CreateShortVar(object e);
 
         /// <summary>
         /// Create a short constant.
         /// </summary>
         /// <returns></returns>
-        TInteger CreateShortConst(short s);
+        TBitvec CreateShortConst(short s);
 
         /// <summary>
         /// Create a new int expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
         /// <returns>The expression.</returns>
-        (TVariable, TInteger) CreateIntVar(object e);
+        (TVariable, TBitvec) CreateIntVar(object e);
 
         /// <summary>
         /// Create an integer constant.
         /// </summary>
         /// <returns></returns>
-        TInteger CreateIntConst(int i);
+        TBitvec CreateIntConst(int i);
 
         /// <summary>
         /// Create a new long expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
         /// <returns>The expression.</returns>
-        (TVariable, TInteger) CreateLongVar(object e);
+        (TVariable, TBitvec) CreateLongVar(object e);
 
         /// <summary>
         /// Create a long constant.
         /// </summary>
         /// <returns></returns>
-        TInteger CreateLongConst(long l);
+        TBitvec CreateLongConst(long l);
+
+        /// <summary>
+        /// Create a new big integer expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TInteger) CreateBigIntegerVar(object e);
+
+        /// <summary>
+        /// Create a big integer constant.
+        /// </summary>
+        /// <returns></returns>
+        TInteger CreateBigIntegerConst(BigInteger b);
 
         /// <summary>
         /// Create a new string expression.
@@ -135,7 +151,7 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TInteger BitwiseAnd(TInteger x, TInteger y);
+        TBitvec BitwiseAnd(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'BitwiseOr' of two expressions.
@@ -143,7 +159,7 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TInteger BitwiseOr(TInteger x, TInteger y);
+        TBitvec BitwiseOr(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'BitwiseXor' of two expressions.
@@ -151,14 +167,22 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TInteger BitwiseXor(TInteger x, TInteger y);
+        TBitvec BitwiseXor(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'BitwiseNot' of an expression.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <returns></returns>
-        TInteger BitwiseNot(TInteger x);
+        TBitvec BitwiseNot(TBitvec x);
+
+        /// <summary>
+        /// The 'Add' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBitvec Add(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'Add' of two expressions.
@@ -174,7 +198,23 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
+        TBitvec Subtract(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'Subtract' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         TInteger Subtract(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'Multiply' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBitvec Multiply(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'Multiply' of two expressions.
@@ -232,7 +272,7 @@ namespace ZenLib.Solver
         /// <param name="y">The offset expression.</param>
         /// <param name="z">The length expression.</param>
         /// <returns></returns>
-        TString Substring(TString x, TInteger y, TInteger z);
+        TString Substring(TString x, TBitvec y, TBitvec z);
 
         /// <summary>
         /// The string 'At' operation.
@@ -240,14 +280,14 @@ namespace ZenLib.Solver
         /// <param name="x">The string expression.</param>
         /// <param name="y">The index expression.</param>
         /// <returns></returns>
-        TString At(TString x, TInteger y);
+        TString At(TString x, TBitvec y);
 
         /// <summary>
         /// The string 'Length' operation.
         /// </summary>
         /// <param name="x">The string expression.</param>
         /// <returns></returns>
-        TInteger Length(TString x);
+        TBitvec Length(TString x);
 
         /// <summary>
         /// The string 'IndexOf' operation.
@@ -256,7 +296,15 @@ namespace ZenLib.Solver
         /// <param name="y">The substring expression.</param>
         /// <param name="z">The offset expression.</param>
         /// <returns></returns>
-        TInteger IndexOf(TString x, TString y, TInteger z);
+        TBitvec IndexOf(TString x, TString y, TBitvec z);
+
+        /// <summary>
+        /// The 'Equal' of two integers.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'Equal' of two integers.
@@ -280,6 +328,14 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
+        TBool LessThanOrEqual(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'LessThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         TBool LessThanOrEqual(TInteger x, TInteger y);
 
         /// <summary>
@@ -288,7 +344,15 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TBool LessThanOrEqualSigned(TInteger x, TInteger y);
+        TBool LessThanOrEqualSigned(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'LessThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThanOrEqual(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -304,7 +368,7 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TBool GreaterThanOrEqualSigned(TInteger x, TInteger y);
+        TBool GreaterThanOrEqualSigned(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'Ite' of a guard and two expressions.
@@ -314,6 +378,15 @@ namespace ZenLib.Solver
         /// <param name="f">The false expression.</param>
         /// <returns></returns>
         TBool Ite(TBool g, TBool t, TBool f);
+
+        /// <summary>
+        /// The 'Ite' of a guard and two integers.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TBitvec Ite(TBool g, TBitvec t, TBitvec f);
 
         /// <summary>
         /// The 'Ite' of a guard and two integers.

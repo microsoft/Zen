@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Numerics;
     using System.Reflection;
     using static ZenLib.Language;
 
@@ -67,6 +68,11 @@ namespace ZenLib
         public readonly static Type UlongType = typeof(ulong);
 
         /// <summary>
+        /// The type of big integer values.
+        /// </summary>
+        public readonly static Type BigIntType = typeof(BigInteger);
+
+        /// <summary>
         /// The type of a tuple.
         /// </summary>
         public readonly static Type TupleType = typeof(Tuple<,>);
@@ -113,7 +119,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsIntegerType(Type type)
         {
-            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type);
+            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsBigIntegerType(type);
         }
 
         /// <summary>
@@ -134,6 +140,16 @@ namespace ZenLib
         public static bool IsSignedIntegerType(Type type)
         {
             return (type == ShortType || type == IntType || type == LongType);
+        }
+
+        /// <summary>
+        /// Check if a type is a big integer.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>True or false.</returns>
+        public static bool IsBigIntegerType(Type type)
+        {
+            return type == BigIntType;
         }
 
         /// <summary>
@@ -412,6 +428,8 @@ namespace ZenLib
                 return visitor.VisitLong();
             if (type == UlongType)
                 return visitor.VisitUlong();
+            if (type == BigIntType)
+                return visitor.VisitBigInteger();
             if (type == StringType)
                 return visitor.VisitString();
 
@@ -543,6 +561,8 @@ namespace ZenLib
                 return Long(v);
             if (value is ulong)
                 return ULong(v);
+            if (value is BigInteger)
+                return BigInt(v);
             if (value is string)
                 return String(v);
             if (IsOptionType(type))

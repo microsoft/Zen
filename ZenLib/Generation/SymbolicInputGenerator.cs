@@ -6,6 +6,7 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Numerics;
     using System.Reflection;
     using static ZenLib.Language;
 
@@ -72,6 +73,13 @@ namespace ZenLib.Generation
         public object VisitInt()
         {
             var e = new ZenArbitraryExpr<int>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
+        public object VisitBigInteger()
+        {
+            var e = new ZenArbitraryExpr<BigInteger>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }

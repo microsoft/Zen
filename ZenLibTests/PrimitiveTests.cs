@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Language;
@@ -39,6 +40,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x > i));
             RandomBytes(x => CheckAgreement<ulong>(i => i > (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x > i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i > new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) > i));
         }
 
         /// <summary>
@@ -61,6 +64,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x < i));
             RandomBytes(x => CheckAgreement<ulong>(i => i < (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x < i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i < new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) < i));
         }
 
         /// <summary>
@@ -83,6 +88,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x <= i));
             RandomBytes(x => CheckAgreement<ulong>(i => i <= (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x <= i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i <= new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) <= i));
         }
 
         /// <summary>
@@ -105,6 +112,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x >= i));
             RandomBytes(x => CheckAgreement<ulong>(i => i >= (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x >= i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i >= new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) >= i));
         }
 
         /// <summary>
@@ -136,6 +145,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x == i));
             RandomBytes(x => CheckAgreement<ulong>(i => i == (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x == i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i == new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) == i));
         }
 
         /// <summary>
@@ -167,6 +178,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => (long)x != i));
             RandomBytes(x => CheckAgreement<ulong>(i => i != (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x != i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i != new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) != i));
         }
 
         /// <summary>
@@ -312,6 +325,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => Long(4) + i == (x + Long(4))));
             RandomBytes(x => CheckAgreement<ulong>(i => i + ULong(4) == (x + ULong(4))));
             RandomBytes(x => CheckAgreement<ulong>(i => ULong(4) + i == (x + ULong(4))));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i + BigInt(4) == (new BigInteger(x) + BigInt(4))));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => BigInt(4) + i == (new BigInteger(x) + BigInt(4))));
         }
 
         /// <summary>
@@ -349,6 +364,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<long>(i => 4L - i == x));
             RandomBytes(x => CheckAgreement<ulong>(i => i - 4UL == x));
             RandomBytes(x => CheckAgreement<ulong>(i => 4UL - i == x));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i - new BigInteger(4) == new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(4) - i == new BigInteger(x)));
         }
 
         /// <summary>
@@ -365,12 +382,13 @@ namespace ZenLib.Tests
             Assert.IsTrue(Function(() => Null<uint>()).Assert(v => v.Value() == 0));
             Assert.IsTrue(Function(() => Null<long>()).Assert(v => v.Value() == 0));
             Assert.IsTrue(Function(() => Null<ulong>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(Function(() => Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
             Assert.IsTrue(Function(() => Null<IList<bool>>()).Assert(v => v.Value().IsEmpty()));
             Assert.IsTrue(Function(() => Null<IDictionary<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
         }
 
         /// <summary>
-        /// Test that equality completes in reasonable time.
+        /// Test multiplication of integers.
         /// </summary>
         [TestMethod]
         public void TestMultiplication()
@@ -389,6 +407,17 @@ namespace ZenLib.Tests
             Assert.IsTrue(f.Evaluate(5, 2));
             Assert.IsTrue(f.Evaluate(1, 10));
             Assert.IsFalse(f.Evaluate(4, 3));
+        }
+
+        /// <summary>
+        /// Test multiplication of big integers works.
+        /// </summary>
+        [TestMethod]
+        public void TestMultiplySolve()
+        {
+            var f = Function<BigInteger, BigInteger, bool>((x, y) => x * y == new BigInteger(4));
+            var inputs = f.Find((x, y, result) => result);
+            Assert.AreEqual(4, inputs.Value.Item1 * inputs.Value.Item2);
         }
 
         /// <summary>

@@ -7,13 +7,14 @@ namespace ZenLib.Solver
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using DecisionDiagrams;
 
     /// <summary>
     /// Implementation of a solver using decision diagrams.
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
-    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit>
+    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit>
         where T : IDDNode
     {
         /// <summary>
@@ -500,6 +501,48 @@ namespace ZenLib.Solver
             }
 
             return Option.Some(m);
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateBigIntegerVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit CreateBigIntegerConst(BigInteger b)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit Add(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit Subtract(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit Multiply(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD LessThanOrEqual(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD GreaterThanOrEqual(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
     }
 }

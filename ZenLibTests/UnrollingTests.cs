@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
@@ -41,6 +42,8 @@ namespace ZenLib.Tests
             var long2 = Arbitrary<long>();
             var ulong1 = Arbitrary<ulong>();
             var ulong2 = Arbitrary<ulong>();
+            var bigint1 = Arbitrary<BigInteger>();
+            var bigint2 = Arbitrary<BigInteger>();
             var string1 = Arbitrary<string>();
             var string2 = Arbitrary<string>();
             var string3 = Arbitrary<string>();
@@ -75,6 +78,7 @@ namespace ZenLib.Tests
             CheckEqual(x > y, x > y);
             CheckEqual(x <= y, x <= y);
             CheckEqual(x >= y, x >= y);
+            CheckEqual(bigint1 + bigint2, bigint1 + bigint2);
             CheckEqual(string1 + string2, string1 + string2);
             CheckEqual(string1.At(ushort1), string1.At(ushort1));
             CheckEqual(string1.Contains(string2), string1.Contains(string2));

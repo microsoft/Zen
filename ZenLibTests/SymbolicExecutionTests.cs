@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.SymbolicExecution;
     using ZenLib.Tests.Network;
@@ -28,6 +29,16 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionStrings()
         {
             var f = Function<string, int>(x => If(x.Contains("a"), 1, If<int>(x.Contains("b"), 2, 3)));
+            Assert.AreEqual(3, f.GenerateInputs().Count());
+        }
+
+        /// <summary>
+        /// Test symbolic execution for big integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionBigIntegers()
+        {
+            var f = Function<BigInteger, int>(x => If(x == new BigInteger(10), 1, If<int>(x == new BigInteger(20), 2, 3)));
             Assert.AreEqual(3, f.GenerateInputs().Count());
         }
 

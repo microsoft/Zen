@@ -287,6 +287,11 @@ namespace ZenLib.Compilation
             return Expression.Constant(expression.Value);
         }
 
+        public Expression VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return Expression.Constant(expression.Value);
+        }
+
         public Expression VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.UnescapedValue);
@@ -735,6 +740,11 @@ namespace ZenLib.Compilation
         {
             var type = typeof(T);
 
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Add(left, right);
+            }
+
             if (type == ReflectionUtilities.ByteType ||
                 type == ReflectionUtilities.ShortType ||
                 type == ReflectionUtilities.UshortType)
@@ -748,6 +758,11 @@ namespace ZenLib.Compilation
         private Expression Subtract<T>(Expression left, Expression right)
         {
             var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Subtract(left, right);
+            }
 
             if (type == ReflectionUtilities.ByteType ||
                 type == ReflectionUtilities.ShortType ||

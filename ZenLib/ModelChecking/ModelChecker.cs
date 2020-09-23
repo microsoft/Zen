@@ -14,17 +14,18 @@ namespace ZenLib.ModelChecking
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TVar">The variable type.</typeparam>
     /// <typeparam name="TBool">The boolean expression type.</typeparam>
+    /// <typeparam name="TBitvec">The bitvector expression type.</typeparam>
     /// <typeparam name="TInt">The integer expression type.</typeparam>
-    /// <typeparam name="TString">The integer expression type.</typeparam>
-    internal class ModelChecker<TModel, TVar, TBool, TInt, TString> : IModelChecker
+    /// <typeparam name="TString">The string expression type.</typeparam>
+    internal class ModelChecker<TModel, TVar, TBool, TBitvec, TInt, TString> : IModelChecker
     {
-        private ISolver<TModel, TVar, TBool, TInt, TString> solver;
+        private ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver;
 
         /// <summary>
-        /// Create an in instance of the <see cref="ModelChecker{TModel, TVar, TBool, TInt, TString}"/> class.
+        /// Create an in instance of the class.
         /// </summary>
         /// <param name="solver">The solver.</param>
-        public ModelChecker(ISolver<TModel, TVar, TBool, TInt, TString> solver)
+        public ModelChecker(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver)
         {
             this.solver = solver;
         }
@@ -39,10 +40,10 @@ namespace ZenLib.ModelChecking
         /// </returns>
         public Dictionary<object, object> ModelCheck(Zen<bool> expression)
         {
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TInt, TString>(solver);
-            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TInt, TString>();
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString>(solver);
+            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>();
             var symbolicResult =
-                (SymbolicBool<TModel, TVar, TBool, TInt, TString>)expression.Accept(symbolicEvaluator, env);
+                (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Accept(symbolicEvaluator, env);
 
             // Console.WriteLine($"[time] model checking: {watch.ElapsedMilliseconds}ms");
             // watch.Restart();

@@ -95,6 +95,11 @@ namespace ZenLib.SymbolicExecution
             return new NestedEnumerable<PathConstraint>(parameter);
         }
 
+        public NestedEnumerable<PathConstraint> VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, PathConstraint parameter)
+        {
+            return new NestedEnumerable<PathConstraint>(parameter);
+        }
+
         public NestedEnumerable<PathConstraint> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, PathConstraint parameter)
         {
             var result = new NestedEnumerable<PathConstraint>();

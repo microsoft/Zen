@@ -4,14 +4,13 @@
 
 namespace ZenLib.Solver
 {
-    using System.Globalization;
-    using System.Text;
+    using System.Numerics;
     using Microsoft.Z3;
 
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, SeqExpr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr>
     {
         private Context context;
 
@@ -28,6 +27,8 @@ namespace ZenLib.Solver
         private Sort IntSort;
 
         private Sort LongSort;
+
+        private Sort BigIntSort;
 
         private Sort StringSort;
 
@@ -46,17 +47,13 @@ namespace ZenLib.Solver
             this.ShortSort = this.context.MkBitVecSort(16);
             this.IntSort = this.context.MkBitVecSort(32);
             this.LongSort = this.context.MkBitVecSort(64);
+            this.BigIntSort = this.context.MkIntSort();
             this.StringSort = this.context.StringSort;
         }
 
         private Symbol FreshSymbol()
         {
             return this.context.MkSymbol(nextIndex++);
-        }
-
-        public BitVecExpr Add(BitVecExpr x, BitVecExpr y)
-        {
-            return this.context.MkBVAdd(x, y);
         }
 
         public BoolExpr And(BoolExpr x, BoolExpr y)
@@ -134,6 +131,17 @@ namespace ZenLib.Solver
             return (v, (BitVecExpr)v);
         }
 
+        public IntExpr CreateBigIntegerConst(BigInteger bi)
+        {
+            return this.context.MkInt(bi.ToString());
+        }
+
+        public (Expr, IntExpr) CreateBigIntegerVar(object e)
+        {
+            var v = this.context.MkConst(FreshSymbol(), this.BigIntSort);
+            return (v, (IntExpr)v);
+        }
+
         public SeqExpr CreateStringConst(string s)
         {
             return this.context.MkString(s);
@@ -146,6 +154,11 @@ namespace ZenLib.Solver
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
+        {
+            return this.context.MkEq(x, y);
+        }
+
+        public BoolExpr Eq(IntExpr x, IntExpr y)
         {
             return this.context.MkEq(x, y);
         }
@@ -180,6 +193,11 @@ namespace ZenLib.Solver
             return (BitVecExpr)this.context.MkITE(g, t, f);
         }
 
+        public IntExpr Ite(BoolExpr g, IntExpr t, IntExpr f)
+        {
+            return (IntExpr)this.context.MkITE(g, t, f);
+        }
+
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
             return (SeqExpr)this.context.MkITE(g, t, f);
@@ -190,6 +208,11 @@ namespace ZenLib.Solver
             return this.context.MkBVULE(x, y);
         }
 
+        public BoolExpr LessThanOrEqual(IntExpr x, IntExpr y)
+        {
+            return this.context.MkLe(x, y);
+        }
+
         public BoolExpr LessThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkBVSLE(x, y);
@@ -198,6 +221,11 @@ namespace ZenLib.Solver
         public BoolExpr GreaterThanOrEqual(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkBVUGE(x, y);
+        }
+
+        public BoolExpr GreaterThanOrEqual(IntExpr x, IntExpr y)
+        {
+            return this.context.MkGe(x, y);
         }
 
         public BoolExpr GreaterThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
@@ -215,14 +243,34 @@ namespace ZenLib.Solver
             return this.context.MkOr(x, y);
         }
 
+        public BitVecExpr Add(BitVecExpr x, BitVecExpr y)
+        {
+            return this.context.MkBVAdd(x, y);
+        }
+
+        public IntExpr Add(IntExpr x, IntExpr y)
+        {
+            return (IntExpr)this.context.MkAdd(x, y);
+        }
+
         public BitVecExpr Subtract(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkBVSub(x, y);
         }
 
+        public IntExpr Subtract(IntExpr x, IntExpr y)
+        {
+            return (IntExpr)this.context.MkSub(x, y);
+        }
+
         public BitVecExpr Multiply(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkBVMul(x, y);
+        }
+
+        public IntExpr Multiply(IntExpr x, IntExpr y)
+        {
+            return (IntExpr)this.context.MkMul(x, y);
         }
 
         public SeqExpr Concat(SeqExpr x, SeqExpr y)
@@ -307,6 +355,11 @@ namespace ZenLib.Solver
                 }
 
                 return (int)uint.Parse(e.ToString());
+            }
+
+            if (e.Sort == this.BigIntSort)
+            {
+                return BigInteger.Parse(e.ToString());
             }
 
             if (e.Sort == this.StringSort)

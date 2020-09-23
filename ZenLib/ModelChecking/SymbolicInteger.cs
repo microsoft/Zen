@@ -10,20 +10,20 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic integer value.
     /// </summary>
-    internal class SymbolicInteger<TModel, TVar, TBool, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TInt, TString>
+    internal class SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
     {
-        public SymbolicInteger(ISolver<TModel, TVar, TBool, TInt, TString> solver, TInt value) : base(solver)
+        public SymbolicInteger(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, TInt value) : base(solver)
         {
             this.Value = value;
         }
 
         public TInt Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TInt, TString> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other)
         {
-            var o = (SymbolicInteger<TModel, TVar, TBool, TInt, TString>)other;
+            var o = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicInteger<TModel, TVar, TBool, TInt, TString>(this.Solver, value);
+            return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, value);
         }
 
         /// <summary>

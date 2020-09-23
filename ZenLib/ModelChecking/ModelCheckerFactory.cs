@@ -41,7 +41,7 @@ namespace ZenLib.ModelChecking
             var manager = new DDManager<BDDNode>(new BDDNodeFactory());
             var solver = new SolverDD<BDDNode>(manager, mustInterleave);
             solver.Init();
-            return new ModelChecker<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit>(solver);
+            return new ModelChecker<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(solver);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ZenLib.ModelChecking
         private static IModelChecker CreateModelCheckerZ3()
         {
             var solver = new SolverZ3();
-            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, SeqExpr>(solver);
+            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr>(solver);
         }
     }
 }

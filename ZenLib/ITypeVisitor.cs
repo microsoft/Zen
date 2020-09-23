@@ -62,6 +62,12 @@ namespace ZenLib
         T VisitUlong();
 
         /// <summary>
+        /// Visit the BigInteger type.
+        /// </summary>
+        /// <returns></returns>
+        T VisitBigInteger();
+
+        /// <summary>
         /// Visit the string type.
         /// </summary>
         /// <returns>A value.</returns>

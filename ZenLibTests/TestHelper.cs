@@ -41,7 +41,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// Backends to test when running string tests.
         /// </summary>
-        private static TestParameter[] stringParameters = new TestParameter[]
+        private static TestParameter[] unboundedParameters = new TestParameter[]
         {
             new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
             new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
@@ -103,6 +103,21 @@ namespace ZenLib.Tests
             return p.Simplify ? expr.Simplify() : expr;
         }
 
+        private static TestParameter[] SetParameters(params Type[] types)
+        {
+            var ps = parameters;
+
+            foreach (var type in types)
+            {
+                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType)
+                {
+                    ps = unboundedParameters;
+                }
+            }
+
+            return ps;
+        }
+
         /// <summary>
         /// Check a predicate is valid.
         /// </summary>
@@ -110,12 +125,8 @@ namespace ZenLib.Tests
         /// <param name="function">The predicate.</param>
         public static void CheckValid<T1>(Func<Zen<T1>, Zen<bool>> function)
         {
-            // If testing on strings, only use Z3 backend (DD does not support strings)
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1));
+
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
@@ -142,12 +153,8 @@ namespace ZenLib.Tests
         public static void CheckValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function)
         {
             // If testing on strings, only use Z3 backend (DD does not support strings)
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType
-             || typeof(T2) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1), typeof(T2));
+
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
@@ -174,14 +181,8 @@ namespace ZenLib.Tests
         /// <param name="function">The predicate.</param>
         public static void CheckValid<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> function)
         {
-            // If testing on strings, only use Z3 backend (DD does not support strings)
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType
-             || typeof(T2) == ReflectionUtilities.StringType
-             || typeof(T3) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1), typeof(T2), typeof(T3));
+
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
@@ -209,15 +210,8 @@ namespace ZenLib.Tests
         /// <param name="function">The predicate.</param>
         public static void CheckValid<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> function)
         {
-            // If testing on strings, only use Z3 backend (DD does not support strings)
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType
-             || typeof(T2) == ReflectionUtilities.StringType
-             || typeof(T3) == ReflectionUtilities.StringType
-             || typeof(T4) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
@@ -242,11 +236,8 @@ namespace ZenLib.Tests
         /// <param name="function">The predicate.</param>
         public static void CheckNotValid<T1>(Func<Zen<T1>, Zen<bool>> function)
         {
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1));
+
             foreach (var p in selectedParams)
             {
                 // prove that it is not valid
@@ -269,12 +260,8 @@ namespace ZenLib.Tests
         /// <param name="function">The predicate.</param>
         public static void CheckNotValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function)
         {
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType
-             || typeof(T2) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1), typeof(T2));
+
             foreach (var p in selectedParams)
             {
                 var f = Function(function);
@@ -311,11 +298,8 @@ namespace ZenLib.Tests
         /// <param name="function">The function.</param>
         public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function)
         {
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1));
+
             foreach (var p in selectedParams)
             {
                 var f = Function(function);
@@ -338,12 +322,8 @@ namespace ZenLib.Tests
         /// <param name="function">The function.</param>
         public static void CheckAgreement<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function)
         {
-            TestParameter[] selectedParams = parameters;
-            if (typeof(T1) == ReflectionUtilities.StringType
-             || typeof(T2) == ReflectionUtilities.StringType)
-            {
-                selectedParams = stringParameters;
-            }
+            var selectedParams = SetParameters(typeof(T1), typeof(T2));
+
             foreach (var p in selectedParams)
             {
                 var f = Function(function);
