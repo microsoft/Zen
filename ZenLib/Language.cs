@@ -9,6 +9,7 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using System.Reflection;
     using ZenLib.Generation;
 
@@ -172,6 +173,16 @@ namespace ZenLib
         public static Zen<long> Long(long l)
         {
             return ZenConstantLongExpr.Create(l);
+        }
+
+        /// <summary>
+        /// The Zen value for a big integer.
+        /// </summary>
+        /// <param name="bi">A big integer value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> BigInt(BigInteger bi)
+        {
+            return ZenConstantBigIntExpr.Create(bi);
         }
 
         /// <summary>
@@ -756,7 +767,7 @@ namespace ZenLib
         /// <param name="offset">The offset Zen expression.</param>
         /// <param name="length">The length Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> Substring(this Zen<string> str, Zen<ushort> offset, Zen<ushort> length)
+        public static Zen<string> Substring(this Zen<string> str, Zen<BigInteger> offset, Zen<BigInteger> length)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(offset);
@@ -771,7 +782,7 @@ namespace ZenLib
         /// <param name="str">The string Zen expression.</param>
         /// <param name="index">The index Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> At(this Zen<string> str, Zen<ushort> index)
+        public static Zen<string> At(this Zen<string> str, Zen<BigInteger> index)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(index);
@@ -784,7 +795,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="str">The string Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ushort> Length(this Zen<string> str)
+        public static Zen<BigInteger> Length(this Zen<string> str)
         {
             CommonUtilities.ValidateNotNull(str);
 
@@ -799,7 +810,7 @@ namespace ZenLib
         /// <param name="sub">The substring Zen expression.</param>
         /// <param name="offset">The offset Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub, Zen<ushort> offset)
+        public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub, Zen<BigInteger> offset)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(sub);
@@ -814,9 +825,9 @@ namespace ZenLib
         /// <param name="str">The string Zen expression.</param>
         /// <param name="sub">The substring Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<short> IndexOf(this Zen<string> str, Zen<string> sub)
+        public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub)
         {
-            return IndexOf(str, sub, 0);
+            return IndexOf(str, sub, new BigInteger(0));
         }
 
         /// <summary>
@@ -946,6 +957,20 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Compute the maximum of two values.
+        /// </summary>
+        /// <param name="expr1">First value..</param>
+        /// <param name="expr2">Second value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> Max(Zen<BigInteger> expr1, Zen<BigInteger> expr2)
+        {
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
+
+            return If(expr1 >= expr2, expr1, expr2);
+        }
+
+        /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
         /// <param name="expr1">First value..</param>
@@ -1036,6 +1061,20 @@ namespace ZenLib
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Min(Zen<ulong> expr1, Zen<ulong> expr2)
+        {
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
+
+            return If(expr1 <= expr2, expr1, expr2);
+        }
+
+        /// <summary>
+        /// Compute the minimum of two values.
+        /// </summary>
+        /// <param name="expr1">First value..</param>
+        /// <param name="expr2">Second value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> Min(Zen<BigInteger> expr1, Zen<BigInteger> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);

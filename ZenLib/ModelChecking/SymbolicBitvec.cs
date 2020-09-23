@@ -1,4 +1,4 @@
-// <copyright file="SymbolicString.cs" company="Microsoft">
+﻿// <copyright file="SymbolicInteger.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,22 +8,22 @@ namespace ZenLib.ModelChecking
     using ZenLib.Solver;
 
     /// <summary>
-    /// Representation of a symbolic string value.
+    /// Representation of a symbolic integer value.
     /// </summary>
-    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal class SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
     {
-        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, TString value) : base(solver)
+        public SymbolicBitvec(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, TBitvec value) : base(solver)
         {
             this.Value = value;
         }
 
-        public TString Value { get; }
+        public TBitvec Value { get; }
 
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other)
         {
-            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
+            var o = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, value);
+            return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, value);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symstring>";
+            return "<symbitvec>";
         }
     }
 }

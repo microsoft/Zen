@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a substring expression.
@@ -20,18 +21,24 @@ namespace ZenLib
             return Create(this.StringExpr.Unroll(), this.IndexExpr.Unroll());
         }
 
-        public static Zen<string> Simplify(Zen<string> e1, Zen<ushort> e2)
+        public static Zen<string> Simplify(Zen<string> e1, Zen<BigInteger> e2)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
-            if (x != null && y.HasValue)
-                return CommonUtilities.At(x, (ushort)y.Value);
+
+            if (x != null && e2 is ZenConstantBigIntExpr be)
+            {
+                return CommonUtilities.At(x, be.Value);
+            }
+
             if (x == string.Empty)
+            {
                 return string.Empty;
+            }
+
             return new ZenStringAtExpr(e1, e2);
         }
 
-        public static Zen<string> Create(Zen<string> expr1, Zen<ushort> expr2)
+        public static Zen<string> Create(Zen<string> expr1, Zen<BigInteger> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
@@ -52,7 +59,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr1">The string expression.</param>
         /// <param name="expr2">The index expression.</param>
-        private ZenStringAtExpr(Zen<string> expr1, Zen<ushort> expr2)
+        private ZenStringAtExpr(Zen<string> expr1, Zen<BigInteger> expr2)
         {
             this.StringExpr = expr1;
             this.IndexExpr = expr2;
@@ -66,7 +73,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the second expression.
         /// </summary>
-        internal Zen<ushort> IndexExpr { get; }
+        internal Zen<BigInteger> IndexExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

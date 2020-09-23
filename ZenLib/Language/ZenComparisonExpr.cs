@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a Geq expression.
@@ -24,6 +25,13 @@ namespace ZenLib
             (x, y) => x == y ? 1L : 0L,
         };
 
+        private static Func<BigInteger, BigInteger, bool>[] constantBigIntFuncs = new Func<BigInteger, BigInteger, bool>[]
+        {
+            (x, y) => x >= y,
+            (x, y) => x <= y,
+            (x, y) => x == y,
+        };
+
         internal override Zen<bool> Unroll()
         {
             return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.ComparisonType);
@@ -31,6 +39,11 @@ namespace ZenLib
 
         private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2, ComparisonType comparisonType)
         {
+            if (e1 is ZenConstantBigIntExpr be1 && e2 is ZenConstantBigIntExpr be2)
+            {
+                return Language.Bool(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
+            }
+
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 

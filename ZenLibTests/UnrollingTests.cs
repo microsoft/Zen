@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
@@ -41,6 +42,8 @@ namespace ZenLib.Tests
             var long2 = Arbitrary<long>();
             var ulong1 = Arbitrary<ulong>();
             var ulong2 = Arbitrary<ulong>();
+            var bigint1 = Arbitrary<BigInteger>();
+            var bigint2 = Arbitrary<BigInteger>();
             var string1 = Arbitrary<string>();
             var string2 = Arbitrary<string>();
             var string3 = Arbitrary<string>();
@@ -75,15 +78,16 @@ namespace ZenLib.Tests
             CheckEqual(x > y, x > y);
             CheckEqual(x <= y, x <= y);
             CheckEqual(x >= y, x >= y);
+            CheckEqual(bigint1 + bigint2, bigint1 + bigint2);
             CheckEqual(string1 + string2, string1 + string2);
-            CheckEqual(string1.At(ushort1), string1.At(ushort1));
+            CheckEqual(string1.At(bigint1), string1.At(bigint1));
             CheckEqual(string1.Contains(string2), string1.Contains(string2));
             CheckEqual(string1.StartsWith(string2), string1.StartsWith(string2));
             CheckEqual(string1.EndsWith(string2), string1.EndsWith(string2));
-            CheckEqual(string1.IndexOf(string2, ushort1), string1.IndexOf(string2, ushort1));
+            CheckEqual(string1.IndexOf(string2, bigint1), string1.IndexOf(string2, bigint1));
             CheckEqual(string1.Length(), string1.Length());
             CheckEqual(string1.ReplaceFirst(string2, string3), string1.ReplaceFirst(string2, string3));
-            CheckEqual(string1.Substring(ushort1, ushort2), string1.Substring(ushort1, ushort2));
+            CheckEqual(string1.Substring(bigint1, bigint2), string1.Substring(bigint1, bigint2));
             CheckEqual(opt.HasValue(), opt.HasValue());
             CheckEqual(arg, arg);
             CheckEqual(If(a, x, y), If(a, x, y));

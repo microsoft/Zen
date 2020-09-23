@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Language;
@@ -187,6 +188,16 @@ namespace ZenLib.Tests
         public void TestAtException2()
         {
             Language.At(EmptyList<int>(), null);
+        }
+
+        /// <summary>
+        /// Exception thrown for adding big integers.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestBitwiseBigIntegerException()
+        {
+            Language.BitwiseAnd<BigInteger>(new BigInteger(0), new BigInteger(1));
         }
 
         /// <summary>

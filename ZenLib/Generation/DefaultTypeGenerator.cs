@@ -6,6 +6,7 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Numerics;
     using System.Reflection;
 
     /// <summary>
@@ -58,6 +59,11 @@ namespace ZenLib.Generation
         public object VisitLong()
         {
             return ZenConstantLongExpr.Create(0);
+        }
+
+        public object VisitBigInteger()
+        {
+            return ZenConstantBigIntExpr.Create(new BigInteger(0));
         }
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)

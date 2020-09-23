@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.Generation;
 
@@ -29,6 +30,7 @@ namespace ZenLib.Tests
         [DataRow(typeof(uint))]
         [DataRow(typeof(long))]
         [DataRow(typeof(ulong))]
+        [DataRow(typeof(BigInteger))]
         [DataRow(typeof(string))]
         [DataRow(typeof(string))]
         [DataRow(typeof(FiniteString))]

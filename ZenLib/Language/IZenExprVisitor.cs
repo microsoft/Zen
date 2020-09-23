@@ -116,6 +116,14 @@ namespace ZenLib
         TReturn VisitZenConstantLongExpr(ZenConstantLongExpr expression, TParam parameter);
 
         /// <summary>
+        /// Visit a BigIntConstantExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, TParam parameter);
+
+        /// <summary>
         /// Visit a StringConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

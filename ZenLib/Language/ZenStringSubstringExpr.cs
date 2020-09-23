@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a substring expression.
@@ -20,17 +21,17 @@ namespace ZenLib
             return Create(this.StringExpr.Unroll(), this.OffsetExpr.Unroll(), this.LengthExpr.Unroll());
         }
 
-        public static Zen<string> Simplify(Zen<string> e1, Zen<ushort> e2, Zen<ushort> e3)
+        public static Zen<string> Simplify(Zen<string> e1, Zen<BigInteger> e2, Zen<BigInteger> e3)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
-            var z = ReflectionUtilities.GetConstantIntegerValue(e3);
-            if (x != null && y.HasValue && z.HasValue)
-                return CommonUtilities.Substring(x, (ushort)y.Value, (ushort)z.Value);
+
+            if (x != null && e2 is ZenConstantBigIntExpr be2 && e3 is ZenConstantBigIntExpr be3)
+                return CommonUtilities.Substring(x, be2.Value, be3.Value);
+
             return new ZenStringSubstringExpr(e1, e2, e3);
         }
 
-        public static Zen<string> Create(Zen<string> expr1, Zen<ushort> expr2, Zen<ushort> expr3)
+        public static Zen<string> Create(Zen<string> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
@@ -53,7 +54,7 @@ namespace ZenLib
         /// <param name="expr1">The string expression.</param>
         /// <param name="expr2">The subtring match.</param>
         /// <param name="expr3">The substituted string.</param>
-        private ZenStringSubstringExpr(Zen<string> expr1, Zen<ushort> expr2, Zen<ushort> expr3)
+        private ZenStringSubstringExpr(Zen<string> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
         {
             this.StringExpr = expr1;
             this.OffsetExpr = expr2;
@@ -68,12 +69,12 @@ namespace ZenLib
         /// <summary>
         /// Gets the second expression.
         /// </summary>
-        internal Zen<ushort> OffsetExpr { get; }
+        internal Zen<BigInteger> OffsetExpr { get; }
 
         /// <summary>
         /// Gets the third expression.
         /// </summary>
-        internal Zen<ushort> LengthExpr { get; }
+        internal Zen<BigInteger> LengthExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

@@ -7,6 +7,7 @@ namespace ZenLib.Generation
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Numerics;
     using System.Reflection;
 
     /// <summary>
@@ -132,6 +133,11 @@ namespace ZenLib.Generation
         public object VisitLong()
         {
             return this.GenerateRandom(typeof(long), () => ((long)RandomInt() << 32) | (long)RandomInt());
+        }
+
+        public object VisitBigInteger()
+        {
+            return this.GenerateRandom(typeof(BigInteger), () => new BigInteger(RandomInt()));
         }
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)

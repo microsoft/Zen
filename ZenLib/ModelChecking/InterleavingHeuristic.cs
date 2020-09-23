@@ -211,6 +211,12 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
+        public ImmutableHashSet<object> VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, Unit parameter)
+        {
+            throw new ZenException($"Invalid BigInteger type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
         public ImmutableHashSet<object> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Unit parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");

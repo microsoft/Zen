@@ -8,6 +8,7 @@ namespace ZenLib.Compilation
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq.Expressions;
+    using System.Numerics;
     using System.Reflection;
     using ZenLib.Interpretation;
 
@@ -283,6 +284,11 @@ namespace ZenLib.Compilation
         }
 
         public Expression VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return Expression.Constant(expression.Value);
+        }
+
+        public Expression VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
@@ -588,7 +594,7 @@ namespace ZenLib.Compilation
             return LookupOrCompute(expression, () =>
             {
                 var e = expression.Expr.Accept(this, parameter);
-                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(ushort));
+                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(BigInteger));
             });
         }
         public Expression VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ExpressionConverterEnvironment parameter)
@@ -735,6 +741,11 @@ namespace ZenLib.Compilation
         {
             var type = typeof(T);
 
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Add(left, right);
+            }
+
             if (type == ReflectionUtilities.ByteType ||
                 type == ReflectionUtilities.ShortType ||
                 type == ReflectionUtilities.UshortType)
@@ -748,6 +759,11 @@ namespace ZenLib.Compilation
         private Expression Subtract<T>(Expression left, Expression right)
         {
             var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Subtract(left, right);
+            }
 
             if (type == ReflectionUtilities.ByteType ||
                 type == ReflectionUtilities.ShortType ||

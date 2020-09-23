@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.SymbolicExecution;
     using ZenLib.Tests.Network;
@@ -28,6 +29,16 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionStrings()
         {
             var f = Function<string, int>(x => If(x.Contains("a"), 1, If<int>(x.Contains("b"), 2, 3)));
+            Assert.AreEqual(3, f.GenerateInputs().Count());
+        }
+
+        /// <summary>
+        /// Test symbolic execution for big integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionBigIntegers()
+        {
+            var f = Function<BigInteger, int>(x => If(x == new BigInteger(10), 1, If<int>(x == new BigInteger(20), 2, 3)));
             Assert.AreEqual(3, f.GenerateInputs().Count());
         }
 
@@ -157,7 +168,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringAt()
         {
-            var f = Function<string, bool, string>((s, b) => s.At(If<ushort>(b, 1, 2)));
+            var f = Function<string, bool, string>((s, b) => s.At(If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
             Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 
@@ -167,7 +178,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringSubstring()
         {
-            var f = Function<string, bool, string>((s, b) => s.Substring(0, If<ushort>(b, 1, 2)));
+            var f = Function<string, bool, string>((s, b) => s.Substring(new BigInteger(0), If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
             Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 
@@ -187,8 +198,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringLength()
         {
-            var f1 = Function<string, int>(s => If<int>(s.Length() == 3, 1, 2));
-            var f2 = Function<string, int>(s => If(s.Length() == 3, If<int>(s.Length() == 2, 1, 2), 3));
+            var f1 = Function<string, int>(s => If<int>(s.Length() == new BigInteger(3), 1, 2));
+            var f2 = Function<string, int>(s => If(s.Length() == new BigInteger(3), If<int>(s.Length() == new BigInteger(2), 1, 2), 3));
             Assert.AreEqual(2, f1.GenerateInputs().Count());
             Assert.AreEqual(2, f2.GenerateInputs().Count());
         }
@@ -199,7 +210,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringIndexOf()
         {
-            var f = Function<string, bool, short>((s, b) => s.IndexOf(If<string>(b, "hello", "world)")));
+            var f = Function<string, bool, BigInteger>((s, b) => s.IndexOf(If<string>(b, "hello", "world)")));
             Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 

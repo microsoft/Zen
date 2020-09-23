@@ -10,20 +10,20 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>
-    internal class SymbolicBool<TModel, TVar, TBool, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TInt, TString>
+    internal class SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
     {
-        public SymbolicBool(ISolver<TModel, TVar, TBool, TInt, TString> solver, TBool value) : base(solver)
+        public SymbolicBool(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, TBool value) : base(solver)
         {
             this.Value = value;
         }
 
         public TBool Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TInt, TString> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other)
         {
-            var o = (SymbolicBool<TModel, TVar, TBool, TInt, TString>)other;
+            var o = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicBool<TModel, TVar, TBool, TInt, TString>(this.Solver, value);
+            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, value);
         }
 
         /// <summary>

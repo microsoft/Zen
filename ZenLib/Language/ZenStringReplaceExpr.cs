@@ -26,12 +26,14 @@ namespace ZenLib
             string x = ReflectionUtilities.GetConstantString(e1);
             string y = ReflectionUtilities.GetConstantString(e2);
             string z = ReflectionUtilities.GetConstantString(e3);
+
             if (x != null && y != null && z != null)
                 return CommonUtilities.ReplaceFirst(x, y, z);
             if (x == "")
                 return "";
             if (y == "")
                 return e1 + e3;
+
             return new ZenStringReplaceExpr(e1, e2, e3);
         }
 

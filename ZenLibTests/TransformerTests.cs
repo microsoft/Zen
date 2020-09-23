@@ -4,7 +4,9 @@
 
 namespace ZenLib.Tests
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.ModelChecking;
     using ZenLib.Tests.Network;
@@ -17,6 +19,16 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class TransformerTests
     {
+        /// <summary>
+        /// Test a transformer fails for unbounded types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestTransformerExceptionForUnboundedTypes1()
+        {
+            Function<BigInteger, bool>(i => i > new BigInteger(0)).Transformer();
+        }
+
         /// <summary>
         /// Test a transformer with an abitrary works.
         /// </summary>

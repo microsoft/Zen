@@ -6,31 +6,35 @@ namespace ZenLib
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// Class representing a substring expression.
     /// </summary>
-    internal sealed class ZenStringIndexOfExpr : Zen<short>
+    internal sealed class ZenStringIndexOfExpr : Zen<BigInteger>
     {
-        private static Dictionary<(object, object, object), Zen<short>> hashConsTable =
-            new Dictionary<(object, object, object), Zen<short>>();
+        private static Dictionary<(object, object, object), Zen<BigInteger>> hashConsTable =
+            new Dictionary<(object, object, object), Zen<BigInteger>>();
 
-        internal override Zen<short> Unroll()
+        internal override Zen<BigInteger> Unroll()
         {
             return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.OffsetExpr.Unroll());
         }
 
-        public static Zen<short> Simplify(Zen<string> e1, Zen<string> e2, Zen<ushort> e3)
+        public static Zen<BigInteger> Simplify(Zen<string> e1, Zen<string> e2, Zen<BigInteger> e3)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
             var y = ReflectionUtilities.GetConstantString(e2);
-            var z = ReflectionUtilities.GetConstantIntegerValue(e3);
-            if (x != null && y != null && z.HasValue)
-                return CommonUtilities.IndexOf(x, y, (ushort)z.Value);
+
+            if (x != null && y != null && e3 is ZenConstantBigIntExpr be)
+            {
+                return CommonUtilities.IndexOf(x, y, be.Value);
+            }
+
             return new ZenStringIndexOfExpr(e1, e2, e3);
         }
 
-        public static Zen<short> Create(Zen<string> expr1, Zen<string> expr2, Zen<ushort> expr3)
+        public static Zen<BigInteger> Create(Zen<string> expr1, Zen<string> expr2, Zen<BigInteger> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
@@ -53,7 +57,7 @@ namespace ZenLib
         /// <param name="expr1">The string expression.</param>
         /// <param name="expr2">The subtring expression.</param>
         /// <param name="expr3">The offset expression.</param>
-        private ZenStringIndexOfExpr(Zen<string> expr1, Zen<string> expr2, Zen<ushort> expr3)
+        private ZenStringIndexOfExpr(Zen<string> expr1, Zen<string> expr2, Zen<BigInteger> expr3)
         {
             this.StringExpr = expr1;
             this.SubstringExpr = expr2;
@@ -73,7 +77,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the third expression.
         /// </summary>
-        internal Zen<ushort> OffsetExpr { get; }
+        internal Zen<BigInteger> OffsetExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

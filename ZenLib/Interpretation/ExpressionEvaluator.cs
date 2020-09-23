@@ -7,6 +7,7 @@ namespace ZenLib.Interpretation
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Numerics;
     using System.Reflection;
 
     /// <summary>
@@ -87,18 +88,16 @@ namespace ZenLib.Interpretation
             {
                 var e1 = expression.Expr1.Accept(this, parameter);
                 var e2 = expression.Expr2.Accept(this, parameter);
-                var x = ReflectionUtilities.ToLong(e1);
-                var y = ReflectionUtilities.ToLong(e2);
                 var type = typeof(T);
 
                 switch (expression.Operation)
                 {
                     case Op.BitwiseAnd:
-                        return ReflectionUtilities.Specialize<T>(x & y);
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
                     case Op.BitwiseOr:
-                        return ReflectionUtilities.Specialize<T>(x | y);
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
                     case Op.BitwiseXor:
-                        return ReflectionUtilities.Specialize<T>(x ^ y);
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
                     case Op.Addition:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 + (byte)e2);
@@ -112,7 +111,9 @@ namespace ZenLib.Interpretation
                             return (uint)e1 + (uint)e2;
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 + (long)e2;
-                        return (ulong)e1 + (ulong)e2;
+                        if (type == ReflectionUtilities.UlongType)
+                            return (ulong)e1 + (ulong)e2;
+                        return (BigInteger)e1 + (BigInteger)e2;
                     case Op.Subtraction:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 - (byte)e2);
@@ -126,7 +127,9 @@ namespace ZenLib.Interpretation
                             return (uint)e1 - (uint)e2;
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 - (long)e2;
-                        return (ulong)e1 - (ulong)e2;
+                        if (type == ReflectionUtilities.UlongType)
+                            return (ulong)e1 - (ulong)e2;
+                        return (BigInteger)e1 - (BigInteger)e2;
                     default:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 * (byte)e2);
@@ -140,7 +143,9 @@ namespace ZenLib.Interpretation
                             return (uint)e1 * (uint)e2;
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 * (long)e2;
-                        return (ulong)e1 * (ulong)e2;
+                        if (type == ReflectionUtilities.UlongType)
+                            return (ulong)e1 * (ulong)e2;
+                        return (BigInteger)e1 * (BigInteger)e2;
                 }
             });
         }
@@ -152,6 +157,11 @@ namespace ZenLib.Interpretation
                 var x = ReflectionUtilities.ToLong(expression.Expr.Accept(this, parameter));
                 return ReflectionUtilities.Specialize<T>(~x);
             });
+        }
+
+        public object VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return expression.Value;
         }
 
         public object VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, ExpressionEvaluatorEnvironment parameter)
@@ -234,7 +244,9 @@ namespace ZenLib.Interpretation
                             return (uint)e1 >= (uint)e2;
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 >= (long)e2;
-                        return (ulong)e1 >= (ulong)e2;
+                        if (type == ReflectionUtilities.UlongType)
+                            return (ulong)e1 >= (ulong)e2;
+                        return (BigInteger)e1 >= (BigInteger)e2;
 
                     case ComparisonType.Leq:
                         if (type == ReflectionUtilities.ByteType)
@@ -249,7 +261,9 @@ namespace ZenLib.Interpretation
                             return (uint)e1 <= (uint)e2;
                         if (type == ReflectionUtilities.LongType)
                             return (long)e1 <= (long)e2;
-                        return (ulong)e1 <= (ulong)e2;
+                        if (type == ReflectionUtilities.UlongType)
+                            return (ulong)e1 <= (ulong)e2;
+                        return (BigInteger)e1 <= (BigInteger)e2;
 
                     default:
                         return ((T)e1).Equals((T)e2);
@@ -344,8 +358,8 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
-                var e2 = (ushort)expression.OffsetExpr.Accept(this, parameter);
-                var e3 = (ushort)expression.LengthExpr.Accept(this, parameter);
+                var e2 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
+                var e3 = (BigInteger)expression.LengthExpr.Accept(this, parameter);
                 return CommonUtilities.Substring(e1, e2, e3);
             });
         }
@@ -355,7 +369,7 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
-                var e2 = (ushort)expression.IndexExpr.Accept(this, parameter);
+                var e2 = (BigInteger)expression.IndexExpr.Accept(this, parameter);
                 return CommonUtilities.At(e1, e2);
             });
         }
@@ -365,7 +379,7 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e = (string)expression.Expr.Accept(this, parameter);
-                return (ushort)e.Length;
+                return (BigInteger)e.Length;
             });
         }
 
@@ -375,7 +389,7 @@ namespace ZenLib.Interpretation
             {
                 var e1 = (string)expression.StringExpr.Accept(this, parameter);
                 var e2 = (string)expression.SubstringExpr.Accept(this, parameter);
-                var e3 = (ushort)expression.OffsetExpr.Accept(this, parameter);
+                var e3 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
                 return CommonUtilities.IndexOf(e1, e2, e3);
             });
         }

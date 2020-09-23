@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
     using ZenLib;
@@ -150,7 +151,7 @@ namespace ZenLib.Tests
         {
             RandomBytes(offset =>
             RandomBytes(length =>
-                CheckValid<string>(s => s.Contains(s.Substring(offset, length)))));
+                CheckValid<string>(s => s.Contains(s.Substring(new BigInteger(offset), new BigInteger(length))))));
         }
 
         /// <summary>
@@ -159,8 +160,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSubstringAgreement()
         {
-            var offset = RandomByte();
-            var length = RandomByte();
+            var offset = new BigInteger(RandomByte());
+            var length = new BigInteger(RandomByte());
             CheckAgreement<string>(s => s.Substring(offset, length).EndsWith("ab"));
         }
 
@@ -170,13 +171,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthAgreement()
         {
-            CheckAgreement<string>(s => s.Length() == 0);
-            CheckAgreement<string>(s => s.Length() == 1);
-            CheckAgreement<string>(s => s.Length() == 2);
-            CheckAgreement<string>(s => s.Length() == 3);
-            CheckAgreement<string>(s => s.Length() == 4);
-            CheckAgreement<string>(s => s.Length() == 5);
-            CheckAgreement<string>(s => s.Length() == 10);
+            CheckAgreement<string>(s => s.Length() == new BigInteger(0));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(1));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(2));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(3));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(4));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(5));
+            CheckAgreement<string>(s => s.Length() == new BigInteger(10));
         }
 
         /// <summary>
@@ -306,7 +307,7 @@ namespace ZenLib.Tests
         [DataRow("hello", 0, 20, "hello")]
         public void TestSubstringEvaluation(string s, int offset, int length, string expected)
         {
-            var f = Function<string, string>(s => s.Substring((ushort)offset, (ushort)length));
+            var f = Function<string, string>(s => s.Substring(new BigInteger(offset), new BigInteger(length)));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -327,7 +328,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = Function<string, ushort, string>((s, idx) => s.At(idx));
+            var f = Function<string, BigInteger, string>((s, idx) => s.At(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -335,7 +336,7 @@ namespace ZenLib.Tests
             if (expected != "")
             {
                 var x = f.Find((str, idx, o) => And(str == s, o == expected));
-                Assert.AreEqual(x.Value.Item2, (ushort)index);
+                Assert.AreEqual(x.Value.Item2, new BigInteger(index));
             }
         }
 
@@ -352,10 +353,10 @@ namespace ZenLib.Tests
         [DataRow("\x01\x02", 2)]
         public void TestLengthEvaluation(string s, int expected)
         {
-            var f = Function<string, ushort>(s => s.Length());
-            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+            var f = Function<string, BigInteger>(s => s.Length());
+            Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
             f.Compile();
-            Assert.AreEqual((ushort)expected, f.Evaluate(s));
+            Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
         }
 
         /// <summary>
@@ -373,7 +374,7 @@ namespace ZenLib.Tests
         [DataRow("abcda", "e", 0, -1)]
         public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
         {
-            var f = Function<string, short>(s => s.IndexOf(sub, (ushort)offset));
+            var f = Function<string, BigInteger>(s => s.IndexOf(sub, new BigInteger(offset)));
             Assert.AreEqual((short)expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual((short)expected, f.Evaluate(s));
@@ -385,8 +386,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfFind()
         {
-            var f = Function<string, short>(s => s.IndexOf("a", 0));
-            var input = f.Find((s, o) => o == 5);
+            var f = Function<string, BigInteger>(s => s.IndexOf("a", new BigInteger(0)));
+            var input = f.Find((s, o) => o == new BigInteger(5));
             Assert.AreEqual((short)5, f.Evaluate(input.Value));
         }
 
@@ -398,9 +399,9 @@ namespace ZenLib.Tests
         {
             var f = Function<string, bool>(s =>
             {
-                var c = s.At(3);
-                var s2 = s.Substring(5, 2);
-                return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == 10);
+                var c = s.At(new BigInteger(3));
+                var s2 = s.Substring(new BigInteger(5), new BigInteger(2));
+                return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == new BigInteger(10));
             });
 
             var x = f.Find((i, o) => o);
@@ -414,11 +415,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtIsSubstring()
         {
-            CheckValid<string>(s => s.At(0) == s.Substring(0, 1));
-            CheckValid<string>(s => s.At(1) == s.Substring(1, 1));
-            CheckValid<string>(s => s.At(2) == s.Substring(2, 1));
-            CheckValid<string>(s => s.At(3) == s.Substring(3, 1));
-            CheckValid<string>(s => s.At(4) == s.Substring(4, 1));
+            CheckValid<string>(s => s.At(new BigInteger(0)) == s.Substring(new BigInteger(0), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(1)) == s.Substring(new BigInteger(1), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(2)) == s.Substring(new BigInteger(2), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(3)) == s.Substring(new BigInteger(3), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(4)) == s.Substring(new BigInteger(4), new BigInteger(1)));
         }
 
         /// <summary>
