@@ -10,6 +10,7 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
+    using ZenLib.ModelChecking;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
@@ -20,6 +21,17 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class PrimitiveTests
     {
+        /// <summary>
+        /// Test negative numbers.
+        /// </summary>
+        [TestMethod]
+        public void TestNegatives()
+        {
+            var f = Function<short, bool>(x => -2 > -1);
+            var result = f.Find((i, o) => o, backend: Backend.DecisionDiagrams);
+            Assert.IsFalse(result.HasValue);
+        }
+
         /// <summary>
         /// Test integer greater than.
         /// </summary>
