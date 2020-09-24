@@ -26,7 +26,7 @@ namespace ZenLib
             var x = ReflectionUtilities.GetConstantString(e1);
             var y = ReflectionUtilities.GetConstantString(e2);
 
-            if (x != null && y != null && e3 is ZenConstantBigIntExpr be)
+            if (x != null && y != null && e3 is ZenConstantExpr<BigInteger> be)
             {
                 return CommonUtilities.IndexOf(x, y, be.Value);
             }

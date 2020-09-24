@@ -25,7 +25,7 @@ namespace ZenLib
         {
             var x = ReflectionUtilities.GetConstantString(e1);
 
-            if (x != null && e2 is ZenConstantBigIntExpr be2 && e3 is ZenConstantBigIntExpr be3)
+            if (x != null && e2 is ZenConstantExpr<BigInteger> be2 && e3 is ZenConstantExpr<BigInteger> be3)
                 return CommonUtilities.Substring(x, be2.Value, be3.Value);
 
             return new ZenStringSubstringExpr(e1, e2, e3);

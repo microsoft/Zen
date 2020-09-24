@@ -24,7 +24,7 @@ namespace ZenLib
         {
             // if true then e1 else e2 = e1
             // if false then e1 else e2 = e2
-            if (g is ZenConstantBoolExpr ce)
+            if (g is ZenConstantExpr<bool> ce)
             {
                 return ce.Value ? t : f;
             }

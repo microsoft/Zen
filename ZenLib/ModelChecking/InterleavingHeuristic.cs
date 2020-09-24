@@ -132,47 +132,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantByteExpr(ZenConstantByteExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantShortExpr(ZenConstantShortExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantUintExpr(ZenConstantUintExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantIntExpr(ZenConstantIntExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantLongExpr(ZenConstantLongExpr expression, Unit parameter)
-        {
-            return emptySet;
-        }
-
-        public ImmutableHashSet<object> VisitZenConstantStringExpr(ZenConstantStringExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, Unit parameter)
         {
             return emptySet;
         }
@@ -208,12 +168,6 @@ namespace ZenLib.ModelChecking
                 this.Combine(x, y);
                 return x.Union(y);
             });
-        }
-
-        [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, Unit parameter)
-        {
-            throw new ZenException($"Invalid BigInteger type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]

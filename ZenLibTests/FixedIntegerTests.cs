@@ -15,6 +15,9 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class FixedIntegerTests
     {
+        /// <summary>
+        /// How many random tests to run.
+        /// </summary>
         private static int numRandomTests = 30;
 
         /// <summary>

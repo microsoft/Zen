@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenConstantShortExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenConstantExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,42 +8,49 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a ulong constant expression.
+    /// Class representing a constant expression.
     /// </summary>
-    internal sealed class ZenConstantShortExpr : Zen<short>
+    internal sealed class ZenConstantExpr<T> : Zen<T>
     {
-        private static Dictionary<short, Zen<short>> hashConsTable = new Dictionary<short, Zen<short>>();
+        /// <summary>
+        /// Hash cons table.
+        /// </summary>
+        private static Dictionary<T, Zen<T>> hashConsTable = new Dictionary<T, Zen<T>>();
 
-        internal override Zen<short> Unroll()
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        internal T Value { get; }
+
+        /// <summary>
+        /// Unroll the expression.
+        /// </summary>
+        /// <returns>The new unrolled expression.</returns>
+        internal override Zen<T> Unroll()
         {
             return this;
         }
 
-        public static Zen<short> Create(short value)
+        public static Zen<T> Create(T value)
         {
             if (hashConsTable.TryGetValue(value, out var v))
             {
                 return v;
             }
 
-            var ret = new ZenConstantShortExpr(value);
+            var ret = new ZenConstantExpr<T>(value);
             hashConsTable[value] = ret;
             return ret;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenConstantShortExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenConstantExpr{T}"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        private ZenConstantShortExpr(short value)
+        private ZenConstantExpr(T value)
         {
             this.Value = value;
         }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        internal short Value { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -65,7 +72,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenConstantShortExpr(this, parameter);
+            return visitor.VisitZenConstantExpr(this, parameter);
         }
     }
 }

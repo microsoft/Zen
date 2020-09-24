@@ -159,17 +159,7 @@ namespace ZenLib.Interpretation
             });
         }
 
-        public object VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantByteExpr(ZenConstantByteExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
@@ -392,41 +382,6 @@ namespace ZenLib.Interpretation
                 var e3 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
                 return CommonUtilities.IndexOf(e1, e2, e3);
             });
-        }
-
-        public object VisitZenConstantIntExpr(ZenConstantIntExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantUintExpr(ZenConstantUintExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantLongExpr(ZenConstantLongExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantShortExpr(ZenConstantShortExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.Value;
-        }
-
-        public object VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return expression.UnescapedValue;
         }
 
         public object VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)

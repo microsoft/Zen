@@ -8,6 +8,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using ZenLib.Solver;
 
     /// <summary>
@@ -206,92 +207,69 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
-                var bi = this.Solver.CreateBigIntegerConst(expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bi);
-            });
-        }
+                var type = typeof(T);
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var b = expression.Value ? this.Solver.True() : this.Solver.False();
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, b);
-            });
-        }
+                if (type == ReflectionUtilities.BigIntType)
+                {
+                    var bi = this.Solver.CreateBigIntegerConst((BigInteger)(object)expression.Value);
+                    return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bi);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantByteExpr(ZenConstantByteExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateByteConst(expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.BoolType)
+                {
+                    var b = (bool)(object)expression.Value ? this.Solver.True() : this.Solver.False();
+                    return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, b);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantIntExpr(ZenConstantIntExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateIntConst(expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.ByteType)
+                {
+                    var bv = this.Solver.CreateByteConst((byte)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantLongExpr(ZenConstantLongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateLongConst(expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.ShortType)
+                {
+                    var bv = this.Solver.CreateShortConst((short)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantShortExpr(ZenConstantShortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateShortConst(expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.UshortType)
+                {
+                    var bv = this.Solver.CreateShortConst((short)(ushort)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantUintExpr(ZenConstantUintExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateIntConst((int)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.IntType)
+                {
+                    var bv = this.Solver.CreateIntConst((int)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateLongConst((long)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.UintType)
+                {
+                    var bv = this.Solver.CreateIntConst((int)(uint)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var bv = this.Solver.CreateShortConst((short)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
-            });
-        }
+                if (type == ReflectionUtilities.LongType)
+                {
+                    var bv = this.Solver.CreateLongConst((long)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenConstantStringExpr(ZenConstantStringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var v = this.Solver.CreateStringConst(expression.EscapedValue);
+                if (type == ReflectionUtilities.UlongType)
+                {
+                    var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
+
+                // string type.
+                var s = CommonUtilities.ConvertCSharpStringToZ3((string)(object)expression.Value);
+                var v = this.Solver.CreateStringConst(s);
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, v);
             });
         }

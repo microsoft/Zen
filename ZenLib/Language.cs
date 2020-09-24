@@ -83,7 +83,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> False()
         {
-            return ZenConstantBoolExpr.False;
+            return ZenConstantExpr<bool>.Create(false);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> True()
         {
-            return ZenConstantBoolExpr.True;
+            return ZenConstantExpr<bool>.Create(true);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<byte> Byte(byte b)
         {
-            return ZenConstantByteExpr.Create(b);
+            return ZenConstantExpr<byte>.Create(b);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> UShort(ushort s)
         {
-            return ZenConstantUshortExpr.Create(s);
+            return ZenConstantExpr<ushort>.Create(s);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<short> Short(short s)
         {
-            return ZenConstantShortExpr.Create(s);
+            return ZenConstantExpr<short>.Create(s);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<uint> UInt(uint i)
         {
-            return ZenConstantUintExpr.Create(i);
+            return ZenConstantExpr<uint>.Create(i);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<int> Int(int i)
         {
-            return ZenConstantIntExpr.Create(i);
+            return ZenConstantExpr<int>.Create(i);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ulong> ULong(ulong l)
         {
-            return ZenConstantUlongExpr.Create(l);
+            return ZenConstantExpr<ulong>.Create(l);
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<long> Long(long l)
         {
-            return ZenConstantLongExpr.Create(l);
+            return ZenConstantExpr<long>.Create(l);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> BigInt(BigInteger bi)
         {
-            return ZenConstantBigIntExpr.Create(bi);
+            return ZenConstantExpr<BigInteger>.Create(bi);
         }
 
         /// <summary>
@@ -194,7 +194,8 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(s);
             CommonUtilities.ValidateStringLiteral(s);
-            return ZenConstantStringExpr.Create(s);
+
+            return ZenConstantExpr<string>.Create(s);
         }
 
         /// <summary>

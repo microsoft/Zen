@@ -22,9 +22,9 @@ namespace ZenLib
 
         private static Zen<bool> Simplify(Zen<bool> e)
         {
-            if (e is ZenConstantBoolExpr x)
+            if (e is ZenConstantExpr<bool> x)
             {
-                return x.Value ? ZenConstantBoolExpr.False : ZenConstantBoolExpr.True;
+                return x.Value ? ZenConstantExpr<bool>.Create(false) : ZenConstantExpr<bool>.Create(true);
             }
 
             if (e is ZenNotExpr y)

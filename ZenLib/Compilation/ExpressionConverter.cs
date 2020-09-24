@@ -248,54 +248,9 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantByteExpr(ZenConstantByteExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantIntExpr(ZenConstantIntExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantLongExpr(ZenConstantLongExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantShortExpr(ZenConstantShortExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantUintExpr(ZenConstantUintExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression VisitZenConstantStringExpr(ZenConstantStringExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.UnescapedValue);
         }
 
         public Expression VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)

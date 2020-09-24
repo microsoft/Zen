@@ -39,7 +39,7 @@ namespace ZenLib
 
         private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2, ComparisonType comparisonType)
         {
-            if (e1 is ZenConstantBigIntExpr be1 && e2 is ZenConstantBigIntExpr be2)
+            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
             {
                 return Language.Bool(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
             }

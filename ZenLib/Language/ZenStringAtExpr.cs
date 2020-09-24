@@ -25,7 +25,7 @@ namespace ZenLib
         {
             var x = ReflectionUtilities.GetConstantString(e1);
 
-            if (x != null && e2 is ZenConstantBigIntExpr be)
+            if (x != null && e2 is ZenConstantExpr<BigInteger> be)
             {
                 return CommonUtilities.At(x, be.Value);
             }
