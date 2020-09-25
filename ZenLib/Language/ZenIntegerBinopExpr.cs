@@ -42,9 +42,9 @@ namespace ZenLib
 
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, Op op)
         {
-            if (e1 is ZenConstantBigIntExpr be1 && e2 is ZenConstantBigIntExpr be2)
+            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
             {
-                return (Zen<T>)(object)ZenConstantBigIntExpr.Create(constantBigIntFuncs[(int)op - 3](be1.Value, be2.Value));
+                return (Zen<T>)(object)ZenConstantExpr<BigInteger>.Create(constantBigIntFuncs[(int)op - 3](be1.Value, be2.Value));
             }
 
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
@@ -89,9 +89,12 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
-            if (typeof(T) == ReflectionUtilities.BigIntType && IsBitwiseOp(op))
+            var type = typeof(T);
+
+            if ((type == ReflectionUtilities.BigIntType && IsBitwiseOp(op)) ||
+                (ReflectionUtilities.IsFixedIntegerType(type) && op == Op.Multiplication))
             {
-                throw new ArgumentException($"Operation: {op} is not supported for type BigInteger");
+                throw new ArgumentException($"Operation: {op} is not supported for type {type}");
             }
 
             var key = (expr1, expr2, (int)op);

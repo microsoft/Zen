@@ -52,84 +52,12 @@ namespace ZenLib
         TReturn VisitZenIfExpr<T>(ZenIfExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a BoolConstantExpr.
+        /// Visit a ConstantExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a ByteConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantByteExpr(ZenConstantByteExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a UshortConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a ShortConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantShortExpr(ZenConstantShortExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a UintConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantUintExpr(ZenConstantUintExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a IntConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantIntExpr(ZenConstantIntExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a UlongConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a LongConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantLongExpr(ZenConstantLongExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a BigIntConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringConstantExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConstantStringExpr(ZenConstantStringExpr expression, TParam parameter);
+        TReturn VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ConcatExpr.

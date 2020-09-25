@@ -19,6 +19,16 @@ namespace ZenLib
     internal static class CommonUtilities
     {
         /// <summary>
+        /// constructor arguments for creating fixed integers.
+        /// </summary>
+        private static object[] constructorArgs = new object[] { 0L };
+
+        /// <summary>
+        /// constructor types for creating fixed integers.
+        /// </summary>
+        private static Type[] constructorTypes = new Type[] { typeof(long) };
+
+        /// <summary>
         /// Merge two immutable dictionaries together by key.
         /// </summary>
         /// <typeparam name="T1">Type of the key.</typeparam>
@@ -190,6 +200,41 @@ namespace ZenLib
         public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
         {
             return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
+        }
+
+        /// <summary>
+        /// Gets the integer size for a given integer type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The size of the integer.</returns>
+        public static int IntegerSize(Type type)
+        {
+            var c = type.GetConstructor(constructorTypes);
+            var integer = (dynamic)c.Invoke(constructorArgs);
+            return integer.Size;
+        }
+
+        /// <summary>
+        /// Converts a solver result back to a C# result.
+        /// </summary>
+        /// <param name="value">The solver result..</param>
+        /// <returns>The C# value.</returns>
+        public static T ConvertSymbolicResultToCSharp<T>(object value)
+        {
+            if (value == null)
+            {
+                return default;
+            }
+
+            if (value.GetType() == typeof(byte[]))
+            {
+                var type = typeof(T);
+                var c = type.GetConstructor(new Type[] { typeof(byte[]) });
+                var intObj = c.Invoke(new object[] { (byte[])value });
+                return (T)intObj;
+            }
+
+            return (T)value;
         }
 
         /// <summary>

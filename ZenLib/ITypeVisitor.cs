@@ -68,6 +68,12 @@ namespace ZenLib
         T VisitBigInteger();
 
         /// <summary>
+        /// Visit a fixed width integer type.
+        /// </summary>
+        /// <returns></returns>
+        T VisitFixedInteger(Type intType);
+
+        /// <summary>
         /// Visit the string type.
         /// </summary>
         /// <returns>A value.</returns>

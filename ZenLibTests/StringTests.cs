@@ -457,7 +457,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestInvalidStringLiteralNull()
         {
-            String(null);
+            Constant<string>(null);
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace ZenLib.Tests
         public void TestInvalidStringLiteral2()
         {
             char c = (char)960; // greek pi
-            String(c.ToString());
+            Constant(c.ToString());
         }
 
         /// <summary>

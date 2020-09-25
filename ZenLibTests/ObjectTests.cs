@@ -129,8 +129,8 @@ namespace ZenLib.Tests
         private void CheckGetWithForField<T>(string field)
         {
             RandomBytes(x => CheckValid<T>(o => o
-                .WithField(field, Int(x))
-                .GetField<T, int>(field) == Int(x)));
+                .WithField(field, Constant<int>(x))
+                .GetField<T, int>(field) == Constant<int>(x)));
         }
 
         /// <summary>
@@ -240,8 +240,8 @@ namespace ZenLib.Tests
         /// <param name="field">The field name.</param>
         private void CheckWithIsSet<T>(string field)
         {
-            var f = Function<T, T>(o => o.WithField(field, Int(1)));
-            var r = f.Find((i, o) => o.GetField<T, int>(field) == Int(0));
+            var f = Function<T, T>(o => o.WithField(field, Constant(1)));
+            var r = f.Find((i, o) => o.GetField<T, int>(field) == Constant(0));
             Assert.IsFalse(r.HasValue);
         }
 
@@ -251,12 +251,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject1()
         {
-            var f1 = Function<int, Object1>(i => Create<Object1>(("Field1", Int(1))));
+            var f1 = Function<int, Object1>(i => Create<Object1>(("Field1", Constant(1))));
 
             var r = f1.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
 
-            Assert.IsFalse(f1.Find((i, o) => o.GetField<Object1, int>("Field1") != Int(1)).HasValue);
+            Assert.IsFalse(f1.Find((i, o) => o.GetField<Object1, int>("Field1") != Constant(1)).HasValue);
         }
 
         /// <summary>
@@ -266,15 +266,15 @@ namespace ZenLib.Tests
         public void TestCreateObject2()
         {
             var f2 = Function<int, Object2>(i => Create<Object2>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2))));
 
             var r = f2.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
             Assert.AreEqual(2, r.Field2);
             r.Field2 = 0; // avoid dead code error
 
-            Assert.IsFalse(f2.Find((i, o) => o.GetField<Object2, int>("Field2") != Int(2)).HasValue);
+            Assert.IsFalse(f2.Find((i, o) => o.GetField<Object2, int>("Field2") != Constant(2)).HasValue);
         }
 
         /// <summary>
@@ -284,9 +284,9 @@ namespace ZenLib.Tests
         public void TestCreateObject3()
         {
             var f3 = Function<int, Object3>(i => Create<Object3>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3))));
 
             var r = f3.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -294,7 +294,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(3, r.Field3);
             r.Field3 = 0; // avoid dead code error
 
-            Assert.IsFalse(f3.Find((i, o) => o.GetField<Object3, int>("Field3") != Int(3)).HasValue);
+            Assert.IsFalse(f3.Find((i, o) => o.GetField<Object3, int>("Field3") != Constant(3)).HasValue);
         }
 
         /// <summary>
@@ -304,10 +304,10 @@ namespace ZenLib.Tests
         public void TestCreateObject4()
         {
             var f4 = Function<int, Object4>(i => Create<Object4>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4))));
 
             var r = f4.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -316,7 +316,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(4, r.Field4);
             r.Field4 = 0; // avoid dead code
 
-            Assert.IsFalse(f4.Find((i, o) => o.GetField<Object4, int>("Field4") != Int(4)).HasValue);
+            Assert.IsFalse(f4.Find((i, o) => o.GetField<Object4, int>("Field4") != Constant(4)).HasValue);
         }
 
         /// <summary>
@@ -326,11 +326,11 @@ namespace ZenLib.Tests
         public void TestCreateObject5()
         {
             var f5 = Function<int, Object5>(i => Create<Object5>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5))));
 
             var r = f5.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -340,7 +340,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(5, r.Field5);
             r.Field5 = 0; // avoid dead code
 
-            Assert.IsFalse(f5.Find((i, o) => o.GetField<Object5, int>("Field5") != Int(5)).HasValue);
+            Assert.IsFalse(f5.Find((i, o) => o.GetField<Object5, int>("Field5") != Constant(5)).HasValue);
         }
 
         /// <summary>
@@ -350,12 +350,12 @@ namespace ZenLib.Tests
         public void TestCreateObject6()
         {
             var f6 = Function<int, Object6>(i => Create<Object6>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6))));
 
             var r = f6.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -366,7 +366,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(6, r.Field6);
             r.Field6 = 0; // avoid dead code error
 
-            Assert.IsFalse(f6.Find((i, o) => o.GetField<Object6, int>("Field6") != Int(6)).HasValue);
+            Assert.IsFalse(f6.Find((i, o) => o.GetField<Object6, int>("Field6") != Constant(6)).HasValue);
         }
 
         /// <summary>
@@ -376,13 +376,13 @@ namespace ZenLib.Tests
         public void TestCreateObject7()
         {
             var f7 = Function<int, Object7>(i => Create<Object7>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6)),
-                ("Field7", Int(7))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6)),
+                ("Field7", Constant(7))));
 
             var r = f7.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -394,7 +394,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(7, r.Field7);
             r.Field7 = 0; // avoid dead code error
 
-            Assert.IsFalse(f7.Find((i, o) => o.GetField<Object7, int>("Field7") != Int(7)).HasValue);
+            Assert.IsFalse(f7.Find((i, o) => o.GetField<Object7, int>("Field7") != Constant(7)).HasValue);
         }
 
         /// <summary>
@@ -404,14 +404,14 @@ namespace ZenLib.Tests
         public void TestCreateObject8()
         {
             var f8 = Function<int, Object8>(i => Create<Object8>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6)),
-                ("Field7", Int(7)),
-                ("Field8", Int(8))));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6)),
+                ("Field7", Constant(7)),
+                ("Field8", Constant(8))));
 
             var r = f8.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -424,7 +424,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(8, r.Field8);
             r.Field8 = 0; // avoid dead code error
 
-            Assert.IsFalse(f8.Find((i, o) => o.GetField<Object8, int>("Field8") != Int(8)).HasValue);
+            Assert.IsFalse(f8.Find((i, o) => o.GetField<Object8, int>("Field8") != Constant(8)).HasValue);
         }
 
         /// <summary>
@@ -434,10 +434,10 @@ namespace ZenLib.Tests
         public void TestGetCreateObject1()
         {
             var f = Function<int, int>(i => Create<Object1>(
-                ("Field1", Int(1))).GetField<Object1, int>("Field1"));
+                ("Field1", Constant(1))).GetField<Object1, int>("Field1"));
 
             Assert.AreEqual(1, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(1)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(1)).HasValue);
         }
 
         /// <summary>
@@ -447,11 +447,11 @@ namespace ZenLib.Tests
         public void TestGetCreateObject2()
         {
             var f = Function<int, int>(i => Create<Object2>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2))).GetField<Object2, int>("Field2"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2))).GetField<Object2, int>("Field2"));
 
             Assert.AreEqual(2, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(2)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(2)).HasValue);
         }
 
         /// <summary>
@@ -461,12 +461,12 @@ namespace ZenLib.Tests
         public void TestGetCreateObject3()
         {
             var f = Function<int, int>(i => Create<Object3>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3))).GetField<Object3, int>("Field3"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3))).GetField<Object3, int>("Field3"));
 
             Assert.AreEqual(3, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(3)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(3)).HasValue);
         }
 
         /// <summary>
@@ -476,13 +476,13 @@ namespace ZenLib.Tests
         public void TestGetCreateObject4()
         {
             var f = Function<int, int>(i => Create<Object4>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4))).GetField<Object4, int>("Field4"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4))).GetField<Object4, int>("Field4"));
 
             Assert.AreEqual(4, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(4)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(4)).HasValue);
         }
 
         /// <summary>
@@ -492,14 +492,14 @@ namespace ZenLib.Tests
         public void TestGetCreateObject5()
         {
             var f = Function<int, int>(i => Create<Object5>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5))).GetField<Object5, int>("Field5"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5))).GetField<Object5, int>("Field5"));
 
             Assert.AreEqual(5, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(5)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(5)).HasValue);
         }
 
         /// <summary>
@@ -509,15 +509,15 @@ namespace ZenLib.Tests
         public void TestGetCreateObject6()
         {
             var f = Function<int, int>(i => Create<Object6>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6))).GetField<Object6, int>("Field6"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6))).GetField<Object6, int>("Field6"));
 
             Assert.AreEqual(6, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(6)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(6)).HasValue);
         }
 
         /// <summary>
@@ -527,16 +527,16 @@ namespace ZenLib.Tests
         public void TestGetCreateObject7()
         {
             var f = Function<int, int>(i => Create<Object7>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6)),
-                ("Field7", Int(7))).GetField<Object7, int>("Field7"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6)),
+                ("Field7", Constant(7))).GetField<Object7, int>("Field7"));
 
             Assert.AreEqual(7, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(7)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(7)).HasValue);
         }
 
         /// <summary>
@@ -546,17 +546,17 @@ namespace ZenLib.Tests
         public void TestGetCreateObject8()
         {
             var f = Function<int, int>(i => Create<Object8>(
-                ("Field1", Int(1)),
-                ("Field2", Int(2)),
-                ("Field3", Int(3)),
-                ("Field4", Int(4)),
-                ("Field5", Int(5)),
-                ("Field6", Int(6)),
-                ("Field7", Int(7)),
-                ("Field8", Int(8))).GetField<Object8, int>("Field8"));
+                ("Field1", Constant(1)),
+                ("Field2", Constant(2)),
+                ("Field3", Constant(3)),
+                ("Field4", Constant(4)),
+                ("Field5", Constant(5)),
+                ("Field6", Constant(6)),
+                ("Field7", Constant(7)),
+                ("Field8", Constant(8))).GetField<Object8, int>("Field8"));
 
             Assert.AreEqual(8, f.Evaluate(0));
-            Assert.IsTrue(f.Find((i, o) => o == Int(8)).HasValue);
+            Assert.IsTrue(f.Find((i, o) => o == Constant(8)).HasValue);
         }
 
         /// <summary>
@@ -567,12 +567,12 @@ namespace ZenLib.Tests
         {
             var f = Function<bool, Object2>(b =>
             {
-                var o1 = Create<Object2>(("Field1", Int(1)), ("Field2", Int(2)));
-                var o2 = Create<Object2>(("Field1", Int(2)), ("Field2", Int(1)));
+                var o1 = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
+                var o2 = Create<Object2>(("Field1", Constant(2)), ("Field2", Constant(1)));
                 return If(b, o1, o2);
             });
 
-            var r = f.Find((i, o) => o.GetField<Object2, int>("Field1") == Int(2));
+            var r = f.Find((i, o) => o.GetField<Object2, int>("Field1") == Constant(2));
             Assert.IsTrue(r.HasValue);
             Assert.IsFalse(r.Value);
         }
@@ -585,8 +585,8 @@ namespace ZenLib.Tests
         {
             var f = Function<bool, Object2>(b =>
             {
-                var o1 = Create<Object2>(("Field1", Int(1)), ("Field2", Int(2)));
-                var o2 = Create<Object2>(("Field1", Int(2)), ("Field2", Int(1)));
+                var o1 = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
+                var o2 = Create<Object2>(("Field1", Constant(2)), ("Field2", Constant(1)));
                 return If(b, o1, o2);
             });
 
@@ -606,7 +606,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate1()
         {
-            var f = Function(() => Create<Object1>(("Field1", Int(1))));
+            var f = Function(() => Create<Object1>(("Field1", Constant(1))));
 
             Assert.AreEqual(f.Evaluate().Field1, 1);
 
@@ -624,7 +624,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object2>(
-                    ("Field1", Int(1)), ("Field2", Int(2))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -646,7 +646,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object3>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -670,7 +670,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object4>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3)), ("Field4", Int(4))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)), ("Field4", Constant(4))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -696,7 +696,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object5>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3)), ("Field4", Int(4)), ("Field5", Int(5))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)), ("Field4", Constant(4)), ("Field5", Constant(5))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -724,8 +724,8 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object6>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3)),
-                    ("Field4", Int(4)), ("Field5", Int(5)), ("Field6", Int(6))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
+                    ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -755,9 +755,9 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object7>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3)),
-                    ("Field4", Int(4)), ("Field5", Int(5)), ("Field6", Int(6)),
-                    ("Field7", Int(7))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
+                    ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6)),
+                    ("Field7", Constant(7))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -789,9 +789,9 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<Object8>(
-                    ("Field1", Int(1)), ("Field2", Int(2)), ("Field3", Int(3)),
-                    ("Field4", Int(4)), ("Field5", Int(5)), ("Field6", Int(6)),
-                    ("Field7", Int(7)), ("Field8", Int(8))));
+                    ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
+                    ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6)),
+                    ("Field7", Constant(7)), ("Field8", Constant(8))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -824,8 +824,8 @@ namespace ZenLib.Tests
         public void TestObjectEvalWith()
         {
             var f = Function(() =>
-                Create<Object2>(("Field1", Int(1)), ("Field2", Int(2)))
-                    .WithField<Object2, int>("Field1", Int(3)));
+                Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)))
+                    .WithField<Object2, int>("Field1", Constant(3)));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 3);
@@ -848,8 +848,8 @@ namespace ZenLib.Tests
             var f = Function(() =>
             {
                 var b = Arbitrary<bool>();
-                var o1 = Create<Object1>(("Field1", Int(1)));
-                var o2 = Create<Object1>(("Field1", Int(2)));
+                var o1 = Create<Object1>(("Field1", Constant(1)));
+                var o2 = Create<Object1>(("Field1", Constant(2)));
                 return If(b, o1, o2);
             });
 
@@ -873,7 +873,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<ObjectField1>(
-                    ("Field1", Int(1))));
+                    ("Field1", Constant(1))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);
@@ -891,7 +891,7 @@ namespace ZenLib.Tests
         {
             var f = Function(() =>
                 Create<StructField1>(
-                    ("Field1", Int(1))));
+                    ("Field1", Constant(1))));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 1);

@@ -157,6 +157,17 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test state sets with fixed width integers.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerFixedWidthInteger()
+        {
+            var t = Function<Int5, bool>(i => i <= new Int5(0)).Transformer();
+            var set = t.InputSet((x, y) => y);
+            Assert.IsTrue(set.Element().Value <= new Int5(0));
+        }
+
+        /// <summary>
         /// Test state set equality.
         /// </summary>
         [TestMethod]

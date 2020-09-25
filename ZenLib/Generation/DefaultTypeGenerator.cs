@@ -31,17 +31,17 @@ namespace ZenLib.Generation
 
         public object VisitBool()
         {
-            return ZenConstantBoolExpr.False;
+            return ZenConstantExpr<bool>.Create(false);
         }
 
         public object VisitByte()
         {
-            return ZenConstantByteExpr.Create(0);
+            return ZenConstantExpr<byte>.Create(0);
         }
 
         public object VisitInt()
         {
-            return ZenConstantIntExpr.Create(0);
+            return ZenConstantExpr<int>.Create(0);
         }
 
         public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
@@ -58,12 +58,19 @@ namespace ZenLib.Generation
 
         public object VisitLong()
         {
-            return ZenConstantLongExpr.Create(0);
+            return ZenConstantExpr<long>.Create(0);
+        }
+
+        public object VisitFixedInteger(Type intType)
+        {
+            var c = intType.GetConstructor(new Type[] { typeof(long) });
+            dynamic value = c.Invoke(new object[] { 0L });
+            return Language.Constant(value);
         }
 
         public object VisitBigInteger()
         {
-            return ZenConstantBigIntExpr.Create(new BigInteger(0));
+            return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
@@ -79,7 +86,7 @@ namespace ZenLib.Generation
 
         public object VisitShort()
         {
-            return ZenConstantShortExpr.Create(0);
+            return ZenConstantExpr<short>.Create(0);
         }
 
         public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
@@ -94,23 +101,23 @@ namespace ZenLib.Generation
 
         public object VisitUint()
         {
-            return ZenConstantUintExpr.Create(0);
+            return ZenConstantExpr<uint>.Create(0);
         }
 
         public object VisitUlong()
         {
-            return ZenConstantUlongExpr.Create(0);
+            return ZenConstantExpr<ulong>.Create(0);
         }
 
         public object VisitUshort()
         {
-            return ZenConstantUshortExpr.Create(0);
+            return ZenConstantExpr<ushort>.Create(0);
         }
 
         // FIXME: default value for a c# string is null, not empty. How to represent null strings?
         public object VisitString()
         {
-            return ZenConstantStringExpr.Create("");
+            return ZenConstantExpr<string>.Create("");
         }
     }
 }

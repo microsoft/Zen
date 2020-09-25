@@ -27,7 +27,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestAddException1()
         {
-            Language.Add(null, Int(1), Int(1));
+            Language.Add(null, Constant(1), Constant(1));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestAddBackException1()
         {
-            Language.AddBack(null, Int(1));
+            Language.AddBack(null, Constant(1));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestAddFrontException1()
         {
-            Language.AddFront(null, Int(1));
+            Language.AddFront(null, Constant(1));
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestGetFieldException2()
         {
-            Language.GetField<Object1, int>(Language.Create<Object1>(("Field1", Int(0))), null);
+            Language.GetField<Object1, int>(Language.Create<Object1>(("Field1", Constant(0))), null);
         }
 
         /// <summary>
@@ -852,7 +852,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMaxException1()
         {
-            Language.Max(null, Byte(0));
+            Language.Max(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -862,7 +862,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMaxException2()
         {
-            Language.Max(Byte(0), null);
+            Language.Max(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -872,7 +872,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMinException1()
         {
-            Language.Min(null, Byte(0));
+            Language.Min(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -882,7 +882,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMinException2()
         {
-            Language.Min(Byte(0), null);
+            Language.Min(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -892,7 +892,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMinusException1()
         {
-            Language.Minus(null, Byte(0));
+            Language.Minus(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -902,7 +902,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMinusException2()
         {
-            Language.Minus(Byte(0), null);
+            Language.Minus(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -912,7 +912,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMultiplyException1()
         {
-            Language.Multiply(null, Byte(0));
+            Language.Multiply(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -922,7 +922,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestMultiplyException2()
         {
-            Language.Multiply(Byte(0), null);
+            Language.Multiply(Constant<byte>(0), null);
         }
 
         /// <summary>

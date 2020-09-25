@@ -50,52 +50,7 @@ namespace ZenLib.SymbolicExecution
             return Compose2(expression.Expr1, expression.Expr2, parameter);
         }
 
-        public NestedEnumerable<PathConstraint> VisitZenConstantBoolExpr(ZenConstantBoolExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantByteExpr(ZenConstantByteExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantIntExpr(ZenConstantIntExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantLongExpr(ZenConstantLongExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantShortExpr(ZenConstantShortExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantStringExpr(ZenConstantStringExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantUintExpr(ZenConstantUintExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantUlongExpr(ZenConstantUlongExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantUshortExpr(ZenConstantUshortExpr expression, PathConstraint parameter)
-        {
-            return new NestedEnumerable<PathConstraint>(parameter);
-        }
-
-        public NestedEnumerable<PathConstraint> VisitZenConstantBigIntExpr(ZenConstantBigIntExpr expression, PathConstraint parameter)
+        public NestedEnumerable<PathConstraint> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, PathConstraint parameter)
         {
             return new NestedEnumerable<PathConstraint>(parameter);
         }

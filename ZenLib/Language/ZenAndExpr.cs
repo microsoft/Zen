@@ -21,12 +21,12 @@ namespace ZenLib
 
         private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
         {
-            if (e1 is ZenConstantBoolExpr x)
+            if (e1 is ZenConstantExpr<bool> x)
             {
                 return (x.Value ? e2 : e1);
             }
 
-            if (e2 is ZenConstantBoolExpr y)
+            if (e2 is ZenConstantExpr<bool> y)
             {
                 return (y.Value ? e1 : e2);
             }

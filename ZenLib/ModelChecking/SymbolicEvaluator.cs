@@ -76,7 +76,7 @@ namespace ZenLib.ModelChecking
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
             var result = input.Accept(new ExpressionEvaluator(), interpreterEnv);
-            return Option.Some((T)result);
+            return Option.Some(CommonUtilities.ConvertSymbolicResultToCSharp<T>(result));
         }
 
         /// <summary>
@@ -105,7 +105,8 @@ namespace ZenLib.ModelChecking
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
             var result1 = input1.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
-            return Option.Some(((T1)result1, (T2)result2));
+            return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2)));
         }
 
         /// <summary>
@@ -136,7 +137,9 @@ namespace ZenLib.ModelChecking
             var result1 = input1.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result3 = input3.Accept(new ExpressionEvaluator(), interpreterEnv);
-            return Option.Some(((T1)result1, (T2)result2, (T3)result3));
+            return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T3>(result3)));
         }
 
         /// <summary>
@@ -170,7 +173,10 @@ namespace ZenLib.ModelChecking
             var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result3 = input3.Accept(new ExpressionEvaluator(), interpreterEnv);
             var result4 = input4.Accept(new ExpressionEvaluator(), interpreterEnv);
-            return Option.Some(((T1)result1, (T2)result2, (T3)result3, (T4)result4));
+            return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T3>(result3),
+                                CommonUtilities.ConvertSymbolicResultToCSharp<T4>(result4)));
         }
 
         /// <summary>
@@ -340,6 +346,17 @@ namespace ZenLib.ModelChecking
             if (zenExpr is Zen<long> || zenExpr is Zen<ulong>)
             {
                 var (v, _) = solver.CreateLongVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+                return;
+            }
+
+            var type = zenExpr.GetType();
+            var zenType = type.GetGenericArguments()[0];
+
+            if (ReflectionUtilities.IsFixedIntegerType(zenType))
+            {
+                var size = CommonUtilities.IntegerSize(zenType);
+                var (v, _) = solver.CreateBitvecVar(zenExpr, (uint)size);
                 zenExprToVariable[zenExpr] = v;
                 return;
             }

@@ -34,7 +34,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionSomeInt()
         {
-            RandomBytes(x => CheckAgreement<Option<int>>(o => And(o.HasValue(), o.Value() == Int(x))));
+            RandomBytes(x => CheckAgreement<Option<int>>(o => And(o.HasValue(), o.Value() == Constant<int>(x))));
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace ZenLib.Tests
             {
                 CheckAgreement<Option<Tuple<byte, byte>>>(o =>
                 {
-                    var item1 = o.Value().Item1() == Byte(x);
-                    var item2 = o.Value().Item2() == Byte(x);
+                    var item1 = o.Value().Item1() == x;
+                    var item2 = o.Value().Item2() == x;
                     return And(o.HasValue(), Or(item1, item2));
                 });
             });
@@ -71,7 +71,7 @@ namespace ZenLib.Tests
         public void TestOptionSelect()
         {
             CheckValid<Option<int>>(o =>
-                Implies(o.HasValue(), o.Select(v => v + Int(1)).Value() == o.Value() + Int(1)));
+                Implies(o.HasValue(), o.Select(v => v + Constant<int>(1)).Value() == o.Value() + Constant<int>(1)));
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace ZenLib.Tests
         public void TestOptionWhere()
         {
             CheckValid<Option<int>>(o =>
-                Implies(And(o.HasValue(), o.Value() <= Int(4)), Not(o.Where(v => v > Int(4)).HasValue())));
+                Implies(And(o.HasValue(), o.Value() <= Constant<int>(4)), Not(o.Where(v => v > Constant<int>(4)).HasValue())));
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace ZenLib.Tests
         public void TestOptionMatch()
         {
             CheckValid<Option<int>>(o =>
-                Implies(And(o.HasValue(), o.Value() <= Int(4)),
-                    o.Case(none: () => False(), some: v => v <= Int(4))));
+                Implies(And(o.HasValue(), o.Value() <= Constant<int>(4)),
+                    o.Case(none: () => False(), some: v => v <= Constant<int>(4))));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionValueOrDefault()
         {
-            CheckValid<Option<int>>(o => o.Select(v => Int(2)).ValueOrDefault(Int(2)) == Int(2));
+            CheckValid<Option<int>>(o => o.Select(v => Constant(2)).ValueOrDefault(Constant(2)) == Constant(2));
         }
 
         /// <summary>

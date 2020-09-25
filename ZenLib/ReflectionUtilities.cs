@@ -108,6 +108,11 @@ namespace ZenLib
         public readonly static Type DictType = typeof(Dictionary<,>);
 
         /// <summary>
+        /// Type of a fixed size integer.
+        /// </summary>
+        public readonly static Type IntNType = typeof(IntN<,>);
+
+        /// <summary>
         /// The object creation method.
         /// </summary>
         public static MethodInfo CreateMethod = typeof(Language).GetMethod("Create");
@@ -119,7 +124,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsIntegerType(Type type)
         {
-            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsBigIntegerType(type);
+            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsBigIntegerType(type) || IsFixedIntegerType(type);
         }
 
         /// <summary>
@@ -155,7 +160,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is a tuple type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsTupleType(Type type)
         {
@@ -165,7 +170,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is some kind of tuple type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsValueTupleType(Type type)
         {
@@ -175,7 +180,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is some kind of tuple type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsSomeTupleType(Type type)
         {
@@ -185,7 +190,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is some kind of tuple type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsOptionType(Type type)
         {
@@ -195,7 +200,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is an IList type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsIListType(Type type)
         {
@@ -207,7 +212,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is an IDictionary type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsIDictionaryType(Type type)
         {
@@ -218,7 +223,7 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is a List type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsListType(Type type)
         {
@@ -228,11 +233,23 @@ namespace ZenLib
         /// <summary>
         /// Check if a type is a Dictionary type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         public static bool IsDictionaryType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == DictType;
+        }
+
+        /// <summary>
+        /// Check if a type is fixed width integer.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsFixedIntegerType(Type type)
+        {
+            return type.BaseType != null &&
+                   type.BaseType.IsGenericType &&
+                   type.BaseType.GetGenericTypeDefinition() == IntNType;
         }
 
         /// <summary>
@@ -432,6 +449,8 @@ namespace ZenLib
                 return visitor.VisitBigInteger();
             if (type == StringType)
                 return visitor.VisitString();
+            if (IsFixedIntegerType(type))
+                return visitor.VisitFixedInteger(type);
 
             if (IsOptionType(type))
             {
@@ -545,26 +564,13 @@ namespace ZenLib
             var type = typeof(T);
             dynamic v = value;
 
-            if (value is bool)
-                return Bool(v);
-            if (value is byte)
-                return Byte(v);
-            if (value is short)
-                return Short(v);
-            if (value is ushort)
-                return UShort(v);
-            if (value is int)
-                return Int(v);
-            if (value is uint)
-                return UInt(v);
-            if (value is long)
-                return Long(v);
-            if (value is ulong)
-                return ULong(v);
-            if (value is BigInteger)
-                return BigInt(v);
-            if (value is string)
-                return String(v);
+            if (value is bool || value is byte || value is short || value is ushort || value is int ||
+                value is uint || value is long || value is ulong || value is string || value is BigInteger ||
+                IsFixedIntegerType(type))
+            {
+                return Constant(v);
+            }
+
             if (IsOptionType(type))
                 return CreateZenOptionConstant(v);
             if (IsTupleType(type))
@@ -608,19 +614,19 @@ namespace ZenLib
         /// <returns>A long.</returns>
         public static long? GetConstantIntegerValue<T>(Zen<T> value)
         {
-            if (value is ZenConstantByteExpr xb)
+            if (value is ZenConstantExpr<byte> xb)
                 return xb.Value;
-            if (value is ZenConstantShortExpr xs)
+            if (value is ZenConstantExpr<short> xs)
                 return xs.Value;
-            if (value is ZenConstantUshortExpr xus)
+            if (value is ZenConstantExpr<ushort> xus)
                 return xus.Value;
-            if (value is ZenConstantIntExpr xi)
+            if (value is ZenConstantExpr<int> xi)
                 return xi.Value;
-            if (value is ZenConstantUintExpr xui)
+            if (value is ZenConstantExpr<uint> xui)
                 return xui.Value;
-            if (value is ZenConstantLongExpr xl)
+            if (value is ZenConstantExpr<long> xl)
                 return xl.Value;
-            if (value is ZenConstantUlongExpr xul)
+            if (value is ZenConstantExpr<ulong> xul)
                 return (long?)xul.Value;
             return null;
         }
@@ -633,9 +639,9 @@ namespace ZenLib
         /// <returns>A string.</returns>
         public static string GetConstantString<T>(Zen<T> value)
         {
-            if (value is ZenConstantStringExpr xs)
+            if (value is ZenConstantExpr<string> xs)
             {
-                return xs.UnescapedValue;
+                return xs.Value;
             }
 
             return null;
@@ -654,19 +660,19 @@ namespace ZenLib
             if (type == BoolType)
                 return (Zen<T>)(object)(value == 0L ? False() : True());
             if (type == ByteType)
-                return (Zen<T>)(object)ZenConstantByteExpr.Create((byte)value);
+                return (Zen<T>)(object)ZenConstantExpr<byte>.Create((byte)value);
             if (type == ShortType)
-                return (Zen<T>)(object)ZenConstantShortExpr.Create((short)value);
+                return (Zen<T>)(object)ZenConstantExpr<short>.Create((short)value);
             if (type == UshortType)
-                return (Zen<T>)(object)ZenConstantUshortExpr.Create((ushort)value);
+                return (Zen<T>)(object)ZenConstantExpr<ushort>.Create((ushort)value);
             if (type == IntType)
-                return (Zen<T>)(object)ZenConstantIntExpr.Create((int)value);
+                return (Zen<T>)(object)ZenConstantExpr<int>.Create((int)value);
             if (type == UintType)
-                return (Zen<T>)(object)ZenConstantUintExpr.Create((uint)value);
+                return (Zen<T>)(object)ZenConstantExpr<uint>.Create((uint)value);
             if (type == LongType)
-                return (Zen<T>)(object)ZenConstantLongExpr.Create(value);
+                return (Zen<T>)(object)ZenConstantExpr<long>.Create(value);
 
-            return (Zen<T>)(object)ZenConstantUlongExpr.Create((ulong)value);
+            return (Zen<T>)(object)ZenConstantExpr<ulong>.Create((ulong)value);
         }
 
         /// <summary>
@@ -676,7 +682,7 @@ namespace ZenLib
         /// <returns>A string.</returns>
         public static Zen<string> CreateConstantString(string value)
         {
-            return (Zen<string>)(object)ZenConstantStringExpr.Create(value);
+            return (Zen<string>)(object)ZenConstantExpr<string>.Create(value);
         }
 
         /// <summary>
