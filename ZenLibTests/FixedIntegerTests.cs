@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Net;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.ModelChecking;
     using static ZenLib.Language;
@@ -605,6 +606,21 @@ namespace ZenLib.Tests
             var f = Function<Option<Int5>, Option<Int5>>(x => Null<Int5>());
             var input = f.Find((x, y) => true);
             Assert.IsTrue(input.HasValue);
+        }
+
+        /// <summary>
+        /// Test solving with option.
+        /// </summary>
+        [TestMethod]
+        public void Test128BitInteger()
+        {
+            var a = new UInt128(IPAddress.Parse("1000::").GetAddressBytes());
+            var b = new UInt128(IPAddress.Parse("2000::").GetAddressBytes());
+
+            var f = Function<UInt128, bool>(x => And(x >= a, x <= b));
+            var input = f.Find((x, y) => y, backend: Backend.DecisionDiagrams);
+
+            Assert.AreEqual(a, input.Value);
         }
 
         /// <summary>
