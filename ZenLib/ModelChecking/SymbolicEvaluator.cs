@@ -350,6 +350,17 @@ namespace ZenLib.ModelChecking
                 return;
             }
 
+            var type = zenExpr.GetType();
+            var zenType = type.GetGenericArguments()[0];
+
+            if (ReflectionUtilities.IsFixedIntegerType(zenType))
+            {
+                var size = CommonUtilities.IntegerSize(zenType);
+                var (v, _) = solver.CreateBitvecVar(zenExpr, (uint)size);
+                zenExprToVariable[zenExpr] = v;
+                return;
+            }
+
             throw new ZenException($"Unsupported type: {zenExpr.GetType()} in transformer.");
         }
     }

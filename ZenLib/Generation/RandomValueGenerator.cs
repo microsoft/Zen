@@ -210,10 +210,10 @@ namespace ZenLib.Generation
 
         public object VisitFixedInteger(Type intType)
         {
-            var size = ((dynamic)Activator.CreateInstance(intType)).Size;
-
-            var value = RandomInt() % (int)Math.Pow(2, size - 2);
             var c = intType.GetConstructor(new Type[] { typeof(long) });
+            var size = CommonUtilities.IntegerSize(intType);
+            int exp = size <= 1 ? 0 : size - 2;
+            long value = RandomInt() % (int)Math.Pow(2, exp);
             return c.Invoke(new object[] { value });
         }
 

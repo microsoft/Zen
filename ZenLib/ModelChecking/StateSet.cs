@@ -135,7 +135,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result = (T)this.ZenExpression.Accept(new ExpressionEvaluator(), interpreterEnv);
+            var result = CommonUtilities.ConvertSymbolicResultToCSharp<T>(this.ZenExpression.Accept(new ExpressionEvaluator(), interpreterEnv));
             return Option.Some(result);
         }
 

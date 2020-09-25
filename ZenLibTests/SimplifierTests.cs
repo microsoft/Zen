@@ -122,6 +122,36 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify bitwise or with constants.
+        /// </summary>
+        [TestMethod]
+        public void TestBitwiseOrConstant()
+        {
+            Assert.AreEqual((Constant<byte>(1) | Constant<byte>(1)), Constant<byte>(1));
+            Assert.AreEqual((Constant<short>(1) | Constant<short>(1)), Constant<short>(1));
+            Assert.AreEqual((Constant<ushort>(1) | Constant<ushort>(1)), Constant<ushort>(1));
+            Assert.AreEqual((Constant<int>(1) | Constant<int>(1)), Constant<int>(1));
+            Assert.AreEqual((Constant<uint>(1) | Constant<uint>(1)), Constant<uint>(1));
+            Assert.AreEqual((Constant<long>(1) | Constant<long>(1)), Constant<long>(1));
+            Assert.AreEqual((Constant<ulong>(1) | Constant<ulong>(1)), Constant<ulong>(1));
+        }
+
+        /// <summary>
+        /// Simplify bitwise xor with constants.
+        /// </summary>
+        [TestMethod]
+        public void TestBitwiseXorConstant()
+        {
+            Assert.AreEqual((Constant<byte>(1) ^ Constant<byte>(1)), Constant<byte>(0));
+            Assert.AreEqual((Constant<short>(1) ^ Constant<short>(1)), Constant<short>(0));
+            Assert.AreEqual((Constant<ushort>(1) ^ Constant<ushort>(1)), Constant<ushort>(0));
+            Assert.AreEqual((Constant<int>(1) ^ Constant<int>(1)), Constant<int>(0));
+            Assert.AreEqual((Constant<uint>(1) ^ Constant<uint>(1)), Constant<uint>(0));
+            Assert.AreEqual((Constant<long>(1) ^ Constant<long>(1)), Constant<long>(0));
+            Assert.AreEqual((Constant<ulong>(1) ^ Constant<ulong>(1)), Constant<ulong>(0));
+        }
+
+        /// <summary>
         /// Simplify less than or equal.
         /// </summary>
         [TestMethod]

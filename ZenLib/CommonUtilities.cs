@@ -12,14 +12,22 @@ namespace ZenLib
     using System.Numerics;
     using System.Text;
     using System.Threading;
-    using ZenLib.Generation;
-    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// A collection of common utility functions.
     /// </summary>
     internal static class CommonUtilities
     {
+        /// <summary>
+        /// constructor arguments for creating fixed integers.
+        /// </summary>
+        private static object[] constructorArgs = new object[] { 0L };
+
+        /// <summary>
+        /// constructor types for creating fixed integers.
+        /// </summary>
+        private static Type[] constructorTypes = new Type[] { typeof(long) };
+
         /// <summary>
         /// Merge two immutable dictionaries together by key.
         /// </summary>
@@ -154,9 +162,7 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
-            return f();
-
-            /* T result = default;
+            T result = default;
             Exception exn = null;
 
             // run in another thread with a larger stack.
@@ -181,7 +187,7 @@ namespace ZenLib
                 throw exn;
             }
 
-            return result; */
+            return result;
         }
 
         /// <summary>
@@ -194,6 +200,18 @@ namespace ZenLib
         public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
         {
             return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
+        }
+
+        /// <summary>
+        /// Gets the integer size for a given integer type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The size of the integer.</returns>
+        public static int IntegerSize(Type type)
+        {
+            var c = type.GetConstructor(constructorTypes);
+            var integer = (dynamic)c.Invoke(constructorArgs);
+            return integer.Size;
         }
 
         /// <summary>

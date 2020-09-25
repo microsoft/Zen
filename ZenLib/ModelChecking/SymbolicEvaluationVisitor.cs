@@ -145,8 +145,7 @@ namespace ZenLib.ModelChecking
                 }
 
                 // Fixed width integer case
-                dynamic obj = type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
-                int size = obj.Size;
+                var size = CommonUtilities.IntegerSize(type);
                 var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
                 this.Variables.Add(v);
                 var r = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, e);

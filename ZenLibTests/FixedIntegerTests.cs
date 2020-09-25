@@ -597,6 +597,17 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test solving with option.
+        /// </summary>
+        [TestMethod]
+        public void TestConstructingOptions()
+        {
+            var f = Function<Option<Int5>, Option<Int5>>(x => Null<Int5>());
+            var input = f.Find((x, y) => true);
+            Assert.IsTrue(input.HasValue);
+        }
+
+        /// <summary>
         /// Test that backends agree on semantics.
         /// </summary>
         [TestMethod]

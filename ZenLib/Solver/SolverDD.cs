@@ -29,11 +29,6 @@ namespace ZenLib.Solver
         internal List<Variable<T>> Variables { get; } = new List<Variable<T>>();
 
         /// <summary>
-        /// Gets the sizes of every variable.
-        /// </summary>
-        private Dictionary<Variable<T>, int> VariableSizes = new Dictionary<Variable<T>, int>();
-
-        /// <summary>
         /// The variable "must interleave" dependencies.
         /// </summary>
         private Dictionary<object, ImmutableHashSet<object>> interleavingDependencies { get; }
@@ -115,11 +110,11 @@ namespace ZenLib.Solver
                         objsUlong.Add(elt);
                     }
 
-                    if (type == typeof(ZenArbitraryExpr<>) &&
+                    if (type.IsGenericType &&
+                        type.GetGenericTypeDefinition() == typeof(ZenArbitraryExpr<>) &&
                         ReflectionUtilities.IsFixedIntegerType(type.GetGenericArguments()[0]))
                     {
-                        dynamic obj = Activator.CreateInstance(type);
-                        var size = obj.Size;
+                        var size = CommonUtilities.IntegerSize(type.GetGenericArguments()[0]);
 
                         if (!objsFixedInt.TryGetValue(size, out List<object> list))
                         {
@@ -189,7 +184,6 @@ namespace ZenLib.Solver
                     {
                         this.ExistingAssignment[kv.Value[i]] = fixedvars[i];
                         this.Variables.Add(fixedvars[i]);
-                        this.VariableSizes[fixedvars[i]] = size;
                     }
                 }
             }
@@ -456,7 +450,6 @@ namespace ZenLib.Solver
             {
                 variable = this.Manager.CreateInt((int)size);
                 this.Variables.Add(variable);
-                this.VariableSizes[variable] = (int)size;
                 this.ExistingAssignment[e] = variable;
                 return (variable, this.Manager.CreateBitvector(variable));
             }
@@ -516,8 +509,7 @@ namespace ZenLib.Solver
             // bits are stored in little endian, need to reverse
 
             var bytes = m.Get((VarInt<T>)v);
-            var size = this.VariableSizes[v];
-            var remainder = size % 8;
+            var remainder = v.NumBits % 8;
 
             if (remainder != 0)
             {
