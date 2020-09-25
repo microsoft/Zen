@@ -101,7 +101,7 @@ namespace ZenLib.Generation
 
             for (int i = maxSize; i > 0; i--)
             {
-                var guard = length == Byte((byte)i);
+                var guard = length == Constant((byte)i);
                 var trueBranch = GeneratorHelper.ApplyToList(recurse, elementType, i);
                 list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
             }
@@ -154,6 +154,14 @@ namespace ZenLib.Generation
         public object VisitUshort()
         {
             var e = new ZenArbitraryExpr<ushort>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
+        public object VisitFixedInteger(Type intType)
+        {
+            var c = typeof(ZenArbitraryExpr<>).MakeGenericType(intType).GetConstructor(new Type[] { });
+            var e = c.Invoke(new object[] { });
             this.ArbitraryExpressions.Add(e);
             return e;
         }

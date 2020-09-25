@@ -93,11 +93,20 @@ namespace ZenLib.Interpretation
                 switch (expression.Operation)
                 {
                     case Op.BitwiseAnd:
+                        if (ReflectionUtilities.IsFixedIntegerType(type))
+                            return ((dynamic)e1).BitwiseAnd((dynamic)e2);
                         return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
+
                     case Op.BitwiseOr:
+                        if (ReflectionUtilities.IsFixedIntegerType(type))
+                            return ((dynamic)e1).BitwiseOr((dynamic)e2);
                         return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
+
                     case Op.BitwiseXor:
+                        if (ReflectionUtilities.IsFixedIntegerType(type))
+                            return ((dynamic)e1).BitwiseXor((dynamic)e2);
                         return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
+
                     case Op.Addition:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 + (byte)e2);
@@ -113,7 +122,10 @@ namespace ZenLib.Interpretation
                             return (long)e1 + (long)e2;
                         if (type == ReflectionUtilities.UlongType)
                             return (ulong)e1 + (ulong)e2;
-                        return (BigInteger)e1 + (BigInteger)e2;
+                        if (type == ReflectionUtilities.BigIntType)
+                            return (BigInteger)e1 + (BigInteger)e2;
+                        return ((dynamic)e1).Add((dynamic)e2);
+
                     case Op.Subtraction:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 - (byte)e2);
@@ -129,7 +141,10 @@ namespace ZenLib.Interpretation
                             return (long)e1 - (long)e2;
                         if (type == ReflectionUtilities.UlongType)
                             return (ulong)e1 - (ulong)e2;
-                        return (BigInteger)e1 - (BigInteger)e2;
+                        if (type == ReflectionUtilities.BigIntType)
+                            return (BigInteger)e1 - (BigInteger)e2;
+                        return ((dynamic)e1).Subtract((dynamic)e2);
+
                     default:
                         if (type == ReflectionUtilities.ByteType)
                             return (byte)((byte)e1 * (byte)e2);
@@ -236,7 +251,9 @@ namespace ZenLib.Interpretation
                             return (long)e1 >= (long)e2;
                         if (type == ReflectionUtilities.UlongType)
                             return (ulong)e1 >= (ulong)e2;
-                        return (BigInteger)e1 >= (BigInteger)e2;
+                        if (type == ReflectionUtilities.BigIntType)
+                            return (BigInteger)e1 >= (BigInteger)e2;
+                        return ((dynamic)e1) >= ((dynamic)e2);
 
                     case ComparisonType.Leq:
                         if (type == ReflectionUtilities.ByteType)
@@ -253,7 +270,9 @@ namespace ZenLib.Interpretation
                             return (long)e1 <= (long)e2;
                         if (type == ReflectionUtilities.UlongType)
                             return (ulong)e1 <= (ulong)e2;
-                        return (BigInteger)e1 <= (BigInteger)e2;
+                        if (type == ReflectionUtilities.BigIntType)
+                            return (BigInteger)e1 <= (BigInteger)e2;
+                        return ((dynamic)e1) <= ((dynamic)e2);
 
                     default:
                         return ((T)e1).Equals((T)e2);

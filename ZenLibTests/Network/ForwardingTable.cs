@@ -20,7 +20,7 @@ namespace ZenLib.Tests.Network
         {
             if (i == this.Rules.Length)
             {
-                return Byte(0); // 0 is the null interface
+                return Constant<byte>(0); // 0 is the null interface
             }
 
             var rule = this.Rules[i];

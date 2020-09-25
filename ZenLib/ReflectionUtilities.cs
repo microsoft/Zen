@@ -449,6 +449,8 @@ namespace ZenLib
                 return visitor.VisitBigInteger();
             if (type == StringType)
                 return visitor.VisitString();
+            if (IsFixedIntegerType(type))
+                return visitor.VisitFixedInteger(type);
 
             if (IsOptionType(type))
             {
@@ -562,26 +564,13 @@ namespace ZenLib
             var type = typeof(T);
             dynamic v = value;
 
-            if (value is bool)
-                return Bool(v);
-            if (value is byte)
-                return Byte(v);
-            if (value is short)
-                return Short(v);
-            if (value is ushort)
-                return UShort(v);
-            if (value is int)
-                return Int(v);
-            if (value is uint)
-                return UInt(v);
-            if (value is long)
-                return Long(v);
-            if (value is ulong)
-                return ULong(v);
-            if (value is BigInteger)
-                return BigInt(v);
-            if (value is string)
-                return String(v);
+            if (value is bool || value is byte || value is short || value is ushort || value is int ||
+                value is uint || value is long || value is ulong || value is string || value is BigInteger ||
+                IsFixedIntegerType(type))
+            {
+                return Constant(v);
+            }
+
             if (IsOptionType(type))
                 return CreateZenOptionConstant(v);
             if (IsTupleType(type))

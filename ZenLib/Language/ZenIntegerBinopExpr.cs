@@ -89,9 +89,12 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
-            if (typeof(T) == ReflectionUtilities.BigIntType && IsBitwiseOp(op))
+            var type = typeof(T);
+
+            if ((type == ReflectionUtilities.BigIntType && IsBitwiseOp(op)) ||
+                (ReflectionUtilities.IsFixedIntegerType(type) && op == Op.Multiplication))
             {
-                throw new ArgumentException($"Operation: {op} is not supported for type BigInteger");
+                throw new ArgumentException($"Operation: {op} is not supported for type {type}");
             }
 
             var key = (expr1, expr2, (int)op);

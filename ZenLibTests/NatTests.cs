@@ -46,13 +46,13 @@ namespace ZenLib.Tests
             var lo = rule.Item1;
             var hi = rule.Item2;
             var dstIp = header.GetDstIp().GetValue();
-            return And(dstIp >= UInt(lo), dstIp <= UInt(hi));
+            return And(dstIp >= Constant<uint>(lo), dstIp <= Constant<uint>(hi));
         }
 
         private Zen<IpHeader> ApplyNatLine((uint, uint, uint) rule, Zen<IpHeader> header)
         {
             var newDstIp = rule.Item3;
-            return header.WithField("DstIp", Ip.Create(UInt(newDstIp)));
+            return header.WithField("DstIp", Ip.Create(Constant<uint>(newDstIp)));
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace ZenLib.Tests
         {
             var rules = new ValueTuple<uint, uint, uint>[2] { (0, 10, 99), (11, 20, 100) };
             var nat = new Nat { Rules = rules };
-            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == UInt(100));
-            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == UInt(99));
+            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == Constant<uint>(100));
+            CheckAgreement<IpHeader>(p => NatMatch(nat, p).GetDstIp().GetValue() == Constant<uint>(99));
         }
     }
 }

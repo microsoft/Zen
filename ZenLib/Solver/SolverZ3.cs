@@ -4,6 +4,8 @@
 
 namespace ZenLib.Solver
 {
+    using System;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
 
@@ -129,6 +131,24 @@ namespace ZenLib.Solver
         {
             var v = this.context.MkConst(FreshSymbol(), this.LongSort);
             return (v, (BitVecExpr)v);
+        }
+
+        public (Expr, BitVecExpr) CreateBitvecVar(object e, uint size)
+        {
+            var v = this.context.MkConst(FreshSymbol(), this.context.MkBitVecSort(size));
+            return (v, (BitVecExpr)v);
+        }
+
+        public BitVecExpr CreateBitvecConst(bool[] bits)
+        {
+            var littleEndian = new bool[bits.Length];
+
+            for (int i = 0; i < bits.Length; i++)
+            {
+                littleEndian[i] = bits[bits.Length - 1 - i];
+            }
+
+            return this.context.MkBV(littleEndian);
         }
 
         public IntExpr CreateBigIntegerConst(BigInteger bi)
@@ -359,16 +379,23 @@ namespace ZenLib.Solver
 
             if (e.Sort == this.StringSort)
             {
-                // Remove beginning and ending quotation marks
                 return CommonUtilities.ConvertZ3StringToCSharp(e.ToString());
             }
 
-            if (long.TryParse(e.ToString(), out long xl))
+            if (e.Sort == this.LongSort)
             {
-                return xl;
+                if (long.TryParse(e.ToString(), out long xl))
+                {
+                    return xl;
+                }
+
+                return (long)ulong.Parse(e.ToString());
             }
 
-            return (long)ulong.Parse(e.ToString());
+            // must be a fixed width integer
+            var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
+            Array.Reverse(bytes);
+            return bytes;
         }
 
         public Option<Model> Satisfiable(BoolExpr x)

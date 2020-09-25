@@ -135,10 +135,21 @@ namespace ZenLib.ModelChecking
                     return result;
                 }
 
-                // BigInteger case
-                var (v, e) = this.Solver.CreateBigIntegerVar(expression);
+                if (type == ReflectionUtilities.BigIntType)
+                {
+                    var (variable, expr) = this.Solver.CreateBigIntegerVar(expression);
+                    this.Variables.Add(variable);
+                    var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, expr);
+                    this.ArbitraryVariables[expression] = variable;
+                    return result;
+                }
+
+                // Fixed width integer case
+                dynamic obj = type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
+                int size = obj.Size;
+                var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
                 this.Variables.Add(v);
-                var r = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, e);
+                var r = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, e);
                 this.ArbitraryVariables[expression] = v;
                 return r;
             });
@@ -264,6 +275,12 @@ namespace ZenLib.ModelChecking
                 if (type == ReflectionUtilities.UlongType)
                 {
                     var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
+                    return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
+                }
+
+                if (ReflectionUtilities.IsFixedIntegerType(type))
+                {
+                    var bv = this.Solver.CreateBitvecConst(((dynamic)expression.Value).GetBits());
                     return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, bv);
                 }
 

@@ -89,6 +89,21 @@ namespace ZenLib.Solver
         TBitvec CreateLongConst(long l);
 
         /// <summary>
+        /// Create a bitvector variable.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <param name="size">The size of the bitvector.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TBitvec) CreateBitvecVar(object e, uint size);
+
+        /// <summary>
+        /// Create a bitvector constant.
+        /// </summary>
+        /// <param name="bits">The bits.</param>
+        /// <returns>A bitvector expression.</returns>
+        TBitvec CreateBitvecConst(bool[] bits);
+
+        /// <summary>
         /// Create a new big integer expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>

@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -26,6 +27,11 @@ namespace ZenLib.Solver
         /// All allocated variables.
         /// </summary>
         internal List<Variable<T>> Variables { get; } = new List<Variable<T>>();
+
+        /// <summary>
+        /// Gets the sizes of every variable.
+        /// </summary>
+        private Dictionary<Variable<T>, int> VariableSizes = new Dictionary<Variable<T>, int>();
 
         /// <summary>
         /// The variable "must interleave" dependencies.
@@ -63,6 +69,7 @@ namespace ZenLib.Solver
                 var objsUint = new List<object>();
                 var objsLong = new List<object>();
                 var objsUlong = new List<object>();
+                var objsFixedInt = new Dictionary<int, List<object>>();
 
                 foreach (var elt in set)
                 {
@@ -106,6 +113,21 @@ namespace ZenLib.Solver
                     if (type == typeof(ZenArbitraryExpr<ulong>))
                     {
                         objsUlong.Add(elt);
+                    }
+
+                    if (type == typeof(ZenArbitraryExpr<>) &&
+                        ReflectionUtilities.IsFixedIntegerType(type.GetGenericArguments()[0]))
+                    {
+                        dynamic obj = Activator.CreateInstance(type);
+                        var size = obj.Size;
+
+                        if (!objsFixedInt.TryGetValue(size, out List<object> list))
+                        {
+                            list = new List<object>();
+                            objsFixedInt[size] = list;
+                        }
+
+                        list.Add(elt);
                     }
                 }
 
@@ -156,6 +178,19 @@ namespace ZenLib.Solver
                 {
                     this.ExistingAssignment[objsUlong[i]] = ulongvars[i];
                     this.Variables.Add(ulongvars[i]);
+                }
+
+                foreach (var kv in objsFixedInt)
+                {
+                    var size = kv.Key;
+                    var fixedvars = this.Manager.CreateInterleavedInt(kv.Value.Count, size);
+
+                    for (int i = 0; i < fixedvars.Length; i++)
+                    {
+                        this.ExistingAssignment[kv.Value[i]] = fixedvars[i];
+                        this.Variables.Add(fixedvars[i]);
+                        this.VariableSizes[fixedvars[i]] = size;
+                    }
                 }
             }
         }
@@ -410,6 +445,35 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(l);
         }
 
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, BitVector<T>) CreateBitvecVar(object e, uint size)
+        {
+            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+            else
+            {
+                variable = this.Manager.CreateInt((int)size);
+                this.Variables.Add(variable);
+                this.VariableSizes[variable] = (int)size;
+                this.ExistingAssignment[e] = variable;
+                return (variable, this.Manager.CreateBitvector(variable));
+            }
+        }
+
+        public BitVector<T> CreateBitvecConst(bool[] bits)
+        {
+            var dds = new DD[bits.Length];
+
+            for (int i = 0; i < dds.Length; i++)
+            {
+                dds[i] = bits[i] ? this.Manager.True() : this.Manager.False();
+            }
+
+            return this.Manager.CreateBitvector(dds);
+        }
+
         public (Variable<T>, Unit) CreateStringVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
@@ -443,7 +507,24 @@ namespace ZenLib.Solver
                 return m.Get(v32);
             }
 
-            return m.Get((VarInt64<T>)v);
+            if (v is VarInt64<T> v64)
+            {
+                return m.Get(v64);
+            }
+
+            // fixed width integer.
+            // bits are stored in little endian, need to reverse
+
+            var bytes = m.Get((VarInt<T>)v);
+            var size = this.VariableSizes[v];
+            var remainder = size % 8;
+
+            if (remainder != 0)
+            {
+                bytes[bytes.Length - 1] >>= (8 - remainder);
+            }
+
+            return bytes;
         }
 
         public DD Ite(DD g, DD t, DD f)

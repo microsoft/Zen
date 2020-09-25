@@ -317,16 +317,40 @@ namespace ZenLib.Compilation
                 switch (expression.ComparisonType)
                 {
                     case ComparisonType.Geq:
+                        if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                        {
+                            return Expression.Call(
+                                expression.Expr1.Accept(this, parameter),
+                                typeof(T).GetMethod("GreaterThanOrEqual"),
+                                expression.Expr2.Accept(this, parameter));
+                        }
+
                         return Expression.GreaterThanOrEqual(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
                     case ComparisonType.Leq:
+                        if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                        {
+                            return Expression.Call(
+                                expression.Expr1.Accept(this, parameter),
+                                typeof(T).GetMethod("LessThanOrEqual"),
+                                expression.Expr2.Accept(this, parameter));
+                        }
+
                         return Expression.LessThanOrEqual(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
                     default:
+                        if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                        {
+                            return Expression.Call(
+                                expression.Expr1.Accept(this, parameter),
+                                typeof(T).GetMethod("Equals", new Type[] { typeof(object) }),
+                                expression.Expr2.Accept(this, parameter));
+                        }
+
                         return Expression.Equal(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
@@ -679,16 +703,34 @@ namespace ZenLib.Compilation
 
         private Expression BitwiseOr<T>(Expression left, Expression right)
         {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethod("BitwiseOr");
+                return Expression.Call(left, method, right);
+            }
+
             return WrapMathBinary<T, T>(left, right, Expression.Or);
         }
 
         private Expression BitwiseAnd<T>(Expression left, Expression right)
         {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethod("BitwiseAnd");
+                return Expression.Call(left, method, right);
+            }
+
             return WrapMathBinary<T, T>(left, right, Expression.And);
         }
 
         private Expression BitwiseXor<T>(Expression left, Expression right)
         {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethod("BitwiseXor");
+                return Expression.Call(left, method, right);
+            }
+
             return WrapMathBinary<T, T>(left, right, Expression.ExclusiveOr);
         }
 
@@ -699,6 +741,12 @@ namespace ZenLib.Compilation
             if (type == ReflectionUtilities.BigIntType)
             {
                 return Expression.Add(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethod("Add");
+                return Expression.Call(left, method, right);
             }
 
             if (type == ReflectionUtilities.ByteType ||
@@ -718,6 +766,12 @@ namespace ZenLib.Compilation
             if (type == ReflectionUtilities.BigIntType)
             {
                 return Expression.Subtract(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethod("Subtract");
+                return Expression.Call(left, method, right);
             }
 
             if (type == ReflectionUtilities.ByteType ||

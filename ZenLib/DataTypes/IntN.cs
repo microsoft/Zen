@@ -33,13 +33,20 @@ namespace ZenLib
         /// <param name="bytes">The bytes in Big Endian.</param>
         public IntN(byte[] bytes)
         {
-            if (bytes.Length != this.NumBytes())
+            var numBytes = this.NumBytes();
+
+            if (bytes.Length > numBytes)
             {
                 throw new ArgumentException($"Invalid byte[] length, expected {this.Size % 8} but got {bytes.Length}");
             }
 
             this.Signed = typeof(TSign) == typeof(Signed);
-            this.Bytes = bytes;
+            this.Bytes = new byte[numBytes];
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                this.Bytes[this.Bytes.Length - 1 - i] = bytes[bytes.Length - 1 - i];
+            }
         }
 
         /// <summary>
@@ -92,8 +99,18 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(left);
             CommonUtilities.ValidateNotNull(right);
 
-            var ln = GetBit(left.Bytes, left.Size, 0);
-            var rn = GetBit(right.Bytes, right.Size, 0);
+            return left.LessThanOrEqual(right);
+        }
+
+        /// <summary>
+        /// Less than or equal to for fixed bit size integers.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns></returns>
+        public bool LessThanOrEqual(IntN<T, TSign> other)
+        {
+            var ln = GetBit(this.Bytes, this.Size, 0);
+            var rn = GetBit(other.Bytes, other.Size, 0);
 
             if (ln && !rn)
             {
@@ -105,14 +122,14 @@ namespace ZenLib
                 return false;
             }
 
-            for (int i = 0; i < left.Bytes.Length; i++)
+            for (int i = 0; i < this.Bytes.Length; i++)
             {
-                if (left.Bytes[i] < right.Bytes[i])
+                if (this.Bytes[i] < other.Bytes[i])
                 {
                     return true;
                 }
 
-                if (right.Bytes[i] < left.Bytes[i])
+                if (other.Bytes[i] < this.Bytes[i])
                 {
                     return false;
                 }
@@ -129,7 +146,20 @@ namespace ZenLib
         /// <returns></returns>
         public static bool operator >=(IntN<T, TSign> left, IntN<T, TSign> right)
         {
-            return !(left <= right) || left == right;
+            CommonUtilities.ValidateNotNull(left);
+            CommonUtilities.ValidateNotNull(right);
+
+            return left.GreaterThanOrEqual(right);
+        }
+
+        /// <summary>
+        /// Greater than or equal to for fixed bit size integers.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns></returns>
+        public bool GreaterThanOrEqual(IntN<T, TSign> other)
+        {
+            return !(this <= other) || this == other;
         }
 
         /// <summary>
@@ -395,6 +425,22 @@ namespace ZenLib
             }
 
             return negated ? -result : result;
+        }
+
+        /// <summary>
+        /// Gets the bits for the integer.
+        /// </summary>
+        /// <returns>The bits as an array.</returns>
+        public bool[] GetBits()
+        {
+            var result = new bool[this.Size];
+
+            for (int i = 0; i < this.Size; i++)
+            {
+                result[i] = GetBit(this.Bytes, this.Size, i);
+            }
+
+            return result;
         }
 
         /// <summary>

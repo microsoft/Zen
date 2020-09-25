@@ -93,8 +93,8 @@ namespace ZenLib.Tests
             CheckEqual(If(a, x, y), If(a, x, y));
 
             list1.AddFront(byte1).Unroll();
-            list1.Case(Int(1), (hd, tl) => 2).Unroll();
-            If(b, list1, list2).Case(Int(1), (hd, tl) => 2).Unroll();
+            list1.Case(Constant(1), (hd, tl) => 2).Unroll();
+            If(b, list1, list2).Case(Constant(1), (hd, tl) => 2).Unroll();
             header.Unroll();
             If(b, h1, h2).GetDstIp().Unroll();
             header.WithField("DstIp", Ip.Create(99)).Unroll();

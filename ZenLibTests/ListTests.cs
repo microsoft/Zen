@@ -80,7 +80,7 @@ namespace ZenLib.Tests
         public void TestListContainsFind()
         {
             RandomBytes(x => CheckValid<IList<byte>>(l =>
-                Implies(l.Contains(Byte(x)), l.Find(v => v == x).HasValue())));
+                Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).HasValue())));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ZenLib.Tests
         public void TestListIndexOf()
         {
             RandomBytes(x => CheckValid<IList<byte>>(l =>
-                Implies(l.Contains(Byte(x)), l.IndexOf(x).HasValue())));
+                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x).HasValue())));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListIntersperse()
         {
-            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Intersperse(Int(x)).Contains(3)));
+            RandomBytes(x => CheckAgreement<IList<int>>(l => l.Intersperse(Constant<int>(x)).Contains(3)));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListRemoveAllNotContains()
         {
-            RandomBytes(x => CheckValid<IList<int>>(l => Not(l.RemoveAll(Int(x)).Contains(x))));
+            RandomBytes(x => CheckValid<IList<int>>(l => Not(l.RemoveAll(Constant<int>(x)).Contains(x))));
         }
 
         /// <summary>

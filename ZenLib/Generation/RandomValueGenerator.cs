@@ -208,6 +208,15 @@ namespace ZenLib.Generation
             return this.GenerateRandom(typeof(ulong), () => (ulong)(long)this.VisitLong());
         }
 
+        public object VisitFixedInteger(Type intType)
+        {
+            var size = ((dynamic)Activator.CreateInstance(intType)).Size;
+
+            var value = RandomInt() % (int)Math.Pow(2, size - 2);
+            var c = intType.GetConstructor(new Type[] { typeof(long) });
+            return c.Invoke(new object[] { value });
+        }
+
         public object VisitUshort()
         {
             return this.GenerateRandom(typeof(ushort), () => (ushort)RandomInt());

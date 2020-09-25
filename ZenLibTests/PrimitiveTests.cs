@@ -200,13 +200,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerBitwiseOrConstant()
         {
-            CheckAgreement<byte, byte>((a, b) => (Byte(1) | (byte)2) == ((byte)2 | Byte(1)));
-            CheckAgreement<short, short>((a, b) => (Short(1) | (short)2) == ((short)2 | Short(1)));
-            CheckAgreement<ushort, ushort>((a, b) => (UShort(1) | (ushort)2) == ((ushort)2 | UShort(1)));
-            CheckAgreement<int, int>((a, b) => (Int(1) | (int)2) == ((int)2 | Int(1)));
-            CheckAgreement<uint, uint>((a, b) => (UInt(1) | 2U) == (2U | UInt(1)));
-            CheckAgreement<long, long>((a, b) => (Long(1) | 2L) == (2L | Long(1)));
-            CheckAgreement<ulong, ulong>((a, b) => (ULong(1) | 2UL) == (2UL | ULong(1)));
+            CheckAgreement<byte, byte>((a, b) => ((byte)1 | (byte)2) == ((byte)2 | (byte)1));
+            CheckAgreement<short, short>((a, b) => ((short)1 | (short)2) == ((short)2 | (short)1));
+            CheckAgreement<ushort, ushort>((a, b) => ((ushort)1 | (ushort)2) == ((ushort)2 | (ushort)1));
+            CheckAgreement<int, int>((a, b) => ((int)1 | (int)2) == ((int)2 | (int)1));
+            CheckAgreement<uint, uint>((a, b) => (1U | 2U) == (2U | 1U));
+            CheckAgreement<long, long>((a, b) => (1L | 2L) == (2L | 1L));
+            CheckAgreement<ulong, ulong>((a, b) => (1UL | 2UL) == (2UL | 1UL));
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace ZenLib.Tests
         public void TestIntegerBitwiseOr()
         {
             RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseOr(a, b) == x));
-            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseOr(a, b, Byte(0)) == x));
+            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseOr(a, b, (byte)0) == x));
             RandomBytes(x => CheckAgreement<short, short>((a, b) => BitwiseOr(a, b) == x));
             RandomBytes(x => CheckAgreement<ushort, ushort>((a, b) => BitwiseOr(a, b) == x));
             RandomBytes(x => CheckAgreement<int, int>((a, b) => BitwiseOr(a, b) == x));
@@ -231,13 +231,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerBitwiseAndConstantByte()
         {
-            CheckAgreement<byte, byte>((a, b) => (Byte(1) & (byte)2) == ((byte)2 & Byte(1)));
-            CheckAgreement<short, short>((a, b) => (Short(1) & (short)2) == ((short)2 & Short(1)));
-            CheckAgreement<ushort, ushort>((a, b) => (UShort(1) & (ushort)2) == ((ushort)2 & UShort(1)));
-            CheckAgreement<int, int>((a, b) => (Int(1) & (int)2) == ((int)2 & Int(1)));
-            CheckAgreement<uint, uint>((a, b) => (UInt(1) & 2U) == (2U & UInt(1)));
-            CheckAgreement<long, long>((a, b) => (Long(1) & 2L) == (2L & Long(1)));
-            CheckAgreement<ulong, ulong>((a, b) => (ULong(1) & 2UL) == (2UL & ULong(1)));
+            CheckAgreement<byte, byte>((a, b) => ((byte)1 & (byte)2) == ((byte)2 & (byte)1));
+            CheckAgreement<short, short>((a, b) => ((short)1 & (short)2) == ((short)2 & (short)1));
+            CheckAgreement<ushort, ushort>((a, b) => ((ushort)1 & (ushort)2) == ((ushort)2 & (ushort)1));
+            CheckAgreement<int, int>((a, b) => (1 & (int)2) == ((int)2 & 1));
+            CheckAgreement<uint, uint>((a, b) => (1U & 2U) == (2U & 1U));
+            CheckAgreement<long, long>((a, b) => (1L & 2L) == (2L & 1L));
+            CheckAgreement<ulong, ulong>((a, b) => (1UL & 2UL) == (2UL & 1UL));
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace ZenLib.Tests
         public void TestIntegerBitwiseAnd()
         {
             RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseAnd(a, b) == x));
-            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseAnd(a, b, Byte(255)) == x));
+            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseAnd(a, b, (byte)255) == x));
             RandomBytes(x => CheckAgreement<short, short>((a, b) => BitwiseAnd(a, b) == x));
             RandomBytes(x => CheckAgreement<ushort, ushort>((a, b) => BitwiseAnd(a, b) == x));
             RandomBytes(x => CheckAgreement<int, int>((a, b) => BitwiseAnd(a, b) == x));
@@ -262,13 +262,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerBitwiseXorConstant()
         {
-            CheckAgreement<byte, byte>((a, b) => (Byte(1) ^ (byte)2) == ((byte)2 ^ Byte(1)));
-            CheckAgreement<short, short>((a, b) => (Short(1) ^ (short)2) == ((short)2 ^ Short(1)));
-            CheckAgreement<ushort, ushort>((a, b) => (UShort(1) ^ (ushort)2) == ((ushort)2 ^ UShort(1)));
-            CheckAgreement<int, int>((a, b) => (Int(1) ^ (int)2) == ((int)2 ^ Int(1)));
-            CheckAgreement<uint, uint>((a, b) => (UInt(1) ^ 2U) == (2U ^ UInt(1)));
-            CheckAgreement<long, long>((a, b) => (Long(1) ^ 2L) == (2L ^ Long(1)));
-            CheckAgreement<ulong, ulong>((a, b) => (ULong(1) ^ 2UL) == (2UL ^ ULong(1)));
+            CheckAgreement<byte, byte>((a, b) => ((byte)1 ^ (byte)2) == ((byte)2 ^ (byte)1));
+            CheckAgreement<short, short>((a, b) => ((short)1 ^ (short)2) == ((short)2 ^ (short)1));
+            CheckAgreement<ushort, ushort>((a, b) => ((ushort)1 ^ (ushort)2) == ((ushort)2 ^ (ushort)1));
+            CheckAgreement<int, int>((a, b) => (1 ^ (int)2) == ((int)2 ^ 1));
+            CheckAgreement<uint, uint>((a, b) => (1U ^ 2U) == (2U ^ 1U));
+            CheckAgreement<long, long>((a, b) => (1L ^ 2L) == (2L ^ 1L));
+            CheckAgreement<ulong, ulong>((a, b) => (1UL ^ 2UL) == (2UL ^ 1UL));
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace ZenLib.Tests
         public void TestIntegerBitwiseXor()
         {
             RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseXor(a, b) == x));
-            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseXor(a, b, Byte(0)) == x));
+            RandomBytes(x => CheckAgreement<byte, byte>((a, b) => BitwiseXor(a, b, (byte)0) == x));
             RandomBytes(x => CheckAgreement<short, short>((a, b) => BitwiseXor(a, b) == x));
             RandomBytes(x => CheckAgreement<ushort, ushort>((a, b) => BitwiseXor(a, b) == x));
             RandomBytes(x => CheckAgreement<int, int>((a, b) => BitwiseXor(a, b) == x));
@@ -323,22 +323,22 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerSumConstant()
         {
-            RandomBytes(x => CheckAgreement<byte>(i => i + Byte(4) == (x + Byte(4))));
-            RandomBytes(x => CheckAgreement<byte>(i => Byte(4) + i == (x + Byte(4))));
-            RandomBytes(x => CheckAgreement<short>(i => i + Short(4) == (x + Short(4))));
-            RandomBytes(x => CheckAgreement<short>(i => Short(4) + i == (x + Short(4))));
-            RandomBytes(x => CheckAgreement<ushort>(i => i + UShort(4) == (x + UShort(4))));
-            RandomBytes(x => CheckAgreement<ushort>(i => UShort(4) + i == (x + UShort(4))));
-            RandomBytes(x => CheckAgreement<int>(i => i + Int(4) == (x + Int(4))));
-            RandomBytes(x => CheckAgreement<int>(i => Int(4) + i == (x + Int(4))));
-            RandomBytes(x => CheckAgreement<uint>(i => i + UInt(4) == (x + UInt(4))));
-            RandomBytes(x => CheckAgreement<uint>(i => UInt(4) + i == (x + UInt(4))));
-            RandomBytes(x => CheckAgreement<long>(i => i + Long(4) == (x + Long(4))));
-            RandomBytes(x => CheckAgreement<long>(i => Long(4) + i == (x + Long(4))));
-            RandomBytes(x => CheckAgreement<ulong>(i => i + ULong(4) == (x + ULong(4))));
-            RandomBytes(x => CheckAgreement<ulong>(i => ULong(4) + i == (x + ULong(4))));
-            RandomBytes(x => CheckAgreement<BigInteger>(i => i + BigInt(4) == (new BigInteger(x) + BigInt(4))));
-            RandomBytes(x => CheckAgreement<BigInteger>(i => BigInt(4) + i == (new BigInteger(x) + BigInt(4))));
+            RandomBytes(x => CheckAgreement<byte>(i => i + Constant<byte>(4) == (x + Constant<byte>(4))));
+            RandomBytes(x => CheckAgreement<byte>(i => Constant<byte>(4) + i == (x + Constant<byte>(4))));
+            RandomBytes(x => CheckAgreement<short>(i => i + Constant<short>(4) == (x + Constant<short>(4))));
+            RandomBytes(x => CheckAgreement<short>(i => Constant<short>(4) + i == (x + Constant<short>(4))));
+            RandomBytes(x => CheckAgreement<ushort>(i => i + Constant<ushort>(4) == (x + Constant<ushort>(4))));
+            RandomBytes(x => CheckAgreement<ushort>(i => Constant<ushort>(4) + i == (x + Constant<ushort>(4))));
+            RandomBytes(x => CheckAgreement<int>(i => i + Constant<int>(4) == (x + Constant<int>(4))));
+            RandomBytes(x => CheckAgreement<int>(i => Constant<int>(4) + i == (x + Constant<int>(4))));
+            RandomBytes(x => CheckAgreement<uint>(i => i + Constant<uint>(4) == (x + Constant<uint>(4))));
+            RandomBytes(x => CheckAgreement<uint>(i => Constant<uint>(4) + i == (x + Constant<uint>(4))));
+            RandomBytes(x => CheckAgreement<long>(i => i + Constant<long>(4) == (x + Constant<long>(4))));
+            RandomBytes(x => CheckAgreement<long>(i => Constant<long>(4) + i == (x + Constant<long>(4))));
+            RandomBytes(x => CheckAgreement<ulong>(i => i + Constant<ulong>(4) == (x + Constant<ulong>(4))));
+            RandomBytes(x => CheckAgreement<ulong>(i => Constant<ulong>(4) + i == (x + Constant<ulong>(4))));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => i + Constant<BigInteger>(4) == (new BigInteger(x) + Constant<BigInteger>(4))));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => Constant<BigInteger>(4) + i == (new BigInteger(x) + Constant<BigInteger>(4))));
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEqualityDoesNotBlowup()
         {
-            RandomBytes(x => CheckAgreement<int, int>((a, b) => And(a == b, b > Int(4))));
+            RandomBytes(x => CheckAgreement<int, int>((a, b) => And(a == b, b > 4)));
         }
     }
 }

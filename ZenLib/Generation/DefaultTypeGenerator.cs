@@ -61,6 +61,13 @@ namespace ZenLib.Generation
             return ZenConstantExpr<long>.Create(0);
         }
 
+        public object VisitFixedInteger(Type intType)
+        {
+            var c = intType.GetConstructor(new Type[] { typeof(long) });
+            dynamic value = c.Invoke(new object[] { 0L });
+            return Language.Constant(value);
+        }
+
         public object VisitBigInteger()
         {
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));

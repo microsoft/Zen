@@ -5,8 +5,12 @@
 namespace ZenLib.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib.ModelChecking;
+    using static ZenLib.Language;
 
     /// <summary>
     /// Tests fixed integer operations.
@@ -320,16 +324,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestInvalidByteLength1()
-        {
-            new Int1(new byte[] { });
-        }
-
-        /// <summary>
-        /// Test that a byte range is invalid.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void TestInvalidByteLength2()
         {
             new Int1(new byte[] { 1, 2 });
@@ -407,6 +401,215 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenLib.Int64(0).Size == 64);
             Assert.IsTrue(new Int128(0).Size == 128);
             Assert.IsTrue(new Int256(0).Size == 256);
+        }
+
+        /// <summary>
+        /// Test interpreting fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestInterpretation()
+        {
+            var f = Function<Int3, Int3, Int3>((x, y) => x + y);
+            Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(1), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x - y);
+            Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x | y);
+            Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x & y);
+            Assert.AreEqual(new Int3(2), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x ^ y);
+            Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
+        }
+
+        /// <summary>
+        /// Test compiling fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestCompilation()
+        {
+            var f = Function<Int3, Int3, Int3>((x, y) => x + y);
+            f.Compile();
+            Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(1), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x - y);
+            f.Compile();
+            Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x | y);
+            f.Compile();
+            Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x & y);
+            f.Compile();
+            Assert.AreEqual(new Int3(2), f.Evaluate(new Int3(3), new Int3(2)));
+
+            f = Function<Int3, Int3, Int3>((x, y) => x ^ y);
+            f.Compile();
+            Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
+        }
+
+        /// <summary>
+        /// Test solving addition.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingEquality()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, bool>((x, y) => x == y);
+                var inputs = f.FindAll((x, y, z) => z).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(input.Item1, input.Item2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving addition.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingAddition()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, Int5>((x, y) => x + y);
+                var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(new Int5(4), input.Item1.Add(input.Item2));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving subtraction.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingSubtraction()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, Int5>((x, y) => x - y);
+                var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(new Int5(4), input.Item1.Subtract(input.Item2));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving bitwise and.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingBitwiseAnd()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, Int5>((x, y) => x & y);
+                var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(new Int5(4), input.Item1.BitwiseAnd(input.Item2));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving bitwise or.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingBitwiseOr()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, Int5>((x, y) => x | y);
+                var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(new Int5(4), input.Item1.BitwiseOr(input.Item2));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving bitwise xor.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingBitwiseXor()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, Int5>((x, y) => x ^ y);
+                var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(new Int5(4), input.Item1.BitwiseXor(input.Item2));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving less than or equal.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingLeq()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, bool>((x, y) => x <= y);
+                var inputs = f.FindAll((x, y, z) => z).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(true, input.Item1 <= input.Item2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test solving greater than or equal.
+        /// </summary>
+        [TestMethod]
+        public void TestSolvingGeq()
+        {
+            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var f = Function<Int5, Int5, bool>((x, y) => x >= y);
+                var inputs = f.FindAll((x, y, z) => z).Take(5);
+
+                foreach (var input in inputs)
+                {
+                    Assert.AreEqual(true, input.Item1 >= input.Item2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test that backends agree on semantics.
+        /// </summary>
+        [TestMethod]
+        public void TestAgreement()
+        {
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x <= new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x >= new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x == new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x + y == new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x - y == new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => (x & y) == new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => (x | y) == new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => (x ^ y) == new Int5(5));
         }
     }
 }

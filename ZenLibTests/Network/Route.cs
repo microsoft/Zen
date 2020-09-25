@@ -69,7 +69,7 @@ namespace ZenLib.Tests.Network
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
                 {
-                    var line = Int(i);
+                    var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
                         return Some(Null<Route>());
@@ -94,12 +94,12 @@ namespace ZenLib.Tests.Network
         {
             return TestHelper.ApplyOrderedRules<Route, Tuple<Option<Route>, int>, RouteMapLine>(
                 input: route,
-                deflt: Tuple(Null<Route>(), Int(this.Lines.Count)),
+                deflt: Tuple(Null<Route>(), Constant<int>(this.Lines.Count)),
                 ruleMatch: (l, r, i) => l.Matches(r),
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
                 {
-                    var line = Int(i);
+                    var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
                         return Some(Tuple(Null<Route>(), line));

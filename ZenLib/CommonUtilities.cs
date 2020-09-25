@@ -12,6 +12,8 @@ namespace ZenLib
     using System.Numerics;
     using System.Text;
     using System.Threading;
+    using ZenLib.Generation;
+    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// A collection of common utility functions.
@@ -152,7 +154,9 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
-            T result = default;
+            return f();
+
+            /* T result = default;
             Exception exn = null;
 
             // run in another thread with a larger stack.
@@ -177,7 +181,7 @@ namespace ZenLib
                 throw exn;
             }
 
-            return result;
+            return result; */
         }
 
         /// <summary>
@@ -190,6 +194,29 @@ namespace ZenLib
         public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
         {
             return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
+        }
+
+        /// <summary>
+        /// Converts a solver result back to a C# result.
+        /// </summary>
+        /// <param name="value">The solver result..</param>
+        /// <returns>The C# value.</returns>
+        public static T ConvertSymbolicResultToCSharp<T>(object value)
+        {
+            if (value == null)
+            {
+                return default;
+            }
+
+            if (value.GetType() == typeof(byte[]))
+            {
+                var type = typeof(T);
+                var c = type.GetConstructor(new Type[] { typeof(byte[]) });
+                var intObj = c.Invoke(new object[] { (byte[])value });
+                return (T)intObj;
+            }
+
+            return (T)value;
         }
 
         /// <summary>

@@ -96,106 +96,20 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The Zen value for a bool.
+        /// The Zen value for a constant.
         /// </summary>
-        /// <param name="b">A bool value.</param>
+        /// <param name="value">A value.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> Bool(bool b)
+        public static Zen<T> Constant<T>(T value)
         {
-            return b ? True() : False();
-        }
+            CommonUtilities.ValidateNotNull(value);
 
-        /// <summary>
-        /// The Zen value for a byte.
-        /// </summary>
-        /// <param name="b">A byte value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<byte> Byte(byte b)
-        {
-            return ZenConstantExpr<byte>.Create(b);
-        }
+            if (typeof(T) == ReflectionUtilities.StringType)
+            {
+                CommonUtilities.ValidateStringLiteral((string)(object)value);
+            }
 
-        /// <summary>
-        /// The Zen value for a ushort.
-        /// </summary>
-        /// <param name="s">A ushort value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<ushort> UShort(ushort s)
-        {
-            return ZenConstantExpr<ushort>.Create(s);
-        }
-
-        /// <summary>
-        /// The Zen value for a short.
-        /// </summary>
-        /// <param name="s">A short value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<short> Short(short s)
-        {
-            return ZenConstantExpr<short>.Create(s);
-        }
-
-        /// <summary>
-        /// The Zen value for a uint.
-        /// </summary>
-        /// <param name="i">A uint value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<uint> UInt(uint i)
-        {
-            return ZenConstantExpr<uint>.Create(i);
-        }
-
-        /// <summary>
-        /// The Zen value for an int.
-        /// </summary>
-        /// <param name="i">An int value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<int> Int(int i)
-        {
-            return ZenConstantExpr<int>.Create(i);
-        }
-
-        /// <summary>
-        /// The Zen value for a ulong.
-        /// </summary>
-        /// <param name="l">A ulong value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<ulong> ULong(ulong l)
-        {
-            return ZenConstantExpr<ulong>.Create(l);
-        }
-
-        /// <summary>
-        /// The Zen value for a long.
-        /// </summary>
-        /// <param name="l">A long value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<long> Long(long l)
-        {
-            return ZenConstantExpr<long>.Create(l);
-        }
-
-        /// <summary>
-        /// The Zen value for a big integer.
-        /// </summary>
-        /// <param name="bi">A big integer value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<BigInteger> BigInt(BigInteger bi)
-        {
-            return ZenConstantExpr<BigInteger>.Create(bi);
-        }
-
-        /// <summary>
-        /// The Zen value for a string.
-        /// </summary>
-        /// <param name="s">A string value.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<string> String(string s)
-        {
-            CommonUtilities.ValidateNotNull(s);
-            CommonUtilities.ValidateStringLiteral(s);
-
-            return ZenConstantExpr<string>.Create(s);
+            return ZenConstantExpr<T>.Create(value);
         }
 
         /// <summary>
@@ -1215,9 +1129,9 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(valueExpr);
 
             return listExpr.Case(
-                empty: UShort(0),
+                empty: Constant<ushort>(0),
                 cons: (hd, tl) =>
-                    If(hd == valueExpr, tl.Duplicates(valueExpr), tl.Duplicates(valueExpr) + UShort(1)));
+                    If(hd == valueExpr, tl.Duplicates(valueExpr), tl.Duplicates(valueExpr) + Constant<ushort>(1)));
         }
 
         /// <summary>
@@ -1337,7 +1251,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(listExpr);
 
             return listExpr.Case(
-                empty: UShort(0),
+                empty: Constant<ushort>(0),
                 cons: (hd, tl) => tl.Length() + 1);
         }
 
@@ -1522,7 +1436,7 @@ namespace ZenLib
         {
             return expr.Case(
                 empty: EmptyList<T>(),
-                cons: (hd, tl) => If(UShort((ushort)i) == numElements, EmptyList<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
+                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == numElements, EmptyList<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
         }
 
         /// <summary>
@@ -1566,7 +1480,7 @@ namespace ZenLib
         {
             return expr.Case(
                 empty: EmptyList<T>(),
-                cons: (hd, tl) => If(UShort((ushort)i) == numElements, expr, tl.Drop(numElements, i + 1)));
+                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == numElements, expr, tl.Drop(numElements, i + 1)));
         }
 
         /// <summary>
@@ -1644,7 +1558,7 @@ namespace ZenLib
         {
             return listExpr.Case(
                 empty: Null<T>(),
-                cons: (hd, tl) => If(UShort((ushort)i) == index, Some(hd), tl.At(index, i + 1)));
+                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == index, Some(hd), tl.At(index, i + 1)));
         }
 
         /// <summary>
@@ -1672,7 +1586,7 @@ namespace ZenLib
         {
             return listExpr.Case(
                 empty: Null<ushort>(),
-                cons: (hd, tl) => If(value == hd, Some(UShort((ushort)i)), tl.IndexOf(value, i + 1)));
+                cons: (hd, tl) => If(value == hd, Some(Constant<ushort>((ushort)i)), tl.IndexOf(value, i + 1)));
         }
 
         /// <summary>

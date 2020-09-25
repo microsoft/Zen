@@ -24,13 +24,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBitwiseNotNot()
         {
-            Assert.AreEqual((~~Byte(3)), Byte(3));
-            Assert.AreEqual((~~Short(3)), Short(3));
-            Assert.AreEqual((~~UShort(3)), UShort(3));
-            Assert.AreEqual((~~Int(3)), Int(3));
-            Assert.AreEqual((~~UInt(3)), UInt(3));
-            Assert.AreEqual((~~Long(3)), Long(3));
-            Assert.AreEqual((~~ULong(3)), ULong(3));
+            Assert.AreEqual((~~Constant<byte>(3)), Constant<byte>(3));
+            Assert.AreEqual((~~Constant<short>(3)), Constant<short>(3));
+            Assert.AreEqual((~~Constant<ushort>(3)), Constant<ushort>(3));
+            Assert.AreEqual((~~Constant<int>(3)), Constant<int>(3));
+            Assert.AreEqual((~~Constant<uint>(3)), Constant<uint>(3));
+            Assert.AreEqual((~~Constant<long>(3)), Constant<long>(3));
+            Assert.AreEqual((~~Constant<ulong>(3)), Constant<ulong>(3));
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestHashCons()
         {
-            Assert.IsTrue(ReferenceEquals(~Int(10), ~Int(10)));
-            Assert.IsTrue(ReferenceEquals(Int(10) - Int(10), Int(10) - Int(10)));
-            Assert.IsTrue(ReferenceEquals(Int(10) * Int(10), Int(10) * Int(10)));
+            Assert.IsTrue(ReferenceEquals(~Constant<int>(10), ~Constant<int>(10)));
+            Assert.IsTrue(ReferenceEquals(Constant<int>(10) - Constant<int>(10), Constant<int>(10) - Constant<int>(10)));
+            Assert.IsTrue(ReferenceEquals(Constant<int>(10) * Constant<int>(10), Constant<int>(10) * Constant<int>(10)));
             Assert.IsTrue(ReferenceEquals(Some<int>(1), Some<int>(1)));
         }
 
@@ -112,13 +112,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBitwiseAndConstant()
         {
-            Assert.AreEqual((Byte(1) & Byte(1)), Byte(1));
-            Assert.AreEqual((Short(1) & Short(1)), Short(1));
-            Assert.AreEqual((UShort(1) & UShort(1)), UShort(1));
-            Assert.AreEqual((Int(1) & Int(1)), Int(1));
-            Assert.AreEqual((UInt(1) & UInt(1)), UInt(1));
-            Assert.AreEqual((Long(1) & Long(1)), Long(1));
-            Assert.AreEqual((ULong(1) & ULong(1)), ULong(1));
+            Assert.AreEqual((Constant<byte>(1) & Constant<byte>(1)), Constant<byte>(1));
+            Assert.AreEqual((Constant<short>(1) & Constant<short>(1)), Constant<short>(1));
+            Assert.AreEqual((Constant<ushort>(1) & Constant<ushort>(1)), Constant<ushort>(1));
+            Assert.AreEqual((Constant<int>(1) & Constant<int>(1)), Constant<int>(1));
+            Assert.AreEqual((Constant<uint>(1) & Constant<uint>(1)), Constant<uint>(1));
+            Assert.AreEqual((Constant<long>(1) & Constant<long>(1)), Constant<long>(1));
+            Assert.AreEqual((Constant<ulong>(1) & Constant<ulong>(1)), Constant<ulong>(1));
         }
 
         /// <summary>
@@ -127,22 +127,22 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLeqSimplification()
         {
-            Assert.AreEqual((Byte(1) <= Byte(1)), True());
-            Assert.AreEqual((Byte(1) <= Byte(0)), False());
-            Assert.AreEqual((Short(1) <= Short(1)), True());
-            Assert.AreEqual((Short(1) <= Short(0)), False());
-            Assert.AreEqual((UShort(1) <= UShort(1)), True());
-            Assert.AreEqual((UShort(1) <= UShort(0)), False());
-            Assert.AreEqual((Int(1) <= Int(1)), True());
-            Assert.AreEqual((Int(1) <= Int(0)), False());
-            Assert.AreEqual((UInt(1) <= UInt(1)), True());
-            Assert.AreEqual((UInt(1) <= UInt(0)), False());
-            Assert.AreEqual((Long(1) <= Long(1)), True());
-            Assert.AreEqual((Long(1) <= Long(0)), False());
-            Assert.AreEqual((ULong(1) <= ULong(1)), True());
-            Assert.AreEqual((ULong(1) <= ULong(0)), False());
-            Assert.AreEqual((BigInt(1) <= BigInt(1)), True());
-            Assert.AreEqual((BigInt(1) <= BigInt(0)), False());
+            Assert.AreEqual((Constant<byte>(1) <= Constant<byte>(1)), True());
+            Assert.AreEqual((Constant<byte>(1) <= Constant<byte>(0)), False());
+            Assert.AreEqual((Constant<short>(1) <= Constant<short>(1)), True());
+            Assert.AreEqual((Constant<short>(1) <= Constant<short>(0)), False());
+            Assert.AreEqual((Constant<ushort>(1) <= Constant<ushort>(1)), True());
+            Assert.AreEqual((Constant<ushort>(1) <= Constant<ushort>(0)), False());
+            Assert.AreEqual((Constant<int>(1) <= Constant<int>(1)), True());
+            Assert.AreEqual((Constant<int>(1) <= Constant<int>(0)), False());
+            Assert.AreEqual((Constant<uint>(1) <= Constant<uint>(1)), True());
+            Assert.AreEqual((Constant<uint>(1) <= Constant<uint>(0)), False());
+            Assert.AreEqual((Constant<long>(1) <= Constant<long>(1)), True());
+            Assert.AreEqual((Constant<long>(1) <= Constant<long>(0)), False());
+            Assert.AreEqual((Constant<ulong>(1) <= Constant<ulong>(1)), True());
+            Assert.AreEqual((Constant<ulong>(1) <= Constant<ulong>(0)), False());
+            Assert.AreEqual((Constant<BigInteger>(1) <= Constant<BigInteger>(1)), True());
+            Assert.AreEqual((Constant<BigInteger>(1) <= Constant<BigInteger>(0)), False());
         }
 
         /// <summary>
@@ -151,22 +151,22 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGeqSimplification()
         {
-            Assert.AreEqual((Byte(1) >= Byte(1)), True());
-            Assert.AreEqual((Byte(0) >= Byte(1)), False());
-            Assert.AreEqual((Short(1) >= Short(1)), True());
-            Assert.AreEqual((Short(0) >= Short(1)), False());
-            Assert.AreEqual((UShort(1) >= UShort(1)), True());
-            Assert.AreEqual((UShort(0) >= UShort(1)), False());
-            Assert.AreEqual((Int(1) >= Int(1)), True());
-            Assert.AreEqual((Int(0) >= Int(1)), False());
-            Assert.AreEqual((UInt(1) >= UInt(1)), True());
-            Assert.AreEqual((UInt(0) >= UInt(1)), False());
-            Assert.AreEqual((Long(1) >= Long(1)), True());
-            Assert.AreEqual((Long(0) >= Long(1)), False());
-            Assert.AreEqual((ULong(1) >= ULong(1)), True());
-            Assert.AreEqual((ULong(0) >= ULong(1)), False());
-            Assert.AreEqual((BigInt(1) >= BigInt(1)), True());
-            Assert.AreEqual((BigInt(0) >= BigInt(1)), False());
+            Assert.AreEqual((Constant<byte>(1) >= Constant<byte>(1)), True());
+            Assert.AreEqual((Constant<byte>(0) >= Constant<byte>(1)), False());
+            Assert.AreEqual((Constant<short>(1) >= Constant<short>(1)), True());
+            Assert.AreEqual((Constant<short>(0) >= Constant<short>(1)), False());
+            Assert.AreEqual((Constant<ushort>(1) >= Constant<ushort>(1)), True());
+            Assert.AreEqual((Constant<ushort>(0) >= Constant<ushort>(1)), False());
+            Assert.AreEqual((Constant<int>(1) >= Constant<int>(1)), True());
+            Assert.AreEqual((Constant<int>(0) >= Constant<int>(1)), False());
+            Assert.AreEqual((Constant<uint>(1) >= Constant<uint>(1)), True());
+            Assert.AreEqual((Constant<uint>(0) >= Constant<uint>(1)), False());
+            Assert.AreEqual((Constant<long>(1) >= Constant<long>(1)), True());
+            Assert.AreEqual((Constant<long>(0) >= Constant<long>(1)), False());
+            Assert.AreEqual((Constant<ulong>(1) >= Constant<ulong>(1)), True());
+            Assert.AreEqual((Constant<ulong>(0) >= Constant<ulong>(1)), False());
+            Assert.AreEqual((Constant<BigInteger>(1) >= Constant<BigInteger>(1)), True());
+            Assert.AreEqual((Constant<BigInteger>(0) >= Constant<BigInteger>(1)), False());
         }
 
         /// <summary>
@@ -175,10 +175,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAdditionSimplification()
         {
-            Assert.AreEqual((Byte(1) + Byte(0)), Byte(1));
-            Assert.AreEqual((Byte(0) + Byte(1)), Byte(1));
-            Assert.AreEqual((BigInt(1) + BigInt(0)), BigInt(1));
-            Assert.AreEqual((BigInt(0) + BigInt(1)), BigInt(1));
+            Assert.AreEqual((Constant<byte>(1) + Constant<byte>(0)), Constant<byte>(1));
+            Assert.AreEqual((Constant<byte>(0) + Constant<byte>(1)), Constant<byte>(1));
+            Assert.AreEqual((Constant<BigInteger>(1) + Constant<BigInteger>(0)), Constant<BigInteger>(1));
+            Assert.AreEqual((Constant<BigInteger>(0) + Constant<BigInteger>(1)), Constant<BigInteger>(1));
             CheckValid<byte>(x => x + 0 == x);
             CheckValid<byte>(x => 0 + x == x);
         }
@@ -189,8 +189,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMinusSimplification()
         {
-            Assert.AreEqual((Byte(1) - Byte(0)), Byte(1));
-            Assert.AreEqual((BigInt(1) - BigInt(0)), BigInt(1));
+            Assert.AreEqual((Constant<byte>(1) - Constant<byte>(0)), Constant<byte>(1));
+            Assert.AreEqual((Constant<BigInteger>(1) - Constant<BigInteger>(0)), Constant<BigInteger>(1));
         }
 
         /// <summary>
@@ -199,8 +199,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultiplicationSimplification()
         {
-            Assert.AreEqual((Byte(2) * Byte(2)), Byte(4));
-            Assert.AreEqual((BigInt(2) * BigInt(2)), BigInt(4));
+            Assert.AreEqual((Constant<byte>(2) * Constant<byte>(2)), Constant<byte>(4));
+            Assert.AreEqual((Constant<BigInteger>(2) * Constant<BigInteger>(2)), Constant<BigInteger>(4));
             CheckValid<byte>(x => x * 1 == x);
             CheckValid<byte>(x => 1 * x == x);
             CheckValid<byte>(x => x * 0 == 0);
@@ -213,8 +213,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatenationSimplification()
         {
-            Assert.AreEqual(String("hello") + String(""), String("hello"));
-            Assert.AreEqual(String("a") + String("hello"), String("ahello"));
+            Assert.AreEqual(Constant("hello") + Constant(""), Constant("hello"));
+            Assert.AreEqual(Constant("a") + Constant("hello"), Constant("ahello"));
             CheckValid<string>(x => x + "" == x);
             CheckValid<string>(x => "" + x == x);
         }
@@ -225,14 +225,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestStartsWithSimplification()
         {
-            var s1 = String("hello");
-            var s2 = String("he");
-            var s3 = String("lo");
+            var s1 = Constant("hello");
+            var s2 = Constant("he");
+            var s3 = Constant("lo");
 
             Assert.AreEqual(s1.StartsWith(s2), True());
             Assert.AreEqual(s1.StartsWith(s3), False());
             CheckValid<string>(s => s.StartsWith(""));
-            CheckValid<string>(s => Not(String("").StartsWith(s)));
+            CheckValid<string>(s => Not(Constant("").StartsWith(s)));
         }
 
         /// <summary>
@@ -241,14 +241,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEndsWithSimplification()
         {
-            var s1 = String("hello");
-            var s2 = String("he");
-            var s3 = String("lo");
+            var s1 = Constant("hello");
+            var s2 = Constant("he");
+            var s3 = Constant("lo");
 
             Assert.AreEqual(s1.EndsWith(s2), False());
             Assert.AreEqual(s1.EndsWith(s3), True());
             CheckValid<string>(s => s.EndsWith(""));
-            CheckValid<string>(s => Not(String("").EndsWith(s)));
+            CheckValid<string>(s => Not(Constant("").EndsWith(s)));
         }
 
         /// <summary>
@@ -257,14 +257,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestContainsSimplification()
         {
-            var s1 = String("hello");
-            var s2 = String("elo");
-            var s3 = String("ll");
+            var s1 = Constant("hello");
+            var s2 = Constant("elo");
+            var s3 = Constant("ll");
 
             Assert.AreEqual(s1.Contains(s2), False());
             Assert.AreEqual(s1.Contains(s3), True());
             CheckValid<string>(s => s.Contains(""));
-            CheckValid<string>(s => Not(String("").Contains(s1)));
+            CheckValid<string>(s => Not(Constant("").Contains(s1)));
         }
 
         /// <summary>
@@ -273,15 +273,15 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestReplaceSimplification()
         {
-            var s1 = String("hello");
-            var s2 = String("ll");
-            var s3 = String("ll");
+            var s1 = Constant("hello");
+            var s2 = Constant("ll");
+            var s3 = Constant("ll");
 
-            Assert.AreEqual(String("abc").ReplaceFirst("b", "c"), String("acc"));
-            Assert.AreEqual(String("abc").ReplaceFirst("", "d"), String("abcd"));
+            Assert.AreEqual(Constant("abc").ReplaceFirst("b", "c"), Constant("acc"));
+            Assert.AreEqual(Constant("abc").ReplaceFirst("", "d"), Constant("abcd"));
 
             CheckValid<string, string>((s1, s2) => s1.ReplaceFirst("", s2) == s1 + s2);
-            CheckValid<string, string>((s1, s2) => String("").ReplaceFirst(s1, s2) == "");
+            CheckValid<string, string>((s1, s2) => Constant("").ReplaceFirst(s1, s2) == "");
         }
 
         /// <summary>
@@ -290,10 +290,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSubstringSimplification()
         {
-            Assert.AreEqual(String("abc").Substring(new BigInteger(0), new BigInteger(1)), String("a"));
-            Assert.AreEqual(String("abc").Substring(new BigInteger(0), new BigInteger(2)), String("ab"));
-            Assert.AreEqual(String("abc").Substring(new BigInteger(0), new BigInteger(3)), String("abc"));
-            Assert.AreEqual(String("abc").Substring(new BigInteger(0), new BigInteger(4)), String("abc"));
+            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(1)), Constant("a"));
+            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(2)), Constant("ab"));
+            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(3)), Constant("abc"));
+            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(4)), Constant("abc"));
         }
 
         /// <summary>
@@ -302,12 +302,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtSimplification()
         {
-            Assert.AreEqual(String("abc").At(new BigInteger(0)), String("a"));
-            Assert.AreEqual(String("abc").At(new BigInteger(1)), String("b"));
-            Assert.AreEqual(String("abc").At(new BigInteger(2)), String("c"));
-            Assert.AreEqual(String("abc").At(new BigInteger(3)), String(""));
+            Assert.AreEqual(Constant("abc").At(new BigInteger(0)), Constant("a"));
+            Assert.AreEqual(Constant("abc").At(new BigInteger(1)), Constant("b"));
+            Assert.AreEqual(Constant("abc").At(new BigInteger(2)), Constant("c"));
+            Assert.AreEqual(Constant("abc").At(new BigInteger(3)), Constant(""));
             var x = Arbitrary<BigInteger>();
-            Assert.AreEqual(String("").At(x), String(""));
+            Assert.AreEqual(Constant("").At(x), Constant(""));
         }
 
         /// <summary>
@@ -316,10 +316,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthSimplification()
         {
-            Assert.AreEqual(String("a").Length(), BigInt(1));
-            Assert.AreEqual(String("ab").Length(), BigInt(2));
-            Assert.AreEqual(String("abc").Length(), BigInt(3));
-            Assert.AreEqual(String("").Length(), BigInt(0));
+            Assert.AreEqual(Constant("a").Length(), Constant<BigInteger>(1));
+            Assert.AreEqual(Constant("ab").Length(), Constant<BigInteger>(2));
+            Assert.AreEqual(Constant("abc").Length(), Constant<BigInteger>(3));
+            Assert.AreEqual(Constant("").Length(), Constant<BigInteger>(0));
         }
 
         /// <summary>
@@ -328,11 +328,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfSimplification()
         {
-            Assert.AreEqual(String("abc").IndexOf(""), BigInt(0));
-            Assert.AreEqual(String("abc").IndexOf("a"), BigInt(0));
-            Assert.AreEqual(String("abc").IndexOf("b"), BigInt(1));
-            Assert.AreEqual(String("abc").IndexOf("c"), BigInt(2));
-            Assert.AreEqual(String("abc").IndexOf("d"), BigInt(-1));
+            Assert.AreEqual(Constant("abc").IndexOf(""), Constant<BigInteger>(0));
+            Assert.AreEqual(Constant("abc").IndexOf("a"), Constant<BigInteger>(0));
+            Assert.AreEqual(Constant("abc").IndexOf("b"), Constant<BigInteger>(1));
+            Assert.AreEqual(Constant("abc").IndexOf("c"), Constant<BigInteger>(2));
+            Assert.AreEqual(Constant("abc").IndexOf("d"), Constant<BigInteger>(-1));
         }
 
         /// <summary>
@@ -441,8 +441,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIfSimplification()
         {
-            var x = Int(1);
-            var y = Int(2);
+            var x = Constant(1);
+            var y = Constant(2);
             var b = Arbitrary<bool>();
             Assert.AreEqual(If(true, x, y), x);
             Assert.AreEqual(If(false, x, y), y);
@@ -458,9 +458,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectGetSimplification()
         {
-            var x = Create<Object2>(("Field1", Int(1)), ("Field2", Int(2)));
-            var y = x.WithField("Field1", Int(3));
-            Assert.AreEqual(y.GetField<Object2, int>("Field1"), Int(3));
+            var x = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
+            var y = x.WithField("Field1", Constant(3));
+            Assert.AreEqual(y.GetField<Object2, int>("Field1"), Constant(3));
             Assert.AreEqual(y.GetField<Object2, int>("Field2"), x.GetField<Object2, int>("Field2"));
         }
 
@@ -594,8 +594,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestHashconsingWorksForCreate()
         {
-            var x = Create<Object2>(("Field1", Int(0)), ("Field2", Int(0)));
-            var y = Create<Object2>(("Field2", Int(0)), ("Field1", Int(0)));
+            var x = Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(0)));
+            var y = Create<Object2>(("Field2", Constant(0)), ("Field1", Constant(0)));
             Assert.AreEqual(x, y);
         }
     }
