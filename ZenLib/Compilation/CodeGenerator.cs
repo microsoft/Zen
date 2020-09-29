@@ -12,7 +12,7 @@ namespace ZenLib.Compilation
     /// Code generation for converting Zen functions
     /// to IL that executes with native C# performance.
     /// </summary>
-    public static class CodeGenerator
+    internal static class CodeGenerator
     {
         /// <summary>
         /// Compile a Zen expression to native IL.

@@ -1,6 +1,5 @@
 ﻿namespace ZenLib.SymbolicExecution
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -9,7 +8,7 @@
     /// <summary>
     /// A class to efficienty enumerate items recursively.
     /// </summary>
-    public sealed class NestedEnumerable<T> : IEnumerable<T>
+    internal sealed class NestedEnumerable<T> : IEnumerable<T>
     {
         /// <summary>
         /// Nested enumerator type.

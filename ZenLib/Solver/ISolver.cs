@@ -15,7 +15,7 @@ namespace ZenLib.Solver
     /// <typeparam name="TBitvec">The finite integer type.</typeparam>
     /// <typeparam name="TInteger">The integer type.</typeparam>
     /// <typeparam name="TString">The string type.</typeparam>
-    public interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString>
+    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString>
     {
         /// <summary>
         /// The false expression.

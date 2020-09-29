@@ -69,6 +69,18 @@ namespace ZenLib
         private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// Generates a new random value of a given type.
+        /// </summary>
+        /// <param name="magicConstants">Magic constants to use.</param>
+        /// <param name="sizeBound">The bound on the size of objects.</param>
+        /// <returns>A random value of a given type.</returns>
+        public static T Generate<T>(Dictionary<Type, ISet<object>> magicConstants = null, int sizeBound = 20)
+        {
+            var generator = new RandomValueGenerator(magicConstants, sizeBound);
+            return (T)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T));
+        }
+
+        /// <summary>
         /// Lift a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
@@ -127,6 +139,22 @@ namespace ZenLib
         internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator)
         {
             return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T));
+        }
+
+        /// <summary>
+        /// Create a list of arbitrary elements.
+        /// </summary>
+        /// <param name="count">Zen elements.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<IList<T>> ArbitraryList<T>(ushort count)
+        {
+            var elements = new Zen<T>[count];
+            for (int i = 0; i < count; i++)
+            {
+                elements[i] = Arbitrary<T>();
+            }
+
+            return List(elements);
         }
 
         /// <summary>

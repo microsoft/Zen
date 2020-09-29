@@ -270,6 +270,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test List arbitrary.
+        /// </summary>
+        [TestMethod]
+        public void TestListArbitrary()
+        {
+            var f = new ZenFunction<IList<int>, bool>(l => And(l.Contains(1), l.Contains(2)));
+            var input = f.Find((l, o) => o, ArbitraryList<int>(2));
+            Assert.IsTrue(input.Value.Contains(1));
+            Assert.IsTrue(input.Value.Contains(2));
+        }
+
+        /// <summary>
         /// Test List reverse and append.
         /// </summary>
         [TestMethod]

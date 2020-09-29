@@ -31,8 +31,13 @@ namespace ZenLib
             return () => value.Evaluate();
         }
 
-        internal ZenFunction(Func<Zen<T>> function)
+        /// <summary>
+        /// Create a new instance of the <see cref="ZenFunction{T}"/> class.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        public ZenFunction(Func<Zen<T>> function)
         {
+            CommonUtilities.ValidateNotNull(function);
             this.function = function;
         }
 
@@ -100,8 +105,13 @@ namespace ZenLib
             return (v) => value.Evaluate(v);
         }
 
-        internal ZenFunction(Func<Zen<T1>, Zen<T2>> function)
+        /// <summary>
+        /// Creates a new instance of the <see cref="ZenFunction{T1, T2}"/> class.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        public ZenFunction(Func<Zen<T1>, Zen<T2>> function)
         {
+            CommonUtilities.ValidateNotNull(function);
             this.function = function;
         }
 
@@ -243,8 +253,13 @@ namespace ZenLib
             return (v1, v2) => value.Evaluate(v1, v2);
         }
 
-        internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
+        /// <summary>
+        /// Creates a new instance of the <see cref="ZenFunction{T1, T2, T3}"/> class.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
+            CommonUtilities.ValidateNotNull(function);
             this.function = function;
         }
 
@@ -388,8 +403,13 @@ namespace ZenLib
             return (v1, v2, v3) => value.Evaluate(v1, v2, v3);
         }
 
-        internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
+        /// <summary>
+        /// Creates a new instance of the <see cref="ZenFunction{T1, T2, T3, T4}"/> class.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
+            CommonUtilities.ValidateNotNull(function);
             this.function = function;
         }
 
@@ -544,8 +564,13 @@ namespace ZenLib
             return (v1, v2, v3, v4) => value.Evaluate(v1, v2, v3, v4);
         }
 
-        internal ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
+        /// <summary>
+        /// Creates a new instance of the <see cref="ZenFunction{T1, T2, T3, T4, T5}"/> class.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
+            CommonUtilities.ValidateNotNull(function);
             this.function = function;
         }
 
