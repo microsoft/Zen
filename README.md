@@ -33,13 +33,9 @@ ZenFunction<int, int, int> function = Function<int, int, int>(MultiplyAndAdd);
 
 Given a `ZenFunction` we can leverage the library to perform multiple tasks.
 
-## Executing a function
+### Executing a function
 
-Zen can execute the function we have built on a given collection of inputs. 
-
-### Interpreting the model
-
-The simplest way to do so is to call the `Evaluate` method on the `ZenFunction`:
+Zen can execute the function we have built on a given collection of inputs. The simplest way to do so is to call the `Evaluate` method on the `ZenFunction`:
 
 ```csharp
 var output = function.Evaluate(3, 2); // output = 11
@@ -47,16 +43,12 @@ var output = function.Evaluate(3, 2); // output = 11
 
 This will interpret abstract syntax tree represented by the Zen function at runtime. Of course doing so can be quite slow, particularly compared to a native version of the function.
 
-### Compiling the model
-
 When performance is important, or if you need to execute the model on many inputs, Zen can compile the model using the C# `System.Reflection.Emit` API. This generates IL instructions that execute more efficiently. Doing so is easy, just call the `Compile` method on the function first:
 
 ```csharp
 function.Compile();
 output = function.Evaluate(3, 2); // output = 11
 ```
-
-### Comparing the performance
 
 We can see the difference by comparing the performance between the two:
 
@@ -86,13 +78,9 @@ compilation time: 4ms
 compiled function time: 2ms
 ```
 
-## Searching for inputs
+### Searching for inputs
 
-A powerful feature Zen supports is the ability to find function inputs that lead to some (un)desirable outcome.
-
-### Finding a single input
-
-For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
+A powerful feature Zen supports is the ability to find function inputs that lead to some (un)desirable outcome. For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
 
 ```csharp
 var input = function.Find((x, y, result) => And(x <= 0, result == 11)); 
@@ -101,8 +89,6 @@ var input = function.Find((x, y, result) => And(x <= 0, result == 11));
 
 The type of the result in this case is `Option<(int, int)>`, which will have a pair of integer inputs that make the expression true if such a pair exists. In this case the library will find `x = -1883171776` and `y = 1354548043`
 
-### Finding multiple inputs
-
 To find multiple inputs, Zen supports an equivalent `FindAll` method, which returns an `IEnumerable` of inputs.
 
 ```csharp
@@ -110,8 +96,6 @@ var inputs = function.FindAll((x, y, result) => And(x <= 0, result == 11)).Take(
 ```
 
 Each input in `inputs` will be unique so there will be no duplicates.
-
-### Richer data structures
 
 Zen also supports richer data types such as lists. For example, we can write an implementation for the insertion sort algorithm using recursion:
 
@@ -129,8 +113,6 @@ Zen<IList<T>> Insert<T>(Zen<T> elt, Zen<IList<T>> list)
 }
 ```
 
-### Using search to verify properties of models
-
 We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
 
 ```csharp
@@ -141,11 +123,9 @@ var input = f.Find((inlist, outlist) => inlist.Length() != outlist.Length());
 
 Input search uses [bounded model checking](https://en.wikipedia.org/wiki/Model_checking#:~:text=Bounded%20model%20checking%20algorithms%20unroll,as%20an%20instance%20of%20SAT.) to perform verification. For data structures like lists, it finds examples up to a given input size *k*, which is an optional parameter to the function.
 
-## Computing with sets
+### Computing with sets
 
 While the `Find` function provides a way to find a single input to a function, Zen also provides an additional API for reasoning about sets of inputs and outputs to functions. 
-
-### Creating transformers
 
 It does this through a `StateSetTransformer` API. A transformer is created by calling the `Transformer()` method on a `ZenFunction`:
 
@@ -155,8 +135,6 @@ ZenFunction<uint, uint> f = Function<uint, uint>(i => i + 1);
 // create a set transformer from the function
 StateSetTransformer<uint, uint> t = f.Transformer();
 ```
-
-### Using transformers
 
 Transformers allow for manipulating (potentially huge) sets of objects efficient. For example, we can get the set of all input `uint` values where adding one will result in an output `y` that is no more than 10 thousand:
 
@@ -181,7 +159,7 @@ Option<uint> example = inputSet.Element(); // example.Value = 0
 
 Internally, transformers leverage [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) to represent, possibly very large, sets of objects efficiently.
 
-## Test input generation
+### Generating test inputs
 
 As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
@@ -237,9 +215,7 @@ We get the following inputs, which exercise all possibilities:
 
 The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path.
 
-# Other information
-
-## Supported data types
+# Supported data types
 
 Zen currently supports a subset of the C# language, described in more detail below.
 
@@ -292,7 +268,7 @@ By default all values are assumed to be non-null by Zen. For nullable values, it
 
 Zen supports custom `class` and `struct` types with some limitations. It will attempt to model all public fields and properties. For these types to work, the class/struct must also have a default constructor.
 
-## Supported solver backends
+# Solver backends
 
 Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). 
 
