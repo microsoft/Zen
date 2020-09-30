@@ -161,8 +161,6 @@ namespace ZenLib.Tests
                 return And(fwd1, fwd2, acl);
             });
 
-            // Console.WriteLine(f.Find((x, y) => y));
-
             // build transformers
             var tfwd1 = Function<Packet, bool>(p => d1.Table.Forward(p, 0) == 1).Transformer();
             var tfwd2 = Function<Packet, bool>(p => d2.Table.Forward(p, 0) == 2).Transformer();

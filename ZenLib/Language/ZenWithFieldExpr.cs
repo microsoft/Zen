@@ -25,7 +25,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
             CommonUtilities.ValidateNotNull(fieldValue);
-            ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), fieldName);
+            ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr, fieldName, fieldValue);
             if (hashConsTable.TryGetValue(key, out var value))

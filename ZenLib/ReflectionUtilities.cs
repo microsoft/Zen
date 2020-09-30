@@ -6,9 +6,11 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
+    using ZenLib.Generation;
     using static ZenLib.Language;
 
     /// <summary>
@@ -276,32 +278,36 @@ namespace ZenLib
         /// <summary>
         /// Validates whether the field or property exists.
         /// </summary>
-        /// <param name="type">The type.</param>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="fieldType">The field type.</param>
         /// <param name="fieldOrPropertyName">The field or property name.</param>
-        public static void ValidateFieldOrProperty(Type type, string fieldOrPropertyName)
+        public static void ValidateFieldOrProperty(Type objectType, Type fieldType, string fieldOrPropertyName)
         {
-            if (type.GetProperty(fieldOrPropertyName) == null && type.GetField(fieldOrPropertyName) == null)
+            var p = objectType.GetProperty(fieldOrPropertyName);
+            var f = objectType.GetField(fieldOrPropertyName);
+
+            if (p == null && f == null)
             {
-                throw new ZenException($"Invalid field or property {fieldOrPropertyName} or object with type {type}");
+                throw new ZenException($"Invalid field or property {fieldOrPropertyName} for object with type {objectType}");
+            }
+
+            var actualFieldType = p == null ? f.FieldType : p.PropertyType;
+
+            if (actualFieldType != fieldType)
+            {
+                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
             }
         }
 
         /// <summary>
-        /// Validates that an object is a Zen object of some type.
+        /// Validates that a type is a Zen type.
         /// </summary>
         /// <param name="type">The object type.</param>
-        /// <param name="value">The field value to validate.</param>
-        /// <param name="fieldOrPropertyName">The object field name.</param>
-        public static void ValidateFieldIsZenObject(Type type, object value, string fieldOrPropertyName)
+        public static void ValidateIsZenType(Type type)
         {
-            var fieldInfo = type.GetField(fieldOrPropertyName);
-            var expectedType = fieldInfo != null ? fieldInfo.FieldType : type.GetProperty(fieldOrPropertyName).PropertyType;
-            var expectedZenType = typeof(Zen<>).MakeGenericType(expectedType);
-
-            var valueType = value.GetType();
-            if (!expectedZenType.IsAssignableFrom(valueType))
+            if (!type.IsGenericType || typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinition()))
             {
-                throw new ZenException($"Attempting to create an object of type {type} using field {fieldOrPropertyName} with type {valueType}, when field type {expectedZenType} is expected");
+                throw new ZenException($"Attempting to use value of non-Zen type: {type}");
             }
         }
 
@@ -418,6 +424,86 @@ namespace ZenLib
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Get a default value of a given type.
+        /// </summary>
+        /// <returns>Default value of that type.</returns>
+        internal static T GetDefaultValue<T>()
+        {
+            return (T)GetDefaultValue(typeof(T));
+        }
+
+        private static object GetDefaultValue(Type type)
+        {
+            if (type == BoolType)
+                return false;
+            if (type == ByteType)
+                return (byte)0;
+            if (type == ShortType)
+                return (short)0;
+            if (type == UshortType)
+                return (ushort)0;
+            if (type == IntType)
+                return 0;
+            if (type == UintType)
+                return 0U;
+            if (type == LongType)
+                return 0L;
+            if (type == UlongType)
+                return 0UL;
+            if (type == BigIntType)
+                return new BigInteger(0);
+            if (type == StringType)
+                return string.Empty;
+            if (IsFixedIntegerType(type))
+                return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
+
+            if (IsOptionType(type))
+            {
+                var innerType = type.GetGenericArguments()[0];
+                return typeof(Option).GetMethod("None").MakeGenericMethod(innerType).Invoke(null, new object[] { });
+            }
+
+            if (IsTupleType(type) || IsValueTupleType(type))
+            {
+                var innerType1 = type.GetGenericArguments()[0];
+                var innerType2 = type.GetGenericArguments()[1];
+                var c = type.GetConstructor(new Type[] { innerType1, innerType2 });
+                return c.Invoke(new object[] { GetDefaultValue(innerType1), GetDefaultValue(innerType2) });
+            }
+
+            if (IsIListType(type))
+            {
+                var innerType = type.GetGenericArguments()[0];
+                var c = ListType.MakeGenericType(innerType).GetConstructor(new Type[] { });
+                return c.Invoke(new object[] { });
+            }
+
+            if (IsIDictionaryType(type))
+            {
+                var keyType = type.GetGenericArguments()[0];
+                var valueType = type.GetGenericArguments()[1];
+                var c = DictType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                return c.Invoke(new object[] { });
+            }
+
+            // some class or struct
+
+            var fields = new SortedDictionary<string, object>();
+
+            foreach (var field in GetAllFields(type))
+            {
+                fields[field.Name] = GetDefaultValue(field.FieldType);
+            }
+
+            foreach (var property in GetAllProperties(type))
+            {
+                fields[property.Name] = GetDefaultValue(property.PropertyType);
+            }
+
+            return CreateInstance(type, fields.Keys.ToArray(), fields.Values.ToArray());
         }
 
         /// <summary>

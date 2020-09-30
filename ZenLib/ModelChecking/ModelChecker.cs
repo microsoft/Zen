@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using ZenLib.Solver;
 
@@ -45,12 +46,7 @@ namespace ZenLib.ModelChecking
             var symbolicResult =
                 (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Accept(symbolicEvaluator, env);
 
-            // Console.WriteLine($"[time] model checking: {watch.ElapsedMilliseconds}ms");
-            // watch.Restart();
-
             var possibleModel = solver.Satisfiable(symbolicResult.Value);
-
-            // Console.WriteLine($"[time] get sat: {watch.ElapsedMilliseconds}ms");
 
             if (!possibleModel.HasValue)
             {
@@ -65,7 +61,15 @@ namespace ZenLib.ModelChecking
             {
                 var expr = kv.Key;
                 var variable = kv.Value;
-                arbitraryAssignment.Add(expr, this.solver.Get(model, variable));
+                var type = expr.GetType().GetGenericArguments()[0];
+                var obj = this.solver.Get(model, variable);
+
+                if (ReflectionUtilities.IsFixedIntegerType(type))
+                {
+                    obj = type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { obj });
+                }
+
+                arbitraryAssignment.Add(expr, obj);
             }
 
             return arbitraryAssignment;
