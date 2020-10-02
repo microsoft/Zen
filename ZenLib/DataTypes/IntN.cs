@@ -206,6 +206,11 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool Equals(IntN<T, TSign> other)
         {
+            if (other is null)
+            {
+                return false;
+            }
+
             for (int i = 0; i < this.Bytes.Length; i++)
             {
                 if (this.Bytes[i] != other.Bytes[i])

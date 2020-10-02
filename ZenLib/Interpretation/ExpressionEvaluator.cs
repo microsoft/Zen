@@ -56,9 +56,9 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 if (parameter.ArbitraryAssignment == null)
-                    return default(T);
+                    return ReflectionUtilities.GetDefaultValue<T>();
                 if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
-                    return default(T);
+                    return ReflectionUtilities.GetDefaultValue<T>();
                 // the library doesn't distinguish between signed and unsigned,
                 // so we must perform this conversion manually.
                 var type = typeof(T);
@@ -188,12 +188,9 @@ namespace ZenLib.Interpretation
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
-                    var value = fieldValuePair.Value;
+                    dynamic value = fieldValuePair.Value;
                     var valueType = value.GetType();
-                    var acceptMethod = valueType
-                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(typeof(ExpressionEvaluatorEnvironment), typeof(object));
-                    var valueResult = acceptMethod.Invoke(value, new object[] { this, parameter });
+                    var valueResult = value.Accept(this, parameter);
                     fieldNames.Add(field);
                     parameters.Add(valueResult);
                 }

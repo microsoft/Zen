@@ -502,7 +502,7 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet1()
         {
             Create<Object1>(
-                    ("Item1", 0))
+                    ("Item1", Constant(0)))
                 .GetField<Object1, string>("Foo");
         }
 
@@ -514,8 +514,8 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet2()
         {
             Create<Object1>(
-                    ("Item1", 0),
-                    ("Item2", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)))
                 .GetField<Object1, string>("Foo");
         }
 
@@ -527,9 +527,9 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet3()
         {
             Create<Object3>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)))
                 .GetField<Object3, string>("Foo");
         }
 
@@ -541,10 +541,10 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet4()
         {
             Create<Object8>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0),
-                    ("Item4", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)),
+                    ("Item4", Constant(0)))
                 .GetField<Object8, string>("Foo");
         }
 
@@ -556,11 +556,11 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet5()
         {
             Create<Object5>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0),
-                    ("Item4", 0),
-                    ("Item5", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)),
+                    ("Item4", Constant(0)),
+                    ("Item5", Constant(0)))
                 .GetField<Object5, string>("Foo");
         }
 
@@ -572,12 +572,12 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet6()
         {
             Create<Object6>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0),
-                    ("Item4", 0),
-                    ("Item5", 0),
-                    ("Item6", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)),
+                    ("Item4", Constant(0)),
+                    ("Item5", Constant(0)),
+                    ("Item6", Constant(0)))
                 .GetField<Object6, string>("Foo");
         }
 
@@ -589,13 +589,13 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet7()
         {
             Create<Object7>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0),
-                    ("Item4", 0),
-                    ("Item5", 0),
-                    ("Item6", 0),
-                    ("Item7", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)),
+                    ("Item4", Constant(0)),
+                    ("Item5", Constant(0)),
+                    ("Item6", Constant(0)),
+                    ("Item7", Constant(0)))
                 .GetField<Object7, string>("Foo");
         }
 
@@ -607,14 +607,14 @@ namespace ZenLib.Tests
         public void TestInvalidFieldGet8()
         {
             Create<Object8>(
-                    ("Item1", 0),
-                    ("Item2", 0),
-                    ("Item3", 0),
-                    ("Item4", 0),
-                    ("Item5", 0),
-                    ("Item6", 0),
-                    ("Item7", 0),
-                    ("Item8", 0))
+                    ("Item1", Constant(0)),
+                    ("Item2", Constant(0)),
+                    ("Item3", Constant(0)),
+                    ("Item4", Constant(0)),
+                    ("Item5", Constant(0)),
+                    ("Item6", Constant(0)),
+                    ("Item7", Constant(0)),
+                    ("Item8", Constant(0)))
                 .GetField<Object8, string>("Foo");
         }
 

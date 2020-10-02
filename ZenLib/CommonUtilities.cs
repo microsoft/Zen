@@ -162,10 +162,16 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
+            if (!Settings.UseLargeStack)
+            {
+                return f();
+            }
+
+            // run in another thread with a larger stack.
+
             T result = default;
             Exception exn = null;
 
-            // run in another thread with a larger stack.
             Thread t = new Thread(() =>
             {
                 try
@@ -221,11 +227,6 @@ namespace ZenLib
         /// <returns>The C# value.</returns>
         public static T ConvertSymbolicResultToCSharp<T>(object value)
         {
-            if (value == null)
-            {
-                return default;
-            }
-
             if (value.GetType() == typeof(byte[]))
             {
                 var type = typeof(T);

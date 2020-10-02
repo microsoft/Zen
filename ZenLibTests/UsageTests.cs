@@ -1441,5 +1441,25 @@ namespace ZenLib.Tests
         {
             Language.Create<Object1>(("Field1", 0));
         }
+
+        /// <summary>
+        /// Exception thrown since we provide a value with the wrong Zen type.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCreationIncorrectType()
+        {
+            Language.Create<Object1>(("Field1", Constant(false)));
+        }
+
+        /// <summary>
+        /// Exception thrown since new field has the wrong type.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidFieldZenType()
+        {
+            Language.Create<Object1>(("Field1", Constant(0))).WithField("Field1", Constant(true));
+        }
     }
 }

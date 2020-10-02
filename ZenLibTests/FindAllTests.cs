@@ -18,11 +18,13 @@ namespace ZenLib.Tests
     public class FindAllTests
     {
         /// <summary>
-        /// Test that Or is commutative.
+        /// Test that find all works.
         /// </summary>
         [TestMethod]
         public void TestFindAll()
         {
+            Settings.UseLargeStack = false;
+
             Assert.AreEqual(11, Function<ushort, bool>(x => x <= 10).FindAll((i, o) => o).Count());
             Assert.AreEqual(2, Function<uint, bool>(x => And(x > 1, x <= 3)).FindAll((i, o) => o).Count());
             Assert.AreEqual(5, Function<ulong, bool>(x => x <= 4).FindAll((i, o) => o).Count());
@@ -38,6 +40,8 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(24, Function<uint, uint, uint, uint, bool>(
                 (x, y, z1, z2) => And(x >= y, x <= 2, z1 <= 1, z2 <= 1)).FindAll((i1, i2, i3, i4, o) => o).Count());
+
+            Settings.UseLargeStack = true;
         }
     }
 }

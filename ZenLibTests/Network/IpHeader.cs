@@ -4,6 +4,8 @@
 
 namespace ZenLib.Tests.Network
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
 
@@ -60,6 +62,30 @@ namespace ZenLib.Tests.Network
                 ("DstPort", dstPort),
                 ("SrcPort", srcPort),
                 ("Protocol", protocol));
+        }
+
+        /// <summary>
+        /// Equality for ip headers.
+        /// </summary>
+        /// <param name="obj">The other header.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is IpHeader header &&
+                   EqualityComparer<Ip>.Default.Equals(DstIp, header.DstIp) &&
+                   EqualityComparer<Ip>.Default.Equals(SrcIp, header.SrcIp) &&
+                   DstPort == header.DstPort &&
+                   SrcPort == header.SrcPort &&
+                   Protocol == header.Protocol;
+        }
+
+        /// <summary>
+        /// Hashcode for ip headers.
+        /// </summary>
+        /// <returns>The hash code.</returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(DstIp, SrcIp, DstPort, SrcPort, Protocol);
         }
 
         /// <summary>

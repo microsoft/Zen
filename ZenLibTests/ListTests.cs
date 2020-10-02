@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Language;
@@ -53,6 +54,22 @@ namespace ZenLib.Tests
         public void TestListAny()
         {
             RandomBytes(x => CheckAgreement<IList<int>>(l => l.Any(e => e >= x)));
+        }
+
+        /// <summary>
+        /// Test List any.
+        /// </summary>
+        [TestMethod]
+        public void TestListAnyObjects()
+        {
+            var f1 = new ZenFunction<IList<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
+            var f2 = new ZenFunction<IList<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7).Simplify());
+
+            var input1 = f1.Find((i, o) => o);
+            var input2 = f2.Find((i, o) => o);
+
+            Assert.IsTrue(input1.Value.Where(x => x.Field1 == 7).Count() > 0);
+            Assert.IsTrue(input2.Value.Where(x => x.Field1 == 7).Count() > 0);
         }
 
         /// <summary>

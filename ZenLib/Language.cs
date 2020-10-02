@@ -434,7 +434,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(guardExpr);
             CommonUtilities.ValidateNotNull(thenExpr);
 
-            return ZenIfExpr<bool>.Create(guardExpr, thenExpr, True());
+            return Or(Not(guardExpr), thenExpr);
         }
 
         /// <summary>
@@ -451,6 +451,26 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(falseExpr);
 
             return ZenIfExpr<T>.Create(guardExpr, trueExpr, falseExpr);
+        }
+
+        /// <summary>
+        /// Compute a switch statement.
+        /// </summary>
+        /// <param name="deflt">The default value.</param>
+        /// <param name="cases">A collection of ordered cases.</param>
+        /// <returns>The resulting Zen value.</returns>
+        public static Zen<T> Cases<T>(Zen<T> deflt, params (Zen<bool>, Zen<T>)[] cases)
+        {
+            CommonUtilities.ValidateNotNull(deflt);
+            CommonUtilities.ValidateNotNull(cases);
+
+            for (int i = cases.Length - 1; i >= 0; i--)
+            {
+                var (guard, value) = cases[i];
+                deflt = If(guard, value, deflt);
+            }
+
+            return deflt;
         }
 
         /// <summary>
@@ -1397,18 +1417,18 @@ namespace ZenLib
         /// Fold a function over a Zen list.
         /// </summary>
         /// <param name="expr">Zen list expression.</param>
-        /// <param name="init">The initial value.</param>
+        /// <param name="acc">The initial value.</param>
         /// <param name="function">The fold function.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T2> Fold<T1, T2>(this Zen<IList<T1>> expr, Zen<T2> init, Func<Zen<T1>, Zen<T2>, Zen<T2>> function)
+        public static Zen<T2> Fold<T1, T2>(this Zen<IList<T1>> expr, Zen<T2> acc, Func<Zen<T1>, Zen<T2>, Zen<T2>> function)
         {
             CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(init);
+            CommonUtilities.ValidateNotNull(acc);
             CommonUtilities.ValidateNotNull(function);
 
             return expr.Case(
-                empty: init,
-                cons: (hd, tl) => function(hd, tl.Fold(init, function)));
+                empty: acc,
+                cons: (hd, tl) => tl.Fold(function(hd, acc), function));
         }
 
         /// <summary>

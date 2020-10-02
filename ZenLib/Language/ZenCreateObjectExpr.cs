@@ -21,7 +21,7 @@ namespace ZenLib
         internal override Zen<TObject> Unroll()
         {
             var fields = this.Fields.Select(kv => (kv.Key, ((dynamic)kv.Value).Unroll()));
-            return new ZenCreateObjectExpr<TObject>(fields.ToArray());
+            return Create(fields.ToArray());
         }
 
         public static Zen<TObject> Create(params (string, object)[] fields)
@@ -29,8 +29,9 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(fields);
             foreach (var field in fields)
             {
-                ReflectionUtilities.ValidateFieldOrProperty(typeof(TObject), field.Item1);
-                ReflectionUtilities.ValidateFieldIsZenObject(typeof(TObject), field.Item2, field.Item1);
+                var fieldType = field.Item2.GetType();
+                ReflectionUtilities.ValidateIsZenType(fieldType);
+                ReflectionUtilities.ValidateFieldOrProperty(typeof(TObject), fieldType.BaseType.GetGenericArguments()[0], field.Item1);
             }
 
             Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));

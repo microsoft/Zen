@@ -140,6 +140,15 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLogicaFormula3()
         {
+            CheckValid<bool, bool>((x, y) => Cases<int>(0, (x, 1), (y, 2)) >= 0);
+        }
+
+        /// <summary>
+        /// Test nested commutativity.
+        /// </summary>
+        [TestMethod]
+        public void TestLogicaFormula4()
+        {
             CheckAgreement(() => True());
         }
     }

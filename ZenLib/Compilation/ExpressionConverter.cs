@@ -192,7 +192,7 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                return Expression.Constant(default(T));
+                return Expression.Constant(ReflectionUtilities.GetDefaultValue<T>());
             });
         }
 

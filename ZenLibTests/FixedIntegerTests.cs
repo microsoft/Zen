@@ -88,8 +88,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEqualityFails()
         {
-            Assert.AreNotEqual(new Int1(0), null);
-            Assert.AreNotEqual(new Int1(0), new Int2(0));
+            Assert.IsFalse(new Int1(0).Equals(null));
+            Assert.IsFalse(new Int1(0).Equals(new Int2(0)));
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace ZenLib
 
         internal override Zen<IList<T>> Unroll()
         {
-            return new ZenListAddFrontExpr<T>(this.Expr.Unroll(), this.Element.Unroll());
+            return Create(this.Expr.Unroll(), this.Element.Unroll());
         }
 
         public static ZenListAddFrontExpr<T> Create(Zen<IList<T>> expr, Zen<T> element)

@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -51,7 +52,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
-            ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), fieldName);
+            ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr, fieldName, unroll);
             if (hashConsTable.TryGetValue(key, out var value))
