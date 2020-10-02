@@ -17,7 +17,7 @@ namespace ZenLib
 
         internal override Zen<T1> Unroll()
         {
-            return new ZenWithFieldExpr<T1, T2>(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
+            return Create(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
         }
 
         public static ZenWithFieldExpr<T1, T2> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)

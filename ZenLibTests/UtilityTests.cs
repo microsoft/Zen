@@ -115,6 +115,23 @@ namespace ZenLib.Tests
             Assert.AreEqual(1, s2.Field);
         }
 
+        /// <summary>
+        /// Test that we don't throw a stack overflow exception.
+        /// </summary>
+        [TestMethod]
+        public void TestStackOverflow()
+        {
+            Zen<int> x = Language.Arbitrary<int>();
+            Zen<int> y = Language.Arbitrary<int>();
+
+            for (int i = 0; i < 20000; i++)
+            {
+                y = Language.If(x >= i, i, y);
+            }
+
+            y.Simplify();
+        }
+
         private struct Test
         {
             public int Field { get; set; }

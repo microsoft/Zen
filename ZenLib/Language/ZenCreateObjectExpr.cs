@@ -21,7 +21,7 @@ namespace ZenLib
         internal override Zen<TObject> Unroll()
         {
             var fields = this.Fields.Select(kv => (kv.Key, ((dynamic)kv.Value).Unroll()));
-            return new ZenCreateObjectExpr<TObject>(fields.ToArray());
+            return Create(fields.ToArray());
         }
 
         public static Zen<TObject> Create(params (string, object)[] fields)

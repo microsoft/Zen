@@ -18,7 +18,7 @@ namespace ZenLib.Tests
     public class FindAllTests
     {
         /// <summary>
-        /// Test that Or is commutative.
+        /// Test that find all works.
         /// </summary>
         [TestMethod]
         public void TestFindAll()

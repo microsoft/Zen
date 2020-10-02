@@ -167,10 +167,11 @@ namespace ZenLib
                 return f();
             }
 
+            // run in another thread with a larger stack.
+
             T result = default;
             Exception exn = null;
 
-            // run in another thread with a larger stack.
             Thread t = new Thread(() =>
             {
                 try
