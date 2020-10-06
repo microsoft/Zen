@@ -6,9 +6,8 @@ namespace ZenLib.SymbolicExecution
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
-    using static ZenLib.Language;
 
     /// <summary>
     /// Generate inputs to a function that exercise all paths.
@@ -27,23 +26,8 @@ namespace ZenLib.SymbolicExecution
             Zen<T2> expression,
             Backend backend)
         {
-            var pathConstraints = expression.Accept(new PathExplorer(), new PathConstraint());
-            var seen = new HashSet<Zen<bool>>();
-            foreach (var pathConstraint in pathConstraints)
-            {
-                var pc = And(pathConstraint.Conjuncts.ToArray());
-                if (seen.Contains(pc))
-                {
-                    continue;
-                }
-
-                seen.Add(pc);
-                var found = SymbolicEvaluator.Find(pc, input, backend);
-                if (found.HasValue)
-                {
-                    yield return found.Value;
-                }
-            }
+            Option<T1> f(Zen<bool> e) => SymbolicEvaluator.Find(e, input, backend);
+            return GenerateInputs(f, expression);
         }
 
         /// <summary>
@@ -60,23 +44,8 @@ namespace ZenLib.SymbolicExecution
             Zen<T3> expression,
             Backend backend)
         {
-            var pathConstraints = expression.Accept(new PathExplorer(), new PathConstraint());
-            var seen = new HashSet<Zen<bool>>();
-            foreach (var pathConstraint in pathConstraints)
-            {
-                var pc = And(pathConstraint.Conjuncts.ToArray());
-                if (seen.Contains(pc))
-                {
-                    continue;
-                }
-
-                seen.Add(pc);
-                var found = SymbolicEvaluator.Find(pc, input1, input2, backend);
-                if (found.HasValue)
-                {
-                    yield return found.Value;
-                }
-            }
+            Option<(T1, T2)> f(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, backend);
+            return GenerateInputs(f, expression);
         }
 
         /// <summary>
@@ -95,23 +64,8 @@ namespace ZenLib.SymbolicExecution
             Zen<T4> expression,
             Backend backend)
         {
-            var pathConstraints = expression.Accept(new PathExplorer(), new PathConstraint());
-            var seen = new HashSet<Zen<bool>>();
-            foreach (var pathConstraint in pathConstraints)
-            {
-                var pc = And(pathConstraint.Conjuncts.ToArray());
-                if (seen.Contains(pc))
-                {
-                    continue;
-                }
-
-                seen.Add(pc);
-                var found = SymbolicEvaluator.Find(pc, input1, input2, input3, backend);
-                if (found.HasValue)
-                {
-                    yield return found.Value;
-                }
-            }
+            Option<(T1, T2, T3)> f(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, backend);
+            return GenerateInputs(f, expression);
         }
 
         /// <summary>
@@ -132,23 +86,63 @@ namespace ZenLib.SymbolicExecution
             Zen<T5> expression,
             Backend backend)
         {
-            var pathConstraints = expression.Accept(new PathExplorer(), new PathConstraint());
+            Option<(T1, T2, T3, T4)> f(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, input4, backend);
+            return GenerateInputs(f, expression);
+        }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="f">Function to convert a path constraint to an input.</param>
+        /// <param name="expression">The expression for which to generate inputs.</param>
+        /// <returns>Example inputs.</returns>
+        private static IEnumerable<T1> GenerateInputs<T1, T2>(Func<Zen<bool>, Option<T1>> f, Zen<T2> expression)
+        {
+            var pathExplorer = new PathExplorer(pc => f(pc).HasValue);
+            var pathConstraints = expression.Accept(pathExplorer, new PathConstraint());
             var seen = new HashSet<Zen<bool>>();
             foreach (var pathConstraint in pathConstraints)
             {
-                var pc = And(pathConstraint.Conjuncts.ToArray());
-                if (seen.Contains(pc))
+                if (seen.Contains(pathConstraint.Expr))
                 {
                     continue;
                 }
 
-                seen.Add(pc);
-                var found = SymbolicEvaluator.Find(pc, input1, input2, input3, input4, backend);
+                seen.Add(pathConstraint.Expr);
+                var found = f(pathConstraint.Expr);
                 if (found.HasValue)
                 {
                     yield return found.Value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Generate inputs that exercise different program paths.
+        /// </summary>
+        /// <param name="input">The symbolic input.</param>
+        /// <param name="expression">The expression.</param>
+        /// <param name="backend">The backend to use.</param>
+        /// <returns>A collection of inputs.</returns>
+        public static IEnumerable<T1> GenerateInputsSage<T1, T2>(
+            Zen<T1> input,
+            Zen<T2> expression,
+            Backend backend)
+        {
+            Option<T1> f(Zen<bool> e) => SymbolicEvaluator.Find(e, input, backend);
+
+            var seed = Language.Generate<T1>();
+            var queue = new Queue<(T1, int)>();
+            queue.Enqueue((seed, 0));
+
+            while (queue.Count > 0)
+            {
+                var (example, bound) = queue.Dequeue();
+                var evaluator = new ExpressionEvaluator(true);
+                expression.Accept(evaluator, new ExpressionEvaluatorEnvironment());
+            }
+
+            return GenerateInputs(f, expression);
         }
     }
 }

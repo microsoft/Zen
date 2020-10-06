@@ -145,6 +145,14 @@
         /// <summary>
         /// Creates a new instance of the <see cref="NestedEnumerable{T}"/> class.
         /// </summary>
+        public NestedEnumerable(IEnumerable<T> e)
+        {
+            this.enumerables = new List<IEnumerable<T>>() { e };
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="NestedEnumerable{T}"/> class.
+        /// </summary>
         /// <param name="elt">A single element.</param>
         public NestedEnumerable(T elt)
         {

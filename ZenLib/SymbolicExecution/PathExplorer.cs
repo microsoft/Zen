@@ -5,6 +5,7 @@
 namespace ZenLib.SymbolicExecution
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
@@ -14,6 +15,31 @@ namespace ZenLib.SymbolicExecution
     /// </summary>
     internal sealed class PathExplorer : IZenExprVisitor<PathConstraint, NestedEnumerable<PathConstraint>>
     {
+        /// <summary>
+        /// Function to check feasibility of a (partial) path constraint.
+        /// </summary>
+        private Func<Zen<bool>, bool> feasibilityCheck;
+
+        private Dictionary<Zen<bool>, bool> feasibilityCheckCache;
+
+        public PathExplorer(Func<Zen<bool>, bool> feasibilityCheck)
+        {
+            this.feasibilityCheckCache = new Dictionary<Zen<bool>, bool>();
+            this.feasibilityCheck = feasibilityCheck;
+        }
+
+        private bool IsFeasible(Zen<bool> pc)
+        {
+            if (this.feasibilityCheckCache.TryGetValue(pc, out var result))
+            {
+                return result;
+            }
+
+            var ret = this.feasibilityCheck(pc);
+            this.feasibilityCheckCache[pc] = ret;
+            return ret;
+        }
+
         public NestedEnumerable<PathConstraint> VisitZenAdapterExpr<T1, T2>(ZenAdapterExpr<T1, T2> expression, PathConstraint parameter)
         {
             return expression.Expr.Accept(this, parameter);
@@ -71,7 +97,7 @@ namespace ZenLib.SymbolicExecution
 
             foreach (var zenObj in rest)
             {
-                enumerable = Compose2(enumerable, zenObj, parameter);
+                enumerable = Compose2(enumerable, zenObj);
             }
 
             result.AddNested(enumerable);
@@ -156,44 +182,54 @@ namespace ZenLib.SymbolicExecution
             return expression.Expr.Accept(this, parameter);
         }
 
-        private NestedEnumerable<PathConstraint> Compose3<T1, T2, T3>(
-            Zen<T1> e1,
-            Zen<T2> e2,
-            Zen<T3> e3,
-            PathConstraint parameter)
+        private NestedEnumerable<PathConstraint> Compose3<T1, T2, T3>(Zen<T1> e1, Zen<T2> e2, Zen<T3> e3, PathConstraint parameter)
         {
-            var result = new NestedEnumerable<PathConstraint>();
-
-            foreach (var p1 in e1.Accept(this, parameter))
-            {
-                var parameter2 = parameter.AddPathConstraint(p1);
-                result.AddNested(Compose2(e2.Accept(this, parameter2), e3, parameter2));
-            }
-
-            return result;
+            return new NestedEnumerable<PathConstraint>(Compose3Internal(e1.Accept(this, parameter), e2, e3));
         }
 
-        private NestedEnumerable<PathConstraint> Compose2<T1, T2>(
-            Zen<T1> e1,
-            Zen<T2> e2,
-            PathConstraint parameter)
+        private IEnumerable<PathConstraint> Compose3Internal<T1, T2>(NestedEnumerable<PathConstraint> enumerable, Zen<T1> e1, Zen<T2> e2)
         {
-            return Compose2(e1.Accept(this, parameter), e2, parameter);
-        }
-
-        private NestedEnumerable<PathConstraint> Compose2<T>(
-            NestedEnumerable<PathConstraint> enumerable,
-            Zen<T> e,
-            PathConstraint parameter)
-        {
-            var result = new NestedEnumerable<PathConstraint>();
-
             foreach (var p1 in enumerable)
             {
-                result.AddNested(e.Accept(this, parameter.AddPathConstraint(p1)));
-            }
+                if (!IsFeasible(p1.Expr))
+                {
+                    continue;
+                }
 
-            return result;
+                foreach (var p2 in e1.Accept(this, p1))
+                {
+                    foreach (var p3 in e2.Accept(this, p2))
+                    {
+                        yield return p3;
+                    }
+                }
+            }
+        }
+
+        private NestedEnumerable<PathConstraint> Compose2<T1, T2>(Zen<T1> e1, Zen<T2> e2, PathConstraint parameter)
+        {
+            return Compose2(e1.Accept(this, parameter), e2);
+        }
+
+        private NestedEnumerable<PathConstraint> Compose2<T>(NestedEnumerable<PathConstraint> enumerable, Zen<T> e)
+        {
+            return new NestedEnumerable<PathConstraint>(Compose2Internal(enumerable, e));
+        }
+
+        private IEnumerable<PathConstraint> Compose2Internal<T>(NestedEnumerable<PathConstraint> enumerable, Zen<T> e)
+        {
+            foreach (var p1 in enumerable)
+            {
+                if (!IsFeasible(p1.Expr))
+                {
+                    continue;
+                }
+
+                foreach (var p2 in e.Accept(this, p1))
+                {
+                    yield return p2;
+                }
+            }
         }
 
         private NestedEnumerable<PathConstraint> Fork<T>(
@@ -204,13 +240,24 @@ namespace ZenLib.SymbolicExecution
         {
             var result = new NestedEnumerable<PathConstraint>();
 
-            var trueEnv = parameter.AddPathConstraint(guardExpr);
-            var falseEnv = parameter.AddPathConstraint(ZenNotExpr.Create(guardExpr));
+            var guardEnumerable = guardExpr.Accept(this, parameter);
 
-            var enumerable = guardExpr.Accept(this, parameter);
+            foreach (var g in guardEnumerable)
+            {
+                Console.WriteLine($"fork guard: {g.Expr}");
+            }
 
-            result.AddNested(Compose2(enumerable, trueExpr, trueEnv));
-            result.AddNested(Compose2(enumerable, falseExpr, falseEnv));
+            var notGuardExpr = ZenNotExpr.Create(guardExpr);
+
+            var tEnumerable = new NestedEnumerable<PathConstraint>(
+                guardEnumerable.Select(pc => pc.AddPathConstraint(guardExpr)));
+
+            var fEnumerable = new NestedEnumerable<PathConstraint>(
+                guardEnumerable.Select(pc => pc.AddPathConstraint(notGuardExpr)));
+
+            result.AddNested(Compose2(fEnumerable, falseExpr));
+            result.AddNested(Compose2(tEnumerable, trueExpr));
+
             return result;
         }
     }

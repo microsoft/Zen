@@ -9,13 +9,37 @@ namespace ZenLib.Interpretation
     using System.Collections.Immutable;
     using System.Numerics;
     using System.Reflection;
+    using ZenLib.SymbolicExecution;
 
     /// <summary>
     /// Interpret a Zen expression.
     /// </summary>
     internal sealed class ExpressionEvaluator : IZenExprVisitor<ExpressionEvaluatorEnvironment, object>
     {
+        /// <summary>
+        /// Whether to track covered branches.
+        /// </summary>
+        private bool trackBranches;
+
+        /// <summary>
+        /// Path constraint for the execution.
+        /// </summary>
+        public PathConstraint PathConstraint { get; }
+
+        /// <summary>
+        /// Cache of inputs and results.
+        /// </summary>
         private Dictionary<(object, ExpressionEvaluatorEnvironment), object> cache = new Dictionary<(object, ExpressionEvaluatorEnvironment), object>();
+
+        /// <summary>
+        /// Create a new instance of the <see cref="ExpressionEvaluator"/> class.
+        /// </summary>
+        /// <param name="trackBranches">Whether to track branches during execution.</param>
+        public ExpressionEvaluator(bool trackBranches)
+        {
+            this.trackBranches = trackBranches;
+            this.PathConstraint = new PathConstraint();
+        }
 
         /// <summary>
         /// Lookup an existing cached value or compute it and cache the result.
@@ -218,8 +242,25 @@ namespace ZenLib.Interpretation
             return LookupOrCompute(expression, parameter, () =>
             {
                 var e1 = (bool)expression.GuardExpr.Accept(this, parameter);
-                var branch = e1 ? expression.TrueExpr : expression.FalseExpr;
-                return (T)branch.Accept(this, parameter);
+
+                if (e1)
+                {
+                    if (trackBranches)
+                    {
+                        this.PathConstraint.AddPathConstraint(expression.GuardExpr);
+                    }
+
+                    return (T)expression.TrueExpr.Accept(this, parameter);
+                }
+                else
+                {
+                    if (trackBranches)
+                    {
+                        this.PathConstraint.AddPathConstraint(ZenNotExpr.Create(expression.GuardExpr));
+                    }
+
+                    return (T)expression.FalseExpr.Accept(this, parameter);
+                }
             });
         }
 

@@ -85,7 +85,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             var f = Function<IList<int>, bool>(x => x.Contains(3));
-            Assert.AreEqual(21, f.GenerateInputs().Count());
+            Assert.AreEqual(6, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionOptions()
         {
             var f = Function<Option<int>, Option<int>>(x => x.Where(v => v == 1));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 
         /// <summary>

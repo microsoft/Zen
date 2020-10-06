@@ -120,6 +120,12 @@ namespace ZenLib
         public static MethodInfo CreateMethod = typeof(Language).GetMethod("Create");
 
         /// <summary>
+        /// The zen constant list creation method.
+        /// </summary>
+        public static MethodInfo CreateZenListConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
         /// Check if a type is a kind of integer.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -664,7 +670,10 @@ namespace ZenLib
             if (IsValueTupleType(type))
                 return ValueTuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
             if (type.IsGenericType && IListType.MakeGenericType(type.GetGenericArguments()[0]).IsAssignableFrom(type))
-                return CreateZenListConstant(v);
+            {
+                var innerType = type.GetGenericArguments()[0];
+                return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+            }
             if (type.IsGenericType && IDictType.MakeGenericType(type.GetGenericArguments()[0], type.GetGenericArguments()[1]).IsAssignableFrom(type))
                 return CreateZenDictConstant(v);
 
