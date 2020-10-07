@@ -7,9 +7,10 @@ namespace ZenLib.Interpretation
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
-    using System.Reflection;
     using ZenLib.SymbolicExecution;
+    using static ZenLib.Language;
 
     /// <summary>
     /// Interpret a Zen expression.
@@ -24,7 +25,7 @@ namespace ZenLib.Interpretation
         /// <summary>
         /// Path constraint for the execution.
         /// </summary>
-        public PathConstraint PathConstraint { get; }
+        public PathConstraint PathConstraint { get; set; }
 
         /// <summary>
         /// Cache of inputs and results.
@@ -38,7 +39,11 @@ namespace ZenLib.Interpretation
         public ExpressionEvaluator(bool trackBranches)
         {
             this.trackBranches = trackBranches;
-            this.PathConstraint = new PathConstraint();
+
+            if (trackBranches)
+            {
+                this.PathConstraint = new PathConstraint();
+            }
         }
 
         /// <summary>
@@ -83,15 +88,19 @@ namespace ZenLib.Interpretation
                     return ReflectionUtilities.GetDefaultValue<T>();
                 if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
                     return ReflectionUtilities.GetDefaultValue<T>();
+
                 // the library doesn't distinguish between signed and unsigned,
                 // so we must perform this conversion manually.
                 var type = typeof(T);
-                if (type == ReflectionUtilities.UshortType)
-                    return (ushort)(short)value;
-                if (type == ReflectionUtilities.UintType)
-                    return (uint)(int)value;
-                if (type == ReflectionUtilities.UlongType)
-                    return (ulong)(long)value;
+                if (type != value.GetType())
+                {
+                    if (type == ReflectionUtilities.UshortType)
+                        return (ushort)(short)value;
+                    if (type == ReflectionUtilities.UintType)
+                        return (uint)(int)value;
+                    if (type == ReflectionUtilities.UlongType)
+                        return (ulong)(long)value;
+                }
                 return value;
             });
         }
@@ -247,7 +256,7 @@ namespace ZenLib.Interpretation
                 {
                     if (trackBranches)
                     {
-                        this.PathConstraint.AddPathConstraint(expression.GuardExpr);
+                        this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                     }
 
                     return (T)expression.TrueExpr.Accept(this, parameter);
@@ -256,7 +265,7 @@ namespace ZenLib.Interpretation
                 {
                     if (trackBranches)
                     {
-                        this.PathConstraint.AddPathConstraint(ZenNotExpr.Create(expression.GuardExpr));
+                        this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                     }
 
                     return (T)expression.FalseExpr.Accept(this, parameter);
@@ -340,15 +349,8 @@ namespace ZenLib.Interpretation
                 }
 
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-
-                // create a new environment and evaluate the function
-                var arg1 = new ZenArgumentExpr<T>();
-                var arg2 = new ZenArgumentExpr<IList<T>>();
-                var args = parameter.ArgumentAssignment.Add(arg1.Id, hd).Add(arg2.Id, tl);
-                var newEnv = new ExpressionEvaluatorEnvironment(args);
-                var result = expression.ConsCase.Invoke(arg1, arg2);
-
-                return (TResult)result.Accept(this, newEnv);
+                var result = expression.ConsCase.Invoke(Constant(hd), Constant(tl));
+                return (TResult)result.Accept(this, parameter);
             });
         }
 

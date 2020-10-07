@@ -21,7 +21,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// How many polling events to encode.
         /// </summary>
-        private static int numPollingIntervals = 1;
+        private static int numPollingIntervals = 2;
 
         /// <summary>
         /// The maximum gap in time between events.
@@ -77,6 +77,29 @@ namespace ZenLib.Tests
 
             // Assert.IsTrue(input.HasValue);
             // Assert.IsTrue(f.Evaluate(input.Value).WatchdogDropPackets1);
+        }
+
+        /// <summary>
+        /// Test solving for preconditions.
+        /// </summary>
+        [TestMethod]
+        public void TestModelWorks()
+        {
+            var initialState = Create<SwitchState>(
+                ("WatchdogDropPackets1", Constant(false)),
+                ("WatchdogDropPackets2", Constant(false)),
+                ("WatchdogStartDropTime1", Constant<ushort>(0)),
+                ("WatchdogStartDropTime2", Constant<ushort>(0)),
+                ("StormStartedTime1", Constant<ushort>(0)),
+                ("StormStartedTime2", Constant<ushort>(0)),
+                ("StormEndedTime1", Constant<ushort>(0)),
+                ("StormEndedTime2", Constant<ushort>(0)));
+
+            var f = new ZenFunction<IList<Event>, SwitchState>(es => If(IsValidSequence(es), ProcessEvents(es, initialState), initialState));
+            var input = f.Find(Invariant);
+
+            Assert.IsTrue(input.HasValue);
+            Assert.IsTrue(f.Evaluate(input.Value).WatchdogDropPackets1);
         }
 
         internal static Zen<bool> Invariant(Zen<IList<Event>> es, Zen<SwitchState> resultState)

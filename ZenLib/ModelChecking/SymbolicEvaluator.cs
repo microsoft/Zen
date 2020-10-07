@@ -75,7 +75,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result = input.Accept(new ExpressionEvaluator(), interpreterEnv);
+            var result = input.Accept(new ExpressionEvaluator(false), interpreterEnv);
             return Option.Some(CommonUtilities.ConvertSymbolicResultToCSharp<T>(result));
         }
 
@@ -103,8 +103,8 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = input1.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
+            var result1 = input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result2 = input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
             return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
                                 CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2)));
         }
@@ -134,9 +134,9 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = input1.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result3 = input3.Accept(new ExpressionEvaluator(), interpreterEnv);
+            var result1 = input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result2 = input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result3 = input3.Accept(new ExpressionEvaluator(false), interpreterEnv);
             return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
                                 CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2),
                                 CommonUtilities.ConvertSymbolicResultToCSharp<T3>(result3)));
@@ -169,10 +169,10 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = input1.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result2 = input2.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result3 = input3.Accept(new ExpressionEvaluator(), interpreterEnv);
-            var result4 = input4.Accept(new ExpressionEvaluator(), interpreterEnv);
+            var result1 = input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result2 = input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result3 = input3.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var result4 = input4.Accept(new ExpressionEvaluator(false), interpreterEnv);
             return Option.Some((CommonUtilities.ConvertSymbolicResultToCSharp<T1>(result1),
                                 CommonUtilities.ConvertSymbolicResultToCSharp<T2>(result2),
                                 CommonUtilities.ConvertSymbolicResultToCSharp<T3>(result3),
