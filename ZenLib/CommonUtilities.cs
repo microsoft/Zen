@@ -155,20 +155,13 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Run a function with a large stack.
+        /// Run a function with a large stack in another thread.
         /// </summary>
         /// <typeparam name="T">The return type.</typeparam>
         /// <param name="f">The function to run.</param>
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
-            if (!Settings.UseLargeStack)
-            {
-                return f();
-            }
-
-            // run in another thread with a larger stack.
-
             T result = default;
             Exception exn = null;
 

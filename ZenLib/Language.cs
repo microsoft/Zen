@@ -312,7 +312,7 @@ namespace ZenLib
 
             var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
             return If(
-                    AndIf(tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1"),
+                    And(tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1"),
                         function(tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2"))),
                     expr,
                     Null<T>());
@@ -491,7 +491,7 @@ namespace ZenLib
             return expr1.Case(
                 empty: expr2.IsEmpty(),
                 cons: (hd1, tl1) =>
-                    expr2.Case(empty: false, cons: (hd2, tl2) => AndIf(hd1 == hd2, EqLists(tl1, tl2))));
+                    expr2.Case(empty: false, cons: (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
         }
 
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
@@ -518,7 +518,7 @@ namespace ZenLib
                 var value2 = method.Invoke(null, new object[] { expr2 });
 
                 var eqValue = (Zen<bool>)equals.Invoke(null, new object[] { value1, value2 });
-                return AndIf(eqBool, eqValue);
+                return And(eqBool, eqValue);
             }
 
             if (ReflectionUtilities.IsSomeTupleType(type))
@@ -543,7 +543,7 @@ namespace ZenLib
 
                 var eqItem1 = (Zen<bool>)equals1.Invoke(null, new object[] { e11, e12 });
                 var eqItem2 = (Zen<bool>)equals2.Invoke(null, new object[] { e21, e22 });
-                return AndIf(eqItem1, eqItem2);
+                return And(eqItem1, eqItem2);
             }
 
             if (ReflectionUtilities.IsIListType(type))
@@ -566,7 +566,7 @@ namespace ZenLib
                 dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
                 dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
                 var emethod = eqMethod.MakeGenericMethod(field.FieldType);
-                acc = AndIf(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
+                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
             }
 
             foreach (var property in ReflectionUtilities.GetAllProperties(type))
@@ -575,7 +575,7 @@ namespace ZenLib
                 dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
                 dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
                 var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
-                acc = AndIf(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
+                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
             }
 
             return acc;
@@ -1442,7 +1442,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(predicate);
 
-            return expr.Fold(False(), (x, y) => OrIf(predicate(x), y));
+            return expr.Fold(False(), (x, y) => Or(predicate(x), y));
         }
 
         /// <summary>
@@ -1456,7 +1456,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(predicate);
 
-            return expr.Fold(True(), (x, y) => AndIf(predicate(x), y));
+            return expr.Fold(True(), (x, y) => And(predicate(x), y));
         }
 
         /// <summary>
@@ -1650,7 +1650,7 @@ namespace ZenLib
                 empty: True(),
                 cons: (hd1, tl1) =>
                     tl1.Case(empty: True(),
-                              cons: (hd2, tl2) => AndIf(hd1 <= hd2, tl1.IsSorted())));
+                              cons: (hd2, tl2) => And(hd1 <= hd2, tl1.IsSorted())));
         }
 
         /// <summary>

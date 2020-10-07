@@ -85,7 +85,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             var f = Function<IList<int>, bool>(x => x.Contains(3));
-            Assert.AreEqual(21, f.GenerateInputs().Count());
+            Assert.AreEqual(6, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace ZenLib.Tests
             var values = f.GenerateInputs().ToList();
             var outputs = values.Select(x => f.Evaluate(x.Item1, x.Item2, x.Item3));
 
-            Assert.AreEqual(5, f.GenerateInputs().Count());
+            Assert.AreEqual(5, values.Count);
             Assert.IsTrue(outputs.Contains(1));
             Assert.IsTrue(outputs.Contains(2));
             Assert.IsTrue(outputs.Contains(3));
@@ -159,7 +159,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionOptions()
         {
             var f = Function<Option<int>, Option<int>>(x => x.Where(v => v == 1));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 
         /// <summary>
@@ -249,42 +249,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionEmptyObject()
         {
-            Assert.AreEqual(0, Function<Object0, Object0>(o => o).GenerateInputs().Count());
-        }
-
-        /// <summary>
-        /// Test the nested enumerator implementation.
-        /// </summary>
-        [TestMethod]
-        public void TestNestedEnumerator()
-        {
-            var ne1 = new NestedEnumerable<int>();
-            ne1.Add(new List<int>() { 1, 2, 3 });
-
-            var ne2 = new NestedEnumerable<int>();
-            ne2.Add(new List<int>() { 4, 5, 6 });
-
-            ne1.AddNested(ne2);
-
-            Assert.IsTrue(ne1.Contains(1));
-            Assert.IsTrue(ne1.Contains(2));
-            Assert.IsTrue(ne1.Contains(3));
-            Assert.IsTrue(ne1.Contains(4));
-            Assert.IsTrue(ne1.Contains(5));
-            Assert.IsTrue(ne1.Contains(6));
-
-            var e = ne1.GetEnumerator();
-            e.MoveNext();
-            e.MoveNext();
-            e.Reset();
-
-            int count = 0;
-            while (e.MoveNext())
-            {
-                count++;
-            }
-
-            Assert.AreEqual(6, count);
+            Assert.AreEqual(1, Function<Object0, Object0>(o => o).GenerateInputs().Count());
         }
 
         /// <summary>
@@ -293,23 +258,27 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionAcl()
         {
-            var random = new Random(7);
+            var random = new Random(1);
             var lines = new List<AclLine>();
 
-            for (int i = 0; i < 20; i++)
+            bool parity = false;
+
+            for (int i = 0; i < 19; i++)
             {
+                parity = !parity;
                 var dlow = (uint)random.Next();
                 var dhigh = (uint)random.Next((int)dlow, int.MaxValue);
                 var slow = (uint)random.Next();
                 var shigh = (uint)random.Next((int)slow, int.MaxValue);
-                var perm = random.Next() % 2 == 0;
 
                 var line = new AclLine
                 {
                     DstIp = Prefix.Random(24, 32),
                     SrcIp = Prefix.Random(24, 32),
-                    Permitted = perm,
+                    Permitted = parity,
                 };
+
+                Console.WriteLine($"{line.DstIp}, {line.SrcIp}, {line.Permitted}");
 
                 lines.Add(line);
             }

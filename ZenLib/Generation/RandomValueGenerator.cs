@@ -214,7 +214,8 @@ namespace ZenLib.Generation
 
                 for (int i = 0; i < size; i++)
                 {
-                    characters[i] = Convert.ToChar((ushort)this.VisitUshort());
+                    var c = (ushort)this.random.Next(32, 126);
+                    characters[i] = Convert.ToChar(c);
                 }
 
                 return new string(characters);

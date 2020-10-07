@@ -21,7 +21,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// How many polling events to encode.
         /// </summary>
-        private static int numPollingIntervals = 3;
+        private static int numPollingIntervals = 2;
 
         /// <summary>
         /// The maximum gap in time between events.
@@ -59,8 +59,34 @@ namespace ZenLib.Tests
                 ("StormEndedTime1", Constant<ushort>(0)),
                 ("StormEndedTime2", Constant<ushort>(0)));
 
-            var f = new ZenFunction<IList<Event>, SwitchState>(es => ProcessEvents(es, initialState));
-            var input = f.Find(Invariant, listSize: 5, checkSmallerLists: true);
+            var f = new ZenFunction<IList<Event>, SwitchState>(es => If(IsValidSequence(es), ProcessEvents(es, initialState), initialState));
+            var fValid = new ZenFunction<IList<Event>, bool>(IsValidSequence);
+
+            foreach (var x in f.GenerateInputs(listSize: 3, checkSmallerLists: false).Take(10))
+            {
+                if (fValid.Evaluate(x))
+                    Console.WriteLine($"[{string.Join(",", x)}]");
+            }
+        }
+
+        /// <summary>
+        /// Test solving for preconditions.
+        /// </summary>
+        [TestMethod]
+        public void TestModelWorks()
+        {
+            var initialState = Create<SwitchState>(
+                ("WatchdogDropPackets1", Constant(false)),
+                ("WatchdogDropPackets2", Constant(false)),
+                ("WatchdogStartDropTime1", Constant<ushort>(0)),
+                ("WatchdogStartDropTime2", Constant<ushort>(0)),
+                ("StormStartedTime1", Constant<ushort>(0)),
+                ("StormStartedTime2", Constant<ushort>(0)),
+                ("StormEndedTime1", Constant<ushort>(0)),
+                ("StormEndedTime2", Constant<ushort>(0)));
+
+            var f = new ZenFunction<IList<Event>, SwitchState>(es => If(IsValidSequence(es), ProcessEvents(es, initialState), initialState));
+            var input = f.Find(Invariant);
 
             Assert.IsTrue(input.HasValue);
             Assert.IsTrue(f.Evaluate(input.Value).WatchdogDropPackets1);
@@ -80,6 +106,7 @@ namespace ZenLib.Tests
         {
             var areTimesAscending = PairwiseInvariant(es, (x, y) => x.GetTimeStamp() < y.GetTimeStamp());
             var areTimeGapsValid = PairwiseInvariant(es, (x, y) => y.GetTimeStamp() - x.GetTimeStamp() <= maxEventTimeGap);
+            var arePrioritiesValid = es.All(e => e.GetPriorityClass() <= 1);
 
             var hasPollingEvents = True();
             for (int i = 0; i < numPollingIntervals; i++)
@@ -90,7 +117,7 @@ namespace ZenLib.Tests
                 hasPollingEvents = And(hasPollingEvent, hasPollingEvents);
             }
 
-            return And(areTimesAscending, areTimeGapsValid, hasPollingEvents);
+            return And(areTimesAscending, areTimeGapsValid, arePrioritiesValid, hasPollingEvents);
         }
 
         /// <summary>
@@ -338,11 +365,6 @@ namespace ZenLib.Tests
 
         public override string ToString()
         {
-            if (EventType == 3)
-            {
-                return $"Event(Time={TimeStamp}, Type={(EventType)EventType})";
-            }
-
             return $"Event(Time={TimeStamp}, Type={(EventType)EventType}, PriorityClass={PriorityClass})";
         }
 

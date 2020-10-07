@@ -52,7 +52,7 @@ namespace ZenLib
                 return compiledFunction();
             }
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function));
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function).Item1);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace ZenLib
                 return compiledFunction(value);
             }
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value));
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value).Item1);
         }
 
         /// <summary>
@@ -227,8 +227,7 @@ namespace ZenLib
             Backend backend = Backend.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
-            var result = this.function(input).Simplify();
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input, result, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input, backend));
         }
     }
 
@@ -276,7 +275,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2);
             }
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2));
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2).Item1);
         }
 
         /// <summary>
@@ -376,8 +375,7 @@ namespace ZenLib
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            var result = this.function(input1, input2).Simplify();
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, result, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, backend));
         }
     }
 
@@ -427,7 +425,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3);
             }
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3));
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3).Item1);
         }
 
         /// <summary>
@@ -536,8 +534,7 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            var result = this.function(input1, input2, input3).Simplify();
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, result, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, input3, backend));
         }
     }
 
@@ -589,7 +586,7 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3, value4);
             }
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3, value4));
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.function, value1, value2, value3, value4).Item1);
         }
 
         /// <summary>
@@ -707,8 +704,7 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
-            var result = this.function(input1, input2, input3, input4).Simplify();
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(input1, input2, input3, input4, result, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, input3, input4, backend));
         }
     }
 }

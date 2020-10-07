@@ -39,7 +39,7 @@ namespace ZenLib
             {
                 // if e1 then true else e2 = Or(e1, e2)
                 // if e1 then false else e2 = And(Not(e1), e2)
-                if (t is ZenConstantBoolExpr te)
+                if (t is ZenConstantExpr<bool> te)
                 {
                     return te.Value ?
                         ZenOrExpr.Create((dynamic)g, (dynamic)f) :
@@ -48,7 +48,7 @@ namespace ZenLib
 
                 // if e1 then e2 else true = Or(Not(e1), e2)
                 // if e1 then e2 else false = And(e1, e2)
-                if (f is ZenConstantBoolExpr fe)
+                if (f is ZenConstantExpr<bool> fe)
                 {
                     return fe.Value ?
                         ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :

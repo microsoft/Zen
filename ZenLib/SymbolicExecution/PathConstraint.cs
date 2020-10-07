@@ -1,10 +1,12 @@
-﻿// <copyright file="PathExplorerEnvironment.cs" company="Microsoft">
+﻿// <copyright file="PathConstraint.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib.SymbolicExecution
 {
+    using System;
     using System.Collections.Immutable;
+    using System.Linq;
 
     /// <summary>
     /// A path constraint.
@@ -14,41 +16,57 @@ namespace ZenLib.SymbolicExecution
         /// <summary>
         /// Gets the current path constraint.
         /// </summary>
-        public ImmutableHashSet<Zen<bool>> Conjuncts { get; }
+        public ImmutableList<Zen<bool>> Conjuncts { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolicExecution.PathConstraint"/> class.
         /// </summary>
         public PathConstraint()
         {
-            this.Conjuncts = ImmutableHashSet<Zen<bool>>.Empty;
+            this.Conjuncts = ImmutableList<Zen<bool>>.Empty;
         }
 
         /// <summary>
-        /// Appends a path constraint and returns a new environment.
+        /// Add a guard to the path constraint.
         /// </summary>
-        /// <param name="pathConstraint">The path constraint to add.</param>
-        /// <returns>The new path constraint with the constraints added.</returns>
-        public PathConstraint AddPathConstraint(PathConstraint pathConstraint)
+        /// <param name="guard">The guard.</param>
+        /// <returns>A new path constraint.</returns>
+        public PathConstraint Add(Zen<bool> guard)
         {
-            return new PathConstraint(this.Conjuncts.Union(pathConstraint.Conjuncts));
+            return new PathConstraint(this.Conjuncts.Add(guard));
         }
 
         /// <summary>
-        /// Appends a path constraint and returns a new environment.
+        /// Get a new path constraint from a range of conjuncts.
         /// </summary>
-        /// <param name="conjunct">The conjunct to add.</param>
-        /// <returns>The new path constraint with the conjunct added.</returns>
-        public PathConstraint AddPathConstraint(Zen<bool> conjunct)
+        /// <param name="i">The lower index.</param>
+        /// <param name="j">The upper index.</param>
+        /// <returns>A new path constraint.</returns>
+        public PathConstraint GetRange(int i, int j)
         {
-            return new PathConstraint(this.Conjuncts.Add(conjunct));
+            if (j < 0)
+            {
+                return new PathConstraint();
+            }
+
+            var conjuncts = this.Conjuncts.GetRange(i, j - i + 1);
+            return new PathConstraint(conjuncts);
+        }
+
+        /// <summary>
+        /// Gets a Zen expression from a path constraint.
+        /// </summary>
+        /// <returns>The Zen expression.</returns>
+        public Zen<bool> GetExpr()
+        {
+            return Language.And(this.Conjuncts.ToArray());
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolicExecution.PathConstraint"/> class.
         /// </summary>
-        /// <param name="pathConstraint"></param>
-        public PathConstraint(ImmutableHashSet<Zen<bool>> pathConstraint)
+        /// <param name="pathConstraint">The conjuncts.</param>
+        private PathConstraint(ImmutableList<Zen<bool>> pathConstraint)
         {
             this.Conjuncts = pathConstraint;
         }
