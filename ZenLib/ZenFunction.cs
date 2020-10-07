@@ -215,6 +215,7 @@ namespace ZenLib
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
+        /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
         /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
@@ -222,12 +223,14 @@ namespace ZenLib
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T1> GenerateInputs(
             Zen<T1> input = null,
+            Func<Zen<T1>, Zen<bool>> precondition = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input, backend));
+            precondition = precondition == null ? (x) => true : precondition;
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input, backend));
         }
     }
 
@@ -360,6 +363,7 @@ namespace ZenLib
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
+        /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
@@ -369,13 +373,15 @@ namespace ZenLib
         public IEnumerable<(T1, T2)> GenerateInputs(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, backend));
+            precondition = precondition == null ? (x, y) => true : precondition;
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, backend));
         }
     }
 
@@ -516,6 +522,7 @@ namespace ZenLib
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
+        /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
@@ -527,6 +534,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
@@ -534,7 +542,8 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, input3, backend));
+            precondition = precondition == null ? (x, y, z) => true : precondition;
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, backend));
         }
     }
 
@@ -683,6 +692,7 @@ namespace ZenLib
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
+        /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
@@ -696,6 +706,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int listSize = 5,
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
@@ -704,7 +715,8 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, input1, input2, input3, input4, backend));
+            precondition = precondition == null ? (w, x, y, z) => true : precondition;
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, input4, backend));
         }
     }
 }

@@ -59,13 +59,11 @@ namespace ZenLib.Tests
                 ("StormEndedTime1", Constant<ushort>(0)),
                 ("StormEndedTime2", Constant<ushort>(0)));
 
-            var f = new ZenFunction<IList<Event>, SwitchState>(es => If(IsValidSequence(es), ProcessEvents(es, initialState), initialState));
-            var fValid = new ZenFunction<IList<Event>, bool>(IsValidSequence);
+            var f = new ZenFunction<IList<Event>, SwitchState>(es => ProcessEvents(es, initialState));
 
-            foreach (var x in f.GenerateInputs(listSize: 3, checkSmallerLists: false).Take(10))
+            foreach (var x in f.GenerateInputs(precondition: IsValidSequence, listSize: 3, checkSmallerLists: false).Take(10))
             {
-                if (fValid.Evaluate(x))
-                    Console.WriteLine($"[{string.Join(",", x)}]");
+                Console.WriteLine($"[{string.Join(",", x)}]");
             }
         }
 

@@ -20,15 +20,18 @@ namespace ZenLib.SymbolicExecution
         /// Generate inputs that exercise different program paths.
         /// </summary>
         /// <param name="function">The function.</param>
+        /// <param name="precondition">A precondition.</param>
         /// <param name="input">The symbolic input.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<T1> GenerateInputs<T1, T2>(
             Func<Zen<T1>, Zen<T2>> function,
+            Func<Zen<T1>, Zen<bool>> precondition,
             Zen<T1> input,
             Backend backend)
         {
             var expression = function(input).Simplify();
+            var assume = precondition(input).Simplify();
 
             (T2, PathConstraint) interpretFunction(T1 e)
             {
@@ -40,24 +43,27 @@ namespace ZenLib.SymbolicExecution
 
             Option<T1> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input, backend);
 
-            return GenerateInputsSage(findFunction, interpretFunction);
+            return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
 
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
         /// <param name="function">The function.</param>
+        /// <param name="precondition">A precondition for inputs.</param>
         /// <param name="input1">The first symbolic input.</param>
         /// <param name="input2">The second symbolic input.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>> function,
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition,
             Zen<T1> input1,
             Zen<T2> input2,
             Backend backend)
         {
             var expression = function(input1, input2).Simplify();
+            var assume = precondition(input1, input2).Simplify();
 
             (T3, PathConstraint) interpretFunction((T1, T2) e)
             {
@@ -71,13 +77,14 @@ namespace ZenLib.SymbolicExecution
 
             Option<(T1, T2)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, backend);
 
-            return GenerateInputsSage(findFunction, interpretFunction);
+            return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
 
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
         /// <param name="function">The function.</param>
+        /// <param name="precondition">A precondition for inputs.</param>
         /// <param name="input1">The first symbolic input.</param>
         /// <param name="input2">The second symbolic input.</param>
         /// <param name="input3">The third symbolic input.</param>
@@ -85,12 +92,14 @@ namespace ZenLib.SymbolicExecution
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
             Backend backend)
         {
             var expression = function(input1, input2, input3).Simplify();
+            var assume = precondition(input1, input2, input3).Simplify();
 
             (T4, PathConstraint) interpretFunction((T1, T2, T3) e)
             {
@@ -104,13 +113,14 @@ namespace ZenLib.SymbolicExecution
 
             Option<(T1, T2, T3)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, backend);
 
-            return GenerateInputsSage(findFunction, interpretFunction);
+            return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
 
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
         /// <param name="function">The function.</param>
+        /// <param name="precondition">A precondition for inputs.</param>
         /// <param name="input1">The first symbolic input.</param>
         /// <param name="input2">The second symbolic input.</param>
         /// <param name="input3">The third symbolic input.</param>
@@ -119,6 +129,7 @@ namespace ZenLib.SymbolicExecution
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
@@ -126,6 +137,7 @@ namespace ZenLib.SymbolicExecution
             Backend backend)
         {
             var expression = function(input1, input2, input3, input4).Simplify();
+            var assume = precondition(input1, input2, input3, input4).Simplify();
 
             (T5, PathConstraint) interpretFunction((T1, T2, T3, T4) e)
             {
@@ -139,20 +151,30 @@ namespace ZenLib.SymbolicExecution
 
             Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, input4, backend);
 
-            return GenerateInputsSage(findFunction, interpretFunction);
+            return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
 
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
+        /// <param name="precondition">A precondition to satisfy for all inputs.</param>
         /// <param name="findFunction">Function to solve path constraints.</param>
         /// <param name="interpretFunction">The function to interpret the expression.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<T1> GenerateInputsSage<T1, T2>(
+            Zen<bool> precondition,
             Func<Zen<bool>, Option<T1>> findFunction,
             Func<T1, (T2, PathConstraint)> interpretFunction)
         {
-            var seed = Generate<T1>();
+            var potentialSeed = findFunction(precondition);
+
+            if (!potentialSeed.HasValue)
+            {
+                yield break;
+            }
+
+            var seed = potentialSeed.Value;
+
             var queue = new Queue<(T1, int)>();
             queue.Enqueue((seed, 0));
 
@@ -170,7 +192,7 @@ namespace ZenLib.SymbolicExecution
                 for (int j = bound; j < pathConstraint.Conjuncts.Count; j++)
                 {
                     var pc = pathConstraint.GetRange(0, j - 1);
-                    var expr = And(pc.GetExpr(), Not(pathConstraint.Conjuncts[j]));
+                    var expr = And(precondition, pc.GetExpr(), Not(pathConstraint.Conjuncts[j]));
                     var found = findFunction(expr);
 
                     if (found.HasValue)

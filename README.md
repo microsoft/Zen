@@ -176,41 +176,15 @@ In this case, we get the following output, which includes all permutations of re
 
 ```text
 []
-[-1560264679,1754872525,-1628602412]
-[1179126401,271786067,-706749952]
-[-1061158268,1090519060,1019166290]
-[67391745,-5104748,1132410975]
-[1091043349,-1464322172,1063741011]
-[268451904,1115293484,1460084738]
-[537004033,400151020]
-[-1064824700,393686098]
 [0]
-```
-
-Or as another example testing if a list contains a given value:
-
-```csharp
-var f = Function<IList<byte>, bool>(l => l.Contains(5));
-
-foreach (var list in f.GenerateInputs(listSize: 3))
-{
-    Console.WriteLine($"[{string.Join(",", list)}]");
-}
-```
-
-We get the following inputs, which exercise all possibilities:
-
-```text
-[]
-[0,0,0]
-[0,0,5]
-[0,5,0]
-[5,0,0]
 [0,0]
-[0,5]
-[5,0]
-[0]
-[5]
+[0,0,0]
+[64,54]
+[0,64,54]
+[136,102,242]
+[32,64,30]
+[136,103,118]
+[144,111,14]
 ```
 
 The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path.

@@ -10,7 +10,6 @@ namespace ZenLib.Tests
     using System.Linq;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using ZenLib.SymbolicExecution;
     using ZenLib.Tests.Network;
     using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
@@ -250,6 +249,44 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionEmptyObject()
         {
             Assert.AreEqual(1, Function<Object0, Object0>(o => o).GenerateInputs().Count());
+        }
+
+        /// <summary>
+        /// Test symbolic execution with preconditions.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionPrecondition()
+        {
+            var f = Function<IList<byte>, bool>(l => l.IsSorted());
+            var f1 = Function<IList<byte>, bool>(l1 => l1.Contains(2));
+            Assert.IsTrue(f1.GenerateInputs(precondition: l => l.IsSorted()).All(i => f.Evaluate(i)));
+        }
+
+        /// <summary>
+        /// Test symbolic execution with preconditions.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionPrecondition2()
+        {
+            var f1 = Function<int, bool>(x => x > 10);
+            var f2 = Function<int, int, bool>((x, y) => x > 10);
+            var f3 = Function<int, int, int, bool>((x, y, z) => x > 10);
+            var f4 = Function<int, int, int, int, bool>((w, x, y, z) => x > 10);
+
+            Assert.IsTrue(f1.GenerateInputs(precondition: x => x < 20).All(i => i < 20));
+            Assert.IsTrue(f2.GenerateInputs(precondition: (x, y) => x < 20).All(i => i.Item1 < 20));
+            Assert.IsTrue(f3.GenerateInputs(precondition: (x, y, z) => x < 20).All(i => i.Item1 < 20));
+            Assert.IsTrue(f4.GenerateInputs(precondition: (w, x, y, z) => x < 20).All(i => i.Item1 < 20));
+        }
+
+        /// <summary>
+        /// Test symbolic execution with invalid precondition.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionPreconditionInvalid()
+        {
+            var f = Function<int, bool>(x => true);
+            Assert.AreEqual(0, f.GenerateInputs(precondition: x => false).Count());
         }
 
         /// <summary>
