@@ -240,7 +240,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionOperations()
         {
             Assert.AreEqual(1, Function<ulong, ulong>(x => ~x).GenerateInputs().Count());
-            // Assert.AreEqual(1, Function<string, string>(x => x + x).GenerateInputs().Count());
+            Assert.AreEqual(1, Function<string, string>(x => x + x).GenerateInputs().Count());
         }
 
         /// <summary>

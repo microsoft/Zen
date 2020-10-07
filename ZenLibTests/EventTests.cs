@@ -61,22 +61,12 @@ namespace ZenLib.Tests
 
             var f = new ZenFunction<IList<Event>, SwitchState>(es => If(IsValidSequence(es), ProcessEvents(es, initialState), initialState));
             var fValid = new ZenFunction<IList<Event>, bool>(IsValidSequence);
-            // var input = f.Find(Invariant, listSize: 5, checkSmallerLists: true);
 
             foreach (var x in f.GenerateInputs(listSize: 3, checkSmallerLists: false).Take(10))
             {
                 if (fValid.Evaluate(x))
                     Console.WriteLine($"[{string.Join(",", x)}]");
             }
-
-            /* var inputs = f.FindAll((es, state) => IsValidSequence(es), listSize: 5, checkSmallerLists: false).Take(20);
-            foreach (var input in inputs)
-            {
-                Console.WriteLine($"[{string.Join(",", input)}]");
-            } */
-
-            // Assert.IsTrue(input.HasValue);
-            // Assert.IsTrue(f.Evaluate(input.Value).WatchdogDropPackets1);
         }
 
         /// <summary>
