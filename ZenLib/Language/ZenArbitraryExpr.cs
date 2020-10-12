@@ -19,7 +19,7 @@ namespace ZenLib
         {
         }
 
-        internal override Zen<T> Unroll()
+        public override Zen<T> Unroll()
         {
             return this;
         }

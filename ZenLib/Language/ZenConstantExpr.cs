@@ -26,7 +26,7 @@ namespace ZenLib
         /// Unroll the expression.
         /// </summary>
         /// <returns>The new unrolled expression.</returns>
-        internal override Zen<T> Unroll()
+        public override Zen<T> Unroll()
         {
             return this;
         }

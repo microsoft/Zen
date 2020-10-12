@@ -22,7 +22,7 @@ namespace ZenLib
             (s1, s2) => s1.Contains(s2),
         };
 
-        internal override Zen<bool> Unroll()
+        public override Zen<bool> Unroll()
         {
             return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ContainmentType);
         }

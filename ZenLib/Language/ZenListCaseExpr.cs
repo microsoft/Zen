@@ -13,7 +13,7 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
-        internal override Zen<TResult> Unroll()
+        public override Zen<TResult> Unroll()
         {
             return Create(this.ListExpr.Unroll(), this.EmptyCase.Unroll(), this.ConsCase, true);
         }

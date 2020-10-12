@@ -32,7 +32,7 @@ namespace ZenLib
             (x, y) => x == y,
         };
 
-        internal override Zen<bool> Unroll()
+        public override Zen<bool> Unroll()
         {
             return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.ComparisonType);
         }

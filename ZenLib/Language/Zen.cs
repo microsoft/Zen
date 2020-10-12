@@ -14,7 +14,7 @@ namespace ZenLib
         /// Simplify an expression by unrolling.
         /// </summary>
         /// <returns></returns>
-        internal abstract Zen<T> Unroll();
+        public abstract Zen<T> Unroll();
 
         /// <summary>
         /// Accept a visitor for the ZenExpr object.

@@ -15,7 +15,7 @@ namespace ZenLib
         private static Dictionary<(object, object), ZenListAddFrontExpr<T>> hashConsTable =
             new Dictionary<(object, object), ZenListAddFrontExpr<T>>();
 
-        internal override Zen<IList<T>> Unroll()
+        public override Zen<IList<T>> Unroll()
         {
             return Create(this.Expr.Unroll(), this.Element.Unroll());
         }

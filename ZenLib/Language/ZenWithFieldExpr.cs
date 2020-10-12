@@ -15,7 +15,7 @@ namespace ZenLib
         private static Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>> hashConsTable =
             new Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>>();
 
-        internal override Zen<T1> Unroll()
+        public override Zen<T1> Unroll()
         {
             return Create(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
         }

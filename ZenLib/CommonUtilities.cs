@@ -10,6 +10,7 @@ namespace ZenLib
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading;
 
@@ -162,13 +163,21 @@ namespace ZenLib
         /// <returns>The result of the function.</returns>
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
+            // don't spawn a new thread if we are in a thread with a larger stack.
+            if (Settings.InSeparateThread)
+            {
+                return f();
+            }
+
             T result = default;
             Exception exn = null;
 
+            // start a new thread to fun the function.
             Thread t = new Thread(() =>
             {
                 try
                 {
+                    Settings.InSeparateThread = true;
                     result = f();
                 }
                 catch (Exception e)
@@ -183,7 +192,7 @@ namespace ZenLib
             // propagate an internal exception
             if (exn != null)
             {
-                throw exn;
+                throw new Exception("Execption thrown in RunWithLargeStack", exn);
             }
 
             return result;

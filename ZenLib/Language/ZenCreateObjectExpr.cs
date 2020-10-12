@@ -18,9 +18,16 @@ namespace ZenLib
         private static Dictionary<(string, object)[], Zen<TObject>> hashConsTable =
             new Dictionary<(string, object)[], Zen<TObject>>(new ArrayComparer());
 
-        internal override Zen<TObject> Unroll()
+        public override Zen<TObject> Unroll()
         {
-            var fields = this.Fields.Select(kv => (kv.Key, ((dynamic)kv.Value).Unroll()));
+            var fields = this.Fields.Select(kv =>
+            {
+                var value = kv.Value.GetType()
+                    .GetMethod("Unroll")
+                    .Invoke(kv.Value, new object[] { });
+                return (kv.Key, value);
+            });
+
             return Create(fields.ToArray());
         }
 

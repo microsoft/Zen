@@ -18,7 +18,7 @@ namespace ZenLib
         /// Unroll the expression.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
-        internal override Zen<IList<T>> Unroll()
+        public override Zen<IList<T>> Unroll()
         {
             return this;
         }

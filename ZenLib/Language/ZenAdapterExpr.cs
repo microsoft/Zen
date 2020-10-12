@@ -16,7 +16,7 @@ namespace ZenLib
     {
         private static Dictionary<object, Zen<TTo>> hashConsTable = new Dictionary<object, Zen<TTo>>();
 
-        internal override Zen<TTo> Unroll()
+        public override Zen<TTo> Unroll()
         {
             return CreateMulti(this.Expr.Unroll(), this.Converters, true);
         }
