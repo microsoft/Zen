@@ -1447,9 +1447,19 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestCreationIncorrectType()
+        public void TestCreationIncorrectType1()
         {
             Language.Create<Object1>(("Field1", Constant(false)));
+        }
+
+        /// <summary>
+        /// Exception thrown since we provide a value with the wrong Zen type.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCreationIncorrectType2()
+        {
+            Language.Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(false)));
         }
 
         /// <summary>
