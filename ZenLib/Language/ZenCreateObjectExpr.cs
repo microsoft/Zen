@@ -7,7 +7,6 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Text;
 
     /// <summary>
@@ -20,29 +19,48 @@ namespace ZenLib
 
         public override Zen<TObject> Unroll()
         {
-            var fields = this.Fields.Select(kv =>
+            var newFields = new (string, object)[this.Fields.Count];
+
+            int i = 0;
+            foreach (var kv in this.Fields)
             {
                 var value = kv.Value.GetType()
-                    .GetMethod("Unroll")
-                    .Invoke(kv.Value, new object[] { });
-                return (kv.Key, value);
-            });
+                    .GetMethodCached("Unroll")
+                    .Invoke(kv.Value, CommonUtilities.EmptyArray);
+                newFields[i++] = (kv.Key, value);
+            }
 
-            return Create(fields.ToArray());
+            return CreateFast(newFields);
         }
 
         public static Zen<TObject> Create(params (string, object)[] fields)
         {
             CommonUtilities.ValidateNotNull(fields);
+
             foreach (var field in fields)
             {
                 var fieldType = field.Item2.GetType();
                 ReflectionUtilities.ValidateIsZenType(fieldType);
-                ReflectionUtilities.ValidateFieldOrProperty(typeof(TObject), fieldType.BaseType.GetGenericArguments()[0], field.Item1);
+                ReflectionUtilities.ValidateFieldOrProperty(
+                    typeof(TObject),
+                    fieldType.BaseType.GetGenericArgumentsCached()[0],
+                    field.Item1);
             }
 
             Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));
 
+            if (hashConsTable.TryGetValue(fields, out var value))
+            {
+                return value;
+            }
+
+            var ret = new ZenCreateObjectExpr<TObject>(fields);
+            hashConsTable[fields] = ret;
+            return ret;
+        }
+
+        private static Zen<TObject> CreateFast(params (string, object)[] fields)
+        {
             if (hashConsTable.TryGetValue(fields, out var value))
             {
                 return value;

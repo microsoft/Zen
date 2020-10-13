@@ -10,7 +10,6 @@ namespace ZenLib
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Numerics;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading;
 
@@ -19,6 +18,11 @@ namespace ZenLib
     /// </summary>
     internal static class CommonUtilities
     {
+        /// <summary>
+        /// An empty array.
+        /// </summary>
+        public static object[] EmptyArray = new object[] { };
+
         /// <summary>
         /// constructor arguments for creating fixed integers.
         /// </summary>
@@ -192,7 +196,7 @@ namespace ZenLib
             // propagate an internal exception
             if (exn != null)
             {
-                throw new Exception("Execption thrown in RunWithLargeStack", exn);
+                throw new ZenException("Execption thrown in RunWithLargeStack", exn);
             }
 
             return result;

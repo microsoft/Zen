@@ -47,13 +47,13 @@ namespace ZenLib.Generation
         public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, new object[] { });
+            return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
         public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
         {
             var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
-            return method.Invoke(null, new object[] { });
+            return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
         public object VisitLong()
@@ -81,7 +81,7 @@ namespace ZenLib.Generation
         public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
         {
             var method = nullMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, new object[] { });
+            return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
         public object VisitShort()

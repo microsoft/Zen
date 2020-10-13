@@ -7,7 +7,7 @@ namespace ZenLib.Tests
     /// <summary>
     /// The type of an event.
     /// </summary>
-    internal enum EventType : byte
+    public enum EventType : byte
     {
         /// <summary>
         /// An event for a packet arrival.

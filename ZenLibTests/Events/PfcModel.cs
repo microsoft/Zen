@@ -5,13 +5,15 @@
 namespace ZenLib.Tests
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib;
     using static ZenLib.Language;
 
     /// <summary>
     /// Class representing the model for Pfc and the watchdog.
     /// </summary>
-    internal sealed class PfcModel
+    [ExcludeFromCodeCoverage]
+    public sealed class PfcModel
     {
         /// <summary>
         /// Time before a detection is triggered.
@@ -29,8 +31,8 @@ namespace ZenLib.Tests
         /// <returns>An input if one exists.</returns>
         public static IEnumerable<IList<Event>> GenerateTests()
         {
-            var f = new ZenFunction<IList<Event>, SwitchState>(es => ProcessEvents(es, InitialState()).Item1());
-            return f.GenerateInputs(precondition: IsValidSequence, listSize: 3, checkSmallerLists: false);
+            var f = new ZenFunction<IList<Event>, SwitchState>(es => ProcessEvents(es, InitialState()));
+            return f.GenerateInputs(precondition: IsValidSequence, listSize: 2, checkSmallerLists: false);
         }
 
         /// <summary>
@@ -47,7 +49,8 @@ namespace ZenLib.Tests
                 ("StormStartedTime1", Constant<ushort>(0)),
                 ("StormStartedTime2", Constant<ushort>(0)),
                 ("StormEndedTime1", Constant<ushort>(0)),
-                ("StormEndedTime2", Constant<ushort>(0)));
+                ("StormEndedTime2", Constant<ushort>(0)),
+                ("Packets", EmptyList<(ushort, (byte, bool))>()));
         }
 
         /// <summary>
@@ -62,12 +65,15 @@ namespace ZenLib.Tests
             var validPriorities = es.All(e => e.GetPriorityClass() <= 1);
             var validTypes = es.All(e => e.GetEventType() <= 2);
 
-            var validStorms0 = AreStartEndStormsValid(es, false, 0, 0);
-            var validStorms1 = AreStartEndStormsValid(es, false, 0, 1);
+            var validStorms0 = AreStartEndStormsValid(es, false, 0);
+            var validStorms1 = AreStartEndStormsValid(es, false, 1);
+
+            var validGaps = Utilities.PairwiseInvariant(es, (x, y) =>
+                Or(y.GetTimeStamp() - x.GetTimeStamp() < 200, y.GetTimeStamp() - x.GetTimeStamp() > 400));
 
             var timesBounded = es.All(e => e.GetTimeStamp() <= 2000);
 
-            return And(areTimesAscending, timesBounded, validPriorities, validTypes, validStorms0, validStorms1);
+            return And(areTimesAscending, timesBounded, validGaps, validPriorities, validTypes, validStorms0, validStorms1);
         }
 
         /// <summary>
@@ -75,13 +81,12 @@ namespace ZenLib.Tests
         /// </summary>
         /// <param name="es">The events.</param>
         /// <param name="isPreviousStart">Whether a start is open and waiting to be closed.</param>
-        /// <param name="prevTime">The previous time of a start or end event.</param>
         /// <param name="priorityClass">The priority class.</param>
         /// <returns></returns>
-        private static Zen<bool> AreStartEndStormsValid(Zen<IList<Event>> es, Zen<bool> isPreviousStart, Zen<ushort> prevTime, byte priorityClass)
+        private static Zen<bool> AreStartEndStormsValid(Zen<IList<Event>> es, Zen<bool> isPreviousStart, byte priorityClass)
         {
-            var startType = Event.EventTypeAsInt(EventType.PfcStormStartEvent);
-            var endType = Event.EventTypeAsInt(EventType.PfcStormEndEvent);
+            var startType = Event.EventTypeAsByte(EventType.PfcStormStartEvent);
+            var endType = Event.EventTypeAsByte(EventType.PfcStormEndEvent);
 
             return es.Case(empty: Not(isPreviousStart), cons: (hd, tl) =>
             {
@@ -90,11 +95,8 @@ namespace ZenLib.Tests
                 var isEnd = And(hd.GetEventType() == endType, isCorrectPriority);
                 var isEvent = Or(isStart, isEnd);
                 var isInvalid = Or(And(isPreviousStart, isStart), And(Not(isPreviousStart), isEnd));
-                var diff = hd.GetTimeStamp() - prevTime;
-                var isTimeGapValid = Implies(isEvent, Or(diff > 400, diff < 200));
                 var previousStart = If(isStart, true, If(isEnd, false, isPreviousStart));
-                var previousTime = If(isEvent, hd.GetTimeStamp(), prevTime);
-                return And(Not(isInvalid), isTimeGapValid, AreStartEndStormsValid(tl, previousStart, previousTime, priorityClass));
+                return And(Not(isInvalid), AreStartEndStormsValid(tl, previousStart, priorityClass));
             });
         }
 
@@ -104,9 +106,9 @@ namespace ZenLib.Tests
         /// <param name="es">The events.</param>
         /// <param name="initialState">The initial state.</param>
         /// <returns>The updated switch state.</returns>
-        private static Zen<(SwitchState, IList<(ushort, byte)>)> ProcessEvents(Zen<IList<Event>> es, Zen<SwitchState> initialState)
+        private static Zen<SwitchState> ProcessEvents(Zen<IList<Event>> es, Zen<SwitchState> initialState)
         {
-            return Language.Fold(es, ValueTuple(initialState, EmptyList<(ushort, byte)>()), ProcessEvent);
+            return Language.Fold(es, initialState, ProcessEvent);
         }
 
         /// <summary>
@@ -115,28 +117,15 @@ namespace ZenLib.Tests
         /// <param name="e">The event to process.</param>
         /// <param name="currentState">The current watchdog state.</param>
         /// <returns>The new watchdog state.</returns>
-        private static Zen<(SwitchState, IList<(ushort, byte)>)> ProcessEvent(
-            Zen<Event> e,
-            Zen<(SwitchState, IList<(ushort, byte)>)> currentState)
+        private static Zen<SwitchState> ProcessEvent(Zen<Event> e, Zen<SwitchState> currentState)
         {
-            var switchState = currentState.Item1();
-            var packets = currentState.Item2();
+            var switchState = currentState;
 
-            var stormStartEvent = Event.EventTypeAsInt(EventType.PfcStormStartEvent);
-            var stormEndEvent = Event.EventTypeAsInt(EventType.PfcStormEndEvent);
+            var burstEvent = Event.EventTypeAsByte(EventType.PacketBurstEvent);
+            var stormStartEvent = Event.EventTypeAsByte(EventType.PfcStormStartEvent);
+            var stormEndEvent = Event.EventTypeAsByte(EventType.PfcStormEndEvent);
 
-            var isStormStartOn1 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 0);
-            var isStormStartOn2 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 1);
-
-            var stateStormStartOn1 = switchState.SetStormStartedTime1(e.GetTimeStamp());
-            var stateStormStartOn2 = switchState.SetStormStartedTime2(e.GetTimeStamp());
-
-            var isStormEndOn1 = And(e.GetEventType() == stormEndEvent, e.GetPriorityClass() == 0);
-            var isStormEndOn2 = And(e.GetEventType() == stormEndEvent, e.GetPriorityClass() == 1);
-
-            var stateStormEndOn1 = switchState.SetStormEndedTime1(e.GetTimeStamp());
-            var stateStormEndOn2 = switchState.SetStormEndedTime2(e.GetTimeStamp());
-
+            // update the watchdog state based on detection
             var conservativeDetectionTime = (ushort)(2 * detectionInterval);
             var conservativeRestorationTime = (ushort)(2 * restorationInterval);
 
@@ -161,11 +150,32 @@ namespace ZenLib.Tests
             switchState = If(isDetectionEvent1, switchState.SetWatchdogStartDropTime1(e.GetTimeStamp()).SetWatchdogDropPackets1(true), switchState);
             switchState = If(isDetectionEvent2, switchState.SetWatchdogStartDropTime2(e.GetTimeStamp()).SetWatchdogDropPackets2(true), switchState);
 
-            return Cases(ValueTuple(switchState, packets),
-                    (isStormStartOn1, ValueTuple(stateStormStartOn1, packets)),
-                    (isStormStartOn2, ValueTuple(stateStormStartOn2, packets)),
-                    (isStormEndOn1, ValueTuple(stateStormEndOn1, packets)),
-                    (isStormEndOn2, ValueTuple(stateStormEndOn2, packets)));
+            // update the watchdog state
+            var isBurstOn1 = And(e.GetEventType() == burstEvent, e.GetPriorityClass() == 0);
+            var isBurstOn2 = And(e.GetEventType() == burstEvent, e.GetPriorityClass() == 1);
+
+            var stateBurst1 = switchState.AddPacket(ValueTuple(e.GetTimeStamp(), ValueTuple<byte, bool>(0, currentState.GetWatchdogDropPackets1())));
+            var stateBurst2 = switchState.AddPacket(ValueTuple(e.GetTimeStamp(), ValueTuple<byte, bool>(1, currentState.GetWatchdogDropPackets1())));
+
+            var isStormStartOn1 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 0);
+            var isStormStartOn2 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 1);
+
+            var stateStormStartOn1 = switchState.SetStormStartedTime1(e.GetTimeStamp());
+            var stateStormStartOn2 = switchState.SetStormStartedTime2(e.GetTimeStamp());
+
+            var isStormEndOn1 = And(e.GetEventType() == stormEndEvent, e.GetPriorityClass() == 0);
+            var isStormEndOn2 = And(e.GetEventType() == stormEndEvent, e.GetPriorityClass() == 1);
+
+            var stateStormEndOn1 = switchState.SetStormEndedTime1(e.GetTimeStamp());
+            var stateStormEndOn2 = switchState.SetStormEndedTime2(e.GetTimeStamp());
+
+            return Cases(switchState,
+                    (isStormStartOn1, stateStormStartOn1),
+                    (isStormStartOn2, stateStormStartOn2),
+                    (isStormEndOn1, stateStormEndOn1),
+                    (isStormEndOn2, stateStormEndOn2),
+                    (isBurstOn1, stateBurst1),
+                    (isBurstOn2, stateBurst2));
         }
     }
 }

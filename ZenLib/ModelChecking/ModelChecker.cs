@@ -61,7 +61,7 @@ namespace ZenLib.ModelChecking
             {
                 var expr = kv.Key;
                 var variable = kv.Value;
-                var type = expr.GetType().GetGenericArguments()[0];
+                var type = expr.GetType().GetGenericArgumentsCached()[0];
                 var obj = this.solver.Get(model, variable);
 
                 if (ReflectionUtilities.IsFixedIntegerType(type))

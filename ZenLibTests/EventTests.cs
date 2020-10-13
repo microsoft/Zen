@@ -4,12 +4,9 @@
 
 namespace ZenLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static ZenLib.Language;
 
     /// <summary>
     /// Tests for primitive types.
@@ -24,11 +21,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInputGeneration()
         {
-            // use the model to generate an example input.
-            foreach (var eventList in PfcModel.GenerateTests())
-            {
-                Console.WriteLine($"{string.Join("\n", eventList)}\n");
-            }
+            Assert.AreEqual(8, PfcModel.GenerateTests().Count());
         }
     }
 }

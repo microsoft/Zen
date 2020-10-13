@@ -97,7 +97,7 @@ namespace ZenLib.Generation
             var emptyMethod = emptyListMethod.MakeGenericMethod(elementType);
             var ifMethod = ifConditionMethod.MakeGenericMethod(listType);
 
-            var list = emptyMethod.Invoke(null, new object[] { });
+            var list = emptyMethod.Invoke(null, CommonUtilities.EmptyArray);
 
             for (int i = maxSize; i > 0; i--)
             {
@@ -161,7 +161,7 @@ namespace ZenLib.Generation
         public object VisitFixedInteger(Type intType)
         {
             var c = typeof(ZenArbitraryExpr<>).MakeGenericType(intType).GetConstructor(new Type[] { });
-            var e = c.Invoke(new object[] { });
+            var e = c.Invoke(CommonUtilities.EmptyArray);
             this.ArbitraryExpressions.Add(e);
             return e;
         }

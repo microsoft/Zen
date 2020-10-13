@@ -4,7 +4,6 @@
 
 namespace ZenLib.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
@@ -439,16 +438,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplicationException()
         {
-            try
-            {
-                var f = Function<int, int, bool>((a, b) => a * b == 10);
-                var inputs = f.Find((a, b, res) => res, backend: ModelChecking.Backend.DecisionDiagrams);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var f = Function<int, int, bool>((a, b) => a * b == 10);
+            var inputs = f.Find((a, b, res) => res, backend: Backend.DecisionDiagrams);
         }
 
         /// <summary>

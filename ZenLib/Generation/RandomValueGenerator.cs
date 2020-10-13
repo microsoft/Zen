@@ -74,10 +74,10 @@ namespace ZenLib.Generation
                 var size = RandomInt() % this.sizeBound;
 
                 var type = typeof(List<>).MakeGenericType(innerType);
-                var addMethod = type.GetMethod("Add");
+                var addMethod = type.GetMethodCached("Add");
 
                 var constructor = type.GetConstructor(new Type[] { });
-                var list = constructor.Invoke(new object[] { });
+                var list = constructor.Invoke(CommonUtilities.EmptyArray);
 
                 for (int i = 0; i < size; i++)
                 {
@@ -96,10 +96,10 @@ namespace ZenLib.Generation
                 var size = RandomInt() % this.sizeBound;
 
                 var type = typeof(Dictionary<,>).MakeGenericType(new Type[] { keyType, valueType });
-                var addMethod = type.GetMethod("set_Item");
+                var addMethod = type.GetMethodCached("set_Item");
 
                 var constructor = type.GetConstructor(new Type[] { });
-                var dictionary = constructor.Invoke(new object[] { });
+                var dictionary = constructor.Invoke(CommonUtilities.EmptyArray);
 
                 for (int i = 0; i < size; i++)
                 {
@@ -148,7 +148,7 @@ namespace ZenLib.Generation
                 if (RandomInt() % 2 == 0)
                 {
                     var noneMethod = optionNoneMethod.MakeGenericMethod(innerType);
-                    return noneMethod.Invoke(null, new object[] { });
+                    return noneMethod.Invoke(null, CommonUtilities.EmptyArray);
                 }
 
                 var value = recurse(innerType);

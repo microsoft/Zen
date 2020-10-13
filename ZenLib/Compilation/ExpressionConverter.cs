@@ -155,7 +155,7 @@ namespace ZenLib.Compilation
                 var expr = expression.Expr.Accept(this, parameter);
                 foreach (var converter in expression.Converters)
                 {
-                    var method = converter.GetType().GetMethod("Invoke");
+                    var method = converter.GetType().GetMethodCached("Invoke");
                     expr = Expression.Convert(Expression.Call(
                         Expression.Constant(converter),
                         method,
@@ -321,7 +321,7 @@ namespace ZenLib.Compilation
                         {
                             return Expression.Call(
                                 expression.Expr1.Accept(this, parameter),
-                                typeof(T).GetMethod("GreaterThanOrEqual"),
+                                typeof(T).GetMethodCached("GreaterThanOrEqual"),
                                 expression.Expr2.Accept(this, parameter));
                         }
 
@@ -334,7 +334,7 @@ namespace ZenLib.Compilation
                         {
                             return Expression.Call(
                                 expression.Expr1.Accept(this, parameter),
-                                typeof(T).GetMethod("LessThanOrEqual"),
+                                typeof(T).GetMethodCached("LessThanOrEqual"),
                                 expression.Expr2.Accept(this, parameter));
                         }
 
@@ -362,11 +362,11 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var method = typeof(ImmutableList<T>).GetMethod("Insert");
+                var method = typeof(ImmutableList<T>).GetMethodCached("Insert");
                 var list = expression.Expr.Accept(this, parameter);
 
                 var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethod("ToImmutableList")
+                    .GetMethodCached("ToImmutableList")
                     .MakeGenericMethod(typeof(T));
 
                 var immutableListExpr = Expression.Call(null, toImmutableListMethod, list);
@@ -380,7 +380,7 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var fieldInfo = typeof(ImmutableList<T>).GetField("Empty");
+                var fieldInfo = typeof(ImmutableList<T>).GetFieldCached("Empty");
                 return Expression.Field(null, fieldInfo);
             });
         }
@@ -398,7 +398,7 @@ namespace ZenLib.Compilation
 
                 // cast to an immutable list, since it will return IList
                 var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethod("ToImmutableList")
+                    .GetMethodCached("ToImmutableList")
                     .MakeGenericMethod(typeof(TList));
 
                 var immutableListExpr = Expression.Call(toImmutableListMethod, listExpr);
@@ -411,7 +411,7 @@ namespace ZenLib.Compilation
                 var isEmptyExpr = Expression.PropertyOrField(listVariable, "IsEmpty");
 
                 // call SplitHead to get the tuple result.
-                var splitMethod = typeof(CommonUtilities).GetMethod("SplitHead").MakeGenericMethod(typeof(TList));
+                var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
                 var splitExpr = Expression.Call(splitMethod, listVariable);
                 var splitVariable = FreshVariable(typeof(ValueTuple<TList, IList<TList>>));
 
@@ -424,14 +424,14 @@ namespace ZenLib.Compilation
 
                 // run the cons lambda
                 var runMethod = typeof(Interpreter)
-                    .GetMethod("CompileRunHelper")
+                    .GetMethodCached("CompileRunHelper")
                     .MakeGenericMethod(typeof(TList), typeof(IList<TList>), typeof(TResult));
 
                 // create the bound arguments by constructing the immutable list
                 var dictType = typeof(ImmutableDictionary<string, object>);
-                var dictField = dictType.GetField("Empty");
+                var dictField = dictType.GetFieldCached("Empty");
                 Expression argsExpr = Expression.Field(null, dictField);
-                var dictAddMethod = dictType.GetMethod("Add");
+                var dictAddMethod = dictType.GetMethodCached("Add");
 
                 foreach (var kv in parameter.ArgumentAssignment)
                 {
@@ -705,7 +705,7 @@ namespace ZenLib.Compilation
         {
             if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
             {
-                var method = typeof(T).GetMethod("BitwiseOr");
+                var method = typeof(T).GetMethodCached("BitwiseOr");
                 return Expression.Call(left, method, right);
             }
 
@@ -716,7 +716,7 @@ namespace ZenLib.Compilation
         {
             if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
             {
-                var method = typeof(T).GetMethod("BitwiseAnd");
+                var method = typeof(T).GetMethodCached("BitwiseAnd");
                 return Expression.Call(left, method, right);
             }
 
@@ -727,7 +727,7 @@ namespace ZenLib.Compilation
         {
             if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
             {
-                var method = typeof(T).GetMethod("BitwiseXor");
+                var method = typeof(T).GetMethodCached("BitwiseXor");
                 return Expression.Call(left, method, right);
             }
 
@@ -745,7 +745,7 @@ namespace ZenLib.Compilation
 
             if (ReflectionUtilities.IsFixedIntegerType(type))
             {
-                var method = typeof(T).GetMethod("Add");
+                var method = typeof(T).GetMethodCached("Add");
                 return Expression.Call(left, method, right);
             }
 
@@ -770,7 +770,7 @@ namespace ZenLib.Compilation
 
             if (ReflectionUtilities.IsFixedIntegerType(type))
             {
-                var method = typeof(T).GetMethod("Subtract");
+                var method = typeof(T).GetMethodCached("Subtract");
                 return Expression.Call(left, method, right);
             }
 

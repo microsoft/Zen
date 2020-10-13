@@ -111,10 +111,10 @@ namespace ZenLib.Solver
                     }
 
                     if (type.IsGenericType &&
-                        type.GetGenericTypeDefinition() == typeof(ZenArbitraryExpr<>) &&
-                        ReflectionUtilities.IsFixedIntegerType(type.GetGenericArguments()[0]))
+                        type.GetGenericTypeDefinitionCached() == typeof(ZenArbitraryExpr<>) &&
+                        ReflectionUtilities.IsFixedIntegerType(type.GetGenericArgumentsCached()[0]))
                     {
-                        var size = CommonUtilities.IntegerSize(type.GetGenericArguments()[0]);
+                        var size = CommonUtilities.IntegerSize(type.GetGenericArgumentsCached()[0]);
 
                         if (!objsFixedInt.TryGetValue(size, out List<object> list))
                         {

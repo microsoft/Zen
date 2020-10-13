@@ -18,5 +18,14 @@ namespace ZenLib
         public ZenException(string e) : base(e)
         {
         }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ZenException"/> class.
+        /// </summary>
+        /// <param name="s">The description.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public ZenException(string s, Exception innerException) : base(s, innerException)
+        {
+        }
     }
 }

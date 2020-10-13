@@ -6,11 +6,13 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib;
 
     /// <summary>
     /// Class representing an event.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal static class Utilities
     {
         /// <summary>

@@ -6,11 +6,9 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using ZenLib.Generation;
     using static ZenLib.Language;
 
     /// <summary>
@@ -126,6 +124,122 @@ namespace ZenLib
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
+        /// Cache of generic arguments.
+        /// </summary>
+        private static Dictionary<Type, Type[]> genericArgumentsCache = new Dictionary<Type, Type[]>();
+
+        /// <summary>
+        /// Cache for property infos.
+        /// </summary>
+        private static Dictionary<(Type, string), PropertyInfo> propertyCache = new Dictionary<(Type, string), PropertyInfo>();
+
+        /// <summary>
+        /// Cache for field infos.
+        /// </summary>
+        private static Dictionary<(Type, string), FieldInfo> fieldCache = new Dictionary<(Type, string), FieldInfo>();
+
+        /// <summary>
+        /// Cache for GetGenericTypeDefinition().
+        /// </summary>
+        private static Dictionary<Type, Type> genericDefinitionCache = new Dictionary<Type, Type>();
+
+        /// <summary>
+        /// Cache for method infos.
+        /// </summary>
+        public static Dictionary<(Type, string), MethodInfo> methodCache = new Dictionary<(Type, string), MethodInfo>();
+
+        /// <summary>
+        /// Get the generic arguments for a given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The generic argument types.</returns>
+        public static Type[] GetGenericArgumentsCached(this Type type)
+        {
+            if (genericArgumentsCache.TryGetValue(type, out var args))
+            {
+                return args;
+            }
+
+            var ret = type.GetGenericArguments();
+            genericArgumentsCache[type] = ret;
+            return ret;
+        }
+
+        /// <summary>
+        /// Get a property from its name.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="propertyName">The property name.</param>
+        /// <returns>The PropertyInfo object.</returns>
+        public static PropertyInfo GetPropertyCached(this Type type, string propertyName)
+        {
+            var key = (type, propertyName);
+            if (propertyCache.TryGetValue(key, out var propertyInfo))
+            {
+                return propertyInfo;
+            }
+
+            var ret = type.GetProperty(propertyName);
+            propertyCache[key] = ret;
+            return ret;
+        }
+
+        /// <summary>
+        /// Get a field from its name.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <returns>The FieldInfo object.</returns>
+        public static FieldInfo GetFieldCached(this Type type, string fieldName)
+        {
+            var key = (type, fieldName);
+            if (fieldCache.TryGetValue(key, out var fieldInfo))
+            {
+                return fieldInfo;
+            }
+
+            var ret = type.GetField(fieldName);
+            fieldCache[key] = ret;
+            return ret;
+        }
+
+        /// <summary>
+        /// Gets the generic type definition.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The generic type.</returns>
+        public static Type GetGenericTypeDefinitionCached(this Type type)
+        {
+            if (genericDefinitionCache.TryGetValue(type, out var genericType))
+            {
+                return genericType;
+            }
+
+            var ret = type.GetGenericTypeDefinition();
+            genericDefinitionCache[type] = ret;
+            return ret;
+        }
+
+        /// <summary>
+        /// Gets the method info.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="methodName">The method name.</param>
+        /// <returns>The generic type.</returns>
+        public static MethodInfo GetMethodCached(this Type type, string methodName)
+        {
+            var key = (type, methodName);
+            if (methodCache.TryGetValue(key, out var methodInfo))
+            {
+                return methodInfo;
+            }
+
+            var ret = type.GetMethod(methodName);
+            methodCache[key] = ret;
+            return ret;
+        }
+
+        /// <summary>
         /// Check if a type is a kind of integer.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -172,7 +286,7 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsTupleType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == TupleType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == TupleType;
         }
 
         /// <summary>
@@ -182,7 +296,7 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsValueTupleType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == ValueTupleType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ValueTupleType;
         }
 
         /// <summary>
@@ -202,7 +316,7 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsOptionType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == OptionType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == OptionType;
         }
 
         /// <summary>
@@ -214,7 +328,7 @@ namespace ZenLib
         {
             return type.IsInterface &&
                    type.IsGenericType &&
-                   type.GetGenericTypeDefinition() == IListType;
+                   type.GetGenericTypeDefinitionCached() == IListType;
         }
 
         /// <summary>
@@ -225,7 +339,7 @@ namespace ZenLib
         public static bool IsIDictionaryType(Type type)
         {
             return type.IsGenericType &&
-                   type.GetGenericTypeDefinition() == IDictType;
+                   type.GetGenericTypeDefinitionCached() == IDictType;
         }
 
         /// <summary>
@@ -235,7 +349,7 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsListType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == ListType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ListType;
         }
 
         /// <summary>
@@ -245,7 +359,7 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsDictionaryType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == DictType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == DictType;
         }
 
         /// <summary>
@@ -257,7 +371,7 @@ namespace ZenLib
         {
             return type.BaseType != null &&
                    type.BaseType.IsGenericType &&
-                   type.BaseType.GetGenericTypeDefinition() == IntNType;
+                   type.BaseType.GetGenericTypeDefinitionCached() == IntNType;
         }
 
         /// <summary>
@@ -277,7 +391,7 @@ namespace ZenLib
                 return (TField)fieldInfo.GetValue(obj);
             }
 
-            var propertyInfo = type.GetProperty(fieldName);
+            var propertyInfo = type.GetPropertyCached(fieldName);
             return (TField)propertyInfo.GetValue(obj);
         }
 
@@ -289,19 +403,23 @@ namespace ZenLib
         /// <param name="fieldOrPropertyName">The field or property name.</param>
         public static void ValidateFieldOrProperty(Type objectType, Type fieldType, string fieldOrPropertyName)
         {
-            var p = objectType.GetProperty(fieldOrPropertyName);
-            var f = objectType.GetField(fieldOrPropertyName);
+            var p = objectType.GetPropertyCached(fieldOrPropertyName);
+
+            if (p != null && p.PropertyType != fieldType)
+            {
+                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
+            }
+
+            var f = objectType.GetFieldCached(fieldOrPropertyName);
+
+            if (f != null && f.FieldType != fieldType)
+            {
+                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
+            }
 
             if (p == null && f == null)
             {
                 throw new ZenException($"Invalid field or property {fieldOrPropertyName} for object with type {objectType}");
-            }
-
-            var actualFieldType = p == null ? f.FieldType : p.PropertyType;
-
-            if (actualFieldType != fieldType)
-            {
-                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
             }
         }
 
@@ -311,7 +429,7 @@ namespace ZenLib
         /// <param name="type">The object type.</param>
         public static void ValidateIsZenType(Type type)
         {
-            if (!type.IsGenericType || typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinition()))
+            if (!type.IsGenericType || typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached()))
             {
                 throw new ZenException($"Attempting to use value of non-Zen type: {type}");
             }
@@ -329,14 +447,14 @@ namespace ZenLib
         public static void SetFieldOrProperty<TObject, TField>(TObject obj, string fieldName, TField fieldValue)
         {
             var type = obj.GetType();
-            var fieldInfo = type.GetField(fieldName);
+            var fieldInfo = type.GetFieldCached(fieldName);
             if (fieldInfo != null)
             {
                 fieldInfo.SetValue(obj, fieldValue);
                 return;
             }
 
-            var propertyInfo = type.GetProperty(fieldName);
+            var propertyInfo = type.GetPropertyCached(fieldName);
             propertyInfo.SetValue(obj, fieldValue);
         }
 
@@ -468,31 +586,35 @@ namespace ZenLib
 
             if (IsOptionType(type))
             {
-                var innerType = type.GetGenericArguments()[0];
-                return typeof(Option).GetMethod("None").MakeGenericMethod(innerType).Invoke(null, new object[] { });
+                var innerType = type.GetGenericArgumentsCached()[0];
+                return typeof(Option)
+                    .GetMethodCached("None")
+                    .MakeGenericMethod(innerType).Invoke(null, CommonUtilities.EmptyArray);
             }
 
             if (IsTupleType(type) || IsValueTupleType(type))
             {
-                var innerType1 = type.GetGenericArguments()[0];
-                var innerType2 = type.GetGenericArguments()[1];
+                var args = type.GetGenericArgumentsCached();
+                var innerType1 = args[0];
+                var innerType2 = args[1];
                 var c = type.GetConstructor(new Type[] { innerType1, innerType2 });
                 return c.Invoke(new object[] { GetDefaultValue(innerType1), GetDefaultValue(innerType2) });
             }
 
             if (IsIListType(type))
             {
-                var innerType = type.GetGenericArguments()[0];
+                var innerType = type.GetGenericArgumentsCached()[0];
                 var c = ListType.MakeGenericType(innerType).GetConstructor(new Type[] { });
-                return c.Invoke(new object[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
             }
 
             if (IsIDictionaryType(type))
             {
-                var keyType = type.GetGenericArguments()[0];
-                var valueType = type.GetGenericArguments()[1];
+                var args = type.GetGenericArgumentsCached();
+                var keyType = args[0];
+                var valueType = args[1];
                 var c = DictType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(new object[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
             }
 
             // some class or struct
@@ -546,33 +668,35 @@ namespace ZenLib
 
             if (IsOptionType(type))
             {
-                var t = type.GetGenericArguments()[0];
+                var t = type.GetGenericArgumentsCached()[0];
                 return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), type, t);
             }
 
             if (IsTupleType(type))
             {
-                var tleft = type.GetGenericArguments()[0];
-                var tright = type.GetGenericArguments()[1];
+                var args = type.GetGenericArgumentsCached();
+                var tleft = args[0];
+                var tright = args[1];
                 return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
             }
 
             if (IsValueTupleType(type))
             {
-                var tleft = type.GetGenericArguments()[0];
-                var tright = type.GetGenericArguments()[1];
+                var args = type.GetGenericArgumentsCached();
+                var tleft = args[0];
+                var tright = args[1];
                 return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
             }
 
             if (IsIListType(type))
             {
-                var t = type.GetGenericArguments()[0];
+                var t = type.GetGenericArgumentsCached()[0];
                 return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
             }
 
             if (IsIDictionaryType(type))
             {
-                var args = type.GetGenericArguments();
+                var args = type.GetGenericArgumentsCached();
                 var tkey = args[0];
                 var tvalue = args[1];
                 return visitor.VisitDictionary(ty => ApplyTypeVisitor(visitor, ty), type, tkey, tvalue);
@@ -669,13 +793,19 @@ namespace ZenLib
                 return Tuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
             if (IsValueTupleType(type))
                 return ValueTuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
-            if (type.IsGenericType && IListType.MakeGenericType(type.GetGenericArguments()[0]).IsAssignableFrom(type))
+
+            var typeArgs = type.GetGenericArgumentsCached();
+
+            if (type.IsGenericType && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
             {
-                var innerType = type.GetGenericArguments()[0];
+                var innerType = typeArgs[0];
                 return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
             }
-            if (type.IsGenericType && IDictType.MakeGenericType(type.GetGenericArguments()[0], type.GetGenericArguments()[1]).IsAssignableFrom(type))
+
+            if (type.IsGenericType && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
+            {
                 return CreateZenDictConstant(v);
+            }
 
             // some class or struct
             var fields = new SortedDictionary<string, dynamic>();

@@ -29,25 +29,6 @@ namespace ZenLib
                 return inner1.Expr;
             }
 
-            // adapt(t1, t2, adapt(t2, t3, e)) == adapt(t1, t3, e)
-            /* var type = e.GetType();
-            if (type.GetGenericTypeDefinition() == typeof(ZenAdapterExpr<,>))
-            {
-                if (type.GetGenericArguments()[0] == typeof(T2))
-                {
-                    var type1 = typeof(T1);
-                    var type3 = type.GetGenericArguments()[1];
-                    var astType = typeof(ZenAdapterExpr<,>).MakeGenericType(type1, type3);
-                    var paramType1 = typeof(Zen<>).MakeGenericType(type3);
-                    var paramType2 = typeof(ImmutableList<>).MakeGenericType(typeof(Func<object, object>));
-                    var method = astType.GetMethod("CreateMulti");
-                    var param1 = type.GetProperty("Expr").GetValue(e);
-                    var converters = (ImmutableList<Func<object, object>>)type.GetProperty("Converters").GetValue(e);
-                    var param2 = converters.AddRange(expression.Converters);
-                    return (Zen<T1>)method.Invoke(null, new object[] { param1, param2 });
-                }
-            } */
-
             if (unroll && e is ZenIfExpr<TFrom> inner2)
             {
                 var trueBranch = CreateMulti(inner2.TrueExpr, converters);

@@ -4,12 +4,15 @@
 
 namespace ZenLib.Tests
 {
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib;
 
     /// <summary>
     /// Class representing the watchdog state.
     /// </summary>
-    internal sealed class SwitchState
+    [ExcludeFromCodeCoverage]
+    public sealed class SwitchState
     {
         /// <summary>
         /// Whether the watchdog is mitigating on priority 1.
@@ -50,11 +53,17 @@ namespace ZenLib.Tests
         /// When a storm started on priority 2.
         /// </summary>
         public ushort StormEndedTime2 { get; set; }
+
+        /// <summary>
+        /// The packet outcomes for bursts.
+        /// </summary>
+        public IList<(ushort, (byte, bool))> Packets { get; set; }
     }
 
     /// <summary>
     /// Extension methods for WatchdogState to access Zen objects.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal static class WatchdogStateExtensions
     {
         internal static Zen<bool> GetWatchdogDropPackets1(this Zen<SwitchState> wd)
@@ -97,6 +106,11 @@ namespace ZenLib.Tests
             return wd.GetField<SwitchState, ushort>("StormEndedTime2");
         }
 
+        internal static Zen<IList<(ushort, (byte, bool))>> GetPackets(this Zen<SwitchState> wd)
+        {
+            return wd.GetField<SwitchState, IList<(ushort, (byte, bool))>>("Packets");
+        }
+
         internal static Zen<SwitchState> SetWatchdogDropPackets1(this Zen<SwitchState> wd, Zen<bool> b)
         {
             return wd.WithField("WatchdogDropPackets1", b);
@@ -135,6 +149,16 @@ namespace ZenLib.Tests
         internal static Zen<SwitchState> SetStormEndedTime2(this Zen<SwitchState> wd, Zen<ushort> t)
         {
             return wd.WithField("StormEndedTime2", t);
+        }
+
+        internal static Zen<SwitchState> SetPackets(this Zen<SwitchState> wd, Zen<IList<(ushort, (byte, bool))>> p)
+        {
+            return wd.WithField("Packets", p);
+        }
+
+        internal static Zen<SwitchState> AddPacket(this Zen<SwitchState> wd, Zen<(ushort, (byte, bool))> p)
+        {
+            return wd.SetPackets(wd.GetPackets().AddFront(p));
         }
     }
 }

@@ -9,7 +9,6 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>

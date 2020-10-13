@@ -505,7 +505,7 @@ namespace ZenLib
 
             if (ReflectionUtilities.IsOptionType(type))
             {
-                var innerType = type.GetGenericArguments()[0];
+                var innerType = type.GetGenericArgumentsCached()[0];
 
                 var method = hasValueMethod.MakeGenericMethod(innerType);
                 var hasValue1 = method.Invoke(null, new object[] { expr1 });
@@ -527,7 +527,7 @@ namespace ZenLib
                 var item1Method = isTuple ? tupItem1Method : valueTupItem1Method;
                 var item2Method = isTuple ? tupItem2Method : valueTupItem2Method;
 
-                var genericArgs = type.GetGenericArguments();
+                var genericArgs = type.GetGenericArgumentsCached();
                 var innerType1 = genericArgs[0];
                 var innerType2 = genericArgs[1];
                 var equals1 = eqMethod.MakeGenericMethod(innerType1);
@@ -548,7 +548,7 @@ namespace ZenLib
 
             if (ReflectionUtilities.IsIListType(type))
             {
-                var innerType = type.GetGenericArguments()[0];
+                var innerType = type.GetGenericArgumentsCached()[0];
                 var method = eqListsMethod.MakeGenericMethod(innerType);
                 return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
             }
