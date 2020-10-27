@@ -21,6 +21,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// The event type.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         public byte EventType { get; set; }
 
         /// <summary>
