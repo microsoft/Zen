@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a research library and verification toolbox that allows for creating models of functionality. The Zen library has a number of built-in tools for processing its models, including a compiler, model checker, and test input generator. 
+Zen is a research library and verification toolbox that allows for creating models of functionality. The Zen library has a number of built-in tools for processing these models, including a compiler, model checker, and test input generator. 
 
 # Installation
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
@@ -25,7 +25,7 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 }
 ```
 
-Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between integer/string literals and Zen values. To use Zen, we must next create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
+Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between C# values and Zen values. To use Zen, we must next create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
 ZenFunction<int, int, int> function = Function<int, int, int>(MultiplyAndAdd);
@@ -195,7 +195,7 @@ Zen currently supports a subset of the C# language, described in more detail bel
 
 ### Primitive types
 
-Zen currently supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`. It does not currently support `char`, though you can typically achieve the same effect by casting to `ushort`.
+Zen supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`. It does not support `char`, though you can typically achieve the same effect by casting to `ushort`.
 
 ### String types
 
@@ -267,12 +267,12 @@ public class Packet
 // define helper extension methods for manipulating packets.
 public static class PacketExtensions
 {
-    public static Zen<uint> GetDstIp(Zen<Packet> packet)
+    public static Zen<uint> GetDstIp(this Zen<Packet> packet)
     {
         return packet.GetField<Packet, uint>("DstIp");
     }
 
-    public static Zen<uint> GetSrcIp(Zen<Packet> packet)
+    public static Zen<uint> GetSrcIp(this Zen<Packet> packet)
     {
         return packet.GetField<Packet, uint>("SrcIp");
     }
