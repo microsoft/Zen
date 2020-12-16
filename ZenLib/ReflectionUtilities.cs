@@ -124,6 +124,30 @@ namespace ZenLib
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
+        /// The zen constant dictionary creation method.
+        /// </summary>
+        public static MethodInfo CreateZenDictConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenDictConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
+        /// The zen constant option creation method.
+        /// </summary>
+        public static MethodInfo CreateZenOptionConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenOptionConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
+        /// The zen constant tuple creation method.
+        /// </summary>
+        public static MethodInfo CreateZenTupleConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenTupleConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
+        /// The zen constant value tuple creation method.
+        /// </summary>
+        public static MethodInfo CreateZenValueTupleConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenValueTupleConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
         /// Cache of generic arguments.
         /// </summary>
         private static Dictionary<Type, Type[]> genericArgumentsCache = new Dictionary<Type, Type[]>();
@@ -733,6 +757,7 @@ namespace ZenLib
             var list = EmptyList<T>();
             foreach (var elt in value.Reverse())
             {
+                ReportIfNullConversionError(elt, "element", typeof(IList<T>));
                 list = list.AddFront(elt);
             }
 
@@ -748,10 +773,35 @@ namespace ZenLib
         {
             if (value.HasValue)
             {
-                return Language.Some<T>(value.Value);
+                ReportIfNullConversionError(value.Value, "value", typeof(Option<T>));
+                return Some<T>(value.Value);
             }
 
-            return Language.Null<T>();
+            return Null<T>();
+        }
+
+        /// <summary>
+        /// Create a constant Zen tuple value.
+        /// </summary>
+        /// <param name="value">The option value.</param>
+        /// <returns>The Zen value representing the option.</returns>
+        internal static Zen<Tuple<T1, T2>> CreateZenTupleConstant<T1, T2>(Tuple<T1, T2> value)
+        {
+            ReportIfNullConversionError(value.Item1, "Item1", typeof(Tuple<T1, T2>));
+            ReportIfNullConversionError(value.Item2, "Item2", typeof(Tuple<T1, T2>));
+            return Tuple<T1, T2>(value.Item1, value.Item2);
+        }
+
+        /// <summary>
+        /// Create a constant Zen value tuple value.
+        /// </summary>
+        /// <param name="value">The option value.</param>
+        /// <returns>The Zen value representing the option.</returns>
+        internal static Zen<(T1, T2)> CreateZenValueTupleConstant<T1, T2>((T1, T2) value)
+        {
+            ReportIfNullConversionError(value.Item1, "Item1", typeof((T1, T2)));
+            ReportIfNullConversionError(value.Item2, "Item2", typeof((T1, T2)));
+            return ValueTuple<T1, T2>(value.Item1, value.Item2);
         }
 
         /// <summary>
@@ -764,6 +814,8 @@ namespace ZenLib
             var dict = EmptyDict<TKey, TValue>();
             foreach (var kv in value)
             {
+                ReportIfNullConversionError(kv.Key, "key", typeof(IDictionary<TKey, TValue>));
+                ReportIfNullConversionError(kv.Value, "value", typeof(IDictionary<TKey, TValue>));
                 dict = dict.Add(kv.Key, kv.Value);
             }
 
@@ -784,17 +836,30 @@ namespace ZenLib
                 value is uint || value is long || value is ulong || value is string || value is BigInteger ||
                 IsFixedIntegerType(type))
             {
-                return Constant(v);
+                return ZenConstantExpr<T>.Create(v);
             }
 
-            if (IsOptionType(type))
-                return CreateZenOptionConstant(v);
-            if (IsTupleType(type))
-                return Tuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
-            if (IsValueTupleType(type))
-                return ValueTuple(CreateZenConstant(v.Item1), CreateZenConstant(v.Item2));
-
             var typeArgs = type.GetGenericArgumentsCached();
+
+            if (IsOptionType(type))
+            {
+                var innerType = typeArgs[0];
+                return CreateZenOptionConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+            }
+
+            if (IsTupleType(type))
+            {
+                var type1 = typeArgs[0];
+                var type2 = typeArgs[1];
+                return CreateZenTupleConstantMethod.MakeGenericMethod(type1, type2).Invoke(null, new object[] { value });
+            }
+
+            if (IsValueTupleType(type))
+            {
+                var type1 = typeArgs[0];
+                var type2 = typeArgs[1];
+                return CreateZenValueTupleConstantMethod.MakeGenericMethod(type1, type2).Invoke(null, new object[] { value });
+            }
 
             if (type.IsGenericType && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
             {
@@ -804,7 +869,9 @@ namespace ZenLib
 
             if (type.IsGenericType && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
             {
-                return CreateZenDictConstant(v);
+                var keyType = typeArgs[0];
+                var valueType = typeArgs[1];
+                return CreateZenDictConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
             }
 
             // some class or struct
@@ -825,10 +892,26 @@ namespace ZenLib
             var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                args[i] = (asList[i].Key, CreateZenConstant(asList[i].Value));
+                var fieldValue = asList[i].Value;
+                ReportIfNullConversionError(fieldValue, "field", type);
+                args[i] = (asList[i].Key, CreateZenConstant(fieldValue));
             }
 
             return createMethod.Invoke(null, new object[] { args });
+        }
+
+        /// <summary>
+        ///     Reports a null error in a conversion from a constant to a Zen value.
+        /// </summary>
+        /// <param name="obj">The object that may be null.</param>
+        /// <param name="where">Description of where the error occurs.</param>
+        /// <param name="type">The containing type.</param>
+        private static void ReportIfNullConversionError(object obj, string where, Type type)
+        {
+            if (obj is null)
+            {
+                throw new ArgumentException($"Null constant in {where} of type {type} can not be converted to a Zen value.");
+            }
         }
 
         /// <summary>

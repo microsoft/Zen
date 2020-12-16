@@ -86,6 +86,13 @@ namespace ZenLib
         /// <param name="x">The value.</param>
         public static Zen<T> Lift<T>(T x)
         {
+            CommonUtilities.ValidateNotNull(x);
+
+            if (typeof(T) == ReflectionUtilities.StringType)
+            {
+                CommonUtilities.ValidateStringLiteral((string)(object)x);
+            }
+
             return (Zen<T>)ReflectionUtilities.CreateZenConstant(x);
         }
 
@@ -114,14 +121,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Constant<T>(T value)
         {
-            CommonUtilities.ValidateNotNull(value);
-
-            if (typeof(T) == ReflectionUtilities.StringType)
-            {
-                CommonUtilities.ValidateStringLiteral((string)(object)value);
-            }
-
-            return ZenConstantExpr<T>.Create(value);
+            return Lift(value);
         }
 
         /// <summary>

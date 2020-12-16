@@ -48,7 +48,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that we can evaluate values correctly..
+        /// Test that we can evaluate values correctly.
         /// </summary>
         [TestMethod]
         public void TestEvaluation()
@@ -67,6 +67,117 @@ namespace ZenLib.Tests
             CheckEqual((9, 10));
             CheckEqual(new FiniteString("hello"));
             CheckEqualLists(new List<int>() { 1, 2, 3 });
+        }
+
+        /// <summary>
+        /// Test that converting works properly when a field has a concrete instantiation of an interface.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertConcreteListField()
+        {
+            var o = new NestedClass { Field1 = new List<int>() };
+            var _ = Constant(o);
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null field does not work.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestConvertNullClass()
+        {
+            var o = new NestedClass { };
+            var _ = Constant(o);
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null tuple inner value.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertNullTupleValue()
+        {
+            try
+            {
+                var o = new Tuple<Object1, Object1>(null, null);
+                var _ = Constant(o);
+                Assert.Fail();
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null tuple inner value.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertNullValueTupleValue()
+        {
+            try
+            {
+                (Object1, Object1) o = (null, null);
+                var _ = Constant(o);
+                Assert.Fail();
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null option inner value.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertNullOptionValue()
+        {
+            try
+            {
+                Option<Object1> o = Option.Some<Object1>(null);
+                var _ = Constant(o);
+                Assert.Fail();
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null dictionary key does not work.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertNullListValue()
+        {
+            try
+            {
+                IList<Object1> o = new List<Object1> { { null } };
+                var _ = Constant(o);
+                Assert.Fail();
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test that converting a value with a null dictionary value does not work.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertNullDictionaryValue()
+        {
+            try
+            {
+                IDictionary<int, Object1> o = new Dictionary<int, Object1> { { 1, null } };
+                var _ = Constant(o);
+                Assert.Fail();
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+            }
         }
 
         /// <summary>
@@ -94,6 +205,14 @@ namespace ZenLib.Tests
             {
                 Assert.AreEqual(value[i], result[i]);
             }
+        }
+
+        /// <summary>
+        /// An object with another nested inside.
+        /// </summary>
+        internal class NestedClass
+        {
+            public IList<int> Field1 { get; set; }
         }
     }
 }
