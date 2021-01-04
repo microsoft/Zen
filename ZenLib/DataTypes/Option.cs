@@ -4,13 +4,15 @@
 
 namespace ZenLib
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// A simple option type to parameterize over nullable
     /// values for both structs and classes.
     /// </summary>
-    public struct Option<T>
+    public struct Option<T> : IEquatable<Option<T>>
     {
         internal Option(bool b, T value) : this()
         {
@@ -56,6 +58,48 @@ namespace ZenLib
             }
 
             return "None";
+        }
+
+        /// <summary>
+        /// Equality between option types.
+        /// </summary>
+        /// <param name="obj">The other option.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj != null && obj is Option<T> o && this.Equals(o);
+        }
+
+        /// <summary>
+        /// Equality between option types.
+        /// </summary>
+        /// <param name="other">The other option.</param>
+        /// <returns>True or false.</returns>
+        public bool Equals(Option<T> other)
+        {
+            if (!this.HasValue && !other.HasValue)
+            {
+                return true;
+            }
+
+            if (this.HasValue && other.HasValue && this.Value.Equals(other.Value))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the hashcode for the optional value.
+        /// </summary>
+        /// <returns>An integer.</returns>
+        public override int GetHashCode()
+        {
+            int hashCode = 299404170;
+            hashCode = hashCode * -1521134295 + HasValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(Value);
+            return hashCode;
         }
     }
 

@@ -163,11 +163,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Null<T>()
         {
-            var b = False();
             var v = (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T));
-            return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", b), ("Item2", v)),
-                CustomTupleToOption<T>);
+            return Create<Option<T>>(("HasValue", False()), ("Value", v));
         }
 
         /// <summary>
@@ -178,9 +175,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", True()), ("Item2", expr)),
-                CustomTupleToOption<T>);
+            return Create<Option<T>>(("HasValue", True()), ("Value", expr));
         }
 
         /// <summary>
@@ -195,9 +190,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(flag);
             CommonUtilities.ValidateNotNull(value);
 
-            return ZenAdapterExpr<Option<T>, CustomTuple<bool, T>>.Create(
-                ZenCreateObjectExpr<CustomTuple<bool, T>>.Create(("Item1", flag), ("Item2", value)),
-                CustomTupleToOption<T>);
+            return Create<Option<T>>(("HasValue", flag), ("Value", value));
         }
 
         /// <summary>
@@ -213,11 +206,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(none);
             CommonUtilities.ValidateNotNull(some);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T1>, Option<T1>>.Create(expr, OptionToCustomTuple<T1>);
-            return If(
-                tupleExpr.GetField<CustomTuple<bool, T1>, bool>("Item1"),
-                some(tupleExpr.GetField<CustomTuple<bool, T1>, T1>("Item2")),
-                none());
+            return If(expr.HasValue(), some(expr.Value()), none());
         }
 
         /// <summary>
@@ -229,8 +218,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
-            return tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1");
+            return expr.GetField<Option<T>, bool>("HasValue");
         }
 
         /// <summary>
@@ -242,12 +230,8 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
-            var emptyList = EmptyList<T>();
-            return If(
-                    tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1"),
-                    emptyList.AddFront(tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2")),
-                    emptyList);
+            var l = EmptyList<T>();
+            return If(expr.HasValue(), l.AddFront(expr.Value()), l);
         }
 
         /// <summary>
@@ -259,8 +243,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
-            return tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2");
+            return expr.GetField<Option<T>, T>("Value");
         }
 
         /// <summary>
@@ -274,11 +257,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(deflt);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
-            return If(
-                    tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1"),
-                    tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2"),
-                    deflt);
+            return If(expr.HasValue(), expr.Value(), deflt);
         }
 
         /// <summary>
@@ -292,11 +271,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(function);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T1>, Option<T1>>.Create(expr, OptionToCustomTuple<T1>);
-            return If(
-                    tupleExpr.GetField<CustomTuple<bool, T1>, bool>("Item1"),
-                    Some(function(tupleExpr.GetField<CustomTuple<bool, T1>, T1>("Item2"))),
-                    Null<T2>());
+            return If(expr.HasValue(), Some(function(expr.Value())), Null<T2>());
         }
 
         /// <summary>
@@ -310,12 +285,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(function);
 
-            var tupleExpr = ZenAdapterExpr<CustomTuple<bool, T>, Option<T>>.Create(expr, OptionToCustomTuple<T>);
-            return If(
-                    And(tupleExpr.GetField<CustomTuple<bool, T>, bool>("Item1"),
-                        function(tupleExpr.GetField<CustomTuple<bool, T>, T>("Item2"))),
-                    expr,
-                    Null<T>());
+            return If(And(expr.HasValue(), function(expr.Value())), expr, Null<T>());
         }
 
         /// <summary>
@@ -791,6 +761,15 @@ namespace ZenLib
         public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub)
         {
             return IndexOf(str, sub, new BigInteger(0));
+        }
+
+        /// <summary>
+        /// Creates an FiniteString.
+        /// </summary>
+        /// <returns>The finite string.</returns>
+        public static Zen<FiniteString> FiniteString(Zen<IList<ushort>> values)
+        {
+            return Create<FiniteString>(("Characters", values));
         }
 
         /// <summary>
@@ -2017,18 +1996,6 @@ namespace ZenLib
             }
 
             return dict;
-        }
-
-        private static object OptionToCustomTuple<T>(object opt)
-        {
-            var x = (Option<T>)opt;
-            return new CustomTuple<bool, T> { Item1 = x.HasValue, Item2 = x.Value };
-        }
-
-        private static object CustomTupleToOption<T>(object tuple)
-        {
-            var x = (CustomTuple<bool, T>)tuple;
-            return new Option<T>(x.Item1, x.Item2);
         }
 
         private static object TupleToCustomTuple<T1, T2>(object tup)

@@ -20,6 +20,36 @@ namespace ZenLib.Tests
     public class OptionTests
     {
         /// <summary>
+        /// Test that option equality works.
+        /// </summary>
+        [TestMethod]
+        public void TestOptionEquality()
+        {
+            Assert.AreNotEqual(Option.None<int>(), null);
+            Assert.AreNotEqual(Option.None<int>(), 4);
+            Assert.AreEqual(Option.None<int>(), Option.None<int>());
+            Assert.AreEqual(new Option<int>(false, 1), new Option<int>(false, 2));
+            Assert.AreNotEqual(Option.None<int>(), Option.Some(0));
+            Assert.AreNotEqual(Option.Some(0), Option.None<int>());
+            Assert.AreEqual(Option.Some(0), Option.Some(0));
+            Assert.AreNotEqual(Option.Some(0), Option.Some(1));
+
+            Assert.AreNotEqual(Option.None<int>().GetHashCode(), Option.Some(1).GetHashCode());
+        }
+
+        /// <summary>
+        /// Test that finding an option works.
+        /// </summary>
+        [TestMethod]
+        public void TestOptionFind()
+        {
+            var zf = new ZenFunction<Option<int>, bool>(o => o.HasValue());
+            var example = zf.Find((i, o) => o);
+            Assert.IsTrue(example.HasValue);
+            Assert.AreEqual(Option.Some(0), example.Value);
+        }
+
+        /// <summary>
         /// Test none has no value.
         /// </summary>
         [TestMethod]
