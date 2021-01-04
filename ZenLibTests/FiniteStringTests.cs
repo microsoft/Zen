@@ -73,7 +73,7 @@ namespace ZenLib.Tests
         [DataRow("endline\r\n")]
         public void TestConstants(string s)
         {
-            var fs = FiniteString.Constant(s);
+            var fs = FiniteString(s);
             var f = Function(() => fs);
             Assert.IsTrue(f.Assert(x => x == fs));
         }
@@ -160,7 +160,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestPrefixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.StartsWith(fs, new FiniteString(sub)));
+            var f = Function<FiniteString, bool>(fs => Language.StartsWith(fs, new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -173,7 +173,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, bool>(fs => FiniteString.Constant(s).StartsWith(fs));
+                var f = Function<FiniteString, bool>(fs => FiniteString(s).StartsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.StartsWith(ex));
             });
@@ -189,7 +189,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestSuffixOf(string s, string sub, bool expected)
         {
-            var f = Function<FiniteString, bool>(fs => FiniteStringExtensions.EndsWith(fs, new FiniteString(sub)));
+            var f = Function<FiniteString, bool>(fs => Language.EndsWith(fs, new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -202,7 +202,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = Function<FiniteString, bool>(fs => FiniteString.Constant(s).EndsWith(fs));
+                var f = Function<FiniteString, bool>(fs => FiniteString(s).EndsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.EndsWith(ex));
             });
