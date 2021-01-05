@@ -92,8 +92,14 @@ namespace ZenLib
     /// <typeparam name="T2">Return type.</typeparam>
     public class ZenFunction<T1, T2>
     {
+        /// <summary>
+        /// The callback for the Zen function.
+        /// </summary>
         private Func<Zen<T1>, Zen<T2>> function;
 
+        /// <summary>
+        /// The compiled C# version of the function.
+        /// </summary>
         private Func<T1, T2> compiledFunction = null;
 
         /// <summary>

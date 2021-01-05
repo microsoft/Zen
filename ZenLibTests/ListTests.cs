@@ -311,5 +311,20 @@ namespace ZenLib.Tests
                 return Implies(Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
             });
         }
+
+        /// <summary>
+        /// Test that size constraints are enforced correctly.
+        /// </summary>
+        [TestMethod]
+        public void TestListSizeConstraints()
+        {
+            var zf = new ZenFunction<IList<byte>, bool>(l => l.Length() == 4);
+            var example1 = zf.Find((l, b) => b, listSize: 3);
+            Assert.IsFalse(example1.HasValue);
+
+            var zfNested = new ZenFunction<IList<IList<byte>>, bool>(l => l.Any(x => x.Length() == 4));
+            var example2 = zfNested.Find((l, b) => b, listSize: 3);
+            Assert.IsFalse(example2.HasValue);
+        }
     }
 }
