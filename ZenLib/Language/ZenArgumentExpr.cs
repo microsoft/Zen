@@ -18,7 +18,7 @@ namespace ZenLib
         /// </summary>
         public ZenArgumentExpr()
         {
-            this.Id = Guid.NewGuid().ToString();
+            this.ArgumentId = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the unique id for the object.
         /// </summary>
-        public string Id { get; }
+        public string ArgumentId { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -42,7 +42,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Arg({this.Id})";
+            return $"Arg({this.ArgumentId})";
         }
 
         /// <summary>

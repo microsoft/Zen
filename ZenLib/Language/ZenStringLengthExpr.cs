@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,13 +12,25 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringLengthExpr : Zen<BigInteger>
     {
-        private static Dictionary<object, Zen<BigInteger>> hashConsTable = new Dictionary<object, Zen<BigInteger>>();
+        /// <summary>
+        /// Hash cons table for ZenStringLengthExpr.
+        /// </summary>
+        private static HashConsTable<long, Zen<BigInteger>> hashConsTable = new HashConsTable<long, Zen<BigInteger>>();
 
+        /// <summary>
+        /// Unroll a ZenStringLengthExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<BigInteger> Unroll()
         {
             return Create(this.Expr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenStringLengthExpr.
+        /// </summary>
+        /// <param name="e1">The string expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<BigInteger> Simplify(Zen<string> e1)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
@@ -32,18 +43,17 @@ namespace ZenLib
             return new ZenStringLengthExpr(e1);
         }
 
+        /// <summary>
+        /// Create a new ZenStringLengthExpr.
+        /// </summary>
+        /// <param name="expr">The string expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<BigInteger> Create(Zen<string> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            if (hashConsTable.TryGetValue(expr, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr);
-            hashConsTable[expr] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(expr.Id, () => Simplify(expr), out var value);
+            return value;
         }
 
         /// <summary>

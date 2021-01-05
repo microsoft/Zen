@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,14 +11,27 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenWithFieldExpr<T1, T2> : Zen<T1>
     {
-        private static Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>> hashConsTable =
-            new Dictionary<(object, object, object), ZenWithFieldExpr<T1, T2>>();
+        /// <summary>
+        /// Hash cons table for ZenWithFieldExpr.
+        /// </summary>
+        private static HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>> hashConsTable = new HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>>();
 
+        /// <summary>
+        /// Unroll the ZenWithFieldExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<T1> Unroll()
         {
             return Create(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
         }
 
+        /// <summary>
+        /// Create a new ZenWithFieldExpr.
+        /// </summary>
+        /// <param name="expr">The object expr.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="fieldValue">The field value.</param>
+        /// <returns></returns>
         public static ZenWithFieldExpr<T1, T2> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
             CommonUtilities.ValidateNotNull(expr);
@@ -27,15 +39,9 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(fieldValue);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
-            var key = (expr, fieldName, fieldValue);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = new ZenWithFieldExpr<T1, T2>(expr, fieldName, fieldValue);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr.Id, fieldName, fieldValue.Id);
+            hashConsTable.GetOrAdd(key, () => new ZenWithFieldExpr<T1, T2>(expr, fieldName, fieldValue), out var value);
+            return value;
         }
 
         /// <summary>

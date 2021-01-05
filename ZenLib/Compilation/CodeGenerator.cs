@@ -42,7 +42,7 @@ namespace ZenLib.Compilation
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.Id, param1);
+            args = args.Add(arg1.ArgumentId, param1);
 
             var env = new ExpressionConverterEnvironment(args);
             var e = function(arg1);
@@ -63,11 +63,11 @@ namespace ZenLib.Compilation
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.Id, param1);
+            args = args.Add(arg1.ArgumentId, param1);
 
             var arg2 = new ZenArgumentExpr<T2>();
             var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.Id, param2);
+            args = args.Add(arg2.ArgumentId, param2);
 
             var env = new ExpressionConverterEnvironment(args);
             var e = function(arg1, arg2);
@@ -88,15 +88,15 @@ namespace ZenLib.Compilation
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.Id, param1);
+            args = args.Add(arg1.ArgumentId, param1);
 
             var arg2 = new ZenArgumentExpr<T2>();
             var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.Id, param2);
+            args = args.Add(arg2.ArgumentId, param2);
 
             var arg3 = new ZenArgumentExpr<T3>();
             var param3 = Expression.Parameter(typeof(T3));
-            args = args.Add(arg3.Id, param3);
+            args = args.Add(arg3.ArgumentId, param3);
 
             var env = new ExpressionConverterEnvironment(args);
             var e = function(arg1, arg2, arg3);
@@ -117,19 +117,19 @@ namespace ZenLib.Compilation
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.Id, param1);
+            args = args.Add(arg1.ArgumentId, param1);
 
             var arg2 = new ZenArgumentExpr<T2>();
             var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.Id, param2);
+            args = args.Add(arg2.ArgumentId, param2);
 
             var arg3 = new ZenArgumentExpr<T3>();
             var param3 = Expression.Parameter(typeof(T3));
-            args = args.Add(arg3.Id, param3);
+            args = args.Add(arg3.ArgumentId, param3);
 
             var arg4 = new ZenArgumentExpr<T4>();
             var param4 = Expression.Parameter(typeof(T4));
-            args = args.Add(arg4.Id, param4);
+            args = args.Add(arg4.ArgumentId, param4);
 
             var env = new ExpressionConverterEnvironment(args);
             var e = function(arg1, arg2, arg3, arg4);

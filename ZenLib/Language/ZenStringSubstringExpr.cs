@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,14 +12,27 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringSubstringExpr : Zen<string>
     {
-        private static Dictionary<(object, object, object), Zen<string>> hashConsTable =
-            new Dictionary<(object, object, object), Zen<string>>();
+        /// <summary>
+        /// Hash cons table for ZenStringSubstringExpr.
+        /// </summary>
+        private static HashConsTable<(long, long, long), Zen<string>> hashConsTable = new HashConsTable<(long, long, long), Zen<string>>();
 
+        /// <summary>
+        /// Unroll a ZenStringSubstringExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<string> Unroll()
         {
             return Create(this.StringExpr.Unroll(), this.OffsetExpr.Unroll(), this.LengthExpr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenStringSubstringExpr.
+        /// </summary>
+        /// <param name="e1">The string expression.</param>
+        /// <param name="e2">The offset expression.</param>
+        /// <param name="e3">The length expression.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<string> Simplify(Zen<string> e1, Zen<BigInteger> e2, Zen<BigInteger> e3)
         {
             var x = ReflectionUtilities.GetConstantString(e1);
@@ -31,21 +43,22 @@ namespace ZenLib
             return new ZenStringSubstringExpr(e1, e2, e3);
         }
 
+        /// <summary>
+        /// Create a new ZenStringSubstringExpr.
+        /// </summary>
+        /// <param name="expr1">The string expression.</param>
+        /// <param name="expr2">The offset expression.</param>
+        /// <param name="expr3">The length expression.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<string> Create(Zen<string> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateNotNull(expr3);
 
-            var key = (expr1, expr2, expr3);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr1, expr2, expr3);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr1.Id, expr2.Id, expr3.Id);
+            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, expr3), out var value);
+            return value;
         }
 
         /// <summary>

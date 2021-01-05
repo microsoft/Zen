@@ -1,11 +1,9 @@
-// <copyright file="ZenContainmentExpr.cs" company="Microsoft">
+// <copyright file="ZenStringReplaceExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,14 +11,27 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringReplaceExpr : Zen<string>
     {
-        private static Dictionary<(object, object, object), Zen<string>> hashConsTable =
-            new Dictionary<(object, object, object), Zen<string>>();
+        /// <summary>
+        /// Hash cons table for ZenStringReplaceExpr.
+        /// </summary>
+        private static HashConsTable<(long, long, long), Zen<string>> hashConsTable = new HashConsTable<(long, long, long), Zen<string>>();
 
+        /// <summary>
+        /// Unroll a ZenStringReplaceExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<string> Unroll()
         {
             return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ReplaceExpr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenStringReplaceExpr.
+        /// </summary>
+        /// <param name="e1">The string expr.</param>
+        /// <param name="e2">The substring expr.</param>
+        /// <param name="e3">The replacement expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<string> Simplify(Zen<string> e1, Zen<string> e2, Zen<string> e3)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
@@ -37,21 +48,22 @@ namespace ZenLib
             return new ZenStringReplaceExpr(e1, e2, e3);
         }
 
+        /// <summary>
+        /// Create a new ZenStringReplaceExpr.
+        /// </summary>
+        /// <param name="expr1">The string expr.</param>
+        /// <param name="expr2">The substring expr.</param>
+        /// <param name="expr3">The replacement expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<string> Create(Zen<string> expr1, Zen<string> expr2, Zen<string> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
             CommonUtilities.ValidateNotNull(expr3);
 
-            var key = (expr1, expr2, expr3);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr1, expr2, expr3);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr1.Id, expr2.Id, expr3.Id);
+            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, expr3), out var value);
+            return value;
         }
 
         /// <summary>

@@ -158,7 +158,7 @@ namespace ZenLib.ModelChecking
         {
             return LookupOrCompute(expression, () =>
             {
-                return parameter.ArgumentAssignment[expression.Id];
+                return parameter.ArgumentAssignment[expression.ArgumentId];
             });
         }
 
@@ -442,7 +442,7 @@ namespace ZenLib.ModelChecking
                     // execute the cons case with placeholder values to get a new Zen value.
                     var arg1 = new ZenArgumentExpr<TList>();
                     var arg2 = new ZenArgumentExpr<IList<TList>>();
-                    var args = parameter.ArgumentAssignment.Add(arg1.Id, hd).Add(arg2.Id, rest);
+                    var args = parameter.ArgumentAssignment.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
                     var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(args);
                     var newExpression = expression.ConsCase(arg1, arg2);
 

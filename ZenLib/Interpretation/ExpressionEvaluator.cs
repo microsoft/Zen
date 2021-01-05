@@ -112,7 +112,7 @@ namespace ZenLib.Interpretation
 
         public object VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return parameter.ArgumentAssignment[expression.Id];
+            return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
         public object VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)

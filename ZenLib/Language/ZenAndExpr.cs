@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,13 +11,26 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenAndExpr : Zen<bool>
     {
-        private static Dictionary<(object, object), Zen<bool>> hashConsTable = new Dictionary<(object, object), Zen<bool>>();
+        /// <summary>
+        /// Hash cons table for And terms.
+        /// </summary>
+        private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
 
+        /// <summary>
+        /// Unroll a ZenAndExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<bool> Unroll()
         {
             return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
         }
 
+        /// <summary>
+        /// Simplify a new ZenAndExpr.
+        /// </summary>
+        /// <param name="e1">The first expr.</param>
+        /// <param name="e2">The second expr.</param>
+        /// <returns>The new Zen expr.</returns>
         private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
         {
             if (e1 is ZenConstantExpr<bool> x)
@@ -39,19 +51,20 @@ namespace ZenLib
             return new ZenAndExpr(e1, e2);
         }
 
+        /// <summary>
+        /// Creates a new ZenAndExpr.
+        /// </summary>
+        /// <param name="expr1">The first expr.</param>
+        /// <param name="expr2">The second expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
-            var key = (expr1, expr2);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
 
-            var ret = Simplify(expr1, expr2);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr1.Id, expr2.Id);
+            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2), out var value);
+            return value;
         }
 
         /// <summary>

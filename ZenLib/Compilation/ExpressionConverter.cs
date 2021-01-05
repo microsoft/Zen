@@ -198,7 +198,7 @@ namespace ZenLib.Compilation
 
         public Expression VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            return parameter.ArgumentAssignment[expression.Id];
+            return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
         public Expression VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
@@ -454,9 +454,9 @@ namespace ZenLib.Compilation
                     var newAssignment = parameter.ArgumentAssignment;
 
                     var argHd = new ZenArgumentExpr<TList>();
-                    newAssignment = newAssignment.Add(argHd.Id, hdExpr);
+                    newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
                     var argTl = new ZenArgumentExpr<IList<TList>>();
-                    newAssignment = newAssignment.Add(argTl.Id, tlExpr);
+                    newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
 
                     var zenConsExpr = expression.ConsCase(argHd, argTl);
 

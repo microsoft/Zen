@@ -4,8 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,13 +11,25 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenNotExpr : Zen<bool>
     {
-        private static Dictionary<object, Zen<bool>> hashConsTable = new Dictionary<object, Zen<bool>>();
+        /// <summary>
+        /// Hash cons table for ZenNotExpr.
+        /// </summary>
+        private static HashConsTable<long, Zen<bool>> hashConsTable = new HashConsTable<long, Zen<bool>>();
 
+        /// <summary>
+        /// Unroll a ZenNotExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<bool> Unroll()
         {
             return Create(this.Expr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a ZenNotExpr.
+        /// </summary>
+        /// <param name="e">The expr.</param>
+        /// <returns>The negated expr.</returns>
         private static Zen<bool> Simplify(Zen<bool> e)
         {
             if (e is ZenConstantExpr<bool> x)
@@ -35,18 +45,17 @@ namespace ZenLib
             return new ZenNotExpr(e);
         }
 
+        /// <summary>
+        /// Create a new ZenNotExpr.
+        /// </summary>
+        /// <param name="expr">The expr.</param>
+        /// <returns>The negated expr.</returns>
         public static Zen<bool> Create(Zen<bool> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            if (hashConsTable.TryGetValue(expr, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr);
-            hashConsTable[expr] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(expr.Id, () => Simplify(expr), out var value);
+            return value;
         }
 
         /// <summary>
