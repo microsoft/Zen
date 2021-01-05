@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,14 +11,27 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenIfExpr<T> : Zen<T>
     {
-        private static Dictionary<(object, object, object), Zen<T>> hashConsTable =
-            new Dictionary<(object, object, object), Zen<T>>();
+        /// <summary>
+        /// Hash cons table for ZenIfExpr.
+        /// </summary>
+        private static HashConsTable<(long, long, long), Zen<T>> hashConsTable = new HashConsTable<(long, long, long), Zen<T>>();
 
+        /// <summary>
+        /// Unroll the ZenIfExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<T> Unroll()
         {
             return Create(this.GuardExpr.Unroll(), this.TrueExpr.Unroll(), this.FalseExpr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenIfExpr.
+        /// </summary>
+        /// <param name="g">The guard expr.</param>
+        /// <param name="t">The true expr.</param>
+        /// <param name="f">The false expr.</param>
+        /// <returns>The new Zen expr.</returns>
         private static Zen<T> Simplify(Zen<bool> g, Zen<T> t, Zen<T> f)
         {
             // if true then e1 else e2 = e1
@@ -29,13 +41,13 @@ namespace ZenLib
                 return ce.Value ? t : f;
             }
 
-            // if g then e else e = e
+            /* if g then e else e = e
             if (ReferenceEquals(t, f))
             {
                 return t;
             }
 
-            /* if (typeof(T) == ReflectionUtilities.BoolType)
+            if (typeof(T) == ReflectionUtilities.BoolType)
             {
                 // if e1 then true else e2 = Or(e1, e2)
                 // if e1 then false else e2 = And(Not(e1), e2)
@@ -59,21 +71,22 @@ namespace ZenLib
             return new ZenIfExpr<T>(g, t, f);
         }
 
+        /// <summary>
+        /// Create a new ZenIfExpr.
+        /// </summary>
+        /// <param name="guardExpr">The guard expr.</param>
+        /// <param name="trueExpr">The true expr.</param>
+        /// <param name="falseExpr">The false expr.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<T> Create(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
             CommonUtilities.ValidateNotNull(guardExpr);
             CommonUtilities.ValidateNotNull(trueExpr);
             CommonUtilities.ValidateNotNull(falseExpr);
 
-            var key = (guardExpr, trueExpr, falseExpr);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(guardExpr, trueExpr, falseExpr);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (guardExpr.Id, trueExpr.Id, falseExpr.Id);
+            hashConsTable.GetOrAdd(key, () => Simplify(guardExpr, trueExpr, falseExpr), out var value);
+            return value;
         }
 
         /// <summary>

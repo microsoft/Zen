@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System.Threading;
+
 namespace ZenLib
 {
     /// <summary>
@@ -10,6 +12,16 @@ namespace ZenLib
     /// <typeparam name="T">Return type as a C# type.</typeparam>
     public abstract class Zen<T>
     {
+        /// <summary>
+        /// The next unique id.
+        /// </summary>
+        private static long nextId = 0;
+
+        /// <summary>
+        /// The unique id for the given Zen expression.
+        /// </summary>
+        internal long Id = Interlocked.Increment(ref nextId);
+
         /// <summary>
         /// Simplify an expression by unrolling.
         /// </summary>

@@ -25,7 +25,7 @@ namespace ZenLib.Interpretation
         {
             var arg1 = new ZenArgumentExpr<T1>();
             var args = ImmutableDictionary<string, object>.Empty;
-            args = args.Add(arg1.Id, value1);
+            args = args.Add(arg1.ArgumentId, value1);
             var expression = function(arg1);
             return Interpret(expression, args, trackBranches);
         }
@@ -35,8 +35,8 @@ namespace ZenLib.Interpretation
             var arg1 = new ZenArgumentExpr<T1>();
             var arg2 = new ZenArgumentExpr<T2>();
             var args = ImmutableDictionary<string, object>.Empty;
-            args = args.Add(arg1.Id, value1);
-            args = args.Add(arg2.Id, value2);
+            args = args.Add(arg1.ArgumentId, value1);
+            args = args.Add(arg2.ArgumentId, value2);
             var expression = function(arg1, arg2);
             return Interpret(expression, args, trackBranches);
         }
@@ -52,9 +52,9 @@ namespace ZenLib.Interpretation
             var arg2 = new ZenArgumentExpr<T2>();
             var arg3 = new ZenArgumentExpr<T3>();
             var args = ImmutableDictionary<string, object>.Empty;
-            args = args.Add(arg1.Id, value1);
-            args = args.Add(arg2.Id, value2);
-            args = args.Add(arg3.Id, value3);
+            args = args.Add(arg1.ArgumentId, value1);
+            args = args.Add(arg2.ArgumentId, value2);
+            args = args.Add(arg3.ArgumentId, value3);
             var expression = function(arg1, arg2, arg3);
             return Interpret(expression, args, trackBranches);
         }
@@ -72,10 +72,10 @@ namespace ZenLib.Interpretation
             var arg3 = new ZenArgumentExpr<T3>();
             var arg4 = new ZenArgumentExpr<T4>();
             var args = ImmutableDictionary<string, object>.Empty;
-            args = args.Add(arg1.Id, value1);
-            args = args.Add(arg2.Id, value2);
-            args = args.Add(arg3.Id, value3);
-            args = args.Add(arg4.Id, value4);
+            args = args.Add(arg1.ArgumentId, value1);
+            args = args.Add(arg2.ArgumentId, value2);
+            args = args.Add(arg3.ArgumentId, value3);
+            args = args.Add(arg4.ArgumentId, value4);
             var expression = function(arg1, arg2, arg3, arg4);
             return Interpret(expression, args, trackBranches);
         }

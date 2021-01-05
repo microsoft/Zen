@@ -13,11 +13,23 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
+        /// <summary>
+        /// Unroll the ZenListCaseExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<TResult> Unroll()
         {
             return Create(this.ListExpr.Unroll(), this.EmptyCase.Unroll(), this.ConsCase, true);
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenListCaseExpr.
+        /// </summary>
+        /// <param name="e">The list expr.</param>
+        /// <param name="emptyCase">The empty case.</param>
+        /// <param name="consCase">The cons case.</param>
+        /// <param name="unroll">Whether to unroll the expr.</param>
+        /// <returns></returns>
         private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase, bool unroll)
         {
             if (e is ZenListEmptyExpr<T> l1)
@@ -40,6 +52,14 @@ namespace ZenLib
             return new ZenListCaseExpr<T, TResult>(e, emptyCase, consCase);
         }
 
+        /// <summary>
+        /// Create a new ZenListCaseExpr.
+        /// </summary>
+        /// <param name="listExpr">TThe list expr.</param>
+        /// <param name="empty">The empty case.</param>
+        /// <param name="cons">The cons case.</param>
+        /// <param name="unroll">Whether to unroll the expr.</param>
+        /// <returns>The new expr.</returns>
         public static Zen<TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,

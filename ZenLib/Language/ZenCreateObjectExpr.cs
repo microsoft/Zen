@@ -14,9 +14,15 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenCreateObjectExpr<TObject> : Zen<TObject>
     {
-        private static Dictionary<(string, object)[], Zen<TObject>> hashConsTable =
-            new Dictionary<(string, object)[], Zen<TObject>>(new ArrayComparer());
+        /// <summary>
+        /// Hash cons table for ZenCreateObjectExpr.
+        /// </summary>
+        private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
 
+        /// <summary>
+        /// Unroll a ZenCreateObjectExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<TObject> Unroll()
         {
             var newFields = new (string, object)[this.Fields.Count];
@@ -33,6 +39,11 @@ namespace ZenLib
             return CreateFast(newFields);
         }
 
+        /// <summary>
+        /// Creates a new ZenCreateObjectExpr.
+        /// </summary>
+        /// <param name="fields">The fields and their values.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<TObject> Create(params (string, object)[] fields)
         {
             CommonUtilities.ValidateNotNull(fields);
@@ -49,26 +60,33 @@ namespace ZenLib
 
             Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));
 
-            if (hashConsTable.TryGetValue(fields, out var value))
+            (string, long)[] fieldIds = new (string, long)[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
             {
-                return value;
+                var f = fields[i];
+                fieldIds[i] = (f.Item1, (long)((dynamic)f.Item2).Id);
             }
 
-            var ret = new ZenCreateObjectExpr<TObject>(fields);
-            hashConsTable[fields] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(fieldIds, () => new ZenCreateObjectExpr<TObject>(fields), out var value);
+            return value;
         }
 
+        /// <summary>
+        /// Creates a ZenCreateObjectExpr without the sorting and checks.
+        /// </summary>
+        /// <param name="fields">The already sorted fields.</param>
+        /// <returns>The new ZenExpr.</returns>
         private static Zen<TObject> CreateFast(params (string, object)[] fields)
         {
-            if (hashConsTable.TryGetValue(fields, out var value))
+            (string, long)[] fieldIds = new (string, long)[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
             {
-                return value;
+                var f = fields[i];
+                fieldIds[i] = (f.Item1, (long)((dynamic)f.Item2).Id);
             }
 
-            var ret = new ZenCreateObjectExpr<TObject>(fields);
-            hashConsTable[fields] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(fieldIds, () => new ZenCreateObjectExpr<TObject>(fields), out var value);
+            return value;
         }
 
         /// <summary>
@@ -120,9 +138,9 @@ namespace ZenLib
         /// Custom array comparer for ensuring hash consing uniqueness.
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class ArrayComparer : IEqualityComparer<(string, object)[]>
+        private class ArrayComparer : IEqualityComparer<(string, long)[]>
         {
-            public bool Equals((string, object)[] a1, (string, object)[] a2)
+            public bool Equals((string, long)[] a1, (string, long)[] a2)
             {
                 if (a1.Length != a2.Length)
                 {
@@ -140,7 +158,7 @@ namespace ZenLib
                 return true;
             }
 
-            public int GetHashCode((string, object)[] array)
+            public int GetHashCode((string, long)[] array)
             {
                 int result = 31;
                 for (int i = 0; i < array.Length; i++)

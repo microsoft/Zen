@@ -5,7 +5,6 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,8 +12,14 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringContainmentExpr : Zen<bool>
     {
-        private static Dictionary<(object, object, int), Zen<bool>> hashConsTable = new Dictionary<(object, object, int), Zen<bool>>();
+        /// <summary>
+        /// Hash cons table for ZenStringContainmentExpr.
+        /// </summary>
+        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
 
+        /// <summary>
+        /// Constant functions for evaluating containment.
+        /// </summary>
         private static Func<string, string, bool>[] constantFuncs = new Func<string, string, bool>[]
         {
             (s1, s2) => s1.StartsWith(s2),
@@ -22,11 +27,22 @@ namespace ZenLib
             (s1, s2) => s1.Contains(s2),
         };
 
+        /// <summary>
+        /// Unroll a ZenStringContainmentExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<bool> Unroll()
         {
             return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ContainmentType);
         }
 
+        /// <summary>
+        /// Simplify and create a ZenStringContainmentExpr.
+        /// </summary>
+        /// <param name="e1">The string expr.</param>
+        /// <param name="e2">The substring expr.</param>
+        /// <param name="containmentType">The containment type.</param>
+        /// <returns>The new Zen expr.</returns>
         public static Zen<bool> Simplify(Zen<string> e1, Zen<string> e2, ContainmentType containmentType)
         {
             string x = ReflectionUtilities.GetConstantString(e1);
@@ -46,20 +62,21 @@ namespace ZenLib
             return new ZenStringContainmentExpr(e1, e2, containmentType);
         }
 
+        /// <summary>
+        /// Create a new ZenStringContainmentExpr.
+        /// </summary>
+        /// <param name="expr1">The string expr.</param>
+        /// <param name="expr2">The substring expr.</param>
+        /// <param name="containmentType">The containment type.</param>
+        /// <returns></returns>
         public static Zen<bool> Create(Zen<string> expr1, Zen<string> expr2, ContainmentType containmentType)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            var key = (expr1, expr2, (int)containmentType);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr1, expr2, containmentType);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr1.Id, expr2.Id, (int)containmentType);
+            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, containmentType), out var value);
+            return value;
         }
 
         /// <summary>

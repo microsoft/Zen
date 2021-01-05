@@ -12,6 +12,9 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListEmptyExpr<T> : Zen<IList<T>>
     {
+        /// <summary>
+        /// The empty list instance.
+        /// </summary>
         public static ZenListEmptyExpr<T> Instance = new ZenListEmptyExpr<T>();
 
         /// <summary>

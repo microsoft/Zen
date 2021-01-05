@@ -12,28 +12,34 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListAddFrontExpr<T> : Zen<IList<T>>
     {
-        private static Dictionary<(object, object), ZenListAddFrontExpr<T>> hashConsTable =
-            new Dictionary<(object, object), ZenListAddFrontExpr<T>>();
+        /// <summary>
+        /// Hash cons table for ZenListAddFrontExpr.
+        /// </summary>
+        private static HashConsTable<(long, long), ZenListAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenListAddFrontExpr<T>>();
 
+        /// <summary>
+        /// Unroll a ZenListAddFrontExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<IList<T>> Unroll()
         {
             return Create(this.Expr.Unroll(), this.Element.Unroll());
         }
 
+        /// <summary>
+        /// Create a new ZenListAddFrontExpr.
+        /// </summary>
+        /// <param name="expr">The list expr.</param>
+        /// <param name="element">The element expr.</param>
+        /// <returns>The new expr.</returns>
         public static ZenListAddFrontExpr<T> Create(Zen<IList<T>> expr, Zen<T> element)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(element);
 
-            var key = (expr, element);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = new ZenListAddFrontExpr<T>(expr, element);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr.Id, element.Id);
+            hashConsTable.GetOrAdd(key, () => new ZenListAddFrontExpr<T>(expr, element), out var value);
+            return value;
         }
 
         /// <summary>

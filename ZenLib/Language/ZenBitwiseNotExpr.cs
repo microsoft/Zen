@@ -4,21 +4,32 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a Not expression.
+    /// Class representing a BitwiseNot expression.
     /// </summary>
     internal sealed class ZenBitwiseNotExpr<T> : Zen<T>
     {
-        private static Dictionary<object, Zen<T>> hashConsTable = new Dictionary<object, Zen<T>>();
+        /// <summary>
+        /// Hash cons table for ZenBitwiseNot expr.
+        /// </summary>
+        private static HashConsTable<long, Zen<T>> hashConsTable = new HashConsTable<long, Zen<T>>();
 
+        /// <summary>
+        /// Unroll a ZenBitwiseNotExpr.
+        /// </summary>
+        /// <returns>The unrolled expression.</returns>
         public override Zen<T> Unroll()
         {
             return Create(this.Expr.Unroll());
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenBitwiseNot expr.
+        /// </summary>
+        /// <param name="e">The expr to bitwise negate.</param>
+        /// <returns>The new expr.</returns>
         private static Zen<T> Simplify(Zen<T> e)
         {
             var x = ReflectionUtilities.GetConstantIntegerValue(e);
@@ -36,19 +47,18 @@ namespace ZenLib
             return new ZenBitwiseNotExpr<T>(e);
         }
 
+        /// <summary>
+        /// Create a new ZenBitwiseNot expr.
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Zen<T> Create(Zen<T> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
-            if (hashConsTable.TryGetValue(expr, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr);
-            hashConsTable[expr] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(expr.Id, () => Simplify(expr), out var value);
+            return value;
         }
 
         /// <summary>
@@ -72,7 +82,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"~({this.Expr.ToString()})";
+            return $"~({this.Expr})";
         }
 
         /// <summary>

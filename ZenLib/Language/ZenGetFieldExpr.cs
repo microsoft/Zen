@@ -4,8 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,13 +11,27 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenGetFieldExpr<T1, T2> : Zen<T2>
     {
-        private static Dictionary<object, Zen<T2>> hashConsTable = new Dictionary<object, Zen<T2>>();
+        /// <summary>
+        /// Hash cons table for ZenGetFieldExpr.
+        /// </summary>
+        private static HashConsTable<(long, string, bool), Zen<T2>> hashConsTable = new HashConsTable<(long, string, bool), Zen<T2>>();
 
+        /// <summary>
+        /// Unroll a ZenGetFieldExpr.
+        /// </summary>
+        /// <returns>The unrolled expr.</returns>
         public override Zen<T2> Unroll()
         {
             return Create(this.Expr.Unroll(), this.FieldName, true);
         }
 
+        /// <summary>
+        /// Simplify and create a new ZenGetFieldExpr.
+        /// </summary>
+        /// <param name="expr">The object expr.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="unroll">Whether to unroll.</param>
+        /// <returns></returns>
         private static Zen<T2> Simplify(Zen<T1> expr, string fieldName, bool unroll)
         {
             // get(with(o, name, f), name) == f
@@ -48,21 +60,22 @@ namespace ZenLib
             return new ZenGetFieldExpr<T1, T2>(expr, fieldName);
         }
 
+        /// <summary>
+        /// Create a new ZenGetFieldExpr.
+        /// </summary>
+        /// <param name="expr">The object expr.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="unroll">Whether to unroll the expr.</param>
+        /// <returns></returns>
         public static Zen<T2> Create(Zen<T1> expr, string fieldName, bool unroll = false)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
-            var key = (expr, fieldName, unroll);
-            if (hashConsTable.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var ret = Simplify(expr, fieldName, unroll);
-            hashConsTable[key] = ret;
-            return ret;
+            var key = (expr.Id, fieldName, unroll);
+            hashConsTable.GetOrAdd(key, () => Simplify(expr, fieldName, unroll), out var value);
+            return value;
         }
 
         /// <summary>

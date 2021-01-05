@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -15,7 +14,7 @@ namespace ZenLib
         /// <summary>
         /// Hash cons table.
         /// </summary>
-        private static Dictionary<T, Zen<T>> hashConsTable = new Dictionary<T, Zen<T>>();
+        private static HashConsTable<T, Zen<T>> hashConsTable = new HashConsTable<T, Zen<T>>();
 
         /// <summary>
         /// Gets the value.
@@ -31,16 +30,15 @@ namespace ZenLib
             return this;
         }
 
+        /// <summary>
+        /// Create a new ZenConstantExpr.
+        /// </summary>
+        /// <param name="value">The constant value.</param>
+        /// <returns>The Zen expr.</returns>
         public static Zen<T> Create(T value)
         {
-            if (hashConsTable.TryGetValue(value, out var v))
-            {
-                return v;
-            }
-
-            var ret = new ZenConstantExpr<T>(value);
-            hashConsTable[value] = ret;
-            return ret;
+            hashConsTable.GetOrAdd(value, () => new ZenConstantExpr<T>(value), out var v);
+            return v;
         }
 
         /// <summary>
