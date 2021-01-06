@@ -9,7 +9,9 @@ Zen is a research library and verification toolbox that allows for creating mode
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
 
 # Getting Started
-To import the library, add the following lines to your source file:
+This page gives a high-level overview of the features in Zen. To see more detailed documentation, check out the [wiki](https://github.com/microsoft/Zen/wiki) page.
+
+To import the Zen library, add the following lines to your source file:
 
 ```csharp
 using ZenLib;
