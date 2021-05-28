@@ -1194,26 +1194,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestTupleToOptionException1()
-        {
-            Language.TupleToOption<int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestTupleToOptionException2()
-        {
-            Language.TupleToOption<int>(true, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void TestTupleValueException()
         {
             Language.Value<int>(null);

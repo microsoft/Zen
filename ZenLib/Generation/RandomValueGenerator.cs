@@ -16,16 +16,6 @@ namespace ZenLib.Generation
     internal sealed class RandomValueGenerator : ITypeVisitor<object>
     {
         /// <summary>
-        /// None method for options.
-        /// </summary>
-        private static MethodInfo optionNoneMethod = typeof(Option).GetMethod("None");
-
-        /// <summary>
-        /// Some method for options.
-        /// </summary>
-        private static MethodInfo optionSomeMethod = typeof(Option).GetMethod("Some");
-
-        /// <summary>
         /// Random number generator.
         /// </summary>
         private Random random;
@@ -138,22 +128,6 @@ namespace ZenLib.Generation
                 }
 
                 return ReflectionUtilities.CreateInstance(objectType, fieldNames, values);
-            });
-        }
-
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            return this.GenerateRandom(optionType, () =>
-            {
-                if (RandomInt() % 2 == 0)
-                {
-                    var noneMethod = optionNoneMethod.MakeGenericMethod(innerType);
-                    return noneMethod.Invoke(null, CommonUtilities.EmptyArray);
-                }
-
-                var value = recurse(innerType);
-                var someMethod = optionSomeMethod.MakeGenericMethod(innerType);
-                return someMethod.Invoke(null, new object[] { value });
             });
         }
 

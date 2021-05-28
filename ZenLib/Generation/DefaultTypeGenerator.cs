@@ -24,11 +24,6 @@ namespace ZenLib.Generation
         /// </summary>
         private static MethodInfo emptyDictMethod = typeof(Language).GetMethod("EmptyDict");
 
-        /// <summary>
-        /// Method for creating a null option.
-        /// </summary>
-        private static MethodInfo nullMethod = typeof(Language).GetMethod("Null");
-
         public object VisitBool()
         {
             return ZenConstantExpr<bool>.Create(false);
@@ -76,12 +71,6 @@ namespace ZenLib.Generation
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {
             return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
-        }
-
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            var method = nullMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
         public object VisitShort()

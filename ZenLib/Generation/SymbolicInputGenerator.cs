@@ -31,11 +31,6 @@ namespace ZenLib.Generation
         private static MethodInfo ifConditionMethod = typeof(Language).GetMethod("If");
 
         /// <summary>
-        /// The method for creating an option from a tuple at runtime.
-        /// </summary>
-        private static MethodInfo tupleToOptionMethod = typeof(Language).GetMethod("TupleToOption");
-
-        /// <summary>
         /// The arbitrary expressions generated.
         /// </summary>
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
@@ -171,14 +166,6 @@ namespace ZenLib.Generation
             var e = new ZenArbitraryExpr<string>();
             this.ArbitraryExpressions.Add(e);
             return e;
-        }
-
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            var flag = recurse(ReflectionUtilities.BoolType);
-            var value = recurse(innerType);
-            var method = tupleToOptionMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, new object[] { flag, value });
         }
 
         public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)

@@ -39,16 +39,6 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Language).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Option has value method for reflection.
-        /// </summary>
-        private static MethodInfo hasValueMethod = typeof(Language).GetMethod("HasValue");
-
-        /// <summary>
-        /// Option value method for reflection.
-        /// </summary>
-        private static MethodInfo valueMethod = typeof(Language).GetMethod("Value");
-
-        /// <summary>
         /// Tuple item one method for reflection.
         /// </summary>
         private static MethodInfo tupItem1Method = typeof(Language).GetMethod("TupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
@@ -176,21 +166,6 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
 
             return Create<Option<T>>(("HasValue", True()), ("Value", expr));
-        }
-
-        /// <summary>
-        /// The Zen expression for an option create from a tuple.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="flag"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static Zen<Option<T>> TupleToOption<T>(Zen<bool> flag, Zen<T> value)
-        {
-            CommonUtilities.ValidateNotNull(flag);
-            CommonUtilities.ValidateNotNull(value);
-
-            return Create<Option<T>>(("HasValue", flag), ("Value", value));
         }
 
         /// <summary>
@@ -471,24 +446,6 @@ namespace ZenLib
             if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
             {
                 return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
-            }
-
-            if (ReflectionUtilities.IsOptionType(type))
-            {
-                var innerType = type.GetGenericArgumentsCached()[0];
-
-                var method = hasValueMethod.MakeGenericMethod(innerType);
-                var hasValue1 = method.Invoke(null, new object[] { expr1 });
-                var hasValue2 = method.Invoke(null, new object[] { expr2 });
-                var eqBool = (Zen<bool>)eqBoolMethod.Invoke(null, new object[] { hasValue1, hasValue2 });
-
-                method = valueMethod.MakeGenericMethod(innerType);
-                var equals = eqMethod.MakeGenericMethod(innerType);
-                var value1 = method.Invoke(null, new object[] { expr1 });
-                var value2 = method.Invoke(null, new object[] { expr2 });
-
-                var eqValue = (Zen<bool>)equals.Invoke(null, new object[] { value1, value2 });
-                return And(eqBool, eqValue);
             }
 
             if (ReflectionUtilities.IsSomeTupleType(type))

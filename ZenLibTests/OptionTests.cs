@@ -85,16 +85,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test option identities.
-        /// </summary>
-        [TestMethod]
-        public void TestOptionIdentities()
-        {
-            CheckValid<Option<int>>(o => TupleToOption(o.HasValue(), o.Value()).HasValue() == o.HasValue());
-            // CheckValid<Option<int>>(o => TupleToOption(o.HasValue(), o.Value()).Value() == o.Value());
-        }
-
-        /// <summary>
         /// Test option select.
         /// </summary>
         [TestMethod]

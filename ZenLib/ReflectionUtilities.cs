@@ -83,11 +83,6 @@ namespace ZenLib
         public readonly static Type ValueTupleType = typeof(ValueTuple<,>);
 
         /// <summary>
-        /// The type of an option.
-        /// </summary>
-        public readonly static Type OptionType = typeof(Option<>);
-
-        /// <summary>
         /// Type of an IList.
         /// </summary>
         public readonly static Type IListType = typeof(IList<>);
@@ -128,12 +123,6 @@ namespace ZenLib
         /// </summary>
         public static MethodInfo CreateZenDictConstantMethod =
             typeof(ReflectionUtilities).GetMethod("CreateZenDictConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant option creation method.
-        /// </summary>
-        public static MethodInfo CreateZenOptionConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenOptionConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// The zen constant tuple creation method.
@@ -331,16 +320,6 @@ namespace ZenLib
         public static bool IsSomeTupleType(Type type)
         {
             return IsTupleType(type) || IsValueTupleType(type);
-        }
-
-        /// <summary>
-        /// Check if a type is some kind of tuple type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsOptionType(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == OptionType;
         }
 
         /// <summary>
@@ -608,14 +587,6 @@ namespace ZenLib
             if (IsFixedIntegerType(type))
                 return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
 
-            if (IsOptionType(type))
-            {
-                var innerType = type.GetGenericArgumentsCached()[0];
-                return typeof(Option)
-                    .GetMethodCached("None")
-                    .MakeGenericMethod(innerType).Invoke(null, CommonUtilities.EmptyArray);
-            }
-
             if (IsTupleType(type) || IsValueTupleType(type))
             {
                 var args = type.GetGenericArgumentsCached();
@@ -689,12 +660,6 @@ namespace ZenLib
                 return visitor.VisitString();
             if (IsFixedIntegerType(type))
                 return visitor.VisitFixedInteger(type);
-
-            if (IsOptionType(type))
-            {
-                var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitOption(ty => ApplyTypeVisitor(visitor, ty), type, t);
-            }
 
             if (IsTupleType(type))
             {
@@ -841,12 +806,6 @@ namespace ZenLib
 
             var typeArgs = type.GetGenericArgumentsCached();
 
-            if (IsOptionType(type))
-            {
-                var innerType = typeArgs[0];
-                return CreateZenOptionConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
-            }
-
             if (IsTupleType(type))
             {
                 var type1 = typeArgs[0];
@@ -861,13 +820,13 @@ namespace ZenLib
                 return CreateZenValueTupleConstantMethod.MakeGenericMethod(type1, type2).Invoke(null, new object[] { value });
             }
 
-            if (type.IsGenericType && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
+            if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
             {
                 var innerType = typeArgs[0];
                 return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
             }
 
-            if (type.IsGenericType && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
+            if (type.IsGenericType && typeArgs.Length == 2 && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
             {
                 var keyType = typeArgs[0];
                 var valueType = typeArgs[1];
@@ -875,6 +834,7 @@ namespace ZenLib
             }
 
             // some class or struct
+            Console.WriteLine("hello");
             var fields = new SortedDictionary<string, dynamic>();
             foreach (var field in GetAllFields(type))
             {

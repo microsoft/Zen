@@ -130,18 +130,11 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null option inner value.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
         public void TestConvertNullOptionValue()
         {
-            try
-            {
-                Option<Object1> o = Option.Some<Object1>(null);
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
-            }
+            Option<Object1> o = Option.Some<Object1>(null);
+            var _ = Constant(o);
         }
 
         /// <summary>

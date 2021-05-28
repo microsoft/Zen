@@ -80,12 +80,6 @@ namespace ZenLib
         T VisitString();
 
         /// <summary>
-        /// Visit the option type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitOption(Func<Type, T> recurse, Type optionType, Type innerType);
-
-        /// <summary>
         /// Visit the tuple type.
         /// </summary>
         /// <returns>A value.</returns>
