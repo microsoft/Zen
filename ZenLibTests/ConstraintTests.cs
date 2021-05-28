@@ -51,5 +51,18 @@ namespace ZenLib.Tests
             Assert.AreEqual(1, new ZenConstraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).FindAll().Count());
             Assert.AreEqual(1, new ZenConstraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).FindAll().Count());
         }
+
+        /// <summary>
+        /// Test that find works for constraints.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSet()
+        {
+            var c = new ZenConstraint<int>(i => And(i < 10, i >= 1));
+            var set = c.StateSet();
+            Assert.IsFalse(set.IsEmpty());
+            Assert.IsFalse(set.IsFull());
+            Assert.IsTrue(set.Element().Value < 10 && set.Element().Value >= 1);
+        }
     }
 }

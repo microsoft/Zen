@@ -155,7 +155,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer()
         {
             return SymbolicEvaluator.StateTransformer(this.function);

@@ -54,6 +54,15 @@ namespace ZenLib
         {
             return this.FindAll((i, o) => o, input, listSize, checkSmallerLists, backend);
         }
+
+        /// <summary>
+        /// Gets the set of values satisfying the constraint.
+        /// </summary>
+        /// <returns>The set of values.</returns>
+        public StateSet<T> StateSet()
+        {
+            return this.Transformer().InputSet((i, o) => o);
+        }
     }
 
     /// <summary>
