@@ -73,16 +73,6 @@ namespace ZenLib
         public readonly static Type BigIntType = typeof(BigInteger);
 
         /// <summary>
-        /// The type of a tuple.
-        /// </summary>
-        public readonly static Type TupleType = typeof(Tuple<,>);
-
-        /// <summary>
-        /// The type of a value tuple.
-        /// </summary>
-        public readonly static Type ValueTupleType = typeof(ValueTuple<,>);
-
-        /// <summary>
         /// Type of an IList.
         /// </summary>
         public readonly static Type IListType = typeof(IList<>);
@@ -290,36 +280,6 @@ namespace ZenLib
         public static bool IsBigIntegerType(Type type)
         {
             return type == BigIntType;
-        }
-
-        /// <summary>
-        /// Check if a type is a tuple type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsTupleType(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == TupleType;
-        }
-
-        /// <summary>
-        /// Check if a type is some kind of tuple type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsValueTupleType(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ValueTupleType;
-        }
-
-        /// <summary>
-        /// Check if a type is some kind of tuple type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsSomeTupleType(Type type)
-        {
-            return IsTupleType(type) || IsValueTupleType(type);
         }
 
         /// <summary>
@@ -587,15 +547,6 @@ namespace ZenLib
             if (IsFixedIntegerType(type))
                 return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
 
-            if (IsTupleType(type) || IsValueTupleType(type))
-            {
-                var args = type.GetGenericArgumentsCached();
-                var innerType1 = args[0];
-                var innerType2 = args[1];
-                var c = type.GetConstructor(new Type[] { innerType1, innerType2 });
-                return c.Invoke(new object[] { GetDefaultValue(innerType1), GetDefaultValue(innerType2) });
-            }
-
             if (IsIListType(type))
             {
                 var innerType = type.GetGenericArgumentsCached()[0];
@@ -660,22 +611,6 @@ namespace ZenLib
                 return visitor.VisitString();
             if (IsFixedIntegerType(type))
                 return visitor.VisitFixedInteger(type);
-
-            if (IsTupleType(type))
-            {
-                var args = type.GetGenericArgumentsCached();
-                var tleft = args[0];
-                var tright = args[1];
-                return visitor.VisitTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
-            }
-
-            if (IsValueTupleType(type))
-            {
-                var args = type.GetGenericArgumentsCached();
-                var tleft = args[0];
-                var tright = args[1];
-                return visitor.VisitValueTuple(ty => ApplyTypeVisitor(visitor, ty), type, tleft, tright);
-            }
 
             if (IsIListType(type))
             {
@@ -746,30 +681,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Create a constant Zen tuple value.
-        /// </summary>
-        /// <param name="value">The option value.</param>
-        /// <returns>The Zen value representing the option.</returns>
-        internal static Zen<Tuple<T1, T2>> CreateZenTupleConstant<T1, T2>(Tuple<T1, T2> value)
-        {
-            ReportIfNullConversionError(value.Item1, "Item1", typeof(Tuple<T1, T2>));
-            ReportIfNullConversionError(value.Item2, "Item2", typeof(Tuple<T1, T2>));
-            return Tuple<T1, T2>(value.Item1, value.Item2);
-        }
-
-        /// <summary>
-        /// Create a constant Zen value tuple value.
-        /// </summary>
-        /// <param name="value">The option value.</param>
-        /// <returns>The Zen value representing the option.</returns>
-        internal static Zen<(T1, T2)> CreateZenValueTupleConstant<T1, T2>((T1, T2) value)
-        {
-            ReportIfNullConversionError(value.Item1, "Item1", typeof((T1, T2)));
-            ReportIfNullConversionError(value.Item2, "Item2", typeof((T1, T2)));
-            return ValueTuple<T1, T2>(value.Item1, value.Item2);
-        }
-
-        /// <summary>
         /// Create a constant Zen dict value.
         /// </summary>
         /// <param name="value">The dictionary.</param>
@@ -806,20 +717,6 @@ namespace ZenLib
 
             var typeArgs = type.GetGenericArgumentsCached();
 
-            if (IsTupleType(type))
-            {
-                var type1 = typeArgs[0];
-                var type2 = typeArgs[1];
-                return CreateZenTupleConstantMethod.MakeGenericMethod(type1, type2).Invoke(null, new object[] { value });
-            }
-
-            if (IsValueTupleType(type))
-            {
-                var type1 = typeArgs[0];
-                var type2 = typeArgs[1];
-                return CreateZenValueTupleConstantMethod.MakeGenericMethod(type1, type2).Invoke(null, new object[] { value });
-            }
-
             if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
             {
                 var innerType = typeArgs[0];
@@ -834,7 +731,6 @@ namespace ZenLib
             }
 
             // some class or struct
-            Console.WriteLine("hello");
             var fields = new SortedDictionary<string, dynamic>();
             foreach (var field in GetAllFields(type))
             {

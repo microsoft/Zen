@@ -186,9 +186,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatMultipleValues()
         {
-            var f1 = Function<string, string, bool>((w, x) => w + x == "hello");
-            var f2 = Function<string, string, string, bool>((w, x, y) => w + x + y == "hello");
-            var f3 = Function<string, string, string, string, bool>((w, x, y, z) => w + x + y + z == "hello");
+            var f1 = new ZenFunction<string, string, bool>((w, x) => w + x == "hello");
+            var f2 = new ZenFunction<string, string, string, bool>((w, x, y) => w + x + y == "hello");
+            var f3 = new ZenFunction<string, string, string, string, bool>((w, x, y, z) => w + x + y + z == "hello");
             var r1 = f1.Find((i1, i2, o) => o);
             var r2 = f2.Find((i1, i2, i3, o) => o);
             var r3 = f3.Find((i1, i2, i3, i4, o) => o);
@@ -226,7 +226,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestStartsWithEvaluation(string s, string sub, bool expected)
         {
-            var f = Function<string, string, bool>((s1, s2) => s1.StartsWith(s2));
+            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.StartsWith(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -242,7 +242,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestEndsWithEvaluation(string s, string sub, bool expected)
         {
-            var f = Function<string, string, bool>((s1, s2) => s1.EndsWith(s2));
+            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.EndsWith(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -259,7 +259,7 @@ namespace ZenLib.Tests
         [DataRow("hello", "b", false)]
         public void TestContainsEvaluation(string s, string sub, bool expected)
         {
-            var f = Function<string, string, bool>((s1, s2) => s1.Contains(s2));
+            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.Contains(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -291,7 +291,7 @@ namespace ZenLib.Tests
         [DataRow("abc", "b", "", "ac")]
         public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
         {
-            var f = Function<string, string>(s => s.ReplaceFirst(sub, replace));
+            var f = new ZenFunction<string, string>(s => s.ReplaceFirst(sub, replace));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -307,7 +307,7 @@ namespace ZenLib.Tests
         [DataRow("hello", 0, 20, "hello")]
         public void TestSubstringEvaluation(string s, int offset, int length, string expected)
         {
-            var f = Function<string, string>(s => s.Substring(new BigInteger(offset), new BigInteger(length)));
+            var f = new ZenFunction<string, string>(s => s.Substring(new BigInteger(offset), new BigInteger(length)));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -328,7 +328,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = Function<string, BigInteger, string>((s, idx) => s.At(idx));
+            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.At(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -353,7 +353,7 @@ namespace ZenLib.Tests
         [DataRow("\x01\x02", 2)]
         public void TestLengthEvaluation(string s, int expected)
         {
-            var f = Function<string, BigInteger>(s => s.Length());
+            var f = new ZenFunction<string, BigInteger>(s => s.Length());
             Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
@@ -374,7 +374,7 @@ namespace ZenLib.Tests
         [DataRow("abcda", "e", 0, -1)]
         public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
         {
-            var f = Function<string, BigInteger>(s => s.IndexOf(sub, new BigInteger(offset)));
+            var f = new ZenFunction<string, BigInteger>(s => s.IndexOf(sub, new BigInteger(offset)));
             Assert.AreEqual((short)expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual((short)expected, f.Evaluate(s));
@@ -386,7 +386,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfFind()
         {
-            var f = Function<string, BigInteger>(s => s.IndexOf("a", new BigInteger(0)));
+            var f = new ZenFunction<string, BigInteger>(s => s.IndexOf("a", new BigInteger(0)));
             var input = f.Find((s, o) => o == new BigInteger(5));
             Assert.AreEqual((short)5, f.Evaluate(input.Value));
         }
@@ -397,7 +397,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultipleOperations()
         {
-            var f = Function<string, bool>(s =>
+            var f = new ZenFunction<string, bool>(s =>
             {
                 var c = s.At(new BigInteger(3));
                 var s2 = s.Substring(new BigInteger(5), new BigInteger(2));
@@ -518,7 +518,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDiagramBackendException1()
         {
-            var f = Function<string, bool>(s => s == "a");
+            var f = new ZenFunction<string, bool>(s => s == "a");
             f.Find((x, y) => y, backend: ModelChecking.Backend.DecisionDiagrams);
         }
 
@@ -529,7 +529,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDiagramBackendException2()
         {
-            var f = Function<string, string>(s => s + "a");
+            var f = new ZenFunction<string, string>(s => s + "a");
             f.Find((x, y) => x == y, backend: ModelChecking.Backend.DecisionDiagrams);
         }
 
@@ -540,7 +540,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDiagramBackendException3()
         {
-            var f = Function<string, string>(s => s + "a");
+            var f = new ZenFunction<string, string>(s => s + "a");
             f.Transformer();
         }
     }

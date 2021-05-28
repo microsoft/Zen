@@ -90,11 +90,11 @@ namespace ZenLib.Tests.Network
         /// </summary>
         /// <param name="route">The route.</param>
         /// <returns>A new route and the matching line number.</returns>
-        public Zen<Tuple<Option<Route>, int>> ProcessProvenance(Zen<Route> route)
+        public Zen<Pair<Option<Route>, int>> ProcessProvenance(Zen<Route> route)
         {
-            return TestHelper.ApplyOrderedRules<Route, Tuple<Option<Route>, int>, RouteMapLine>(
+            return TestHelper.ApplyOrderedRules<Route, Pair<Option<Route>, int>, RouteMapLine>(
                 input: route,
-                deflt: Tuple(Null<Route>(), Constant<int>(this.Lines.Count)),
+                deflt: Pair(Null<Route>(), Constant<int>(this.Lines.Count)),
                 ruleMatch: (l, r, i) => l.Matches(r),
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
@@ -102,15 +102,15 @@ namespace ZenLib.Tests.Network
                     var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
-                        return Some(Tuple(Null<Route>(), line));
+                        return Some(Pair(Null<Route>(), line));
                     }
 
                     if (l.Disposition == Disposition.Allow)
                     {
-                        return Some(Tuple(Some(r), line));
+                        return Some(Pair(Some(r), line));
                     }
 
-                    return Null<Tuple<Option<Route>, int>>();
+                    return Null<Pair<Option<Route>, int>>();
                 },
                 this.Lines.ToArray());
         }

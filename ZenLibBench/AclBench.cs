@@ -68,7 +68,7 @@ namespace ZenLibBench
         [Benchmark]
         public void VerifyAclProvenance()
         {
-            var f = Function<IpHeader, (bool, ushort)>(h => this.acl.ProcessProvenance(h));
+            var f = new ZenFunction<IpHeader, Pair<bool, ushort>>(h => this.acl.ProcessProvenance(h));
             var packet = f.Find((p, o) => o.Item2() == (ushort)(this.acl.Lines.Length + 1), backend: this.Backend);
             f.Evaluate(packet.Value);
         }

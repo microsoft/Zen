@@ -130,7 +130,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = Function(function);
+                var f = new ZenFunction<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -158,7 +158,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = Function(function);
+                var f = new ZenFunction<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -186,7 +186,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = Function(function);
+                var f = new ZenFunction<T1, T2, T3, bool>(function);
                 var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -215,7 +215,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = Function(function);
+                var f = new ZenFunction<T1, T2, T3, T4, bool>(function);
                 var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -241,7 +241,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is not valid
-                var f = Function(function);
+                var f = new ZenFunction<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
@@ -264,7 +264,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = Function(function);
+                var f = new ZenFunction<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
@@ -283,7 +283,7 @@ namespace ZenLib.Tests
         {
             foreach (var p in parameters)
             {
-                var f = Function(function);
+                var f = new ZenFunction<bool>(function);
                 var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
 
                 Assert.AreEqual(f.Evaluate(), result);
@@ -302,7 +302,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = Function(function);
+                var f = new ZenFunction<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
@@ -326,7 +326,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = Function(function);
+                var f = new ZenFunction<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)

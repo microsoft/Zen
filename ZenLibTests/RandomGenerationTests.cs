@@ -61,7 +61,7 @@ namespace ZenLib.Tests
         [DataRow(typeof(Option<int>))]
         [DataRow(typeof(Option<int>))]
         [DataRow(typeof(IList<Option<ulong>>))]
-        [DataRow(typeof(Tuple<bool, ushort>))]
+        [DataRow(typeof(Pair<bool, ushort>))]
         [DataRow(typeof((int, int)))]
         [DataRow(typeof(bool))]
         public void TestRandomGenerationForType(Type type)

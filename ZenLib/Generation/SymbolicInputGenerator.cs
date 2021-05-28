@@ -106,7 +106,7 @@ namespace ZenLib.Generation
 
         public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
         {
-            var tupleType = typeof(Tuple<,>).MakeGenericType(keyType, valueType);
+            var tupleType = typeof(Pair<,>).MakeGenericType(keyType, valueType);
             var listType = typeof(IList<>).MakeGenericType(tupleType);
             var list = VisitList(recurse, listType, tupleType);
             var method = listToDictMethod.MakeGenericMethod(keyType, valueType);
@@ -166,16 +166,6 @@ namespace ZenLib.Generation
             var e = new ZenArbitraryExpr<string>();
             this.ArbitraryExpressions.Add(e);
             return e;
-        }
-
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
         }
     }
 }

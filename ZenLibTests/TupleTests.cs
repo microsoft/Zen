@@ -24,8 +24,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTuple()
         {
-            CheckValid<int, int>((i1, i2) => Tuple(i1, i2).Item1() == i1);
-            CheckValid<int, int>((i1, i2) => Tuple(i1, i2).Item2() == i2);
+            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item1() == i1);
+            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item2() == i2);
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTuple()
         {
-            CheckValid<int, int>((i1, i2) => ValueTuple(i1, i2).Item1() == i1);
-            CheckValid<int, int>((i1, i2) => ValueTuple(i1, i2).Item2() == i2);
+            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item1() == i1);
+            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item2() == i2);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTupleEvaluateSwap()
         {
-            var f = Function<int, int, Tuple<int, int>>((x, y) => Tuple(y, x));
+            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair(y, x));
             var r = f.Evaluate(1, 2);
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
@@ -56,7 +56,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleEvaluateSwap()
         {
-            var f = Function<int, int, (int, int)>((x, y) => ValueTuple(y, x));
+            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair(y, x));
             var r = f.Evaluate(1, 2);
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
@@ -68,8 +68,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleEvaluateSwap2()
         {
-            var f = Function<(int, int), (int, int)>(x => ValueTuple(x.Item2(), x.Item1()));
-            var r = f.Evaluate((1, 2));
+            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair(x.Item2(), x.Item1()));
+            var r = f.Evaluate(new Pair<int, int> { Item1 = 1, Item2 = 2 });
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
         }
@@ -80,7 +80,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleSymbolicSwap()
         {
-            var f = Function<(int, int), (int, int)>(x => ValueTuple(x.Item2(), x.Item1()));
+            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair(x.Item2(), x.Item1()));
             var result = f.Find((x, o) => o.Item1() == 2);
             Assert.IsTrue(result.HasValue);
             Assert.AreEqual(2, result.Value.Item2);
@@ -92,7 +92,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleSymbolicSwapNested()
         {
-            var f = Function<Tuple<int, (int, int)>, (int, int)>(x => ValueTuple(x.Item2().Item2(), x.Item2().Item1()));
+            var f = new ZenFunction<Pair<int, Pair<int, int>>, Pair<int, int>>(x => Pair(x.Item2().Item2(), x.Item2().Item1()));
             var result = f.Find((x, o) => o.Item1() == 2);
             Assert.IsTrue(result.HasValue);
             Assert.AreEqual(2, result.Value.Item2.Item2);
@@ -104,7 +104,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleEqualComponents()
         {
-            CheckAgreement<(byte, byte)>(x => x.Item2() == x.Item1());
+            CheckAgreement<Pair<byte, byte>>(x => x.Item2() == x.Item1());
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTypeNull()
         {
-            var f = Function(() => Null<(int, int)>());
-            Assert.AreEqual(f.Evaluate(), Option.None<(int, int)>());
+            var f = new ZenFunction<Option<Pair<int, int>>>(() => Null<Pair<int, int>>());
+            Assert.AreEqual(f.Evaluate(), Option.None<Pair<int, int>>());
         }
     }
 }

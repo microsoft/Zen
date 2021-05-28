@@ -136,24 +136,6 @@ namespace ZenLib.Generation
             return this.GenerateRandom(typeof(short), () => (short)RandomInt());
         }
 
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return this.GenerateRandom(tupleType, () =>
-            {
-                var constructor = tupleType.GetConstructor(new Type[] { innerTypeLeft, innerTypeRight });
-                return constructor.Invoke(new object[] { recurse(innerTypeLeft), recurse(innerTypeRight) });
-            });
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return this.GenerateRandom(tupleType, () =>
-            {
-                var constructor = tupleType.GetConstructor(new Type[] { innerTypeLeft, innerTypeRight });
-                return constructor.Invoke(new object[] { recurse(innerTypeLeft), recurse(innerTypeRight) });
-            });
-        }
-
         public object VisitUint()
         {
             return this.GenerateRandom(typeof(uint), () => (uint)RandomInt());

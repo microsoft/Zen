@@ -15,21 +15,6 @@ namespace ZenLib.Generation
     internal static class GeneratorHelper
     {
         /// <summary>
-        /// Method cache to avoid expensive reflection.
-        /// </summary>
-        private static Dictionary<int, MethodInfo> createObjectCache = new Dictionary<int, MethodInfo>();
-
-        /// <summary>
-        /// Tuple method from Zen.Language.
-        /// </summary>
-        private static MethodInfo tupleMethod = typeof(Language).GetMethod("Tuple");
-
-        /// <summary>
-        /// Tuple method from Zen.Language.
-        /// </summary>
-        private static MethodInfo valueTupleMethod = typeof(Language).GetMethod("ValueTuple");
-
-        /// <summary>
         /// List method from Zen.Language.
         /// </summary>
         private static MethodInfo listMethod = typeof(Language).GetMethod("List");
@@ -38,22 +23,6 @@ namespace ZenLib.Generation
         /// Name of the function used to create an object via reflection.
         /// </summary>
         private static MethodInfo createMethod = typeof(Language).GetMethod("Create");
-
-        public static object ApplyToTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
-        {
-            var left = recurse(innerTypeLeft);
-            var right = recurse(innerTypeRight);
-            var method = tupleMethod.MakeGenericMethod(innerTypeLeft, innerTypeRight);
-            return method.Invoke(null, new object[] { left, right });
-        }
-
-        public static object ApplyToValueTuple(Func<Type, object> recurse, Type innerTypeLeft, Type innerTypeRight)
-        {
-            var left = recurse(innerTypeLeft);
-            var right = recurse(innerTypeRight);
-            var method = valueTupleMethod.MakeGenericMethod(innerTypeLeft, innerTypeRight);
-            return method.Invoke(null, new object[] { left, right });
-        }
 
         public static object ApplyToObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {

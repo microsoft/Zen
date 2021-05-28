@@ -410,19 +410,19 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInterpretation()
         {
-            var f = Function<Int3, Int3, Int3>((x, y) => x + y);
+            var f = new ZenFunction<Int3, Int3, Int3>((x, y) => x + y);
             Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(1), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x - y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x - y);
             Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x | y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x | y);
             Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x & y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x & y);
             Assert.AreEqual(new Int3(2), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x ^ y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x ^ y);
             Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
         }
 
@@ -432,23 +432,23 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCompilation()
         {
-            var f = Function<Int3, Int3, Int3>((x, y) => x + y);
+            var f = new ZenFunction<Int3, Int3, Int3>((x, y) => x + y);
             f.Compile();
             Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(1), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x - y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x - y);
             f.Compile();
             Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x | y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x | y);
             f.Compile();
             Assert.AreEqual(new Int3(3), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x & y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x & y);
             f.Compile();
             Assert.AreEqual(new Int3(2), f.Evaluate(new Int3(3), new Int3(2)));
 
-            f = Function<Int3, Int3, Int3>((x, y) => x ^ y);
+            f = new ZenFunction<Int3, Int3, Int3>((x, y) => x ^ y);
             f.Compile();
             Assert.AreEqual(new Int3(1), f.Evaluate(new Int3(3), new Int3(2)));
         }
@@ -461,7 +461,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, bool>((x, y) => x == y);
+                var f = new ZenFunction<Int5, Int5, bool>((x, y) => x == y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
 
                 foreach (var input in inputs)
@@ -479,7 +479,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, Int5>((x, y) => x + y);
+                var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x + y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
 
                 foreach (var input in inputs)
@@ -497,7 +497,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, Int5>((x, y) => x - y);
+                var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x - y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
 
                 foreach (var input in inputs)
@@ -515,7 +515,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, Int5>((x, y) => x & y);
+                var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x & y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
 
                 foreach (var input in inputs)
@@ -533,7 +533,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, Int5>((x, y) => x | y);
+                var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x | y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
 
                 foreach (var input in inputs)
@@ -551,7 +551,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, Int5>((x, y) => x ^ y);
+                var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x ^ y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
 
                 foreach (var input in inputs)
@@ -569,7 +569,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, bool>((x, y) => x <= y);
+                var f = new ZenFunction<Int5, Int5, bool>((x, y) => x <= y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
 
                 foreach (var input in inputs)
@@ -587,7 +587,7 @@ namespace ZenLib.Tests
         {
             foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
             {
-                var f = Function<Int5, Int5, bool>((x, y) => x >= y);
+                var f = new ZenFunction<Int5, Int5, bool>((x, y) => x >= y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
 
                 foreach (var input in inputs)
@@ -603,7 +603,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConstructingOptions()
         {
-            var f = Function<Option<Int5>, Option<Int5>>(x => Null<Int5>());
+            var f = new ZenFunction<Option<Int5>, Option<Int5>>(x => Null<Int5>());
             var input = f.Find((x, y) => true);
             Assert.IsTrue(input.HasValue);
         }
@@ -617,7 +617,7 @@ namespace ZenLib.Tests
             var a = new UInt128(IPAddress.Parse("1000::").GetAddressBytes());
             var b = new UInt128(IPAddress.Parse("2000::").GetAddressBytes());
 
-            var f = Function<UInt128, bool>(x => And(x >= a, x <= b));
+            var f = new ZenFunction<UInt128, bool>(x => And(x >= a, x <= b));
             var input = f.Find((x, y) => y, backend: Backend.DecisionDiagrams);
 
             Assert.AreEqual(a, input.Value);

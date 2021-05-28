@@ -80,18 +80,6 @@ namespace ZenLib
         T VisitString();
 
         /// <summary>
-        /// Visit the tuple type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
-
-        /// <summary>
-        /// Visit the value tuple type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitValueTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
-
-        /// <summary>
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>

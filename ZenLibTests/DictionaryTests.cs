@@ -33,7 +33,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluation()
         {
-            var f = Function<IDictionary<int, int>, IDictionary<int, int>>(d => d.Add(1, 1).Add(2, 2));
+            var f = new ZenFunction<IDictionary<int, int>, IDictionary<int, int>>(d => d.Add(1, 1).Add(2, 2));
             var result = f.Evaluate(new Dictionary<int, int>());
             Assert.AreEqual(result[1], 1);
             Assert.AreEqual(result[2], 2);
@@ -54,7 +54,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateOutput()
         {
-            var f = Function<int, int, IDictionary<int, int>>((x, y) => EmptyDict<int, int>().Add(x, y));
+            var f = new ZenFunction<int, int, IDictionary<int, int>>((x, y) => EmptyDict<int, int>().Add(x, y));
             var d = f.Evaluate(1, 2);
             Assert.AreEqual(1, d.Count);
             Assert.AreEqual(2, d[1]);
@@ -73,7 +73,7 @@ namespace ZenLib.Tests
         {
             CheckAgreement<IDictionary<int, int>>(d => d.ContainsKey(1));
 
-            var f = Function<IDictionary<int, int>, bool>(d => d.ContainsKey(1));
+            var f = new ZenFunction<IDictionary<int, int>, bool>(d => d.ContainsKey(1));
             Assert.AreEqual(true, f.Evaluate(new Dictionary<int, int> { { 1, 2 } }));
             Assert.AreEqual(false, f.Evaluate(new Dictionary<int, int> { { 2, 1 } }));
         }
@@ -84,7 +84,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryStrings()
         {
-            var f = Function<IDictionary<string, string>, bool>(d => true);
+            var f = new ZenFunction<IDictionary<string, string>, bool>(d => true);
             var sat = f.Find((d, allowed) =>
             {
                 return And(

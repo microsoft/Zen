@@ -447,7 +447,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestFunctionException()
         {
-            Language.Function<int, int>(null);
+            new ZenFunction<int, int>(null);
         }
 
         /// <summary>
@@ -677,7 +677,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestItem1Exception1()
         {
-            Zen<Tuple<int, int>> x = null;
+            Zen<Pair<int, int>> x = null;
             Language.Item1(x);
         }
 
@@ -688,7 +688,29 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestItem1Exception2()
         {
-            Zen<ValueTuple<int, int>> x = null;
+            Zen<Pair<int, int, int>> x = null;
+            Language.Item1(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem1Exception3()
+        {
+            Zen<Pair<int, int, int, int>> x = null;
+            Language.Item1(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem1Exception4()
+        {
+            Zen<Pair<int, int, int, int, int>> x = null;
             Language.Item1(x);
         }
 
@@ -699,7 +721,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestItem2Exception1()
         {
-            Zen<Tuple<int, int>> x = null;
+            Zen<Pair<int, int>> x = null;
             Language.Item2(x);
         }
 
@@ -710,8 +732,96 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestItem2Exception2()
         {
-            Zen<ValueTuple<int, int>> x = null;
+            Zen<Pair<int, int, int>> x = null;
             Language.Item2(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem2Exception3()
+        {
+            Zen<Pair<int, int, int, int>> x = null;
+            Language.Item2(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem2Exception4()
+        {
+            Zen<Pair<int, int, int, int, int>> x = null;
+            Language.Item2(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem3Exception1()
+        {
+            Zen<Pair<int, int, int>> x = null;
+            Language.Item3(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem3Exception2()
+        {
+            Zen<Pair<int, int, int, int>> x = null;
+            Language.Item3(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem3Exception3()
+        {
+            Zen<Pair<int, int, int, int, int>> x = null;
+            Language.Item3(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem4Exception1()
+        {
+            Zen<Pair<int, int, int, int>> x = null;
+            Language.Item4(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem4Exception2()
+        {
+            Zen<Pair<int, int, int, int, int>> x = null;
+            Language.Item4(x);
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestItem5Exception1()
+        {
+            Zen<Pair<int, int, int, int, int>> x = null;
+            Language.Item5(x);
         }
 
         /// <summary>
@@ -1176,7 +1286,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestTupleException1()
         {
-            Language.Tuple<int, int>(null, null);
+            Language.Pair<int, int>(null, null);
         }
 
         /// <summary>
@@ -1186,7 +1296,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void TestTupleException2()
         {
-            Language.Tuple<int, int>(0, null);
+            Language.Pair<int, int>(0, null);
         }
 
         /// <summary>
@@ -1217,26 +1327,6 @@ namespace ZenLib.Tests
         public void TestValueOrDefaultException2()
         {
             Language.ValueOrDefault(Null<int>(), null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestValueTupleException1()
-        {
-            Language.ValueTuple<int, int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestValueTupleException2()
-        {
-            Language.ValueTuple<int, int>(0, null);
         }
 
         /// <summary>
@@ -1289,11 +1379,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestImplicitConversions()
         {
-            Func<int> a = Function<int>(() => 1);
-            Func<int, int> b = Function<int, int>((i) => 1);
-            Func<int, int, int> c = Function<int, int, int>((i1, i2) => 1);
-            Func<int, int, int, int> d = Function<int, int, int, int>((i1, i2, i3) => 1);
-            Func<int, int, int, int, int> e = Function<int, int, int, int, int>((i1, i2, i3, i4) => 1);
+            Func<int> a = new ZenFunction<int>(() => 1);
+            Func<int, int> b = new ZenFunction<int, int>((i) => 1);
+            Func<int, int, int> c = new ZenFunction<int, int, int>((i1, i2) => 1);
+            Func<int, int, int, int> d = new ZenFunction<int, int, int, int>((i1, i2, i3) => 1);
+            Func<int, int, int, int, int> e = new ZenFunction<int, int, int, int, int>((i1, i2, i3, i4) => 1);
 
             a();
             b(1);
@@ -1308,7 +1398,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInvalidSymbolicInputs1()
         {
-            var f = Function<int, int>(i => 0);
+            var f = new ZenFunction<int, int>(i => 0);
             f.Find((i, o) => true, Arbitrary<int>());
         }
 
@@ -1318,7 +1408,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInvalidSymbolicInputs2()
         {
-            var f = Function<int, int, int>((i1, i2) => 0);
+            var f = new ZenFunction<int, int, int>((i1, i2) => 0);
             f.Find((i1, i2, o) => true, Arbitrary<int>(), Arbitrary<int>());
         }
 
@@ -1328,7 +1418,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInvalidSymbolicInputs3()
         {
-            var f = Function<int, int, int, int>((i1, i2, i3) => 0);
+            var f = new ZenFunction<int, int, int, int>((i1, i2, i3) => 0);
             f.Find((i1, i2, i3, o) => true, Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
         }
 
@@ -1338,7 +1428,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInvalidSymbolicInputs4()
         {
-            var f = Function<int, int, int, int, int>((i1, i2, i3, i4) => 0);
+            var f = new ZenFunction<int, int, int, int, int>((i1, i2, i3, i4) => 0);
             f.Find((i1, i2, i3, i4, o) => true, Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
         }
 
@@ -1348,7 +1438,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestExactLists()
         {
-            var f = Function<IList<int>, ushort>(l => l.Length());
+            var f = new ZenFunction<IList<int>, ushort>(l => l.Length());
             f.Find((i, o) => true, checkSmallerLists: false);
         }
 
@@ -1358,7 +1448,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDoubleCompile0()
         {
-            var f = Function<int>(() => 1);
+            var f = new ZenFunction<int>(() => 1);
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate());
@@ -1370,7 +1460,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDoubleCompile1()
         {
-            var f = Function<int, int>((i1) => 1);
+            var f = new ZenFunction<int, int>((i1) => 1);
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate(0));
@@ -1382,7 +1472,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDoubleCompile2()
         {
-            var f = Function<int, int, int>((i1, i2) => 1);
+            var f = new ZenFunction<int, int, int>((i1, i2) => 1);
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate(0, 0));
@@ -1394,7 +1484,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDoubleCompile3()
         {
-            var f = Function<int, int, int, int>((i1, i2, i3) => 1);
+            var f = new ZenFunction<int, int, int, int>((i1, i2, i3) => 1);
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate(0, 0, 0));
@@ -1406,7 +1496,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDoubleCompile4()
         {
-            var f = Function<int, int, int, int, int>((i1, i2, i3, i4) => 1);
+            var f = new ZenFunction<int, int, int, int, int>((i1, i2, i3, i4) => 1);
             f.Compile();
             f.Compile();
             Assert.AreEqual(1, f.Evaluate(0, 0, 0, 0));

@@ -39,26 +39,6 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Language).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Tuple item one method for reflection.
-        /// </summary>
-        private static MethodInfo tupItem1Method = typeof(Language).GetMethod("TupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
-
-        /// <summary>
-        /// Tuple item two method for reflection.
-        /// </summary>
-        private static MethodInfo tupItem2Method = typeof(Language).GetMethod("TupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
-
-        /// <summary>
-        /// Value tuple item one method for reflection.
-        /// </summary>
-        private static MethodInfo valueTupItem1Method = typeof(Language).GetMethod("ValueTupleItem1", BindingFlags.Static | BindingFlags.NonPublic);
-
-        /// <summary>
-        /// Value tuple item two method for reflection.
-        /// </summary>
-        private static MethodInfo valueTupItem2Method = typeof(Language).GetMethod("ValueTupleItem2", BindingFlags.Static | BindingFlags.NonPublic);
-
-        /// <summary>
         /// Generates a new random value of a given type.
         /// </summary>
         /// <param name="magicConstants">Magic constants to use.</param>
@@ -278,8 +258,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<IDictionary<TKey, TValue>> EmptyDict<TKey, TValue>()
         {
-            var emptyList = EmptyList<Tuple<TKey, TValue>>();
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Tuple<TKey, TValue>>>.Create(emptyList, ListToDict<TKey, TValue>);
+            var emptyList = EmptyList<Pair<TKey, TValue>>();
+            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(emptyList, ListToDict<TKey, TValue>);
         }
 
         /// <summary>
@@ -446,31 +426,6 @@ namespace ZenLib
             if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
             {
                 return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
-            }
-
-            if (ReflectionUtilities.IsSomeTupleType(type))
-            {
-                var isTuple = ReflectionUtilities.IsTupleType(type);
-                var item1Method = isTuple ? tupItem1Method : valueTupItem1Method;
-                var item2Method = isTuple ? tupItem2Method : valueTupItem2Method;
-
-                var genericArgs = type.GetGenericArgumentsCached();
-                var innerType1 = genericArgs[0];
-                var innerType2 = genericArgs[1];
-                var equals1 = eqMethod.MakeGenericMethod(innerType1);
-                var equals2 = eqMethod.MakeGenericMethod(innerType2);
-                var method1 = item1Method.MakeGenericMethod(innerType1, innerType2);
-                var method2 = item2Method.MakeGenericMethod(innerType1, innerType2);
-
-                var e11 = method1.Invoke(null, new object[] { expr1 });
-                var e12 = method1.Invoke(null, new object[] { expr2 });
-
-                var e21 = method2.Invoke(null, new object[] { expr1 });
-                var e22 = method2.Invoke(null, new object[] { expr2 });
-
-                var eqItem1 = (Zen<bool>)equals1.Invoke(null, new object[] { e11, e12 });
-                var eqItem2 = (Zen<bool>)equals2.Invoke(null, new object[] { e21, e22 });
-                return And(eqItem1, eqItem2);
             }
 
             if (ReflectionUtilities.IsIListType(type))
@@ -1702,7 +1657,7 @@ namespace ZenLib
         /// <param name="expr">Zen list expression.</param>
         /// <param name="index">The index to split at.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Tuple<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index)
+        public static Zen<Pair<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(index);
@@ -1717,16 +1672,16 @@ namespace ZenLib
         /// <param name="index">The index to split at.</param>
         /// <param name="i">The current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<Tuple<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index, int i)
+        private static Zen<Pair<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index, int i)
         {
             return expr.Case(
-                empty: Tuple(EmptyList<T>(), EmptyList<T>()),
+                empty: Pair(EmptyList<T>(), EmptyList<T>()),
                 cons: (hd, tl) =>
                 {
                     var tup = tl.SplitAt(index, i + 1);
                     return If((ushort)i <= index,
-                              Tuple(tup.Item1().AddFront(hd), tup.Item2()),
-                              Tuple(tup.Item1(), tup.Item2().AddFront(hd)));
+                              Pair(tup.Item1().AddFront(hd), tup.Item2()),
+                              Pair(tup.Item1(), tup.Item2().AddFront(hd)));
                 });
         }
 
@@ -1843,9 +1798,9 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            var list = ZenAdapterExpr<IList<Tuple<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
-            var result = list.AddFront(Tuple(keyExpr, valueExpr));
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Tuple<TKey, TValue>>>.Create(result, ListToDict<TKey, TValue>);
+            var list = ZenAdapterExpr<IList<Pair<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
+            var result = list.AddFront(Pair(keyExpr, valueExpr));
+            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(result, ListToDict<TKey, TValue>);
         }
 
         /// <summary>
@@ -1859,7 +1814,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            var list = ZenAdapterExpr<IList<Tuple<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
+            var list = ZenAdapterExpr<IList<Pair<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
             return list.ListGet(keyExpr);
         }
 
@@ -1882,11 +1837,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="listExpr">Zen list expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<IDictionary<TKey, TValue>> ListToDictionary<TKey, TValue>(this Zen<IList<Tuple<TKey, TValue>>> listExpr)
+        public static Zen<IDictionary<TKey, TValue>> ListToDictionary<TKey, TValue>(this Zen<IList<Pair<TKey, TValue>>> listExpr)
         {
             CommonUtilities.ValidateNotNull(listExpr);
 
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Tuple<TKey, TValue>>>.Create(listExpr, ListToDict<TKey, TValue>);
+            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(listExpr, ListToDict<TKey, TValue>);
         }
 
         /// <summary>
@@ -1895,7 +1850,7 @@ namespace ZenLib
         /// <param name="expr">Zen list expression.</param>
         /// <param name="key">The key.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<Option<TValue>> ListGet<TKey, TValue>(this Zen<IList<Tuple<TKey, TValue>>> expr, Zen<TKey> key)
+        private static Zen<Option<TValue>> ListGet<TKey, TValue>(this Zen<IList<Pair<TKey, TValue>>> expr, Zen<TKey> key)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(key);
@@ -1951,13 +1906,14 @@ namespace ZenLib
         /// <param name="expr1">First Zen expression.</param>
         /// <param name="expr2">Second Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Tuple<T1, T2>> Tuple<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
+        public static Zen<Pair<T1, T2>> Pair<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
-            return ZenAdapterExpr<Tuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToTuple<T1, T2>);
+            return ZenCreateObjectExpr<Pair<T1, T2>>.Create(
+                ("Item1", expr1),
+                ("Item2", expr2));
         }
 
         /// <summary>
@@ -1965,34 +1921,62 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr1">First Zen expression.</param>
         /// <param name="expr2">Second Zen expression.</param>
+        /// <param name="expr3">Third Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ValueTuple<T1, T2>> ValueTuple<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
+        public static Zen<Pair<T1, T2, T3>> Pair<T1, T2, T3>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
+            CommonUtilities.ValidateNotNull(expr3);
 
-            var objectExpr = ZenCreateObjectExpr<CustomTuple<T1, T2>>.Create(("Item1", expr1), ("Item2", expr2));
-            return ZenAdapterExpr<ValueTuple<T1, T2>, CustomTuple<T1, T2>>.Create(objectExpr, CustomTupleToValueTuple<T1, T2>);
+            return ZenCreateObjectExpr<Pair<T1, T2, T3>>.Create(
+                ("Item1", expr1),
+                ("Item2", expr2),
+                ("Item3", expr3));
         }
 
-        private static Zen<T1> TupleItem1<T1, T2>(this Zen<Tuple<T1, T2>> expr)
+        /// <summary>
+        /// Create a new Zen value for a tuple.
+        /// </summary>
+        /// <param name="expr1">First Zen expression.</param>
+        /// <param name="expr2">Second Zen expression.</param>
+        /// <param name="expr3">Third Zen expression.</param>
+        /// <param name="expr4">Fourth Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Pair<T1, T2, T3, T4>> Pair<T1, T2, T3, T4>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4)
         {
-            return Item1(expr);
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
+            CommonUtilities.ValidateNotNull(expr3);
+
+            return ZenCreateObjectExpr<Pair<T1, T2, T3, T4>>.Create(
+                ("Item1", expr1),
+                ("Item2", expr2),
+                ("Item3", expr3),
+                ("Item4", expr4));
         }
 
-        private static Zen<T2> TupleItem2<T1, T2>(this Zen<Tuple<T1, T2>> expr)
+        /// <summary>
+        /// Create a new Zen value for a tuple.
+        /// </summary>
+        /// <param name="expr1">First Zen expression.</param>
+        /// <param name="expr2">Second Zen expression.</param>
+        /// <param name="expr3">Third Zen expression.</param>
+        /// <param name="expr4">Fourth Zen expression.</param>
+        /// <param name="expr5">Fifth Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Pair<T1, T2, T3, T4, T5>> Pair<T1, T2, T3, T4, T5>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4, Zen<T5> expr5)
         {
-            return Item2(expr);
-        }
+            CommonUtilities.ValidateNotNull(expr1);
+            CommonUtilities.ValidateNotNull(expr2);
+            CommonUtilities.ValidateNotNull(expr3);
 
-        private static Zen<T1> ValueTupleItem1<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
-        {
-            return Item1(expr);
-        }
-
-        private static Zen<T2> ValueTupleItem2<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
-        {
-            return Item2(expr);
+            return ZenCreateObjectExpr<Pair<T1, T2, T3, T4, T5>>.Create(
+                ("Item1", expr1),
+                ("Item2", expr2),
+                ("Item3", expr3),
+                ("Item4", expr4),
+                ("Item5", expr5));
         }
 
         /// <summary>
@@ -2000,25 +1984,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">Zen tuple expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2>(this Zen<Tuple<T1, T2>> expr)
+        public static Zen<T1> Item1<T1, T2>(this Zen<Pair<T1, T2>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tup = ZenAdapterExpr<CustomTuple<T1, T2>, Tuple<T1, T2>>.Create(expr, TupleToCustomTuple<T1, T2>);
-            return tup.GetField<CustomTuple<T1, T2>, T1>("Item1");
-        }
-
-        /// <summary>
-        /// Get the second element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2>(this Zen<Tuple<T1, T2>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            var tup = ZenAdapterExpr<CustomTuple<T1, T2>, Tuple<T1, T2>>.Create(expr, TupleToCustomTuple<T1, T2>);
-            return tup.GetField<CustomTuple<T1, T2>, T2>("Item2");
+            return expr.GetField<Pair<T1, T2>, T1>("Item1");
         }
 
         /// <summary>
@@ -2026,12 +1996,35 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">Zen tuple expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
+        public static Zen<T1> Item1<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tup = ZenAdapterExpr<CustomTuple<T1, T2>, ValueTuple<T1, T2>>.Create(expr, ValueTupleToCustomTuple<T1, T2>);
-            return tup.GetField<CustomTuple<T1, T2>, T1>("Item1");
+            return expr.GetField<Pair<T1, T2, T3>, T1>("Item1");
+        }
+
+        /// <summary>
+        /// Get the first element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T1> Item1<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4>, T1>("Item1");
+        }
+
+        /// <summary>
+        /// Get the first element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T1> Item1<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T1>("Item1");
         }
 
         /// <summary>
@@ -2039,87 +2032,119 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">Zen tuple expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2>(this Zen<ValueTuple<T1, T2>> expr)
+        public static Zen<T2> Item2<T1, T2>(this Zen<Pair<T1, T2>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var tup = ZenAdapterExpr<CustomTuple<T1, T2>, ValueTuple<T1, T2>>.Create(expr, ValueTupleToCustomTuple<T1, T2>);
-            return tup.GetField<CustomTuple<T1, T2>, T2>("Item2");
+            return expr.GetField<Pair<T1, T2>, T2>("Item2");
         }
 
         /// <summary>
-        /// Create a ZenFunction.
+        /// Get the second element of a Zen tuple.
         /// </summary>
-        /// <typeparam name="T">The return type.</typeparam>
-        /// <param name="function">The function.</param>
-        /// <returns>The Zen function.</returns>
-        public static ZenFunction<T> Function<T>(Func<Zen<T>> function)
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T2> Item2<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
-            CommonUtilities.ValidateNotNull(function);
+            CommonUtilities.ValidateNotNull(expr);
 
-            return new ZenFunction<T>(function);
+            return expr.GetField<Pair<T1, T2, T3>, T2>("Item2");
         }
 
         /// <summary>
-        /// Create a ZenFunction.
+        /// Get the second element of a Zen tuple.
         /// </summary>
-        /// <typeparam name="T1">The first argument type.</typeparam>
-        /// <typeparam name="T2">The return type.</typeparam>
-        /// <param name="function">The function.</param>
-        /// <returns>The Zen function.</returns>
-        public static ZenFunction<T1, T2> Function<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T2> Item2<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(function);
+            CommonUtilities.ValidateNotNull(expr);
 
-            return new ZenFunction<T1, T2>(function);
+            return expr.GetField<Pair<T1, T2, T3, T4>, T2>("Item2");
         }
 
         /// <summary>
-        /// Create a ZenFunction.
+        /// Get the second element of a Zen tuple.
         /// </summary>
-        /// <typeparam name="T1">The first argument type.</typeparam>
-        /// <typeparam name="T2">The second argument type.</typeparam>
-        /// <typeparam name="T3">The return type.</typeparam>
-        /// <param name="function">The function.</param>
-        /// <returns>The Zen function.</returns>
-        public static ZenFunction<T1, T2, T3> Function<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T2> Item2<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(function);
+            CommonUtilities.ValidateNotNull(expr);
 
-            return new ZenFunction<T1, T2, T3>(function);
+            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T2>("Item2");
         }
 
         /// <summary>
-        /// Create a ZenFunction.
+        /// Get the third element of a Zen tuple.
         /// </summary>
-        /// <typeparam name="T1">The first argument type.</typeparam>
-        /// <typeparam name="T2">The second argument type.</typeparam>
-        /// <typeparam name="T3">The third argument type.</typeparam>
-        /// <typeparam name="T4">The return type.</typeparam>
-        /// <param name="function">The function.</param>
-        /// <returns>The Zen function.</returns>
-        public static ZenFunction<T1, T2, T3, T4> Function<T1, T2, T3,  T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T3> Item3<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
-            CommonUtilities.ValidateNotNull(function);
+            CommonUtilities.ValidateNotNull(expr);
 
-            return new ZenFunction<T1, T2, T3, T4>(function);
+            return expr.GetField<Pair<T1, T2, T3>, T3>("Item3");
         }
 
         /// <summary>
-        /// Create a ZenFunction.
+        /// Get the third element of a Zen tuple.
         /// </summary>
-        /// <typeparam name="T1">The first argument type.</typeparam>
-        /// <typeparam name="T2">The second argument type.</typeparam>
-        /// <typeparam name="T3">The third argument type.</typeparam>
-        /// <typeparam name="T4">The fourth argument type.</typeparam>
-        /// <typeparam name="T5">The return type.</typeparam>
-        /// <param name="function">The function.</param>
-        /// <returns>The Zen function.</returns>
-        public static ZenFunction<T1, T2, T3, T4, T5> Function<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T3> Item3<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(function);
+            CommonUtilities.ValidateNotNull(expr);
 
-            return new ZenFunction<T1, T2, T3, T4, T5>(function);
+            return expr.GetField<Pair<T1, T2, T3, T4>, T3>("Item3");
+        }
+
+        /// <summary>
+        /// Get the third element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T3> Item3<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T3>("Item3");
+        }
+
+        /// <summary>
+        /// Get the fourth element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T4> Item4<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4>, T4>("Item4");
+        }
+
+        /// <summary>
+        /// Get the fourth element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T4> Item4<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T4>("Item4");
+        }
+
+        /// <summary>
+        /// Get the fifth element of a Zen tuple.
+        /// </summary>
+        /// <param name="expr">Zen tuple expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T5> Item5<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T5>("Item5");
         }
 
         /// <summary>
@@ -2147,10 +2172,10 @@ namespace ZenLib
         private static object DictToList<T1, T2>(object expr)
         {
             var d = (IDictionary<T1, T2>)expr;
-            var list = new List<Tuple<T1, T2>>();
+            var list = new List<Pair<T1, T2>>();
             foreach (var kv in d)
             {
-                list.Add(new Tuple<T1, T2>(kv.Key, kv.Value));
+                list.Add(new Pair<T1, T2> { Item1 = kv.Key, Item2 = kv.Value });
             }
 
             return list;
@@ -2158,7 +2183,7 @@ namespace ZenLib
 
         private static object ListToDict<T1, T2>(object list)
         {
-            var l = (IList<Tuple<T1, T2>>)list;
+            var l = (IList<Pair<T1, T2>>)list;
             var dict = ImmutableDictionary<T1, T2>.Empty;
             foreach (var elt in l.Reverse())
             {
@@ -2166,43 +2191,6 @@ namespace ZenLib
             }
 
             return dict;
-        }
-
-        private static object TupleToCustomTuple<T1, T2>(object tup)
-        {
-            var x = (Tuple<T1, T2>)tup;
-            return new CustomTuple<T1, T2> { Item1 = x.Item1, Item2 = x.Item2 };
-        }
-
-        private static object CustomTupleToTuple<T1, T2>(object tuple)
-        {
-            var x = (CustomTuple<T1, T2>)tuple;
-            return new Tuple<T1, T2>(x.Item1, x.Item2);
-        }
-
-        private static object ValueTupleToCustomTuple<T1, T2>(object tup)
-        {
-            var x = (ValueTuple<T1, T2>)tup;
-            return new CustomTuple<T1, T2> { Item1 = x.Item1, Item2 = x.Item2 };
-        }
-
-        private static object CustomTupleToValueTuple<T1, T2>(object tuple)
-        {
-            var x = (CustomTuple<T1, T2>)tuple;
-            return new ValueTuple<T1, T2>(x.Item1, x.Item2);
-        }
-
-        internal class CustomTuple<T1, T2>
-        {
-            public T1 Item1 { get; set; }
-
-            public T2 Item2 { get; set; }
-
-            [ExcludeFromCodeCoverage]
-            public override string ToString()
-            {
-                return $"({this.Item1}, {this.Item2})";
-            }
         }
     }
 }

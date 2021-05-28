@@ -78,16 +78,6 @@ namespace ZenLib.Generation
             return ZenConstantExpr<short>.Create(0);
         }
 
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
-        }
-
         public object VisitUint()
         {
             return ZenConstantExpr<uint>.Create(0);

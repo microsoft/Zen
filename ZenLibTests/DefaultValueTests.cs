@@ -38,8 +38,7 @@ namespace ZenLib.Tests
             CheckDefault<UInt2>(new UInt2(0));
             CheckDefault<string>(string.Empty);
             CheckDefault<BigInteger>(new BigInteger(0));
-            CheckDefault<(int, int)>((0, 0));
-            CheckDefault<Tuple<int, int>>(new Tuple<int, int>(0, 0));
+            CheckDefault<Pair<int, int>>(new Pair<int, int> { Item1 = 0, Item2 = 0 });
             CheckDefault<Option<int>>(Option.None<int>());
 
             var o = ReflectionUtilities.GetDefaultValue<Object2>();

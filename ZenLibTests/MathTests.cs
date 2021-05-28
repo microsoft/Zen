@@ -111,9 +111,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAddMultipleValues()
         {
-            var f1 = Function<byte, byte, bool>((w, x) => w + x == 7);
-            var f2 = Function<byte, byte, byte, bool>((w, x, y) => w + x + y == 7);
-            var f3 = Function<byte, byte, byte, byte, bool>((w, x, y, z) => w + x + y + z == 7);
+            var f1 = new ZenFunction<byte, byte, bool>((w, x) => w + x == 7);
+            var f2 = new ZenFunction<byte, byte, byte, bool>((w, x, y) => w + x + y == 7);
+            var f3 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => w + x + y + z == 7);
             var r1 = f1.Find((i1, i2, o) => o);
             var r2 = f2.Find((i1, i2, i3, o) => o);
             var r3 = f3.Find((i1, i2, i3, i4, o) => o);
@@ -142,14 +142,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultiplyConstants()
         {
-            var f1 = Function<byte, byte>(x => x * 2);
-            var f2 = Function<short, short>(x => x * 3);
-            var f3 = Function<ushort, ushort>(x => x * 4);
-            var f4 = Function<int, int>(x => x * 5);
-            var f5 = Function<uint, uint>(x => x * 6);
-            var f6 = Function<long, long>(x => x * 7L);
-            var f7 = Function<ulong, ulong>(x => x * 8L);
-            var f8 = Function<BigInteger, BigInteger>(x => x * new BigInteger(9));
+            var f1 = new ZenFunction<byte, byte>(x => x * 2);
+            var f2 = new ZenFunction<short, short>(x => x * 3);
+            var f3 = new ZenFunction<ushort, ushort>(x => x * 4);
+            var f4 = new ZenFunction<int, int>(x => x * 5);
+            var f5 = new ZenFunction<uint, uint>(x => x * 6);
+            var f6 = new ZenFunction<long, long>(x => x * 7L);
+            var f7 = new ZenFunction<ulong, ulong>(x => x * 8L);
+            var f8 = new ZenFunction<BigInteger, BigInteger>(x => x * new BigInteger(9));
 
             Assert.AreEqual((byte)4, f1.Evaluate(2));
             Assert.AreEqual((short)9, f2.Evaluate(3));
@@ -232,7 +232,7 @@ namespace ZenLib.Tests
         public void TestEqualityComposite()
         {
             CheckAgreement<(byte, byte), (byte, byte)>((x, y) => x == y);
-            CheckAgreement<Tuple<byte, byte>, Tuple<byte, byte>>((x, y) => x == y);
+            CheckAgreement<Pair<byte, byte>, Pair<byte, byte>>((x, y) => x == y);
             CheckAgreement<Option<byte>, Option<byte>>((x, y) => x == y);
             CheckAgreement<Packet, Packet>((x, y) => x == y);
             CheckAgreement<ObjectField1, ObjectField1>((x, y) => x == y);
