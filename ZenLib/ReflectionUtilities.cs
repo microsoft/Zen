@@ -665,22 +665,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Create a constant Zen option value.
-        /// </summary>
-        /// <param name="value">The option value.</param>
-        /// <returns>The Zen value representing the option.</returns>
-        internal static Zen<Option<T>> CreateZenOptionConstant<T>(Option<T> value)
-        {
-            if (value.HasValue)
-            {
-                ReportIfNullConversionError(value.Value, "value", typeof(Option<T>));
-                return Some<T>(value.Value);
-            }
-
-            return Null<T>();
-        }
-
-        /// <summary>
         /// Create a constant Zen dict value.
         /// </summary>
         /// <param name="value">The dictionary.</param>

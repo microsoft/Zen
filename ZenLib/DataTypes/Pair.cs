@@ -24,10 +24,24 @@ namespace ZenLib
         public T2 Item2 { get; set; }
 
         /// <summary>
+        /// Convert a value tuple to a pair.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public static implicit operator Pair<T1, T2>((T1, T2) value)
+        {
+            return new Pair<T1, T2>
+            {
+                Item1 = value.Item1,
+                Item2 = value.Item2,
+            };
+        }
+
+        /// <summary>
         ///     Equality for pairs.
         /// </summary>
         /// <param name="obj">The other object.</param>
         /// <returns>True or false.</returns>
+        [ExcludeFromCodeCoverage]
         public override bool Equals(object obj)
         {
             return obj is Pair<T1, T2> p && Equals(p);
@@ -38,6 +52,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other pair.</param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public bool Equals(Pair<T1, T2> other)
         {
             return other != null &&
@@ -89,10 +104,25 @@ namespace ZenLib
         public T3 Item3 { get; set; }
 
         /// <summary>
+        /// Convert a value tuple to a pair.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public static implicit operator Pair<T1, T2, T3>((T1, T2, T3) value)
+        {
+            return new Pair<T1, T2, T3>
+            {
+                Item1 = value.Item1,
+                Item2 = value.Item2,
+                Item3 = value.Item3,
+            };
+        }
+
+        /// <summary>
         ///     Equality for pairs.
         /// </summary>
         /// <param name="obj">The other object.</param>
         /// <returns>True or false.</returns>
+        [ExcludeFromCodeCoverage]
         public override bool Equals(object obj)
         {
             return obj is Pair<T1, T2, T3> p && Equals(p);
@@ -103,6 +133,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other pair.</param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public bool Equals(Pair<T1, T2, T3> other)
         {
             return other != null &&
@@ -161,10 +192,26 @@ namespace ZenLib
         public T4 Item4 { get; set; }
 
         /// <summary>
+        /// Convert a value tuple to a pair.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public static implicit operator Pair<T1, T2, T3, T4>((T1, T2, T3, T4) value)
+        {
+            return new Pair<T1, T2, T3, T4>
+            {
+                Item1 = value.Item1,
+                Item2 = value.Item2,
+                Item3 = value.Item3,
+                Item4 = value.Item4,
+            };
+        }
+
+        /// <summary>
         ///     Equality for pairs.
         /// </summary>
         /// <param name="obj">The other object.</param>
         /// <returns>True or false.</returns>
+        [ExcludeFromCodeCoverage]
         public override bool Equals(object obj)
         {
             return obj is Pair<T1, T2, T3, T4> p && Equals(p);
@@ -175,6 +222,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other pair.</param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public bool Equals(Pair<T1, T2, T3, T4> other)
         {
             return other != null &&
@@ -240,10 +288,38 @@ namespace ZenLib
         public T5 Item5 { get; set; }
 
         /// <summary>
+        /// Convert a value tuple to a pair.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public static implicit operator Pair<T1, T2, T3, T4, T5>((T1, T2, T3, T4, T5) value)
+        {
+            return new Pair<T1, T2, T3, T4, T5>
+            {
+                Item1 = value.Item1,
+                Item2 = value.Item2,
+                Item3 = value.Item3,
+                Item4 = value.Item4,
+                Item5 = value.Item5,
+            };
+        }
+
+        /// <summary>
+        ///     Equality for pairs.
+        /// </summary>
+        /// <param name="obj">The other object.</param>
+        /// <returns>True or false.</returns>
+        [ExcludeFromCodeCoverage]
+        public override bool Equals(object obj)
+        {
+            return obj is Pair<T1, T2, T3, T4, T5> p && Equals(p);
+        }
+
+        /// <summary>
         ///     Equality for pairs.
         /// </summary>
         /// <param name="other">The other pair.</param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public bool Equals(Pair<T1, T2, T3, T4, T5> other)
         {
             return other != null &&
