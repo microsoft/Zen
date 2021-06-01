@@ -16,14 +16,14 @@ namespace ZenLib.ModelChecking
         /// </summary>
         public SymbolicEvaluationEnvironment()
         {
-            this.ArgumentAssignment = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
+            this.ArgumentAssignment = ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
         }
 
         /// <summary>
         /// Initializes a new instance of the  class.
         /// </summary>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
-        public SymbolicEvaluationEnvironment(ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> argumentAssignment)
+        public SymbolicEvaluationEnvironment(ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> argumentAssignment)
         {
             this.ArgumentAssignment = argumentAssignment;
         }
@@ -31,6 +31,6 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the argument assignment.
         /// </summary>
-        public ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> ArgumentAssignment { get; }
+        public ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> ArgumentAssignment { get; }
     }
 }

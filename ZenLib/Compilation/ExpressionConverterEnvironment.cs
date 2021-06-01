@@ -16,7 +16,7 @@ namespace ZenLib.Compilation
         /// Initializes a new instance of the <see cref="ExpressionConverterEnvironment"/> class.
         /// </summary>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
-        public ExpressionConverterEnvironment(ImmutableDictionary<string, Expression> argumentAssignment)
+        public ExpressionConverterEnvironment(ImmutableDictionary<long, Expression> argumentAssignment)
         {
             this.ArgumentAssignment = argumentAssignment;
         }
@@ -24,6 +24,6 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Gets the argument assignment.
         /// </summary>
-        public ImmutableDictionary<string, Expression> ArgumentAssignment { get; }
+        public ImmutableDictionary<long, Expression> ArgumentAssignment { get; }
     }
 }

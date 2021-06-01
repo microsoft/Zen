@@ -22,7 +22,7 @@ namespace ZenLib.Compilation
         /// <returns>A native IL function.</returns>
         public static Func<T> Compile<T>(Func<Zen<T>> function, int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<string, Expression>.Empty;
+            var args = ImmutableDictionary<long, Expression>.Empty;
             var env = new ExpressionConverterEnvironment(args);
             var e = function();
             var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
@@ -38,7 +38,7 @@ namespace ZenLib.Compilation
         /// <returns>A native IL function.</returns>
         public static Func<T1, T2> Compile<T1, T2>(Func<Zen<T1>, Zen<T2>> function, int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<string, Expression>.Empty;
+            var args = ImmutableDictionary<long, Expression>.Empty;
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
@@ -59,7 +59,7 @@ namespace ZenLib.Compilation
         /// <returns>A native IL function.</returns>
         public static Func<T1, T2, T3> Compile<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> function, int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<string, Expression>.Empty;
+            var args = ImmutableDictionary<long, Expression>.Empty;
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
@@ -84,7 +84,7 @@ namespace ZenLib.Compilation
         /// <returns>A native IL function.</returns>
         public static Func<T1, T2, T3, T4> Compile<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function, int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<string, Expression>.Empty;
+            var args = ImmutableDictionary<long, Expression>.Empty;
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));
@@ -113,7 +113,7 @@ namespace ZenLib.Compilation
         /// <returns>A native IL function.</returns>
         public static Func<T1, T2, T3, T4, T5> Compile<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function, int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<string, Expression>.Empty;
+            var args = ImmutableDictionary<long, Expression>.Empty;
 
             var arg1 = new ZenArgumentExpr<T1>();
             var param1 = Expression.Parameter(typeof(T1));

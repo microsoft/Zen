@@ -410,7 +410,7 @@ namespace ZenLib.Compilation
                     .MakeGenericMethod(typeof(TList), typeof(IList<TList>), typeof(TResult));
 
                 // create the bound arguments by constructing the immutable list
-                var dictType = typeof(ImmutableDictionary<string, object>);
+                var dictType = typeof(ImmutableDictionary<long, object>);
                 var dictField = dictType.GetFieldCached("Empty");
                 Expression argsExpr = Expression.Field(null, dictField);
                 var dictAddMethod = dictType.GetMethodCached("Add");

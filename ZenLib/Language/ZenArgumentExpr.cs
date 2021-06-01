@@ -18,7 +18,7 @@ namespace ZenLib
         /// </summary>
         public ZenArgumentExpr()
         {
-            this.ArgumentId = Interlocked.Increment(ref ZenArgumentId.nextId).ToString();
+            this.ArgumentId = Interlocked.Increment(ref ZenArgumentId.nextId);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the unique id for the object.
         /// </summary>
-        public string ArgumentId { get; }
+        public long ArgumentId { get; }
 
         /// <summary>
         /// Convert the expression to a string.

@@ -25,7 +25,7 @@ namespace ZenLib.Interpretation
         /// Initializes a new instance of the <see cref="ExpressionEvaluatorEnvironment"/> class.
         /// </summary>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
-        public ExpressionEvaluatorEnvironment(ImmutableDictionary<string, object> argumentAssignment)
+        public ExpressionEvaluatorEnvironment(ImmutableDictionary<long, object> argumentAssignment)
         {
             this.ArgumentAssignment = argumentAssignment;
         }
@@ -33,7 +33,7 @@ namespace ZenLib.Interpretation
         /// <summary>
         /// Gets the argument assignment.
         /// </summary>
-        public ImmutableDictionary<string, object> ArgumentAssignment { get; } = ImmutableDictionary<string, object>.Empty;
+        public ImmutableDictionary<long, object> ArgumentAssignment { get; } = ImmutableDictionary<long, object>.Empty;
 
         /// <summary>
         /// Get the arbitrary assignment.
