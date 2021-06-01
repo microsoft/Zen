@@ -21,11 +21,6 @@ namespace ZenLib.Generation
         private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
 
         /// <summary>
-        /// The method for converting a list to a dictionary.
-        /// </summary>
-        private static MethodInfo listToDictMethod = typeof(Language).GetMethod("ListToDictionary");
-
-        /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
         private static MethodInfo ifConditionMethod = typeof(Language).GetMethod("If");
@@ -102,15 +97,6 @@ namespace ZenLib.Generation
             }
 
             return list;
-        }
-
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            var tupleType = typeof(Pair<,>).MakeGenericType(keyType, valueType);
-            var listType = typeof(IList<>).MakeGenericType(tupleType);
-            var list = VisitList(recurse, listType, tupleType);
-            var method = listToDictMethod.MakeGenericMethod(keyType, valueType);
-            return method.Invoke(null, new object[] { list });
         }
 
         public object VisitLong()

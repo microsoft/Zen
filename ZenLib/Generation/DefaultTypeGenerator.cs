@@ -19,11 +19,6 @@ namespace ZenLib.Generation
         /// </summary>
         private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
 
-        /// <summary>
-        /// Method for creating an empty Zen dictionary.
-        /// </summary>
-        private static MethodInfo emptyDictMethod = typeof(Language).GetMethod("EmptyDict");
-
         public object VisitBool()
         {
             return ZenConstantExpr<bool>.Create(false);
@@ -42,12 +37,6 @@ namespace ZenLib.Generation
         public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, CommonUtilities.EmptyArray);
-        }
-
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 

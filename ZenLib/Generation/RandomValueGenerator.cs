@@ -79,29 +79,6 @@ namespace ZenLib.Generation
             });
         }
 
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            return this.GenerateRandom(dictType, () =>
-            {
-                var size = RandomInt() % this.sizeBound;
-
-                var type = typeof(Dictionary<,>).MakeGenericType(new Type[] { keyType, valueType });
-                var addMethod = type.GetMethodCached("set_Item");
-
-                var constructor = type.GetConstructor(new Type[] { });
-                var dictionary = constructor.Invoke(CommonUtilities.EmptyArray);
-
-                for (int i = 0; i < size; i++)
-                {
-                    var key = recurse(keyType);
-                    var value = recurse(valueType);
-                    addMethod.Invoke(dictionary, new object[] { key, value });
-                }
-
-                return dictionary;
-            });
-        }
-
         public object VisitLong()
         {
             return this.GenerateRandom(typeof(long), () => ((long)RandomInt() << 32) | (long)RandomInt());

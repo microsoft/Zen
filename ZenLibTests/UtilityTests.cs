@@ -101,7 +101,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestTypeVisitorDictionaryException()
         {
-            TestHelper.CheckAgreement<Dictionary<int, int>>(d => Language.True());
+            TestHelper.CheckAgreement<List<int>>(d => Language.True());
         }
 
         /// <summary>

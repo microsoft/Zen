@@ -869,16 +869,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestListToDictionaryException()
-        {
-            Language.ListToDictionary<int, int>(null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void TestLtException1()
         {
             Language.Lt<int>(null, null);

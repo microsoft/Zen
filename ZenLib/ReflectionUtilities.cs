@@ -78,19 +78,9 @@ namespace ZenLib
         public readonly static Type IListType = typeof(IList<>);
 
         /// <summary>
-        /// Type of an IDictionary.
-        /// </summary>
-        public readonly static Type IDictType = typeof(IDictionary<,>);
-
-        /// <summary>
         /// Type of an List.
         /// </summary>
         public readonly static Type ListType = typeof(List<>);
-
-        /// <summary>
-        /// Type of an Dictionary.
-        /// </summary>
-        public readonly static Type DictType = typeof(Dictionary<,>);
 
         /// <summary>
         /// Type of a fixed size integer.
@@ -107,12 +97,6 @@ namespace ZenLib
         /// </summary>
         public static MethodInfo CreateZenListConstantMethod =
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant dictionary creation method.
-        /// </summary>
-        public static MethodInfo CreateZenDictConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenDictConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// The zen constant tuple creation method.
@@ -295,17 +279,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Check if a type is an IDictionary type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsIDictionaryType(Type type)
-        {
-            return type.IsGenericType &&
-                   type.GetGenericTypeDefinitionCached() == IDictType;
-        }
-
-        /// <summary>
         /// Check if a type is a List type.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -313,16 +286,6 @@ namespace ZenLib
         public static bool IsListType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ListType;
-        }
-
-        /// <summary>
-        /// Check if a type is a Dictionary type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsDictionaryType(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == DictType;
         }
 
         /// <summary>
@@ -554,15 +517,6 @@ namespace ZenLib
                 return c.Invoke(CommonUtilities.EmptyArray);
             }
 
-            if (IsIDictionaryType(type))
-            {
-                var args = type.GetGenericArgumentsCached();
-                var keyType = args[0];
-                var valueType = args[1];
-                var c = DictType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-
             // some class or struct
 
             var fields = new SortedDictionary<string, object>();
@@ -618,15 +572,7 @@ namespace ZenLib
                 return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
             }
 
-            if (IsIDictionaryType(type))
-            {
-                var args = type.GetGenericArgumentsCached();
-                var tkey = args[0];
-                var tvalue = args[1];
-                return visitor.VisitDictionary(ty => ApplyTypeVisitor(visitor, ty), type, tkey, tvalue);
-            }
-
-            if (IsListType(type) || IsDictionaryType(type))
+            if (IsListType(type))
             {
                 throw new InvalidOperationException($"Unsupported object field type: {type}");
             }
@@ -665,24 +611,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Create a constant Zen dict value.
-        /// </summary>
-        /// <param name="value">The dictionary.</param>
-        /// <returns>The Zen value representing the constant dictinary.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(IDictionary<TKey, TValue> value)
-        {
-            var dict = EmptyDict<TKey, TValue>();
-            foreach (var kv in value)
-            {
-                ReportIfNullConversionError(kv.Key, "key", typeof(IDictionary<TKey, TValue>));
-                ReportIfNullConversionError(kv.Value, "value", typeof(IDictionary<TKey, TValue>));
-                dict = dict.Add(kv.Key, kv.Value);
-            }
-
-            return dict;
-        }
-
-        /// <summary>
         /// Create a constant Zen value.
         /// </summary>
         /// <param name="value">The type.</param>
@@ -705,13 +633,6 @@ namespace ZenLib
             {
                 var innerType = typeArgs[0];
                 return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
-            }
-
-            if (type.IsGenericType && typeArgs.Length == 2 && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
-            {
-                var keyType = typeArgs[0];
-                var valueType = typeArgs[1];
-                return CreateZenDictConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
             }
 
             // some class or struct

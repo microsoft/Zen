@@ -42,7 +42,9 @@ namespace ZenLib.Tests
 
             CheckAgreement<IDictionary<int, int>>(x =>
             {
-                Zen<IDictionary<int, int>> y = new Dictionary<int, int>() { { 1, 2 } };
+                var d = new Dict<int, int>();
+                d.Add(1, 2);
+                Zen<Dict<int, int>> y = d;
                 return y.ContainsKey(4);
             });
         }
@@ -137,13 +139,14 @@ namespace ZenLib.Tests
         {
             try
             {
-                IDictionary<int, Object1> o = new Dictionary<int, Object1> { { 1, null } };
+                Dict<int, Object1> o = new Dict<int, Object1>();
+                o.Add(1, null);
                 var _ = Constant(o);
                 Assert.Fail();
             }
             catch (System.Reflection.TargetInvocationException e)
             {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+                Assert.AreEqual(typeof(ZenException), e.InnerException.GetType());
             }
         }
 

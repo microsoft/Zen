@@ -48,8 +48,7 @@ namespace ZenLib.Tests
             var l = ReflectionUtilities.GetDefaultValue<IList<int>>();
             Assert.AreEqual(0, l.Count);
 
-            var d = ReflectionUtilities.GetDefaultValue<IDictionary<int, int>>();
-            Assert.AreEqual(0, d.Count);
+            var d = ReflectionUtilities.GetDefaultValue<Dict<int, int>>();
         }
 
         private void CheckDefault<T>(object o)

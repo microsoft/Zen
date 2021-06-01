@@ -6,8 +6,6 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -256,10 +254,9 @@ namespace ZenLib
         /// The Zen value for an empty Dictionary.
         /// </summary>
         /// <returns>Zen value.</returns>
-        public static Zen<IDictionary<TKey, TValue>> EmptyDict<TKey, TValue>()
+        public static Zen<Dict<TKey, TValue>> EmptyDict<TKey, TValue>()
         {
-            var emptyList = EmptyList<Pair<TKey, TValue>>();
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(emptyList, ListToDict<TKey, TValue>);
+            return Create<Dict<TKey, TValue>>(("Values", EmptyList<Pair<TKey, TValue>>()));
         }
 
         /// <summary>
@@ -433,11 +430,6 @@ namespace ZenLib
                 var innerType = type.GetGenericArgumentsCached()[0];
                 var method = eqListsMethod.MakeGenericMethod(innerType);
                 return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
-            }
-
-            if (ReflectionUtilities.IsIDictionaryType(type))
-            {
-                throw new ZenException($"Zen does not support equality of {type} types.");
             }
 
             // some class or struct
@@ -1792,15 +1784,14 @@ namespace ZenLib
         /// <param name="keyExpr">Zen key expression.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<IDictionary<TKey, TValue>> Add<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        public static Zen<Dict<TKey, TValue>> Add<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            var list = ZenAdapterExpr<IList<Pair<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
-            var result = list.AddFront(Pair(keyExpr, valueExpr));
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(result, ListToDict<TKey, TValue>);
+            var l = mapExpr.GetField<Dict<TKey, TValue>, IList<Pair<TKey, TValue>>>("Values");
+            return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair(keyExpr, valueExpr))));
         }
 
         /// <summary>
@@ -1809,13 +1800,13 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            var list = ZenAdapterExpr<IList<Pair<TKey, TValue>>, IDictionary<TKey, TValue>>.Create(mapExpr, DictToList<TKey, TValue>);
-            return list.ListGet(keyExpr);
+            var l = mapExpr.GetField<Dict<TKey, TValue>, IList<Pair<TKey, TValue>>>("Values");
+            return l.ListGet(keyExpr);
         }
 
         /// <summary>
@@ -1824,24 +1815,12 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<IDictionary<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
             return mapExpr.Get(keyExpr).HasValue();
-        }
-
-        /// <summary>
-        /// Convert a Zen list to a map.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IDictionary<TKey, TValue>> ListToDictionary<TKey, TValue>(this Zen<IList<Pair<TKey, TValue>>> listExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-
-            return ZenAdapterExpr<IDictionary<TKey, TValue>, IList<Pair<TKey, TValue>>>.Create(listExpr, ListToDict<TKey, TValue>);
         }
 
         /// <summary>
@@ -2167,30 +2146,6 @@ namespace ZenLib
         public static Zen<bool> AndIf(Zen<bool> expr1, Zen<bool> expr2)
         {
             return If(Not(expr1), False(), expr2);
-        }
-
-        private static object DictToList<T1, T2>(object expr)
-        {
-            var d = (IDictionary<T1, T2>)expr;
-            var list = new List<Pair<T1, T2>>();
-            foreach (var kv in d)
-            {
-                list.Add(new Pair<T1, T2> { Item1 = kv.Key, Item2 = kv.Value });
-            }
-
-            return list;
-        }
-
-        private static object ListToDict<T1, T2>(object list)
-        {
-            var l = (IList<Pair<T1, T2>>)list;
-            var dict = ImmutableDictionary<T1, T2>.Empty;
-            foreach (var elt in l.Reverse())
-            {
-                dict = dict.SetItem(elt.Item1, elt.Item2);
-            }
-
-            return dict;
         }
     }
 }
