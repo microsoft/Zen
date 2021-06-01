@@ -60,8 +60,8 @@ namespace ZenLib.Tests
             var set3 = t2.TransformForward(set2);
             var set4 = t2.OutputSet((b, i) => b);
 
-            Assert.AreEqual(11U, set3.Element().Value);
-            Assert.AreEqual(11U, set4.Element().Value);
+            Assert.AreEqual(11U, set3.Element());
+            Assert.AreEqual(11U, set4.Element());
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace ZenLib.Tests
             var inSet3 = inSet1.Intersect(inSet2);
             var inSet4 = inSet1.Union(inSet2);
 
-            Assert.AreEqual(9U, inSet1.Element().Value);
-            Assert.AreEqual(10U, inSet2.Element().Value);
+            Assert.AreEqual(9U, inSet1.Element());
+            Assert.AreEqual(10U, inSet2.Element());
             Assert.IsTrue(inSet3.IsEmpty());
             Assert.IsFalse(inSet4.IsEmpty());
         }
@@ -113,7 +113,7 @@ namespace ZenLib.Tests
             var set3 = set1.Intersect(set2);
 
             Assert.AreEqual(set1, set2);
-            Assert.AreEqual(9U, set3.Element().Value);
+            Assert.AreEqual(9U, set3.Element());
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace ZenLib.Tests
         {
             var t = new ZenFunction<Int5, bool>(i => i <= new Int5(0)).Transformer();
             var set = t.InputSet((x, y) => y);
-            Assert.IsTrue(set.Element().Value <= new Int5(0));
+            Assert.IsTrue(set.Element() <= new Int5(0));
         }
 
         /// <summary>
@@ -187,13 +187,13 @@ namespace ZenLib.Tests
         /// Test getting an element for an empty set.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestTransformerNoElement()
         {
             var f = new ZenFunction<uint, uint>(i => i + 1);
             var t = f.Transformer();
             var emptySet = t.InputSet((x, y) => x + 2 == y);
-
-            Assert.IsFalse(emptySet.Element().HasValue);
+            emptySet.Element();
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace ZenLib.Tests
 
                 StateSetTransformer<IpHeader, bool> transformer = f.Transformer();
                 var set = transformer.InputSet((pkt, matches) => matches);
-                Assert.AreEqual(i, set.Element().Value.DstIp.Value);
+                Assert.AreEqual(i, set.Element().DstIp.Value);
             }
         }
 
@@ -249,8 +249,8 @@ namespace ZenLib.Tests
             var t3 = new ZenFunction<uint, bool>(u => u == 2).Transformer();
             var set3 = t3.InputSet((u, v) => v);
             Assert.IsTrue(set1.IsFull());
-            Assert.AreEqual(1U, set2.Element().Value.DstIp.Value);
-            Assert.AreEqual(2U, set3.Element().Value);
+            Assert.AreEqual(1U, set2.Element().DstIp.Value);
+            Assert.AreEqual(2U, set3.Element());
         }
 
         /// <summary>
@@ -262,10 +262,10 @@ namespace ZenLib.Tests
             var t = new ZenFunction<Pair<IpHeader, IpHeader>, bool>(x => x.Item1() == x.Item2()).Transformer();
             var set = t.InputSet((x, b) => b);
             var e = set.Element();
-            Assert.AreEqual(e.Value.Item1.DstIp, e.Value.Item2.DstIp);
-            Assert.AreEqual(e.Value.Item1.SrcIp, e.Value.Item2.SrcIp);
-            Assert.AreEqual(e.Value.Item1.SrcPort, e.Value.Item2.DstPort);
-            Assert.AreEqual(e.Value.Item1.DstPort, e.Value.Item2.DstPort);
+            Assert.AreEqual(e.Item1.DstIp, e.Item2.DstIp);
+            Assert.AreEqual(e.Item1.SrcIp, e.Item2.SrcIp);
+            Assert.AreEqual(e.Item1.SrcPort, e.Item2.DstPort);
+            Assert.AreEqual(e.Item1.DstPort, e.Item2.DstPort);
         }
 
         /// <summary>
@@ -300,37 +300,9 @@ namespace ZenLib.Tests
             var t2 = new ZenFunction<uint, uint, uint, uint>((x, y, z) => y).Transformer();
             var t3 = new ZenFunction<uint, uint, uint, uint, uint>((w, x, y, z) => y).Transformer();
 
-            Assert.AreEqual(3U, t1.OutputSet((p, o) => p.Item1() == 3U).Element().Value);
-            Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element().Value);
-            Assert.AreEqual(3U, t3.OutputSet((p, o) => p.Item3() == 3U).Element().Value);
-        }
-
-        /// <summary>
-        /// Test that transformers work with multiple inputs.
-        /// </summary>
-        [TestMethod]
-        public void TestConstraints()
-        {
-            var c1 = new ZenConstraint<uint>(x => x == 1);
-            var c2 = new ZenConstraint<uint, uint>((x, y) => And(x == 1, y == 1));
-            var c3 = new ZenConstraint<uint, uint, uint>((x, y, z) => And(x == 1, y == 1, z == 1));
-            var c4 = new ZenConstraint<uint, uint, uint, uint>((w, x, y, z) => And(w == 1, x == 1, y == 1, z == 1));
-
-            var v1 = c1.StateSet().Element().Value;
-            var v2 = c2.StateSet().Element().Value;
-            var v3 = c3.StateSet().Element().Value;
-            var v4 = c4.StateSet().Element().Value;
-
-            Assert.AreEqual(1U, v1);
-            Assert.AreEqual(1U, v2.Item1);
-            Assert.AreEqual(1U, v2.Item2);
-            Assert.AreEqual(1U, v3.Item1);
-            Assert.AreEqual(1U, v3.Item2);
-            Assert.AreEqual(1U, v3.Item3);
-            Assert.AreEqual(1U, v4.Item1);
-            Assert.AreEqual(1U, v4.Item2);
-            Assert.AreEqual(1U, v4.Item3);
-            Assert.AreEqual(1U, v4.Item4);
+            Assert.AreEqual(3U, t1.OutputSet((p, o) => p.Item1() == 3U).Element());
+            Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element());
+            Assert.AreEqual(3U, t3.OutputSet((p, o) => p.Item3() == 3U).Element());
         }
     }
 }
