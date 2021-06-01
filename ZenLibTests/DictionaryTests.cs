@@ -60,7 +60,6 @@ namespace ZenLib.Tests
 
             f.Compile();
             d = f.Evaluate(1, 2);
-            // Assert.AreEqual(1, d.Count);
             Assert.AreEqual(2, d.Get(1));
         }
 
@@ -102,6 +101,48 @@ namespace ZenLib.Tests
             Assert.AreEqual("v1", sat.Value.Get("k1"));
             Assert.AreEqual("v2", sat.Value.Get("k2"));
             Assert.AreEqual("v3", sat.Value.Get("k3"));
+        }
+
+        /// <summary>
+        /// Test that the dictionary get operation works.
+        /// </summary>
+        [TestMethod]
+        public void TestDictionaryGet()
+        {
+            var d = new Dict<int, int>();
+            d.Add(1, 2);
+            d.Add(2, 3);
+            d.Add(1, 4);
+
+            Assert.IsTrue(d.ContainsKey(1));
+            Assert.IsTrue(d.ContainsKey(2));
+            Assert.IsFalse(d.ContainsKey(3));
+        }
+
+        /// <summary>
+        /// Test that the dictionary get operation works.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.IndexOutOfRangeException))]
+        public void TestDictionaryGetException()
+        {
+            var d = new Dict<int, int>();
+            d.Add(1, 2);
+            d.Add(2, 3);
+            d.Get(3);
+        }
+
+        /// <summary>
+        /// Test that the dictionary tostring operation works.
+        /// </summary>
+        [TestMethod]
+        public void TestDictionaryToString()
+        {
+            var d = new Dict<int, int>();
+            d.Add(1, 2);
+            d.Add(2, 3);
+
+            Assert.AreEqual("{2 => 3, 1 => 2}", d.ToString());
         }
     }
 }

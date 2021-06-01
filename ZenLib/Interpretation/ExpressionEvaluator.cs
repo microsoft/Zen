@@ -66,20 +66,6 @@ namespace ZenLib.Interpretation
             return result;
         }
 
-        public object VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                var e = expression.Expr.Accept(this, parameter);
-                foreach (var converter in expression.Converters)
-                {
-                    e = converter(e);
-                }
-
-                return e;
-            });
-        }
-
         public object VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return LookupOrCompute(expression, parameter, () =>
