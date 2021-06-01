@@ -115,6 +115,15 @@ namespace ZenLib
         {
             return this.FindAll((i1, i2, o) => o, input1, input2, listSize, checkSmallerLists, backend);
         }
+
+        /// <summary>
+        /// Gets the set of values satisfying the constraint.
+        /// </summary>
+        /// <returns>The set of values.</returns>
+        public StateSet<Pair<T1, T2>> StateSet()
+        {
+            return this.Transformer().InputSet((i, o) => o);
+        }
     }
 
     /// <summary>
@@ -170,6 +179,15 @@ namespace ZenLib
             Backend backend = Backend.Z3)
         {
             return this.FindAll((i1, i2, i3, o) => o, input1, input2, input3, listSize, checkSmallerLists, backend);
+        }
+
+        /// <summary>
+        /// Gets the set of values satisfying the constraint.
+        /// </summary>
+        /// <returns>The set of values.</returns>
+        public StateSet<Pair<T1, T2, T3>> StateSet()
+        {
+            return this.Transformer().InputSet((i, o) => o);
         }
     }
 
@@ -230,6 +248,15 @@ namespace ZenLib
             Backend backend = Backend.Z3)
         {
             return this.FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, listSize, checkSmallerLists, backend);
+        }
+
+        /// <summary>
+        /// Gets the set of values satisfying the constraint.
+        /// </summary>
+        /// <returns>The set of values.</returns>
+        public StateSet<Pair<T1, T2, T3, T4>> StateSet()
+        {
+            return this.Transformer().InputSet((i, o) => o);
         }
     }
 }

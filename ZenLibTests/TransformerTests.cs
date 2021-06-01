@@ -289,5 +289,48 @@ namespace ZenLib.Tests
             var all = s1.Intersect(s2).Intersect(s3).Intersect(s4).Intersect(s5);
             Assert.AreEqual(allHeaders, all);
         }
+
+        /// <summary>
+        /// Test that transformers work with multiple inputs.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformersMultipleArguments()
+        {
+            var t1 = new ZenFunction<uint, uint, uint>((x, y) => x).Transformer();
+            var t2 = new ZenFunction<uint, uint, uint, uint>((x, y, z) => y).Transformer();
+            var t3 = new ZenFunction<uint, uint, uint, uint, uint>((w, x, y, z) => y).Transformer();
+
+            Assert.AreEqual(3U, t1.OutputSet((p, o) => p.Item1() == 3U).Element().Value);
+            Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element().Value);
+            Assert.AreEqual(3U, t3.OutputSet((p, o) => p.Item3() == 3U).Element().Value);
+        }
+
+        /// <summary>
+        /// Test that transformers work with multiple inputs.
+        /// </summary>
+        [TestMethod]
+        public void TestConstraints()
+        {
+            var c1 = new ZenConstraint<uint>(x => x == 1);
+            var c2 = new ZenConstraint<uint, uint>((x, y) => And(x == 1, y == 1));
+            var c3 = new ZenConstraint<uint, uint, uint>((x, y, z) => And(x == 1, y == 1, z == 1));
+            var c4 = new ZenConstraint<uint, uint, uint, uint>((w, x, y, z) => And(w == 1, x == 1, y == 1, z == 1));
+
+            var v1 = c1.StateSet().Element().Value;
+            var v2 = c2.StateSet().Element().Value;
+            var v3 = c3.StateSet().Element().Value;
+            var v4 = c4.StateSet().Element().Value;
+
+            Assert.AreEqual(1U, v1);
+            Assert.AreEqual(1U, v2.Item1);
+            Assert.AreEqual(1U, v2.Item2);
+            Assert.AreEqual(1U, v3.Item1);
+            Assert.AreEqual(1U, v3.Item2);
+            Assert.AreEqual(1U, v3.Item3);
+            Assert.AreEqual(1U, v4.Item1);
+            Assert.AreEqual(1U, v4.Item2);
+            Assert.AreEqual(1U, v4.Item3);
+            Assert.AreEqual(1U, v4.Item4);
+        }
     }
 }
