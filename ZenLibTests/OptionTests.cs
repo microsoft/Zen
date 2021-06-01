@@ -75,23 +75,13 @@ namespace ZenLib.Tests
         {
             RandomBytes(x =>
             {
-                CheckAgreement<Option<Tuple<byte, byte>>>(o =>
+                CheckAgreement<Option<Pair<byte, byte>>>(o =>
                 {
                     var item1 = o.Value().Item1() == x;
                     var item2 = o.Value().Item2() == x;
                     return And(o.HasValue(), Or(item1, item2));
                 });
             });
-        }
-
-        /// <summary>
-        /// Test option identities.
-        /// </summary>
-        [TestMethod]
-        public void TestOptionIdentities()
-        {
-            CheckValid<Option<int>>(o => TupleToOption(o.HasValue(), o.Value()).HasValue() == o.HasValue());
-            // CheckValid<Option<int>>(o => TupleToOption(o.HasValue(), o.Value()).Value() == o.Value());
         }
 
         /// <summary>
@@ -158,7 +148,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionNullValueType()
         {
-            CheckAgreement<Option<(int, int)>>(o => o.Value().Item1() == o.Value().Item2());
+            CheckAgreement<Option<Pair<int, int>>>(o => o.Value().Item1() == o.Value().Item2());
         }
 
         /// <summary>
@@ -179,7 +169,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionDefault()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<IpHeader>(() =>
             {
                 var x = Null<IpHeader>();
                 return x.Value();

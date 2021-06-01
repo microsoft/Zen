@@ -155,7 +155,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer()
         {
             return SymbolicEvaluator.StateTransformer(this.function);
@@ -301,6 +301,16 @@ namespace ZenLib
             }
 
             this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+        }
+
+        /// <summary>
+        /// Gets the function as a state transformer.
+        /// </summary>
+        /// <returns>A transformer for the function.</returns>
+        public StateSetTransformer<Pair<T1, T2>, T3> Transformer()
+        {
+            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.function(p.Item1(), p.Item2());
+            return SymbolicEvaluator.StateTransformer(f);
         }
 
         /// <summary>
@@ -454,6 +464,16 @@ namespace ZenLib
             }
 
             this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+        }
+
+        /// <summary>
+        /// Gets the function as a state transformer.
+        /// </summary>
+        /// <returns>A transformer for the function.</returns>
+        public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer()
+        {
+            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.function(p.Item1(), p.Item2(), p.Item3());
+            return SymbolicEvaluator.StateTransformer(f);
         }
 
         /// <summary>
@@ -618,6 +638,16 @@ namespace ZenLib
             }
 
             this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+        }
+
+        /// <summary>
+        /// Gets the function as a state transformer.
+        /// </summary>
+        /// <returns>A transformer for the function.</returns>
+        public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer()
+        {
+            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
+            return SymbolicEvaluator.StateTransformer(f);
         }
 
         /// <summary>

@@ -85,14 +85,6 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public ImmutableHashSet<object> VisitZenAdapterExpr<T1, T2>(ZenAdapterExpr<T1, T2> expression, Unit parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return expression.Expr.Accept(this, parameter);
-            });
-        }
-
         public ImmutableHashSet<object> VisitZenAndExpr(ZenAndExpr expression, Unit parameter)
         {
             return LookupOrCompute(expression, () =>

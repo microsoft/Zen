@@ -16,16 +16,6 @@ namespace ZenLib.Generation
     internal sealed class RandomValueGenerator : ITypeVisitor<object>
     {
         /// <summary>
-        /// None method for options.
-        /// </summary>
-        private static MethodInfo optionNoneMethod = typeof(Option).GetMethod("None");
-
-        /// <summary>
-        /// Some method for options.
-        /// </summary>
-        private static MethodInfo optionSomeMethod = typeof(Option).GetMethod("Some");
-
-        /// <summary>
         /// Random number generator.
         /// </summary>
         private Random random;
@@ -89,29 +79,6 @@ namespace ZenLib.Generation
             });
         }
 
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            return this.GenerateRandom(dictType, () =>
-            {
-                var size = RandomInt() % this.sizeBound;
-
-                var type = typeof(Dictionary<,>).MakeGenericType(new Type[] { keyType, valueType });
-                var addMethod = type.GetMethodCached("set_Item");
-
-                var constructor = type.GetConstructor(new Type[] { });
-                var dictionary = constructor.Invoke(CommonUtilities.EmptyArray);
-
-                for (int i = 0; i < size; i++)
-                {
-                    var key = recurse(keyType);
-                    var value = recurse(valueType);
-                    addMethod.Invoke(dictionary, new object[] { key, value });
-                }
-
-                return dictionary;
-            });
-        }
-
         public object VisitLong()
         {
             return this.GenerateRandom(typeof(long), () => ((long)RandomInt() << 32) | (long)RandomInt());
@@ -141,43 +108,9 @@ namespace ZenLib.Generation
             });
         }
 
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            return this.GenerateRandom(optionType, () =>
-            {
-                if (RandomInt() % 2 == 0)
-                {
-                    var noneMethod = optionNoneMethod.MakeGenericMethod(innerType);
-                    return noneMethod.Invoke(null, CommonUtilities.EmptyArray);
-                }
-
-                var value = recurse(innerType);
-                var someMethod = optionSomeMethod.MakeGenericMethod(innerType);
-                return someMethod.Invoke(null, new object[] { value });
-            });
-        }
-
         public object VisitShort()
         {
             return this.GenerateRandom(typeof(short), () => (short)RandomInt());
-        }
-
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return this.GenerateRandom(tupleType, () =>
-            {
-                var constructor = tupleType.GetConstructor(new Type[] { innerTypeLeft, innerTypeRight });
-                return constructor.Invoke(new object[] { recurse(innerTypeLeft), recurse(innerTypeRight) });
-            });
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return this.GenerateRandom(tupleType, () =>
-            {
-                var constructor = tupleType.GetConstructor(new Type[] { innerTypeLeft, innerTypeRight });
-                return constructor.Invoke(new object[] { recurse(innerTypeLeft), recurse(innerTypeRight) });
-            });
         }
 
         public object VisitUint()

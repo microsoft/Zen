@@ -38,8 +38,7 @@ namespace ZenLib.Tests
             CheckDefault<UInt2>(new UInt2(0));
             CheckDefault<string>(string.Empty);
             CheckDefault<BigInteger>(new BigInteger(0));
-            CheckDefault<(int, int)>((0, 0));
-            CheckDefault<Tuple<int, int>>(new Tuple<int, int>(0, 0));
+            CheckDefault<Pair<int, int>>(new Pair<int, int> { Item1 = 0, Item2 = 0 });
             CheckDefault<Option<int>>(Option.None<int>());
 
             var o = ReflectionUtilities.GetDefaultValue<Object2>();
@@ -49,8 +48,7 @@ namespace ZenLib.Tests
             var l = ReflectionUtilities.GetDefaultValue<IList<int>>();
             Assert.AreEqual(0, l.Count);
 
-            var d = ReflectionUtilities.GetDefaultValue<IDictionary<int, int>>();
-            Assert.AreEqual(0, d.Count);
+            var d = ReflectionUtilities.GetDefaultValue<Dict<int, int>>();
         }
 
         private void CheckDefault<T>(object o)

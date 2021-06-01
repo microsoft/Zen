@@ -12,14 +12,6 @@ namespace ZenLib
     internal interface IZenExprVisitor<TParam, TReturn>
     {
         /// <summary>
-        /// Visit a AdapterExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenAdapterExpr<T1, T2>(ZenAdapterExpr<T1, T2> expression, TParam parameter);
-
-        /// <summary>
         /// Visit an AndExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

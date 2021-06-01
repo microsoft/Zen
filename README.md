@@ -236,7 +236,7 @@ The library should take care of the rest. Or equivalently, for unsigned integer 
 
 ### Lists, Dictionaries, Options, Tuples
 
-Zen supports values with type `Tuple<T1, T2>`, `(T1, T2)`, `IList<T>` and `IDictionary<T>` so long as the inner types are also supported. 
+Zen supports values with type `IList<T>` out of the box. It also provides several library types to model other useful data structures. For example, it provides a `Dict<T1, T2>` type to emulate finite dictionaries. It also supports pair types, e.g., `Pair<T1, T2>` as a lightweight alternative to classes. 
 
 By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 

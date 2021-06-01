@@ -63,7 +63,7 @@ namespace ZenLib.Tests
         {
             var rules = new ValueTuple<uint, uint, uint>[2] { (0, 10, 99), (11, 20, 100) };
             var nat = new Nat { Rules = rules };
-            var function = Function<IpHeader, IpHeader>(p => NatMatch(nat, p));
+            var function = new ZenFunction<IpHeader, IpHeader>(p => NatMatch(nat, p));
             Assert.AreEqual(function.Evaluate(new IpHeader { DstIp = new Ip { Value = 10 } }).DstIp.Value, 99U);
             Assert.AreEqual(function.Evaluate(new IpHeader { DstIp = new Ip { Value = 11 } }).DstIp.Value, 100U);
         }

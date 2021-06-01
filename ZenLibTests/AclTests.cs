@@ -36,7 +36,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclEvaluate()
         {
-            var function = Function<IpHeader, bool>(p => ExampleAcl().Process(p, 0));
+            var function = new ZenFunction<IpHeader, bool>(p => ExampleAcl().Process(p, 0));
             var result = function.Evaluate(new IpHeader { DstIp = Ip.Parse("72.1.2.1"), SrcIp = Ip.Parse("1.2.3.4") });
             Assert.IsTrue(result);
         }
@@ -56,7 +56,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAclWithLinesEvaluate()
         {
-            var function = Function<IpHeader, (bool, ushort)>(p => ExampleAcl().ProcessProvenance(p, 0));
+            var function = new ZenFunction<IpHeader, Pair<bool, ushort>>(p => ExampleAcl().ProcessProvenance(p, 0));
             var result = function.Evaluate(new IpHeader { DstIp = Ip.Parse("8.8.8.8"), SrcIp = Ip.Parse("9.9.9.9") });
             Assert.AreEqual(result.Item1, false);
             Assert.AreEqual(result.Item2, (ushort)2);
@@ -79,7 +79,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestUnroll()
         {
-            var function = Function<LocatedPacket, LocatedPacket>(lp => StepMany(lp, 3));
+            var function = new ZenFunction<LocatedPacket, LocatedPacket>(lp => StepMany(lp, 3));
 
             var input = function.Find((inputLp, outputLp) =>
                 And(inputLp.GetNode() == 0,

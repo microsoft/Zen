@@ -50,7 +50,7 @@ namespace ZenLib.Tests
                 ("StormStartedTime2", Constant<ushort>(0)),
                 ("StormEndedTime1", Constant<ushort>(0)),
                 ("StormEndedTime2", Constant<ushort>(0)),
-                ("Packets", EmptyList<(ushort, (byte, bool))>()));
+                ("Packets", EmptyList<Pair<ushort, Pair<byte, bool>>>()));
         }
 
         /// <summary>
@@ -154,8 +154,8 @@ namespace ZenLib.Tests
             var isBurstOn1 = And(e.GetEventType() == burstEvent, e.GetPriorityClass() == 0);
             var isBurstOn2 = And(e.GetEventType() == burstEvent, e.GetPriorityClass() == 1);
 
-            var stateBurst1 = switchState.AddPacket(ValueTuple(e.GetTimeStamp(), ValueTuple<byte, bool>(0, currentState.GetWatchdogDropPackets1())));
-            var stateBurst2 = switchState.AddPacket(ValueTuple(e.GetTimeStamp(), ValueTuple<byte, bool>(1, currentState.GetWatchdogDropPackets1())));
+            var stateBurst1 = switchState.AddPacket(Pair(e.GetTimeStamp(), Pair<byte, bool>(0, currentState.GetWatchdogDropPackets1())));
+            var stateBurst2 = switchState.AddPacket(Pair(e.GetTimeStamp(), Pair<byte, bool>(1, currentState.GetWatchdogDropPackets1())));
 
             var isStormStartOn1 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 0);
             var isStormStartOn2 = And(e.GetEventType() == stormStartEvent, e.GetPriorityClass() == 1);

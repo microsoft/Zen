@@ -80,34 +80,10 @@ namespace ZenLib
         T VisitString();
 
         /// <summary>
-        /// Visit the option type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitOption(Func<Type, T> recurse, Type optionType, Type innerType);
-
-        /// <summary>
-        /// Visit the tuple type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
-
-        /// <summary>
-        /// Visit the value tuple type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitValueTuple(Func<Type, T> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight);
-
-        /// <summary>
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>
         T VisitList(Func<Type, T> recurse, Type listType, Type innerType);
-
-        /// <summary>
-        /// Visit the dictionary type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitDictionary(Func<Type, T> recurse, Type dictType, Type keyType, Type valueType);
 
         /// <summary>
         /// Visit a class/struct type.

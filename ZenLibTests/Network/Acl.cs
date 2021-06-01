@@ -43,14 +43,14 @@ namespace ZenLib.Tests.Network
         /// </summary>
         /// <param name="hdr">The header.</param>
         /// <returns>Whether permitted.</returns>
-        public Zen<(bool, ushort)> ProcessProvenance(Zen<IpHeader> hdr)
+        public Zen<ZenLib.Pair<bool, ushort>> ProcessProvenance(Zen<IpHeader> hdr)
         {
-            var acc = ValueTuple<bool, ushort>(false, (ushort)(this.Lines.Length + 1));
+            var acc = Pair<bool, ushort>(false, (ushort)(this.Lines.Length + 1));
 
             for (int i = this.Lines.Length - 1; i >= 0; i--)
             {
                 var line = this.Lines[i];
-                acc = If(line.Matches(hdr), ValueTuple<bool, ushort>(line.Permitted, (ushort)(i + 1)), acc);
+                acc = If(line.Matches(hdr), Pair<bool, ushort>(line.Permitted, (ushort)(i + 1)), acc);
             }
 
             return acc;
@@ -62,17 +62,17 @@ namespace ZenLib.Tests.Network
         /// <param name="hdr">The header.</param>
         /// <param name="i">The line number.</param>
         /// <returns>Whether permitted.</returns>
-        public Zen<(bool, ushort)> ProcessProvenance(Zen<IpHeader> hdr, int i)
+        public Zen<ZenLib.Pair<bool, ushort>> ProcessProvenance(Zen<IpHeader> hdr, int i)
         {
             if (i == this.Lines.Length)
             {
-                return ValueTuple<bool, ushort>(false, (ushort)(i + 1));
+                return Pair<bool, ushort>(false, (ushort)(i + 1));
             }
 
             var line = this.Lines[i];
             return If(
                 line.Matches(hdr),
-                ValueTuple<bool, ushort>(line.Permitted, (ushort)(i + 1)),
+                Pair<bool, ushort>(line.Permitted, (ushort)(i + 1)),
                 ProcessProvenance(hdr, i + 1));
         }
 

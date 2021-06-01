@@ -148,24 +148,6 @@ namespace ZenLib.Compilation
             return variable;
         }
 
-        public Expression VisitZenAdapterExpr<T1, T2>(ZenAdapterExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var expr = expression.Expr.Accept(this, parameter);
-                foreach (var converter in expression.Converters)
-                {
-                    var method = converter.GetType().GetMethodCached("Invoke");
-                    expr = Expression.Convert(Expression.Call(
-                        Expression.Constant(converter),
-                        method,
-                        Expression.Convert(expr, typeof(object))), typeof(T1));
-                }
-
-                return expr;
-            });
-        }
-
         public Expression VisitZenAndExpr(ZenAndExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>

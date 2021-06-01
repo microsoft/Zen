@@ -28,7 +28,7 @@ namespace ZenLib.Tests
             var routeMap = ExampleRouteMap();
 
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            var function = Function<Route, Tuple<Option<Route>, int>>(r => routeMap.ProcessProvenance(r));
+            var function = new ZenFunction<Route, Pair<Option<Route>, int>>(r => routeMap.ProcessProvenance(r));
             Console.WriteLine($"time build: {timer.ElapsedMilliseconds}");
 
             var result = function.Find((route, outputRoute) => outputRoute.Item2() == 3);

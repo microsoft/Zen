@@ -21,19 +21,9 @@ namespace ZenLib.Generation
         private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
 
         /// <summary>
-        /// The method for converting a list to a dictionary.
-        /// </summary>
-        private static MethodInfo listToDictMethod = typeof(Language).GetMethod("ListToDictionary");
-
-        /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
         private static MethodInfo ifConditionMethod = typeof(Language).GetMethod("If");
-
-        /// <summary>
-        /// The method for creating an option from a tuple at runtime.
-        /// </summary>
-        private static MethodInfo tupleToOptionMethod = typeof(Language).GetMethod("TupleToOption");
 
         /// <summary>
         /// The arbitrary expressions generated.
@@ -109,15 +99,6 @@ namespace ZenLib.Generation
             return list;
         }
 
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            var tupleType = typeof(Tuple<,>).MakeGenericType(keyType, valueType);
-            var listType = typeof(IList<>).MakeGenericType(tupleType);
-            var list = VisitList(recurse, listType, tupleType);
-            var method = listToDictMethod.MakeGenericMethod(keyType, valueType);
-            return method.Invoke(null, new object[] { list });
-        }
-
         public object VisitLong()
         {
             var e = new ZenArbitraryExpr<long>();
@@ -171,24 +152,6 @@ namespace ZenLib.Generation
             var e = new ZenArbitraryExpr<string>();
             this.ArbitraryExpressions.Add(e);
             return e;
-        }
-
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            var flag = recurse(ReflectionUtilities.BoolType);
-            var value = recurse(innerType);
-            var method = tupleToOptionMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, new object[] { flag, value });
-        }
-
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace ZenLib.Tests
             CheckAgreement<long>(x => x == 8);
             CheckAgreement<ulong>(x => x == 9);
             CheckAgreement<Option<int>>(x => x == Option.Some(3));
-            CheckAgreement<Tuple<int, int>>(x => x == new Tuple<int, int>(1, 2));
+            CheckAgreement<Pair<int, int>>(x => x == new Pair<int, int> { Item1 = 1, Item2 = 2 });
             CheckAgreement<(int, int)>(x => x == (1, 2));
             CheckAgreement<IList<int>>(x => x == new List<int>() { 1, 2, 3 });
             CheckAgreement<IList<IList<int>>>(x => x == new List<IList<int>>() { new List<int>() { 1 } });
@@ -42,7 +42,9 @@ namespace ZenLib.Tests
 
             CheckAgreement<IDictionary<int, int>>(x =>
             {
-                Zen<IDictionary<int, int>> y = new Dictionary<int, int>() { { 1, 2 } };
+                var d = new Dict<int, int>();
+                d.Add(1, 2);
+                Zen<Dict<int, int>> y = d;
                 return y.ContainsKey(4);
             });
         }
@@ -63,8 +65,7 @@ namespace ZenLib.Tests
             CheckEqual(7UL);
             CheckEqual(Option.None<int>());
             CheckEqual(Option.Some(8));
-            CheckEqual(new Tuple<int, int>(9, 10));
-            CheckEqual((9, 10));
+            CheckEqual(new Pair<int, int> { Item1 = 9, Item2 = 10 });
             CheckEqual(new FiniteString("hello"));
             CheckEqualLists(new List<int>() { 1, 2, 3 });
         }
@@ -94,54 +95,22 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null tuple inner value.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
         public void TestConvertNullTupleValue()
         {
-            try
-            {
-                var o = new Tuple<Object1, Object1>(null, null);
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
-            }
-        }
-
-        /// <summary>
-        /// Test that converting a value with a null tuple inner value.
-        /// </summary>
-        [TestMethod]
-        public void TestConvertNullValueTupleValue()
-        {
-            try
-            {
-                (Object1, Object1) o = (null, null);
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
-            }
+            var o = new Pair<Object1, Object1> { Item1 = null, Item2 = null };
+            var _ = Constant(o);
         }
 
         /// <summary>
         /// Test that converting a value with a null option inner value.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
         public void TestConvertNullOptionValue()
         {
-            try
-            {
-                Option<Object1> o = Option.Some<Object1>(null);
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
-            }
+            Option<Object1> o = Option.Some<Object1>(null);
+            var _ = Constant(o);
         }
 
         /// <summary>
@@ -170,13 +139,14 @@ namespace ZenLib.Tests
         {
             try
             {
-                IDictionary<int, Object1> o = new Dictionary<int, Object1> { { 1, null } };
+                Dict<int, Object1> o = new Dict<int, Object1>();
+                o.Add(1, null);
                 var _ = Constant(o);
                 Assert.Fail();
             }
             catch (System.Reflection.TargetInvocationException e)
             {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+                Assert.AreEqual(typeof(ZenException), e.InnerException.GetType());
             }
         }
 
@@ -186,7 +156,7 @@ namespace ZenLib.Tests
         /// <param name="value">The value.</param>
         private void CheckEqual<T>(T value)
         {
-            var f = Function<T>(() => value);
+            var f = new ZenFunction<T>(() => value);
             Assert.AreEqual(value, f.Evaluate());
         }
 
@@ -196,7 +166,7 @@ namespace ZenLib.Tests
         /// <param name="value">The value.</param>
         private void CheckEqualLists<T>(IList<T> value)
         {
-            var f = Function(() => Lift(value));
+            var f = new ZenFunction<IList<T>>(() => Lift(value));
             var result = f.Evaluate();
 
             Assert.AreEqual(value.Count, result.Count);

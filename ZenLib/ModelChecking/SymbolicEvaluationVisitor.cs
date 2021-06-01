@@ -57,14 +57,6 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenAdapterExpr<TTo, TFrom>(ZenAdapterExpr<TTo, TFrom> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                return expression.Expr.Accept(this, parameter);
-            });
-        }
-
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
         {
             return LookupOrCompute(expression, () =>

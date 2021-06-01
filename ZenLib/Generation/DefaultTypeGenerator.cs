@@ -19,16 +19,6 @@ namespace ZenLib.Generation
         /// </summary>
         private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
 
-        /// <summary>
-        /// Method for creating an empty Zen dictionary.
-        /// </summary>
-        private static MethodInfo emptyDictMethod = typeof(Language).GetMethod("EmptyDict");
-
-        /// <summary>
-        /// Method for creating a null option.
-        /// </summary>
-        private static MethodInfo nullMethod = typeof(Language).GetMethod("Null");
-
         public object VisitBool()
         {
             return ZenConstantExpr<bool>.Create(false);
@@ -47,12 +37,6 @@ namespace ZenLib.Generation
         public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, CommonUtilities.EmptyArray);
-        }
-
-        public object VisitDictionary(Func<Type, object> recurse, Type dictType, Type keyType, Type valueType)
-        {
-            var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
@@ -78,25 +62,9 @@ namespace ZenLib.Generation
             return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
         }
 
-        public object VisitOption(Func<Type, object> recurse, Type optionType, Type innerType)
-        {
-            var method = nullMethod.MakeGenericMethod(innerType);
-            return method.Invoke(null, CommonUtilities.EmptyArray);
-        }
-
         public object VisitShort()
         {
             return ZenConstantExpr<short>.Create(0);
-        }
-
-        public object VisitTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToTuple(recurse, innerTypeLeft, innerTypeRight);
-        }
-
-        public object VisitValueTuple(Func<Type, object> recurse, Type tupleType, Type innerTypeLeft, Type innerTypeRight)
-        {
-            return GeneratorHelper.ApplyToValueTuple(recurse, innerTypeLeft, innerTypeRight);
         }
 
         public object VisitUint()

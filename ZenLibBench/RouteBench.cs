@@ -87,7 +87,7 @@ namespace ZenLibBench
         [Benchmark]
         public void VerifyRouteMapProvenance()
         {
-            var f = Function<Route, Tuple<Option<Route>, int>>(this.routeMap.ProcessProvenance);
+            var f = new ZenFunction<Route, Pair<Option<Route>, int>>(this.routeMap.ProcessProvenance);
             var packet = f.Find(
                 (p, o) => o.Item2() == (this.routeMap.Lines.Count + 1),
                 listSize: this.ListSize,
@@ -100,7 +100,7 @@ namespace ZenLibBench
         [Benchmark]
         public void VerifyRouteMap()
         {
-            var f = Function<Route, Option<Route>>(this.routeMap.Process);
+            var f = new ZenFunction<Route, Option<Route>>(this.routeMap.Process);
             var packet = f.Find(
                 (p, o) => Not(o.HasValue()),
                 listSize: this.ListSize,

@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestNegatives()
         {
-            var f = Function<short, bool>(x => -2 > -1);
+            var f = new ZenFunction<short, bool>(x => -2 > -1);
             var result = f.Find((i, o) => o, backend: Backend.DecisionDiagrams);
             Assert.IsFalse(result.HasValue);
         }
@@ -385,17 +385,17 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDefaultValues()
         {
-            Assert.IsTrue(Function(() => Null<bool>()).Assert(v => v.Value() == false));
-            Assert.IsTrue(Function(() => Null<byte>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<short>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<ushort>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<int>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<uint>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<long>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<ulong>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(Function(() => Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
-            Assert.IsTrue(Function(() => Null<IList<bool>>()).Assert(v => v.Value().IsEmpty()));
-            Assert.IsTrue(Function(() => Null<IDictionary<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
+            Assert.IsTrue(new ZenFunction<Option<bool>>(() => Null<bool>()).Assert(v => v.Value() == false));
+            Assert.IsTrue(new ZenFunction<Option<byte>>(() => Null<byte>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<short>>(() => Null<short>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<ushort>>(() => Null<ushort>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<int>>(() => Null<int>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<uint>>(() => Null<uint>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<long>>(() => Null<long>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<ulong>>(() => Null<ulong>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<BigInteger>>(() => Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
+            Assert.IsTrue(new ZenFunction<Option<IList<bool>>>(() => Null<IList<bool>>()).Assert(v => v.Value().IsEmpty()));
+            Assert.IsTrue(new ZenFunction<Option<Dict<bool, bool>>>(() => Null<Dict<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultiplication()
         {
-            var f = Function<int, int, bool>((a, b) => a * b == 10);
+            var f = new ZenFunction<int, int, bool>((a, b) => a * b == 10);
             var inputs = f.Find((a, b, res) => res, backend: ModelChecking.Backend.Z3);
             Assert.IsTrue(inputs.HasValue);
             Assert.AreEqual(10, inputs.Value.Item1 * inputs.Value.Item2);
@@ -426,7 +426,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultiplySolve()
         {
-            var f = Function<BigInteger, BigInteger, bool>((x, y) => x * y == new BigInteger(4));
+            var f = new ZenFunction<BigInteger, BigInteger, bool>((x, y) => x * y == new BigInteger(4));
             var inputs = f.Find((x, y, result) => result);
             Assert.AreEqual(4, inputs.Value.Item1 * inputs.Value.Item2);
         }
@@ -438,7 +438,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplicationException()
         {
-            var f = Function<int, int, bool>((a, b) => a * b == 10);
+            var f = new ZenFunction<int, int, bool>((a, b) => a * b == 10);
             var inputs = f.Find((a, b, res) => res, backend: Backend.DecisionDiagrams);
         }
 

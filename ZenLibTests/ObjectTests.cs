@@ -240,7 +240,7 @@ namespace ZenLib.Tests
         /// <param name="field">The field name.</param>
         private void CheckWithIsSet<T>(string field)
         {
-            var f = Function<T, T>(o => o.WithField(field, Constant(1)));
+            var f = new ZenFunction<T, T>(o => o.WithField(field, Constant(1)));
             var r = f.Find((i, o) => o.GetField<T, int>(field) == Constant(0));
             Assert.IsFalse(r.HasValue);
         }
@@ -251,7 +251,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject1()
         {
-            var f1 = Function<int, Object1>(i => Create<Object1>(("Field1", Constant(1))));
+            var f1 = new ZenFunction<int, Object1>(i => Create<Object1>(("Field1", Constant(1))));
 
             var r = f1.Evaluate(0);
             Assert.AreEqual(1, r.Field1);
@@ -265,7 +265,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject2()
         {
-            var f2 = Function<int, Object2>(i => Create<Object2>(
+            var f2 = new ZenFunction<int, Object2>(i => Create<Object2>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2))));
 
@@ -283,7 +283,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject3()
         {
-            var f3 = Function<int, Object3>(i => Create<Object3>(
+            var f3 = new ZenFunction<int, Object3>(i => Create<Object3>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3))));
@@ -303,7 +303,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject4()
         {
-            var f4 = Function<int, Object4>(i => Create<Object4>(
+            var f4 = new ZenFunction<int, Object4>(i => Create<Object4>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -325,7 +325,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject5()
         {
-            var f5 = Function<int, Object5>(i => Create<Object5>(
+            var f5 = new ZenFunction<int, Object5>(i => Create<Object5>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -349,7 +349,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject6()
         {
-            var f6 = Function<int, Object6>(i => Create<Object6>(
+            var f6 = new ZenFunction<int, Object6>(i => Create<Object6>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -375,7 +375,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject7()
         {
-            var f7 = Function<int, Object7>(i => Create<Object7>(
+            var f7 = new ZenFunction<int, Object7>(i => Create<Object7>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -403,7 +403,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCreateObject8()
         {
-            var f8 = Function<int, Object8>(i => Create<Object8>(
+            var f8 = new ZenFunction<int, Object8>(i => Create<Object8>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -433,7 +433,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject1()
         {
-            var f = Function<int, int>(i => Create<Object1>(
+            var f = new ZenFunction<int, int>(i => Create<Object1>(
                 ("Field1", Constant(1))).GetField<Object1, int>("Field1"));
 
             Assert.AreEqual(1, f.Evaluate(0));
@@ -446,7 +446,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject2()
         {
-            var f = Function<int, int>(i => Create<Object2>(
+            var f = new ZenFunction<int, int>(i => Create<Object2>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2))).GetField<Object2, int>("Field2"));
 
@@ -460,7 +460,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject3()
         {
-            var f = Function<int, int>(i => Create<Object3>(
+            var f = new ZenFunction<int, int>(i => Create<Object3>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3))).GetField<Object3, int>("Field3"));
@@ -475,7 +475,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject4()
         {
-            var f = Function<int, int>(i => Create<Object4>(
+            var f = new ZenFunction<int, int>(i => Create<Object4>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -491,7 +491,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject5()
         {
-            var f = Function<int, int>(i => Create<Object5>(
+            var f = new ZenFunction<int, int>(i => Create<Object5>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -508,7 +508,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject6()
         {
-            var f = Function<int, int>(i => Create<Object6>(
+            var f = new ZenFunction<int, int>(i => Create<Object6>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -526,7 +526,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject7()
         {
-            var f = Function<int, int>(i => Create<Object7>(
+            var f = new ZenFunction<int, int>(i => Create<Object7>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -545,7 +545,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGetCreateObject8()
         {
-            var f = Function<int, int>(i => Create<Object8>(
+            var f = new ZenFunction<int, int>(i => Create<Object8>(
                 ("Field1", Constant(1)),
                 ("Field2", Constant(2)),
                 ("Field3", Constant(3)),
@@ -565,7 +565,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectIfThenElse()
         {
-            var f = Function<bool, Object2>(b =>
+            var f = new ZenFunction<bool, Object2>(b =>
             {
                 var o1 = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
                 var o2 = Create<Object2>(("Field1", Constant(2)), ("Field2", Constant(1)));
@@ -583,7 +583,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalIf()
         {
-            var f = Function<bool, Object2>(b =>
+            var f = new ZenFunction<bool, Object2>(b =>
             {
                 var o1 = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
                 var o2 = Create<Object2>(("Field1", Constant(2)), ("Field2", Constant(1)));
@@ -606,7 +606,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate1()
         {
-            var f = Function(() => Create<Object1>(("Field1", Constant(1))));
+            var f = new ZenFunction<Object1>(() => Create<Object1>(("Field1", Constant(1))));
 
             Assert.AreEqual(f.Evaluate().Field1, 1);
 
@@ -622,7 +622,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate2()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object2>(() =>
                 Create<Object2>(
                     ("Field1", Constant(1)), ("Field2", Constant(2))));
 
@@ -644,7 +644,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate3()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object3>(() =>
                 Create<Object3>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3))));
 
@@ -668,7 +668,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate4()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object4>(() =>
                 Create<Object4>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)), ("Field4", Constant(4))));
 
@@ -694,7 +694,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate5()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object5>(() =>
                 Create<Object5>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)), ("Field4", Constant(4)), ("Field5", Constant(5))));
 
@@ -722,7 +722,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate6()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object6>(() =>
                 Create<Object6>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
                     ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6))));
@@ -753,7 +753,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate7()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object7>(() =>
                 Create<Object7>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
                     ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6)),
@@ -787,7 +787,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate8()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object8>(() =>
                 Create<Object8>(
                     ("Field1", Constant(1)), ("Field2", Constant(2)), ("Field3", Constant(3)),
                     ("Field4", Constant(4)), ("Field5", Constant(5)), ("Field6", Constant(6)),
@@ -823,9 +823,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalWith()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object2>(() =>
                 Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)))
-                    .WithField<Object2, int>("Field1", Constant(3)));
+                    .WithField("Field1", Constant(3)));
 
             var o1 = f.Evaluate();
             Assert.AreEqual(o1.Field1, 3);
@@ -845,7 +845,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectCreateArbitrary()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<Object1>(() =>
             {
                 var b = Arbitrary<bool>();
                 var o1 = Create<Object1>(("Field1", Constant(1)));
@@ -871,7 +871,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestObjectEvalCreate1Field()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<ObjectField1>(() =>
                 Create<ObjectField1>(
                     ("Field1", Constant(1))));
 
@@ -889,7 +889,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestStructEvalCreate1Field()
         {
-            var f = Function(() =>
+            var f = new ZenFunction<StructField1>(() =>
                 Create<StructField1>(
                     ("Field1", Constant(1))));
 
@@ -946,7 +946,7 @@ namespace ZenLib.Tests
             StructWithString s;
             s.Field = "";
 
-            var f = Function<StructWithString, StructWithString>(o =>
+            var f = new ZenFunction<StructWithString, StructWithString>(o =>
                 o.WithField<StructWithString, string>("Field", "hello"));
 
             var input = new StructWithString { Field = "hola" };
@@ -960,7 +960,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketEncapsulation()
         {
-            var encap = Function<IList<IpHeader>, IList<IpHeader>>(headers =>
+            var encap = new ZenFunction<IList<IpHeader>, IList<IpHeader>>(headers =>
             {
                 var currentHeader = headers.At(0);
                 var newHeader = currentHeader.Value().WithField("DstIp", Ip.Create(5));
@@ -982,7 +982,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMatrixAdd()
         {
-            var function = Function<Matrix3x3, Matrix3x3, Matrix3x3>(Matrix3x3.Add);
+            var function = new ZenFunction<Matrix3x3, Matrix3x3, Matrix3x3>(Matrix3x3.Add);
             var input = function.Find((x, y, result) => result.GetField<Matrix3x3, int>("v22") == 10);
             var x = input.Value.Item1;
             var y = input.Value.Item2;
