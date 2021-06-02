@@ -20,8 +20,17 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            _ = BenchmarkRunner.Run<AclBench>();
-            _ = BenchmarkRunner.Run<RouteBench>();
+            for (int i = 0; i < 1000; i++)
+            {
+                var b = new AclBench();
+                b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
+                b.NumLines = 100;
+                b.CreateAcl();
+                b.VerifyAclProvenance();
+            }
+
+            // _ = BenchmarkRunner.Run<AclBench>();
+            // _ = BenchmarkRunner.Run<RouteBench>();
             
             /* var watch = System.Diagnostics.Stopwatch.StartNew();
             foreach (var input in PfcModel.GenerateTests().Take(10))
