@@ -168,7 +168,7 @@ namespace ZenLib
         internal static T RunWithLargeStack<T>(Func<T> f)
         {
             // don't spawn a new thread if we are in a thread with a larger stack.
-            if (Settings.InSeparateThread)
+            if (!Settings.UseLargeStack || Settings.InSeparateThread)
             {
                 return f();
             }
