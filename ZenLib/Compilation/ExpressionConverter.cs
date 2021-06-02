@@ -32,14 +32,9 @@ namespace ZenLib.Compilation
     internal class ExpressionConverter : IZenExprVisitor<ExpressionConverterEnvironment, Expression>
     {
         /// <summary>
-        /// Lock for thread-safe compilation.
-        /// </summary>
-        private static object nextVariableLock = new object();
-
-        /// <summary>
         /// Variable id used for easier debugging of compiled code.
         /// </summary>
-        private static int nextVariableId = 0;
+        private int nextVariableId = 0;
 
         /// <summary>
         /// Create an instance of the <see cref="ExpressionConverter"/> class.
@@ -658,10 +653,7 @@ namespace ZenLib.Compilation
 
         private ParameterExpression FreshVariable(Type type)
         {
-            lock (nextVariableLock)
-            {
-                return Expression.Variable(type, "v" + nextVariableId++);
-            }
+            return Expression.Variable(type, "v" + nextVariableId++);
         }
 
         private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
