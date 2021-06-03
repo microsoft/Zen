@@ -15,9 +15,7 @@ namespace ZenLib
         /// <summary>
         /// Initializes a new instance of the <see cref="ZenArbitraryExpr{T}"/> class.
         /// </summary>
-        public ZenArbitraryExpr()
-        {
-        }
+        public ZenArbitraryExpr() { }
 
         public override Zen<T> Unroll()
         {

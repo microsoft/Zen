@@ -56,13 +56,41 @@ namespace ZenLib.Tests
         /// Test that find works for constraints.
         /// </summary>
         [TestMethod]
-        public void TestStateSet()
+        public void TestStateSet1()
         {
             var c = new ZenConstraint<int>(i => And(i < 10, i >= 1));
             var set = c.StateSet();
             Assert.IsFalse(set.IsEmpty());
             Assert.IsFalse(set.IsFull());
-            Assert.IsTrue(set.Element().Value < 10 && set.Element().Value >= 1);
+            Assert.IsTrue(set.Element() < 10 && set.Element() >= 1);
+        }
+
+        /// <summary>
+        /// Test that transformers work with multiple inputs.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSet2()
+        {
+            var c1 = new ZenConstraint<uint>(x => x == 1);
+            var c2 = new ZenConstraint<uint, uint>((x, y) => And(x == 1, y == 1));
+            var c3 = new ZenConstraint<uint, uint, uint>((x, y, z) => And(x == 1, y == 1, z == 1));
+            var c4 = new ZenConstraint<uint, uint, uint, uint>((w, x, y, z) => And(w == 1, x == 1, y == 1, z == 1));
+
+            var v1 = c1.StateSet().Element();
+            var v2 = c2.StateSet().Element();
+            var v3 = c3.StateSet().Element();
+            var v4 = c4.StateSet().Element();
+
+            Assert.AreEqual(1U, v1);
+            Assert.AreEqual(1U, v2.Item1);
+            Assert.AreEqual(1U, v2.Item2);
+            Assert.AreEqual(1U, v3.Item1);
+            Assert.AreEqual(1U, v3.Item2);
+            Assert.AreEqual(1U, v3.Item3);
+            Assert.AreEqual(1U, v4.Item1);
+            Assert.AreEqual(1U, v4.Item2);
+            Assert.AreEqual(1U, v4.Item3);
+            Assert.AreEqual(1U, v4.Item4);
         }
     }
 }

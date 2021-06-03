@@ -119,12 +119,12 @@ namespace ZenLib.ModelChecking
         /// Get an element from the set.
         /// </summary>
         /// <returns>An element if non-empty.</returns>
-        public Option<T> Element()
+        public T Element()
         {
             var model = this.Solver.Satisfiable(this.Set);
             if (!model.HasValue)
             {
-                return Option.None<T>();
+                throw new ZenException("No element exists in state set.");
             }
 
             var assignment = new Dictionary<object, object>();
@@ -135,8 +135,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result = CommonUtilities.ConvertSymbolicResultToCSharp<T>(this.ZenExpression.Accept(new ExpressionEvaluator(false), interpreterEnv));
-            return Option.Some(result);
+            return CommonUtilities.ConvertSymbolicResultToCSharp<T>(this.ZenExpression.Accept(new ExpressionEvaluator(false), interpreterEnv));
         }
 
         /// <summary>

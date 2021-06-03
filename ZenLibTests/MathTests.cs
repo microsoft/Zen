@@ -239,16 +239,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test equality for composite types.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestEqualityCompositeException2()
-        {
-            CheckAgreement<IDictionary<byte, byte>, IDictionary<byte, byte>>((l1, l2) => l1 == l2);
-        }
-
-        /// <summary>
         /// Test an exception is thrown for non-integers.
         /// </summary>
         [TestMethod]

@@ -40,9 +40,8 @@ namespace ZenLib.Solver
             this.context = new Context();
             var t1 = this.context.MkTactic("simplify");
             var t2 = this.context.MkTactic("solve-eqs");
-            var t3 = this.context.MkTactic("bit-blast");
-            var t4 = this.context.MkTactic("smt");
-            var tactic = this.context.AndThen(t1, t2, t3, t4);
+            var t3 = this.context.MkTactic("smt");
+            var tactic = this.context.AndThen(t1, t2, t3);
             this.solver = this.context.MkSolver(tactic);
             this.BoolSort = this.context.MkBoolSort();
             this.ByteSort = this.context.MkBitVecSort(8);

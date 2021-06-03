@@ -4,8 +4,8 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
 
     /// <summary>
     /// A function argument placeholder expression..
@@ -18,7 +18,7 @@ namespace ZenLib
         /// </summary>
         public ZenArgumentExpr()
         {
-            this.ArgumentId = Guid.NewGuid().ToString();
+            this.ArgumentId = Interlocked.Increment(ref ZenArgumentId.nextId);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the unique id for the object.
         /// </summary>
-        public string ArgumentId { get; }
+        public long ArgumentId { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -57,5 +57,15 @@ namespace ZenLib
         {
             return visitor.VisitZenArgumentExpr(this, parameter);
         }
+    }
+
+    /// <summary>
+    /// Placeholder for the next unique id for an argument expression.
+    /// This is kept outside the class to avoid having a separate id
+    /// for each instantiation of the generic type T.
+    /// </summary>
+    internal static class ZenArgumentId
+    {
+        internal static long nextId;
     }
 }

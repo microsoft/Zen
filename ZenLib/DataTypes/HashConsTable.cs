@@ -15,6 +15,11 @@ namespace ZenLib
     internal sealed class HashConsTable<TKey, TValue> where TValue : class
     {
         /// <summary>
+        /// Lock object for the hash cons table.
+        /// </summary>
+        private object lockObj = new object();
+
+        /// <summary>
         /// The table of hash consed elements.
         /// </summary>
         private Dictionary<TKey, WeakReference<TValue>> table = new Dictionary<TKey, WeakReference<TValue>>();
@@ -44,57 +49,60 @@ namespace ZenLib
         /// <returns>True if the element was added.</returns>
         public bool GetOrAdd(TKey key, Func<TValue> createFunc, out TValue result)
         {
-            // we need to occasionally cull the dead elements in the table to avoid
-            // growing in an unbounded way when there are many values that become dead.
-            // when we reach a power of 2 size, we count the dead entries, and clean them up
-            // only if they exceed half the elements in the table.
-            // if this never happens, then it means that the dead entries are a constant fraction
-            // of the entries.
-            if ((this.table.Count & (this.table.Count - 1)) == 0)
+            lock (this.lockObj)
             {
-                int numDead = 0;
-
-                foreach (var v in this.table.Values)
+                // we need to occasionally cull the dead elements in the table to avoid
+                // growing in an unbounded way when there are many values that become dead.
+                // when we reach a power of 2 size, we count the dead entries, and clean them up
+                // only if they exceed half the elements in the table.
+                // if this never happens, then it means that the dead entries are a constant fraction
+                // of the entries.
+                if ((this.table.Count & (this.table.Count - 1)) == 0)
                 {
-                    if (!v.TryGetTarget(out var _))
-                    {
-                        numDead++;
-                    }
-                }
+                    int numDead = 0;
 
-                if (numDead >= this.table.Count / 2)
-                {
-                    var newCount = (this.table.Count - numDead) * 2;
-                    var newTable = new Dictionary<TKey, WeakReference<TValue>>(newCount, this.table.Comparer);
-
-                    foreach (var kv in this.table)
+                    foreach (var v in this.table.Values)
                     {
-                        if (kv.Value.TryGetTarget(out var _))
+                        if (!v.TryGetTarget(out var _))
                         {
-                            newTable[kv.Key] = kv.Value;
+                            numDead++;
                         }
                     }
 
-                    this.table = newTable;
-                }
-            }
+                    if (numDead >= this.table.Count / 2)
+                    {
+                        var newCount = (this.table.Count - numDead) * 2;
+                        var newTable = new Dictionary<TKey, WeakReference<TValue>>(newCount, this.table.Comparer);
 
-            if (this.table.TryGetValue(key, out var wref))
-            {
-                if (wref.TryGetTarget(out var target))
+                        foreach (var kv in this.table)
+                        {
+                            if (kv.Value.TryGetTarget(out var _))
+                            {
+                                newTable[kv.Key] = kv.Value;
+                            }
+                        }
+
+                        this.table = newTable;
+                    }
+                }
+
+                if (this.table.TryGetValue(key, out var wref))
                 {
-                    result = target;
-                    return false;
+                    if (wref.TryGetTarget(out var target))
+                    {
+                        result = target;
+                        return false;
+                    }
+
+                    result = createFunc();
+                    wref.SetTarget(result);
+                    return true;
                 }
 
                 result = createFunc();
-                wref.SetTarget(result);
+                this.table[key] = new WeakReference<TValue>(result);
                 return true;
             }
-
-            result = createFunc();
-            this.table[key] = new WeakReference<TValue>(result);
-            return true;
         }
     }
 }
