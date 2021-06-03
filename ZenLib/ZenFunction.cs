@@ -158,7 +158,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer()
         {
-            return SymbolicEvaluator.StateTransformer(this.function);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.StateTransformer(this.function));
         }
 
         /// <summary>

@@ -30,6 +30,25 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test a transformer fails for unbounded types.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerExceptionForUnboundedTypes2()
+        {
+            Settings.UseLargeStack = true;
+
+            try
+            {
+                new ZenFunction<BigInteger, bool>(i => i > new BigInteger(0)).Transformer();
+                Assert.Fail();
+            }
+            catch
+            {
+                Settings.UseLargeStack = false;
+            }
+        }
+
+        /// <summary>
         /// Test a transformer with an abitrary works.
         /// </summary>
         [TestMethod]
