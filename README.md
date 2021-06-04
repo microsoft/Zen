@@ -30,7 +30,7 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between C# values and Zen values. To use Zen, we must next create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
-ZenFunction<int, int, int> function = Function<int, int, int>(MultiplyAndAdd);
+ZenFunction<int, int, int> function = new ZenFunction<int, int, int>(MultiplyAndAdd);
 ```
 
 Given a `ZenFunction` we can leverage the library to perform multiple tasks.
@@ -118,7 +118,7 @@ Zen<IList<T>> Insert<T>(Zen<T> elt, Zen<IList<T>> list)
 We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
 
 ```csharp
-var f = Function<IList<byte>, IList<byte>>(l => Sort(l));
+var f = new ZenFunction<IList<byte>, IList<byte>>(l => Sort(l));
 var input = f.Find((inlist, outlist) => inlist.Length() != outlist.Length());
 // input = None
 ```
@@ -132,7 +132,7 @@ While the `Find` function provides a way to find a single input to a function, Z
 It does this through a `StateSetTransformer` API. A transformer is created by calling the `Transformer()` method on a `ZenFunction`:
 
 ```csharp
-ZenFunction<uint, uint> f = Function<uint, uint>(i => i + 1);
+ZenFunction<uint, uint> f = new ZenFunction<uint, uint>(i => i + 1);
 
 // create a set transformer from the function
 StateSetTransformer<uint, uint> t = f.Transformer();
@@ -166,7 +166,7 @@ Internally, transformers leverage [binary decision diagrams](https://github.com/
 As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
 ```csharp
-var f = Function<IList<byte>, IList<byte>>(l => Sort(l));
+var f = new ZenFunction<IList<byte>, IList<byte>>(l => Sort(l));
 
 foreach (var list in f.GenerateInputs(listSize: 3))
 {
