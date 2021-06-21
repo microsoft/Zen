@@ -80,6 +80,69 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test integer comparison for unsigned values.
+        /// </summary>
+        [TestMethod]
+        public void TestIntegerComparisonUnsignedLong()
+        {
+            Zen<ulong> a = 0xffffffffffffffff;
+            Zen<ulong> b = 0x1000000000000000;
+            Assert.AreEqual(True(), a > b);
+
+            ulong c = 0xffffffffffffffff;
+            ulong d = 0x1000000000000000;
+            Assert.IsTrue(c > d);
+
+            var zf = new ZenFunction<ulong, ulong, bool>((x, y) => x > y);
+            Assert.IsTrue(zf.Evaluate(c, d));
+
+            zf.Compile();
+            Assert.IsTrue(zf.Evaluate(c, d));
+        }
+
+        /// <summary>
+        /// Test integer comparison for unsigned values.
+        /// </summary>
+        [TestMethod]
+        public void TestIntegerComparisonUnsignedInt()
+        {
+            Zen<uint> a = 0xffffffff;
+            Zen<uint> b = 0x10000000;
+            Assert.AreEqual(True(), a > b);
+
+            uint c = 0xffffffff;
+            uint d = 0x10000000;
+            Assert.IsTrue(c > d);
+
+            var zf = new ZenFunction<uint, uint, bool>((x, y) => x > y);
+            Assert.IsTrue(zf.Evaluate(c, d));
+
+            zf.Compile();
+            Assert.IsTrue(zf.Evaluate(c, d));
+        }
+
+        /// <summary>
+        /// Test integer comparison for unsigned values.
+        /// </summary>
+        [TestMethod]
+        public void TestIntegerComparisonUnsignedShort()
+        {
+            Zen<ushort> a = 0xffff;
+            Zen<ushort> b = 0x1000;
+            Assert.AreEqual(True(), a > b);
+
+            ushort c = 0xffff;
+            ushort d = 0x1000;
+            Assert.IsTrue(c > d);
+
+            var zf = new ZenFunction<ushort, ushort, bool>((x, y) => x > y);
+            Assert.IsTrue(zf.Evaluate(c, d));
+
+            zf.Compile();
+            Assert.IsTrue(zf.Evaluate(c, d));
+        }
+
+        /// <summary>
         /// Test integer less than or equal.
         /// </summary>
         [TestMethod]
