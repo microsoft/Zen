@@ -239,6 +239,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify unsigned integer operations.
+        /// </summary>
+        [TestMethod]
+        public void TestUnsignedSimplification()
+        {
+            ulong a = 0xffffffffffffffff;
+            ulong b = 0x1000000000000000;
+            Assert.AreEqual(Constant(a + b), Constant(a) + Constant(b));
+            Assert.AreEqual(Constant(b - a), Constant(b) - Constant(a));
+            Assert.AreEqual(Constant(a * b), Constant(a) * Constant(b));
+        }
+
+        /// <summary>
         /// Simplify for concatenaion.
         /// </summary>
         [TestMethod]

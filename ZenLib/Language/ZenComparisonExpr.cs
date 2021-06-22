@@ -34,6 +34,16 @@ namespace ZenLib
         };
 
         /// <summary>
+        /// The constant functions for comparison operations for ulong values.
+        /// </summary>
+        private static Func<ulong, ulong, bool>[] constantUlongFuncs = new Func<ulong, ulong, bool>[]
+        {
+            (x, y) => x >= y,
+            (x, y) => x <= y,
+            (x, y) => x == y,
+        };
+
+        /// <summary>
         /// The interpretation functions for comparison operations.
         /// </summary>
         private static Func<BigInteger, BigInteger, bool>[] constantBigIntFuncs = new Func<BigInteger, BigInteger, bool>[]
@@ -66,13 +76,17 @@ namespace ZenLib
                 return Language.Constant(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
             }
 
+            if (e1 is ZenConstantExpr<ulong> ue1 && e2 is ZenConstantExpr<ulong> ue2)
+            {
+                return Language.Constant(constantUlongFuncs[(int)comparisonType](ue1.Value, ue2.Value));
+            }
+
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
             if (x.HasValue && y.HasValue)
             {
-                var f = constantFuncs[(int)comparisonType];
-                return ReflectionUtilities.CreateConstantIntegerValue<bool>(f(x.Value, y.Value));
+                return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)comparisonType](x.Value, y.Value));
             }
 
             return new ZenComparisonExpr<T>(e1, e2, comparisonType);
