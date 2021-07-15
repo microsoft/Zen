@@ -17,30 +17,23 @@ namespace ZenLib.ModelChecking
     internal static class StateSetTransformerFactory
     {
         /// <summary>
-        /// Manager object for building transformers.
+        ///     Default manager object will allocate all objects.
         /// </summary>
-        private static DDManager<BDDNode> transformerManager =
-            new DDManager<BDDNode>(new BDDNodeFactory());
-
-        /// <summary>
-        /// Canonical variables used for a given type.
-        /// </summary>
-        private static Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> canonicalValues =
-            new Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)>();
-
-        /// <summary>
-        /// Keep track of, for each type, if there is an output
-        /// of that type that is dependency free.
-        /// </summary>
-        private static Dictionary<Type, VariableSet<BDDNode>> dependencyFreeOutput = new Dictionary<Type, VariableSet<BDDNode>>();
+        private static StateSetTransformerManager DefaultManager = new StateSetTransformerManager();
 
         /// <summary>
         /// Create a state set transformer from a zen function.
         /// </summary>
         /// <param name="function">The Zen function to make into a transformer.</param>
+        /// <param name="manager">The transformation manager object to use.</param>
         /// <returns>A state set transformer between input and output types.</returns>
-        public static StateSetTransformer<T1, T2> CreateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function)
+        public static StateSetTransformer<T1, T2> CreateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function, StateSetTransformerManager manager = null)
         {
+            if (manager == null)
+            {
+                manager = DefaultManager;
+            }
+
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputGenerator(0, false);
             var input = Language.Arbitrary<T1>(generator);
@@ -60,7 +53,7 @@ namespace ZenLib.ModelChecking
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression);
 
-            var solver = new SolverDD<BDDNode>(transformerManager, mustInterleave);
+            var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
@@ -69,7 +62,7 @@ namespace ZenLib.ModelChecking
 
             if (isDependencyFree)
             {
-                if (canonicalValues.TryGetValue(typeof(T1), out var canonicalInput))
+                if (manager.CanonicalValues.TryGetValue(typeof(T1), out var canonicalInput))
                 {
                     for (int i = 0; i < arbitrariesForInput.Count; i++)
                     {
@@ -77,7 +70,7 @@ namespace ZenLib.ModelChecking
                     }
                 }
 
-                if (dependencyFreeOutput.TryGetValue(typeof(T2), out var canonicalOutput))
+                if (manager.DependencyFreeOutput.TryGetValue(typeof(T2), out var canonicalOutput))
                 {
                     for (int i = 0; i < arbitrariesForOutput.Count; i++)
                     {
@@ -135,19 +128,19 @@ namespace ZenLib.ModelChecking
             var inputVariableSet = solver.Manager.CreateVariableSet(inputVariables.ToArray());
             var outputVariableSet = solver.Manager.CreateVariableSet(outputVariables.ToArray());
 
-            if (isDependencyFree && !dependencyFreeOutput.ContainsKey(typeof(T2)))
+            if (isDependencyFree && !manager.DependencyFreeOutput.ContainsKey(typeof(T2)))
             {
-                dependencyFreeOutput[typeof(T2)] = outputVariableSet;
+                manager.DependencyFreeOutput[typeof(T2)] = outputVariableSet;
             }
 
-            if (!canonicalValues.ContainsKey(typeof(T1)))
+            if (!manager.CanonicalValues.ContainsKey(typeof(T1)))
             {
-                canonicalValues[typeof(T1)] = (input, inputVariableSet, arbitraryMappingInput);
+                manager.CanonicalValues[typeof(T1)] = (input, inputVariableSet, arbitraryMappingInput);
             }
 
-            if (!canonicalValues.ContainsKey(typeof(T2)))
+            if (!manager.CanonicalValues.ContainsKey(typeof(T2)))
             {
-                canonicalValues[typeof(T2)] = (output, outputVariableSet, arbitraryMappingOutput);
+                manager.CanonicalValues[typeof(T2)] = (output, outputVariableSet, arbitraryMappingOutput);
             }
 
             return new StateSetTransformer<T1, T2>(
@@ -157,7 +150,7 @@ namespace ZenLib.ModelChecking
                 (output, outputVariableSet),
                 arbitraryMappingInput,
                 arbitraryMappingOutput,
-                canonicalValues);
+                manager);
         }
 
         /// <summary>

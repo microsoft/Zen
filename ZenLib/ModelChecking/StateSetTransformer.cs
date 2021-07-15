@@ -45,9 +45,9 @@ namespace ZenLib.ModelChecking
         private VariableSet<BDDNode> outputVariables;
 
         /// <summary>
-        /// Cache of canonical variable values for different types.
+        /// Manager object for transformers.
         /// </summary>
-        private Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> canonicalValues;
+        private StateSetTransformerManager manager;
 
         /// <summary>
         /// Cache from zen expression to variables for that expression.
@@ -66,7 +66,7 @@ namespace ZenLib.ModelChecking
             (Zen<T2>, VariableSet<BDDNode>) outputAndVariables,
             Dictionary<object, Variable<BDDNode>> arbitraryMappingInput,
             Dictionary<object, Variable<BDDNode>> arbitraryMappingOutput,
-            Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> canonicalValues)
+            StateSetTransformerManager manager)
         {
             this.solver = solver;
             this.setTransformer = setTransformer;
@@ -74,9 +74,9 @@ namespace ZenLib.ModelChecking
             this.zenOutput = outputAndVariables.Item1;
             this.inputVariables = inputAndVariables.Item2;
             this.outputVariables = outputAndVariables.Item2;
-            this.canonicalValues = canonicalValues;
             this.arbitraryMappingInput = arbitraryMappingInput;
             this.arbitraryMappingOutput = arbitraryMappingOutput;
+            this.manager = manager;
         }
 
         /// <summary>
@@ -99,8 +99,8 @@ namespace ZenLib.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
-            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
-            return ConvertTo(result, this.canonicalValues[typeof(T1)]);
+            var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
+            return ConvertTo(result, this.manager.CanonicalValues[typeof(T1)]);
         }
 
         /// <summary>
@@ -123,8 +123,8 @@ namespace ZenLib.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, inputVariables);
-            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
-            return ConvertTo(result, this.canonicalValues[typeof(T2)]);
+            var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
+            return ConvertTo(result, this.manager.CanonicalValues[typeof(T2)]);
         }
 
         /// <summary>
@@ -134,12 +134,13 @@ namespace ZenLib.ModelChecking
         /// <returns>The post image output set of the input.</returns>
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
+            CheckValidOperation(input);
             input = ConvertTo(input, (this.zenInput, this.inputVariables, this.arbitraryMappingInput));
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.inputVariables);
-            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
-            return ConvertTo(result, this.canonicalValues[typeof(T2)]);
+            var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
+            return ConvertTo(result, this.manager.CanonicalValues[typeof(T2)]);
         }
 
         /// <summary>
@@ -149,12 +150,13 @@ namespace ZenLib.ModelChecking
         /// <returns>The pre image set of the output.</returns>
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
+            CheckValidOperation(output);
             output = ConvertTo(output, (this.zenOutput, this.outputVariables, this.arbitraryMappingOutput));
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.outputVariables);
-            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
-            return ConvertTo(result, this.canonicalValues[typeof(T1)]);
+            var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
+            return ConvertTo(result, this.manager.CanonicalValues[typeof(T1)]);
         }
 
         /// <summary>
@@ -173,6 +175,18 @@ namespace ZenLib.ModelChecking
             }
 
             return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1, conversionData.Item3);
+        }
+
+        /// <summary>
+        /// Checks if an operation with a state set object is valid.
+        /// </summary>
+        /// <param name="argument">The state set argument.</param>
+        private void CheckValidOperation<T>(StateSet<T> argument)
+        {
+            if (!this.manager.Equals(argument.Manager))
+            {
+                throw new InvalidOperationException($"Attempting to combine transformations and state sets with different manager objects");
+            }
         }
     }
 }
