@@ -67,8 +67,9 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="newVariableSet">The new decision diagram variables.</param>
         /// <param name="newZenExpression">The new Zen expression for the Zen variables.</param>
+        /// <param name="arbitraryMapping">The mapping from arbitrary to bdd variable.</param>
         /// <returns>A new state set with the underlying variables replaced.</returns>
-        internal StateSet<T> ConvertSetVariables(VariableSet<BDDNode> newVariableSet, Zen<T> newZenExpression)
+        internal StateSet<T> ConvertSetVariables(VariableSet<BDDNode> newVariableSet, Zen<T> newZenExpression, Dictionary<object, Variable<BDDNode>> arbitraryMapping)
         {
             var a1 = this.VariableSet.Variables;
             var a2 = newVariableSet.Variables;
@@ -80,7 +81,7 @@ namespace ZenLib.ModelChecking
 
             var mapping = this.Solver.Manager.CreateVariableMap(map);
             var x = this.Solver.Manager.Replace(this.Set, mapping);
-            return new StateSet<T>(this.Solver, x, this.ArbitraryMapping, newZenExpression, newVariableSet);
+            return new StateSet<T>(this.Solver, x, arbitraryMapping, newZenExpression, newVariableSet);
         }
 
         /// <summary>

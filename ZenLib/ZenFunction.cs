@@ -158,7 +158,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer()
         {
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.StateTransformer(this.function));
+            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.function));
         }
 
         /// <summary>
@@ -310,7 +310,7 @@ namespace ZenLib
         public StateSetTransformer<Pair<T1, T2>, T3> Transformer()
         {
             Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.function(p.Item1(), p.Item2());
-            return SymbolicEvaluator.StateTransformer(f);
+            return StateSetTransformerFactory.CreateTransformer(f);
         }
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace ZenLib
         public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer()
         {
             Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.function(p.Item1(), p.Item2(), p.Item3());
-            return SymbolicEvaluator.StateTransformer(f);
+            return StateSetTransformerFactory.CreateTransformer(f);
         }
 
         /// <summary>
@@ -647,7 +647,7 @@ namespace ZenLib
         public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer()
         {
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
-            return SymbolicEvaluator.StateTransformer(f);
+            return StateSetTransformerFactory.CreateTransformer(f);
         }
 
         /// <summary>

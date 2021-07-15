@@ -47,20 +47,26 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Cache of canonical variable values for different types.
         /// </summary>
-        private Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues;
+        private Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> canonicalValues;
 
         /// <summary>
         /// Cache from zen expression to variables for that expression.
         /// </summary>
-        private Dictionary<object, Variable<BDDNode>> arbitraryMapping;
+        private Dictionary<object, Variable<BDDNode>> arbitraryMappingInput;
+
+        /// <summary>
+        /// Cache from zen expression to variables for that expression.
+        /// </summary>
+        private Dictionary<object, Variable<BDDNode>> arbitraryMappingOutput;
 
         internal StateSetTransformer(
             SolverDD<BDDNode> solver,
             DD setTransformer,
             (Zen<T1>, VariableSet<BDDNode>) inputAndVariables,
             (Zen<T2>, VariableSet<BDDNode>) outputAndVariables,
-            Dictionary<object, Variable<BDDNode>> arbitraryMapping,
-            Dictionary<Type, (object, VariableSet<BDDNode>)> canonicalValues)
+            Dictionary<object, Variable<BDDNode>> arbitraryMappingInput,
+            Dictionary<object, Variable<BDDNode>> arbitraryMappingOutput,
+            Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> canonicalValues)
         {
             this.solver = solver;
             this.setTransformer = setTransformer;
@@ -69,7 +75,8 @@ namespace ZenLib.ModelChecking
             this.inputVariables = inputAndVariables.Item2;
             this.outputVariables = outputAndVariables.Item2;
             this.canonicalValues = canonicalValues;
-            this.arbitraryMapping = arbitraryMapping;
+            this.arbitraryMappingInput = arbitraryMappingInput;
+            this.arbitraryMappingOutput = arbitraryMappingOutput;
         }
 
         /// <summary>
@@ -92,7 +99,7 @@ namespace ZenLib.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
-            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
         }
 
@@ -116,7 +123,7 @@ namespace ZenLib.ModelChecking
             }
 
             var dd = solver.Manager.Exists(set, inputVariables);
-            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMapping, this.zenOutput, this.outputVariables);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T2)]);
         }
 
@@ -127,11 +134,11 @@ namespace ZenLib.ModelChecking
         /// <returns>The post image output set of the input.</returns>
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
-            input = ConvertTo(input, (this.zenInput, this.inputVariables));
+            input = ConvertTo(input, (this.zenInput, this.inputVariables, this.arbitraryMappingInput));
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.inputVariables);
-            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMapping, this.zenOutput, this.outputVariables);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T2)]);
         }
 
@@ -142,11 +149,11 @@ namespace ZenLib.ModelChecking
         /// <returns>The pre image set of the output.</returns>
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
-            output = ConvertTo(output, (this.zenOutput, this.outputVariables));
+            output = ConvertTo(output, (this.zenOutput, this.outputVariables, this.arbitraryMappingOutput));
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.outputVariables);
-            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMapping, this.zenInput, this.inputVariables);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return ConvertTo(result, this.canonicalValues[typeof(T1)]);
         }
 
@@ -156,7 +163,7 @@ namespace ZenLib.ModelChecking
         /// <param name="sourceStateSet">The source state set.</param>
         /// <param name="conversionData">The conversion variables.</param>
         /// <returns>A converted state set.</returns>
-        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>) conversionData)
+        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>) conversionData)
         {
             var x = new HashSet<Variable<BDDNode>>(sourceStateSet.VariableSet.Variables);
             var y = new HashSet<Variable<BDDNode>>(conversionData.Item2.Variables);
@@ -165,7 +172,7 @@ namespace ZenLib.ModelChecking
                 return sourceStateSet;
             }
 
-            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1);
+            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1, conversionData.Item3);
         }
     }
 }

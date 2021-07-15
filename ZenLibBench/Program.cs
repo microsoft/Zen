@@ -20,14 +20,29 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
+            var zf = new ZenFunction<int, int, bool>((x, y) => 
+            {
+                return Language.And(x <= 4, Language.Arbitrary<int>() <= 5);
+            });
+
+
+            var w = System.Diagnostics.Stopwatch.StartNew();
             for (int i = 0; i < 1000; i++)
+            {
+                var packetSet = zf.Transformer().InputSet((i, o) => o);
+                var elt = packetSet.Element();
+            }
+
+            Console.WriteLine($"Time was: {w.ElapsedMilliseconds}");
+
+            /* for (int i = 0; i < 1000; i++)
             {
                 var b = new AclBench();
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
                 b.NumLines = 100;
                 b.CreateAcl();
                 b.VerifyAclProvenance();
-            }
+            } */
 
             // _ = BenchmarkRunner.Run<AclBench>();
             // _ = BenchmarkRunner.Run<RouteBench>();
