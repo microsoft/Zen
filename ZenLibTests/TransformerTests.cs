@@ -323,5 +323,59 @@ namespace ZenLib.Tests
             Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element());
             Assert.AreEqual(3U, t3.OutputSet((p, o) => p.Item3() == 3U).Element());
         }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void TestTransformerInvalidArguments1()
+        {
+            var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+            var t2 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+
+            var set1 = t1.InputSet((i, o) => o);
+            t2.TransformForward(set1);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void TestTransformerInvalidArguments2()
+        {
+            var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+            var t2 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+
+            var set1 = t1.InputSet((i, o) => o);
+            var set2 = t2.InputSet((i, o) => o);
+            set1.Union(set2);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void TestTransformerInvalidArguments3()
+        {
+            var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+            var t2 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+
+            var set1 = t1.InputSet((i, o) => o);
+            var set2 = t2.InputSet((i, o) => o);
+            set1.Intersect(set2);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestTransformerInvalidType()
+        {
+            var t1 = new ZenFunction<string, bool>(x => true).Transformer(new StateSetTransformerManager());
+        }
     }
 }
