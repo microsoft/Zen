@@ -155,10 +155,11 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<T1, T2> Transformer()
+        public StateSetTransformer<T1, T2> Transformer(StateSetTransformerManager manager = null)
         {
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.function));
+            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.function, manager));
         }
 
         /// <summary>
