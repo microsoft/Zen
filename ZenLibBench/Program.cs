@@ -10,8 +10,6 @@ namespace ZenLibBench
     using System.Linq;
     using BenchmarkDotNet.Running;
     using ZenLib;
-    using ZenLib.Tests;
-    using ZenLib.Tests.Network;
 
     /// <summary>
     /// Run a collection of benchmarks for Zen.

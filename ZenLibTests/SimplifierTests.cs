@@ -500,12 +500,28 @@ namespace ZenLib.Tests
         /// Simplify get field.
         /// </summary>
         [TestMethod]
-        public void TestObjectGetSimplification()
+        public void TestObjectGetSimplification1()
         {
             var x = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
             var y = x.WithField("Field1", Constant(3));
             Assert.AreEqual(y.GetField<Object2, int>("Field1"), Constant(3));
             Assert.AreEqual(y.GetField<Object2, int>("Field2"), x.GetField<Object2, int>("Field2"));
+        }
+
+        /// <summary>
+        /// Simplify get field.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectGetSimplification2()
+        {
+            // suppress warning
+            Object2Different o = new Object2Different();
+            o.Field2 = 0;
+
+            var x = Create<Object2Different>(("Field1", Constant(1)), ("Field2", Constant((short)2)));
+            var y = x.WithField("Field1", Constant(3));
+            Assert.AreEqual(y.GetField<Object2Different, int>("Field1"), Constant(3));
+            Assert.AreEqual(y.GetField<Object2Different, short>("Field2"), x.GetField<Object2Different, short>("Field2"));
         }
 
         /// <summary>

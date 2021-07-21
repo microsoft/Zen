@@ -418,6 +418,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// An object with two fields.
+        /// </summary>
+        internal class Object2Different
+        {
+            public int Field1 { get; set; }
+
+            public short Field2;
+        }
+
+        /// <summary>
         /// An object with three fields.
         /// </summary>
         internal class Object3

@@ -36,11 +36,16 @@ namespace ZenLib
         {
             // get(with(o, name, f), name) == f
             // get(with(o, name', f), name) == get(o, name)
-            if (expr is ZenWithFieldExpr<T1, T2> e1)
+            var type = expr.GetType();
+            if (type.GetGenericTypeDefinition() == typeof(ZenWithFieldExpr<,>))
             {
-                return (e1.FieldName == fieldName) ?
-                        e1.FieldValue :
-                        Create(e1.Expr, fieldName); // recurse
+                var fieldNameProperty = type.GetProperty("FieldName");
+                var fieldValueProperty = type.GetProperty("FieldValue");
+                var exprProperty = type.GetProperty("Expr");
+
+                return ((string)fieldNameProperty.GetValue(expr) == fieldName) ?
+                        (Zen<T2>)fieldValueProperty.GetValue(expr) :
+                        Create((Zen<T1>)exprProperty.GetValue(expr), fieldName); // recurse
             }
 
             // get(if e1 then e2 else e3, name) = if e1 then get(e2, name) else get(e3, name)
