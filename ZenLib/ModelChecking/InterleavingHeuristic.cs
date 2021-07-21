@@ -64,24 +64,24 @@ namespace ZenLib.ModelChecking
                 return;
             }
 
-            var all = emptySet;
-            var allAffected = new HashSet<object>();
+            var all = set1.Union(set2);
+            int previousCount;
 
-            foreach (var s in set1)
+            do
             {
-                all = all.Union(this.DisjointSets[s]);
-                allAffected.Add(s);
-            }
+                previousCount = all.Count;
+                var newAll = all;
+                foreach (var element in all)
+                {
+                    newAll = newAll.Union(this.DisjointSets[element]);
+                }
 
-            foreach (var s in set2)
-            {
-                all = all.Union(this.DisjointSets[s]);
-                allAffected.Add(s);
-            }
+                all = newAll;
+            } while (all.Count > previousCount);
 
-            foreach (var obj in allAffected)
+            foreach (var element in all)
             {
-                this.DisjointSets[obj] = all;
+                this.DisjointSets[element] = all;
             }
         }
 
