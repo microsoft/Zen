@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using DecisionDiagrams;
     using ZenLib.Generation;
@@ -51,7 +52,7 @@ namespace ZenLib.ModelChecking
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
-            var mustInterleave = heuristic.Compute(newExpression);
+            var mustInterleave = heuristic.Compute(newExpression, ImmutableDictionary<long, object>.Empty);
 
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
@@ -83,7 +84,7 @@ namespace ZenLib.ModelChecking
 
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>();
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(ImmutableDictionary<long, object>.Empty);
             var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)symbolicValue;
 

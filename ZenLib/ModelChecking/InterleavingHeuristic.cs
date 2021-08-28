@@ -15,7 +15,7 @@ namespace ZenLib.ModelChecking
     /// Class to conservatively estimate which variables
     /// must be interleaved to avoid exponential blowup in the encoding.
     /// </summary>
-    internal sealed class InterleavingHeuristic : IZenExprVisitor<Unit, ImmutableHashSet<object>>
+    internal sealed class InterleavingHeuristic : IZenExprVisitor<ImmutableDictionary<long, object>, ImmutableHashSet<object>>
     {
         private static Type ZenBoolType = typeof(Zen<bool>);
 
@@ -45,9 +45,9 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr)
+        public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr, ImmutableDictionary<long, object> arguments)
         {
-            var _ = expr.Accept(this, new Unit());
+            var _ = expr.Accept(this, arguments);
             return this.DisjointSets;
         }
 
@@ -85,7 +85,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public ImmutableHashSet<object> VisitZenAndExpr(ZenAndExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenAndExpr(ZenAndExpr expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -95,7 +95,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenOrExpr(ZenOrExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenOrExpr(ZenOrExpr expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -105,7 +105,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenNotExpr(ZenNotExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenNotExpr(ZenNotExpr expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -113,7 +113,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenIfExpr<T>(ZenIfExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenIfExpr<T>(ZenIfExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -124,12 +124,12 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return emptySet;
         }
 
-        public ImmutableHashSet<object> VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -151,7 +151,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -163,42 +163,42 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringAtExpr(ZenStringAtExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringAtExpr(ZenStringAtExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringLengthExpr(ZenStringLengthExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringLengthExpr(ZenStringLengthExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
-        public ImmutableHashSet<object> VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -206,12 +206,12 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return emptySet;
         }
 
-        public ImmutableHashSet<object> VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -221,7 +221,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -231,7 +231,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -239,7 +239,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -249,18 +249,21 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
                 var set = ImmutableHashSet<object>.Empty;
                 foreach (var value in expression.Fields.Values)
                 {
-                    var valueType = value.GetType();
-                    var acceptMethod = valueType
-                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(typeof(Unit), typeof(ImmutableHashSet<object>));
-                    var valueResult = (ImmutableHashSet<object>)acceptMethod.Invoke(value, new object[] { this, parameter });
+                    var valueResult = CommonUtilities.RunAndPreserveExceptions(() =>
+                    {
+                        var valueType = value.GetType();
+                        var acceptMethod = valueType
+                            .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                            .MakeGenericMethod(typeof(ImmutableDictionary<long, object>), typeof(ImmutableHashSet<object>));
+                        return (ImmutableHashSet<object>)acceptMethod.Invoke(value, new object[] { this, parameter });
+                    });
 
                     set = set.Union(valueResult);
                 }
@@ -269,7 +272,7 @@ namespace ZenLib.ModelChecking
             });
         }
 
-        public ImmutableHashSet<object> VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -281,12 +284,22 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
-            throw new UnreachableException();
+            return LookupOrCompute(expression, () =>
+            {
+                return CommonUtilities.RunAndPreserveExceptions(() =>
+                {
+                    var expr = parameter[expression.ArgumentId];
+                    var acceptMethod = expr.GetType()
+                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(typeof(ImmutableDictionary<long, object>), typeof(ImmutableHashSet<object>));
+                    return (ImmutableHashSet<object>)acceptMethod.Invoke(expr, new object[] { this, parameter });
+                });
+            });
         }
 
-        public ImmutableHashSet<object> VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, Unit parameter)
+        public ImmutableHashSet<object> VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             return LookupOrCompute(expression, () =>
             {

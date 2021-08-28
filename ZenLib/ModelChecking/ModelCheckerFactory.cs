@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System.Collections.Immutable;
     using DecisionDiagrams;
     using Microsoft.Z3;
     using ZenLib.Solver;
@@ -18,12 +19,13 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="backend">The backend to use.</param>
         /// <param name="expression">The expression to evaluate.</param>
+        /// <param name="arguments">The arguements.</param>
         /// <returns>A new model checker.</returns>
-        internal static IModelChecker CreateModelChecker(Backend backend, Zen<bool> expression)
+        internal static IModelChecker CreateModelChecker(Backend backend, Zen<bool> expression, ImmutableDictionary<long, object> arguments)
         {
             if (backend == Backend.DecisionDiagrams)
             {
-                return CreateModelCheckerDD(expression);
+                return CreateModelCheckerDD(expression, arguments);
             }
 
             return CreateModelCheckerZ3();
@@ -32,12 +34,13 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Create a model checker based on decision diagrams.
         /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        private static IModelChecker CreateModelCheckerDD(Zen<bool> expression)
+        /// <param name="expression">The expression.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>A model checker.</returns>
+        private static IModelChecker CreateModelCheckerDD(Zen<bool> expression, ImmutableDictionary<long, object> arguments)
         {
             var heuristic = new InterleavingHeuristic();
-            var mustInterleave = heuristic.Compute(expression);
+            var mustInterleave = heuristic.Compute(expression, arguments);
             var manager = new DDManager<BDDNode>(new BDDNodeFactory());
             var solver = new SolverDD<BDDNode>(manager, mustInterleave);
             solver.Init();
@@ -47,7 +50,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Create a model checker based on SMT with Z3.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A model checker.</returns>
         private static IModelChecker CreateModelCheckerZ3()
         {
             var solver = new SolverZ3();

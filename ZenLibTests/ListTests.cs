@@ -35,7 +35,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListContainsVariable()
         {
-            CheckAgreement<IList<byte>, byte>((l, x) => l.Contains(x));
+            CheckAgreement<IList<byte>, byte>((l, x) => l.Contains(x), bddListSize: 2);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestListSort()
         {
-            CheckAgreement<IList<int>>(l => l.Sort().IsSorted());
+            CheckAgreement<IList<int>>(l => l.Sort().IsSorted(), bddListSize: 1);
         }
 
         /// <summary>

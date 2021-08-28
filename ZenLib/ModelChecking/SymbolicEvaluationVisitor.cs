@@ -9,6 +9,7 @@ namespace ZenLib.ModelChecking
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
+    using System.Reflection;
     using ZenLib.Solver;
 
     /// <summary>
@@ -150,7 +151,22 @@ namespace ZenLib.ModelChecking
         {
             return LookupOrCompute(expression, () =>
             {
-                return parameter.ArgumentAssignment[expression.ArgumentId];
+                if (parameter.ArgumentsToExpr.TryGetValue(expression.ArgumentId, out var expr))
+                {
+                    var result = CommonUtilities.RunAndPreserveExceptions(() =>
+                    {
+                        var acceptMethod = expr.GetType()
+                            .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                            .MakeGenericMethod(
+                                typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>),
+                                typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>));
+                        return (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>)acceptMethod.Invoke(expr, new object[] { this, parameter });
+                    });
+
+                    return result;
+                }
+
+                return parameter.ArgumentsToValue[expression.ArgumentId];
             });
         }
 
@@ -434,8 +450,8 @@ namespace ZenLib.ModelChecking
                     // execute the cons case with placeholder values to get a new Zen value.
                     var arg1 = new ZenArgumentExpr<TList>();
                     var arg2 = new ZenArgumentExpr<IList<TList>>();
-                    var args = parameter.ArgumentAssignment.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
-                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(args);
+                    var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
+                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(parameter.ArgumentsToExpr, args);
                     var newExpression = expression.ConsCase(arg1, arg2);
 
                     // model check the resulting value using the computed values for the placeholders.
