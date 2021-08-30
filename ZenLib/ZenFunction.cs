@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq.Expressions;
     using ZenLib.Compilation;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
@@ -82,7 +83,8 @@ namespace ZenLib
                 return;
             }
 
-            this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+            var args = ImmutableDictionary<long, Expression>.Empty;
+            this.compiledFunction = CodeGenerator.Compile(this.functionBodyExpr, args, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -177,7 +179,10 @@ namespace ZenLib
                 return;
             }
 
-            this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+            var param1 = Expression.Parameter(typeof(T1));
+            var args = ImmutableDictionary<long, Expression>.Empty
+                .Add(this.argument1.ArgumentId, param1);
+            this.compiledFunction = CodeGenerator.Compile<T1, T2>(this.functionBodyExpr, args, param1, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -361,7 +366,12 @@ namespace ZenLib
                 return;
             }
 
-            this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+            var param1 = Expression.Parameter(typeof(T1));
+            var param2 = Expression.Parameter(typeof(T2));
+            var args = ImmutableDictionary<long, Expression>.Empty
+                .Add(this.argument1.ArgumentId, param1)
+                .Add(this.argument2.ArgumentId, param2);
+            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.functionBodyExpr, args, param1, param2, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -565,7 +575,14 @@ namespace ZenLib
                 return;
             }
 
-            this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+            var param1 = Expression.Parameter(typeof(T1));
+            var param2 = Expression.Parameter(typeof(T2));
+            var param3 = Expression.Parameter(typeof(T3));
+            var args = ImmutableDictionary<long, Expression>.Empty
+                .Add(this.argument1.ArgumentId, param1)
+                .Add(this.argument2.ArgumentId, param2)
+                .Add(this.argument3.ArgumentId, param3);
+            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.functionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -788,7 +805,16 @@ namespace ZenLib
                 return;
             }
 
-            this.compiledFunction = CodeGenerator.Compile(this.function, maxUnrollingDepth);
+            var param1 = Expression.Parameter(typeof(T1));
+            var param2 = Expression.Parameter(typeof(T2));
+            var param3 = Expression.Parameter(typeof(T3));
+            var param4 = Expression.Parameter(typeof(T4));
+            var args = ImmutableDictionary<long, Expression>.Empty
+                .Add(this.argument1.ArgumentId, param1)
+                .Add(this.argument2.ArgumentId, param2)
+                .Add(this.argument3.ArgumentId, param3)
+                .Add(this.argument4.ArgumentId, param4);
+            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.functionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
         }
 
         /// <summary>
