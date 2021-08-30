@@ -111,7 +111,7 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private ZenArgumentExpr<T1> argument1;
+        private static ZenArgumentExpr<T1> argument1;
 
         /// <summary>
         /// The expression for the function body.
@@ -145,8 +145,8 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
-            this.argument1 = new ZenArgumentExpr<T1>();
-            this.functionBodyExpr = this.function(this.argument1);
+            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
+            this.functionBodyExpr = this.function(argument1);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, object>.Empty
-                .Add(this.argument1.ArgumentId, value);
+                .Add(argument1.ArgumentId, value);
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -181,7 +181,7 @@ namespace ZenLib
 
             var param1 = Expression.Parameter(typeof(T1));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(this.argument1.ArgumentId, param1);
+                .Add(argument1.ArgumentId, param1);
             this.compiledFunction = CodeGenerator.Compile<T1, T2>(this.functionBodyExpr, args, param1, maxUnrollingDepth);
         }
 
@@ -215,10 +215,10 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input },
+                { argument1.ArgumentId, input },
             };
 
-            var result = invariant(this.argument1, this.functionBodyExpr);
+            var result = invariant(argument1, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, backend));
         }
 
@@ -241,7 +241,7 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input },
+                { argument1.ArgumentId, input },
             };
 
             var result = invariant(input, this.functionBodyExpr);
@@ -258,7 +258,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, input == example.Value);
+                blocking = Or(blocking, argument1 == example.Value);
             }
         }
 
@@ -295,12 +295,12 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private ZenArgumentExpr<T1> argument1;
+        private static ZenArgumentExpr<T1> argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private ZenArgumentExpr<T2> argument2;
+        private static ZenArgumentExpr<T2> argument2;
 
         /// <summary>
         /// Function body expression.
@@ -334,9 +334,9 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
-            this.argument1 = new ZenArgumentExpr<T1>();
-            this.argument2 = new ZenArgumentExpr<T2>();
-            this.functionBodyExpr = this.function(this.argument1, this.argument2);
+            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
+            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
+            this.functionBodyExpr = this.function(argument1, argument2);
         }
 
         /// <summary>
@@ -353,8 +353,8 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, object>.Empty
-                .Add(this.argument1.ArgumentId, value1)
-                .Add(this.argument2.ArgumentId, value2);
+                .Add(argument1.ArgumentId, value1)
+                .Add(argument2.ArgumentId, value2);
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -374,8 +374,8 @@ namespace ZenLib
             var param1 = Expression.Parameter(typeof(T1));
             var param2 = Expression.Parameter(typeof(T2));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(this.argument1.ArgumentId, param1)
-                .Add(this.argument2.ArgumentId, param2);
+                .Add(argument1.ArgumentId, param1)
+                .Add(argument2.ArgumentId, param2);
             this.compiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.functionBodyExpr, args, param1, param2, maxUnrollingDepth);
         }
 
@@ -412,11 +412,11 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
             };
 
-            var result = invariant(this.argument1, this.argument2, this.functionBodyExpr);
+            var result = invariant(argument1, argument2, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend));
         }
 
@@ -442,8 +442,8 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
             };
 
             var result = invariant(input1, input2, this.functionBodyExpr);
@@ -461,7 +461,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2));
+                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2));
             }
         }
 
@@ -502,17 +502,17 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private ZenArgumentExpr<T1> argument1;
+        private static ZenArgumentExpr<T1> argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private ZenArgumentExpr<T2> argument2;
+        private static ZenArgumentExpr<T2> argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        private ZenArgumentExpr<T3> argument3;
+        private static ZenArgumentExpr<T3> argument3;
 
         /// <summary>
         /// Function body expression.
@@ -546,10 +546,10 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
-            this.argument1 = new ZenArgumentExpr<T1>();
-            this.argument2 = new ZenArgumentExpr<T2>();
-            this.argument3 = new ZenArgumentExpr<T3>();
-            this.functionBodyExpr = this.function(this.argument1, this.argument2, this.argument3);
+            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
+            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
+            argument3 = argument3 ?? new ZenArgumentExpr<T3>();
+            this.functionBodyExpr = this.function(argument1, argument2, argument3);
         }
 
         /// <summary>
@@ -567,9 +567,9 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, object>.Empty
-                .Add(this.argument1.ArgumentId, value1)
-                .Add(this.argument2.ArgumentId, value2)
-                .Add(this.argument3.ArgumentId, value3);
+                .Add(argument1.ArgumentId, value1)
+                .Add(argument2.ArgumentId, value2)
+                .Add(argument3.ArgumentId, value3);
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -590,9 +590,9 @@ namespace ZenLib
             var param2 = Expression.Parameter(typeof(T2));
             var param3 = Expression.Parameter(typeof(T3));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(this.argument1.ArgumentId, param1)
-                .Add(this.argument2.ArgumentId, param2)
-                .Add(this.argument3.ArgumentId, param3);
+                .Add(argument1.ArgumentId, param1)
+                .Add(argument2.ArgumentId, param2)
+                .Add(argument3.ArgumentId, param3);
             this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.functionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
         }
 
@@ -632,12 +632,12 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
-                { this.argument3.ArgumentId, input3 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
+                { argument3.ArgumentId, input3 },
             };
 
-            var result = invariant(this.argument1, this.argument2, this.argument3, this.functionBodyExpr);
+            var result = invariant(argument1, argument2, argument3, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend));
         }
 
@@ -666,9 +666,9 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
-                { this.argument3.ArgumentId, input3 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
+                { argument3.ArgumentId, input3 },
             };
 
             var result = invariant(input1, input2, input3, this.functionBodyExpr);
@@ -686,7 +686,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2, input3 == example.Value.Item3));
+                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2, argument3 == example.Value.Item3));
             }
         }
 
@@ -731,22 +731,22 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private ZenArgumentExpr<T1> argument1;
+        private static ZenArgumentExpr<T1> argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private ZenArgumentExpr<T2> argument2;
+        private static ZenArgumentExpr<T2> argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        private ZenArgumentExpr<T3> argument3;
+        private static ZenArgumentExpr<T3> argument3;
 
         /// <summary>
         /// Fourth argument expression.
         /// </summary>
-        private ZenArgumentExpr<T4> argument4;
+        private static ZenArgumentExpr<T4> argument4;
 
         /// <summary>
         /// Function body expression.
@@ -780,11 +780,11 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
-            this.argument1 = new ZenArgumentExpr<T1>();
-            this.argument2 = new ZenArgumentExpr<T2>();
-            this.argument3 = new ZenArgumentExpr<T3>();
-            this.argument4 = new ZenArgumentExpr<T4>();
-            this.functionBodyExpr = this.function(this.argument1, this.argument2, this.argument3, this.argument4);
+            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
+            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
+            argument3 = argument3 ?? new ZenArgumentExpr<T3>();
+            argument4 = argument4 ?? new ZenArgumentExpr<T4>();
+            this.functionBodyExpr = this.function(argument1, argument2, argument3, argument4);
         }
 
         /// <summary>
@@ -803,10 +803,10 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, object>.Empty
-                .Add(this.argument1.ArgumentId, value1)
-                .Add(this.argument2.ArgumentId, value2)
-                .Add(this.argument3.ArgumentId, value3)
-                .Add(this.argument4.ArgumentId, value4);
+                .Add(argument1.ArgumentId, value1)
+                .Add(argument2.ArgumentId, value2)
+                .Add(argument3.ArgumentId, value3)
+                .Add(argument4.ArgumentId, value4);
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -828,10 +828,10 @@ namespace ZenLib
             var param3 = Expression.Parameter(typeof(T3));
             var param4 = Expression.Parameter(typeof(T4));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(this.argument1.ArgumentId, param1)
-                .Add(this.argument2.ArgumentId, param2)
-                .Add(this.argument3.ArgumentId, param3)
-                .Add(this.argument4.ArgumentId, param4);
+                .Add(argument1.ArgumentId, param1)
+                .Add(argument2.ArgumentId, param2)
+                .Add(argument3.ArgumentId, param3)
+                .Add(argument4.ArgumentId, param4);
             this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.functionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
         }
 
@@ -874,13 +874,13 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
-                { this.argument3.ArgumentId, input3 },
-                { this.argument4.ArgumentId, input4 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
+                { argument3.ArgumentId, input3 },
+                { argument4.ArgumentId, input4 },
             };
 
-            var result = invariant(this.argument1, this.argument2, this.argument3, this.argument4, this.functionBodyExpr);
+            var result = invariant(argument1, argument2, argument3, argument4, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend));
         }
 
@@ -912,10 +912,10 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { this.argument1.ArgumentId, input1 },
-                { this.argument2.ArgumentId, input2 },
-                { this.argument3.ArgumentId, input3 },
-                { this.argument4.ArgumentId, input4 },
+                { argument1.ArgumentId, input1 },
+                { argument2.ArgumentId, input2 },
+                { argument3.ArgumentId, input3 },
+                { argument4.ArgumentId, input4 },
             };
 
             var result = invariant(input1, input2, input3, input4, this.functionBodyExpr);
@@ -933,7 +933,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(input1 == example.Value.Item1, input2 == example.Value.Item2, input3 == example.Value.Item3, input4 == example.Value.Item4));
+                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2, argument3 == example.Value.Item3, argument4 == example.Value.Item4));
             }
         }
 

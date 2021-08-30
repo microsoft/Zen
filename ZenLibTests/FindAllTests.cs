@@ -39,5 +39,22 @@ namespace ZenLib.Tests
             Assert.AreEqual(24, new ZenFunction<uint, uint, uint, uint, bool>(
                 (x, y, z1, z2) => And(x >= y, x <= 2, z1 <= 1, z2 <= 1)).FindAll((i1, i2, i3, i4, o) => o).Count());
         }
+
+        /// <summary>
+        /// Test that find all orders values in a deterministic way.
+        /// </summary>
+        [TestMethod]
+        public void TestFindAllOrdering()
+        {
+            var values1 = new ZenFunction<ushort, bool>(x => x <= 10).FindAll((i, o) => o).ToList();
+            var values2 = new ZenFunction<ushort, bool>(x => x <= 10).FindAll((i, o) => o).ToList();
+
+            Assert.AreEqual(values1.Count, values2.Count);
+
+            for (int i = 0; i < values1.Count; i++)
+            {
+                Assert.AreEqual(values1[i], values2[i]);
+            }
+        }
     }
 }

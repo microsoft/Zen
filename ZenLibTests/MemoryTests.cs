@@ -39,5 +39,39 @@ namespace ZenLib.Tests
 
             Assert.IsTrue(Math.Abs(totalMemory2 - totalMemory1) < 5);
         }
+
+        /// <summary>
+        /// Test that we are able to reuse expressions across functions.
+        /// </summary>
+        [TestMethod]
+        public void TestMemoryReuseForSimilarFunctions()
+        {
+            var zf = new ZenFunction<int, int>(x => CreateFunction(x, 0));
+
+            var totalMemory1 = GC.GetTotalMemory(true) / 1000 / 1000;
+            Console.WriteLine($"Using: {totalMemory1} MB");
+
+            var zfs = new ZenFunction<int, int>[2000];
+
+            for (int i = 0; i < 2000; i++)
+            {
+                zfs[i] = new ZenFunction<int, int>(x => CreateFunction(x, 0));
+            }
+
+            var totalMemory2 = GC.GetTotalMemory(true) / 1000 / 1000;
+            Console.WriteLine($"Using: {totalMemory2} MB");
+
+            Assert.IsTrue(Math.Abs(totalMemory2 - totalMemory1) < 5);
+        }
+
+        private Zen<int> CreateFunction(Zen<int> x, int i)
+        {
+            if (i == 100)
+            {
+                return 100;
+            }
+
+            return Language.If(x == i, 100 - i, CreateFunction(x, i + 1));
+        }
     }
 }
