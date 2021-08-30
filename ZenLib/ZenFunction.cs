@@ -99,14 +99,14 @@ namespace ZenLib
         private ZenArgumentExpr<T1> argument1;
 
         /// <summary>
-        /// The callback for the Zen function.
-        /// </summary>
-        private Func<Zen<T1>, Zen<T2>> function;
-
-        /// <summary>
         /// The expression for the function body.
         /// </summary>
         private Zen<T2> functionBodyExpr;
+
+        /// <summary>
+        /// The callback for the Zen function.
+        /// </summary>
+        private Func<Zen<T1>, Zen<T2>> function;
 
         /// <summary>
         /// The compiled C# version of the function.
@@ -267,8 +267,29 @@ namespace ZenLib
     /// <typeparam name="T3">Return type.</typeparam>
     public class ZenFunction<T1, T2, T3>
     {
+        /// <summary>
+        /// First argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T1> argument1;
+
+        /// <summary>
+        /// Second argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T2> argument2;
+
+        /// <summary>
+        /// Function body expression.
+        /// </summary>
+        private Zen<T3> functionBodyExpr;
+
+        /// <summary>
+        /// User provided function.
+        /// </summary>
         private Func<Zen<T1>, Zen<T2>, Zen<T3>> function;
 
+        /// <summary>
+        /// Compiled function to C# IL.
+        /// </summary>
         private Func<T1, T2, T3> compiledFunction = null;
 
         /// <summary>
@@ -288,6 +309,9 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
+            this.argument1 = new ZenArgumentExpr<T1>();
+            this.argument2 = new ZenArgumentExpr<T2>();
+            this.functionBodyExpr = this.function(this.argument1, this.argument2);
         }
 
         /// <summary>
@@ -351,17 +375,15 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            var arg1 = new ZenArgumentExpr<T1>();
-            var arg2 = new ZenArgumentExpr<T2>();
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { arg1.ArgumentId, input1 },
-                { arg2.ArgumentId, input2 },
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
             };
 
-            var result = invariant(arg1, arg2, this.function(arg1, arg2));
+            var result = invariant(this.argument1, this.argument2, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend));
         }
 
@@ -438,8 +460,34 @@ namespace ZenLib
     /// <typeparam name="T4">Return type.</typeparam>
     public class ZenFunction<T1, T2, T3, T4>
     {
+        /// <summary>
+        /// First argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T1> argument1;
+
+        /// <summary>
+        /// Second argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T2> argument2;
+
+        /// <summary>
+        /// Third argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T3> argument3;
+
+        /// <summary>
+        /// Function body expression.
+        /// </summary>
+        private Zen<T4> functionBodyExpr;
+
+        /// <summary>
+        /// User-provided function.
+        /// </summary>
         private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function;
 
+        /// <summary>
+        /// Compiled function as C# IL.
+        /// </summary>
         private Func<T1, T2, T3, T4> compiledFunction = null;
 
         /// <summary>
@@ -459,6 +507,10 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
+            this.argument1 = new ZenArgumentExpr<T1>();
+            this.argument2 = new ZenArgumentExpr<T2>();
+            this.argument3 = new ZenArgumentExpr<T3>();
+            this.functionBodyExpr = this.function(this.argument1, this.argument2, this.argument3);
         }
 
         /// <summary>
@@ -525,20 +577,17 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            var arg1 = new ZenArgumentExpr<T1>();
-            var arg2 = new ZenArgumentExpr<T2>();
-            var arg3 = new ZenArgumentExpr<T3>();
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { arg1.ArgumentId, input1 },
-                { arg2.ArgumentId, input2 },
-                { arg3.ArgumentId, input3 },
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
+                { this.argument3.ArgumentId, input3 },
             };
 
-            var result = invariant(arg1, arg2, arg3, this.function(arg1, arg2, arg3));
+            var result = invariant(this.argument1, this.argument2, this.argument3, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend));
         }
 
@@ -622,8 +671,39 @@ namespace ZenLib
     /// <typeparam name="T5">Return type.</typeparam>
     public class ZenFunction<T1, T2, T3, T4, T5>
     {
+        /// <summary>
+        /// First argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T1> argument1;
+
+        /// <summary>
+        /// Second argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T2> argument2;
+
+        /// <summary>
+        /// Third argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T3> argument3;
+
+        /// <summary>
+        /// Fourth argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T4> argument4;
+
+        /// <summary>
+        /// Function body expression.
+        /// </summary>
+        private Zen<T5> functionBodyExpr;
+
+        /// <summary>
+        /// User-provided function.
+        /// </summary>
         private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function;
 
+        /// <summary>
+        /// Compiled function as C# IL.
+        /// </summary>
         private Func<T1, T2, T3, T4, T5> compiledFunction = null;
 
         /// <summary>
@@ -643,6 +723,11 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
+            this.argument1 = new ZenArgumentExpr<T1>();
+            this.argument2 = new ZenArgumentExpr<T2>();
+            this.argument3 = new ZenArgumentExpr<T3>();
+            this.argument4 = new ZenArgumentExpr<T4>();
+            this.functionBodyExpr = this.function(this.argument1, this.argument2, this.argument3, this.argument4);
         }
 
         /// <summary>
@@ -712,23 +797,19 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            var arg1 = new ZenArgumentExpr<T1>();
-            var arg2 = new ZenArgumentExpr<T2>();
-            var arg3 = new ZenArgumentExpr<T3>();
-            var arg4 = new ZenArgumentExpr<T4>();
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { arg1.ArgumentId, input1 },
-                { arg2.ArgumentId, input2 },
-                { arg3.ArgumentId, input3 },
-                { arg4.ArgumentId, input4 },
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
+                { this.argument3.ArgumentId, input3 },
+                { this.argument4.ArgumentId, input4 },
             };
 
-            var result = invariant(arg1, arg2, arg3, arg4, this.function(arg1, arg2, arg3, arg4));
+            var result = invariant(this.argument1, this.argument2, this.argument3, this.argument4, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend));
         }
 
