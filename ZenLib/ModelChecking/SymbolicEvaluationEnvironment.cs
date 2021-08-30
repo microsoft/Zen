@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
 
     /// <summary>
@@ -14,7 +15,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public SymbolicEvaluationEnvironment(ImmutableDictionary<long, object> argumentsToExpr)
+        public SymbolicEvaluationEnvironment(Dictionary<long, object> argumentsToExpr)
         {
             this.ArgumentsToExpr = argumentsToExpr;
             this.ArgumentsToValue = ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
@@ -26,7 +27,7 @@ namespace ZenLib.ModelChecking
         /// <param name="argumentsToExpr">The arguments to expr assignment.</param>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
         public SymbolicEvaluationEnvironment(
-            ImmutableDictionary<long, object> argumentsToExpr,
+            Dictionary<long, object> argumentsToExpr,
             ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> argumentAssignment)
         {
             this.ArgumentsToValue = argumentAssignment;
@@ -41,6 +42,6 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the argument to expression assignment.
         /// </summary>
-        public ImmutableDictionary<long, object> ArgumentsToExpr { get; }
+        public Dictionary<long, object> ArgumentsToExpr { get; }
     }
 }

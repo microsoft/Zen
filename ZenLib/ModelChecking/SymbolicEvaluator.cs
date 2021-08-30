@@ -4,7 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System.Collections.Immutable;
+    using System.Collections.Generic;
     using ZenLib.Interpretation;
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static bool Find(Zen<bool> expression, ImmutableDictionary<long, object> arguments, Backend backend)
+        public static bool Find(Zen<bool> expression, Dictionary<long, object> arguments, Backend backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
             var assignment = modelChecker.ModelCheck(expression, arguments);
@@ -36,7 +36,7 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<T> Find<T>(
             Zen<bool> expression,
-            ImmutableDictionary<long, object> arguments,
+            Dictionary<long, object> arguments,
             Zen<T> input,
             Backend backend)
         {
@@ -63,7 +63,7 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
             Zen<bool> expression,
-            ImmutableDictionary<long, object> arguments,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Backend backend)
@@ -96,7 +96,7 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
             Zen<bool> expression,
-            ImmutableDictionary<long, object> arguments,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
@@ -132,7 +132,7 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
             Zen<bool> expression,
-            ImmutableDictionary<long, object> arguments,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,

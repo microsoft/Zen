@@ -82,7 +82,7 @@ namespace ZenLib
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
         {
             var result = invariant(this.function());
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, ImmutableDictionary<long, object>.Empty, backend));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend));
         }
     }
 
@@ -94,9 +94,19 @@ namespace ZenLib
     public class ZenFunction<T1, T2>
     {
         /// <summary>
+        /// First argument expression.
+        /// </summary>
+        private ZenArgumentExpr<T1> argument1;
+
+        /// <summary>
         /// The callback for the Zen function.
         /// </summary>
         private Func<Zen<T1>, Zen<T2>> function;
+
+        /// <summary>
+        /// The expression for the function body.
+        /// </summary>
+        private Zen<T2> functionBodyExpr;
 
         /// <summary>
         /// The compiled C# version of the function.
@@ -120,6 +130,8 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.function = function;
+            this.argument1 = new ZenArgumentExpr<T1>();
+            this.functionBodyExpr = this.function(this.argument1);
         }
 
         /// <summary>
@@ -180,10 +192,13 @@ namespace ZenLib
             bool checkSmallerLists = true,
             Backend backend = Backend.Z3)
         {
-            var arg1 = new ZenArgumentExpr<T1>();
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
-            var args = ImmutableDictionary<long, object>.Empty.Add(arg1.ArgumentId, input);
-            var result = invariant(arg1, this.function(arg1));
+            var args = new Dictionary<long, object>
+            {
+                { this.argument1.ArgumentId, input },
+            };
+
+            var result = invariant(this.argument1, this.functionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, backend));
         }
 
@@ -211,7 +226,7 @@ namespace ZenLib
             while (true)
             {
                 var expr = And(result, Not(blocking));
-                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, ImmutableDictionary<long, object>.Empty, input, backend));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -340,9 +355,12 @@ namespace ZenLib
             var arg2 = new ZenArgumentExpr<T2>();
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(arg1.ArgumentId, input1)
-                .Add(arg2.ArgumentId, input2);
+            var args = new Dictionary<long, object>
+            {
+                { arg1.ArgumentId, input1 },
+                { arg2.ArgumentId, input2 },
+            };
+
             var result = invariant(arg1, arg2, this.function(arg1, arg2));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend));
         }
@@ -375,7 +393,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, ImmutableDictionary<long, object>.Empty, input1, input2, backend));
+                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -513,10 +531,13 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(arg1.ArgumentId, input1)
-                .Add(arg2.ArgumentId, input2)
-                .Add(arg3.ArgumentId, input3);
+            var args = new Dictionary<long, object>
+            {
+                { arg1.ArgumentId, input1 },
+                { arg2.ArgumentId, input2 },
+                { arg3.ArgumentId, input3 },
+            };
+
             var result = invariant(arg1, arg2, arg3, this.function(arg1, arg2, arg3));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend));
         }
@@ -552,7 +573,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, ImmutableDictionary<long, object>.Empty, input1, input2, input3, backend));
+                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, input3, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -699,11 +720,14 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(arg1.ArgumentId, input1)
-                .Add(arg2.ArgumentId, input2)
-                .Add(arg3.ArgumentId, input3)
-                .Add(arg4.ArgumentId, input4);
+            var args = new Dictionary<long, object>
+            {
+                { arg1.ArgumentId, input1 },
+                { arg2.ArgumentId, input2 },
+                { arg3.ArgumentId, input3 },
+                { arg4.ArgumentId, input4 },
+            };
+
             var result = invariant(arg1, arg2, arg3, arg4, this.function(arg1, arg2, arg3, arg4));
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend));
         }
@@ -742,7 +766,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, ImmutableDictionary<long, object>.Empty, input1, input2, input3, input4, backend));
+                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, input3, input4, backend));
                 if (!example.HasValue)
                 {
                     yield break;

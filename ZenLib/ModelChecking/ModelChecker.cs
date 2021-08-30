@@ -6,7 +6,6 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using ZenLib.Solver;
 
     /// <summary>
@@ -41,7 +40,7 @@ namespace ZenLib.ModelChecking
         ///     Assignment to zen arbitrary variables that make the expression false.
         ///     Null if no such assignment exists.
         /// </returns>
-        public Dictionary<object, object> ModelCheck(Zen<bool> expression, ImmutableDictionary<long, object> arguments)
+        public Dictionary<object, object> ModelCheck(Zen<bool> expression, Dictionary<long, object> arguments)
         {
             var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString>(solver);
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(arguments);

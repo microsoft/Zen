@@ -4,7 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System.Collections.Immutable;
+    using System.Collections.Generic;
     using DecisionDiagrams;
     using Microsoft.Z3;
     using ZenLib.Solver;
@@ -21,7 +21,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression to evaluate.</param>
         /// <param name="arguments">The arguements.</param>
         /// <returns>A new model checker.</returns>
-        internal static IModelChecker CreateModelChecker(Backend backend, Zen<bool> expression, ImmutableDictionary<long, object> arguments)
+        internal static IModelChecker CreateModelChecker(Backend backend, Zen<bool> expression, Dictionary<long, object> arguments)
         {
             if (backend == Backend.DecisionDiagrams)
             {
@@ -37,7 +37,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="arguments">The arguments.</param>
         /// <returns>A model checker.</returns>
-        private static IModelChecker CreateModelCheckerDD(Zen<bool> expression, ImmutableDictionary<long, object> arguments)
+        private static IModelChecker CreateModelCheckerDD(Zen<bool> expression, Dictionary<long, object> arguments)
         {
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(expression, arguments);

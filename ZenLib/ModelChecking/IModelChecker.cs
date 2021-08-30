@@ -5,7 +5,6 @@
 namespace ZenLib.ModelChecking
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
 
     /// <summary>
     /// Interface for a model checker.
@@ -21,6 +20,6 @@ namespace ZenLib.ModelChecking
         ///     Mapping from zen arbitrary expression to value.
         ///     Null if there is no input.
         /// </returns>
-        Dictionary<object, object> ModelCheck(Zen<bool> expression, ImmutableDictionary<long, object> arguments);
+        Dictionary<object, object> ModelCheck(Zen<bool> expression, Dictionary<long, object> arguments);
     }
 }

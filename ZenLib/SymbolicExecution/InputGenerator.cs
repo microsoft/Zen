@@ -17,6 +17,8 @@ namespace ZenLib.SymbolicExecution
     /// </summary>
     internal static class InputGenerator
     {
+        private static Dictionary<long, object> arguments = new Dictionary<long, object>();
+
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
@@ -33,7 +35,6 @@ namespace ZenLib.SymbolicExecution
         {
             var expression = function(input).Simplify();
             var assume = precondition(input).Simplify();
-            var arguments = ImmutableDictionary<long, object>.Empty;
 
             (T2, PathConstraint) interpretFunction(T1 e)
             {
@@ -66,7 +67,6 @@ namespace ZenLib.SymbolicExecution
         {
             var expression = function(input1, input2).Simplify();
             var assume = precondition(input1, input2).Simplify();
-            var arguments = ImmutableDictionary<long, object>.Empty;
 
             (T3, PathConstraint) interpretFunction((T1, T2) e)
             {
@@ -103,7 +103,6 @@ namespace ZenLib.SymbolicExecution
         {
             var expression = function(input1, input2, input3).Simplify();
             var assume = precondition(input1, input2, input3).Simplify();
-            var arguments = ImmutableDictionary<long, object>.Empty;
 
             (T4, PathConstraint) interpretFunction((T1, T2, T3) e)
             {
@@ -142,7 +141,6 @@ namespace ZenLib.SymbolicExecution
         {
             var expression = function(input1, input2, input3, input4).Simplify();
             var assume = precondition(input1, input2, input3, input4).Simplify();
-            var arguments = ImmutableDictionary<long, object>.Empty;
 
             (T5, PathConstraint) interpretFunction((T1, T2, T3, T4) e)
             {
