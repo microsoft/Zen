@@ -239,14 +239,19 @@ namespace ZenLib
             Backend backend = Backend.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
-            var result = invariant(input, this.function(input));
+            var args = new Dictionary<long, object>
+            {
+                { this.argument1.ArgumentId, input },
+            };
+
+            var result = invariant(input, this.functionBodyExpr);
 
             Zen<bool> blocking = false;
 
             while (true)
             {
                 var expr = And(result, Not(blocking));
-                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input, backend));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, args, input, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -435,7 +440,13 @@ namespace ZenLib
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            var result = invariant(input1, input2, this.function(input1, input2));
+            var args = new Dictionary<long, object>
+            {
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
+            };
+
+            var result = invariant(input1, input2, this.functionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -443,7 +454,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, backend));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -653,7 +664,14 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            var result = invariant(input1, input2, input3, this.function(input1, input2, input3));
+            var args = new Dictionary<long, object>
+            {
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
+                { this.argument3.ArgumentId, input3 },
+            };
+
+            var result = invariant(input1, input2, input3, this.functionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -661,7 +679,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, input3, backend));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, backend));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -892,7 +910,15 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
-            var result = invariant(input1, input2, input3, input4, this.function(input1, input2, input3, input4));
+            var args = new Dictionary<long, object>
+            {
+                { this.argument1.ArgumentId, input1 },
+                { this.argument2.ArgumentId, input2 },
+                { this.argument3.ArgumentId, input3 },
+                { this.argument4.ArgumentId, input4 },
+            };
+
+            var result = invariant(input1, input2, input3, input4, this.functionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -900,7 +926,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), input1, input2, input3, input4, backend));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, input4, backend));
                 if (!example.HasValue)
                 {
                     yield break;
