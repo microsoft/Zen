@@ -6,6 +6,7 @@ namespace ZenLib.SymbolicExecution
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
@@ -16,6 +17,8 @@ namespace ZenLib.SymbolicExecution
     /// </summary>
     internal static class InputGenerator
     {
+        private static Dictionary<long, object> arguments = new Dictionary<long, object>();
+
         /// <summary>
         /// Generate inputs that exercise different program paths.
         /// </summary>
@@ -35,13 +38,13 @@ namespace ZenLib.SymbolicExecution
 
             (T2, PathConstraint) interpretFunction(T1 e)
             {
-                var assignment = ModelCheckerFactory.CreateModelChecker(backend, null).ModelCheck(input == e);
+                var assignment = ModelCheckerFactory.CreateModelChecker(backend, null, arguments).ModelCheck(input == e, arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
                 return ((T2)expression.Accept(evaluator, env), evaluator.PathConstraint);
             }
 
-            Option<T1> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input, backend);
+            Option<T1> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -68,14 +71,14 @@ namespace ZenLib.SymbolicExecution
             (T3, PathConstraint) interpretFunction((T1, T2) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2));
+                    .CreateModelChecker(backend, null, arguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
                 return ((T3)expression.Accept(evaluator, env), evaluator.PathConstraint);
             }
 
-            Option<(T1, T2)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, backend);
+            Option<(T1, T2)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -104,14 +107,14 @@ namespace ZenLib.SymbolicExecution
             (T4, PathConstraint) interpretFunction((T1, T2, T3) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3));
+                    .CreateModelChecker(backend, null, arguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
                 return ((T4)expression.Accept(evaluator, env), evaluator.PathConstraint);
             }
 
-            Option<(T1, T2, T3)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, backend);
+            Option<(T1, T2, T3)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, input3, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -142,14 +145,14 @@ namespace ZenLib.SymbolicExecution
             (T5, PathConstraint) interpretFunction((T1, T2, T3, T4) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4));
+                    .CreateModelChecker(backend, null, arguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
                 return ((T5)expression.Accept(evaluator, env), evaluator.PathConstraint);
             }
 
-            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, input1, input2, input3, input4, backend);
+            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, input3, input4, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }

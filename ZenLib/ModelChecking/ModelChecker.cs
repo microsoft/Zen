@@ -35,14 +35,15 @@ namespace ZenLib.ModelChecking
         /// Model check an expression to find inputs that lead to it being false.
         /// </summary>
         /// <param name="expression">The expression.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <returns>
         ///     Assignment to zen arbitrary variables that make the expression false.
         ///     Null if no such assignment exists.
         /// </returns>
-        public Dictionary<object, object> ModelCheck(Zen<bool> expression)
+        public Dictionary<object, object> ModelCheck(Zen<bool> expression, Dictionary<long, object> arguments)
         {
             var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString>(solver);
-            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>();
+            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(arguments);
             var symbolicResult =
                 (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Accept(symbolicEvaluator, env);
 

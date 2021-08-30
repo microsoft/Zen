@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using DecisionDiagrams;
     using ZenLib.Solver;
 
@@ -14,6 +15,8 @@ namespace ZenLib.ModelChecking
     /// </summary>
     public class StateSetTransformer<T1, T2>
     {
+        private static Dictionary<long, object> arguments = new Dictionary<long, object>();
+
         /// <summary>
         /// The underlying solver to use.
         /// </summary>
@@ -91,7 +94,7 @@ namespace ZenLib.ModelChecking
             {
                 var expr = invariant(this.zenInput, this.zenOutput);
                 var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>();
+                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
                 var symbolicResult =
                     (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
                 var ddOutput = symbolicResult.Value;
@@ -115,7 +118,7 @@ namespace ZenLib.ModelChecking
                 var expr = invariant(this.zenInput, this.zenOutput);
 
                 var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>();
+                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
                 var symbolicResult =
                     (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
                 var ddInput = symbolicResult.Value;

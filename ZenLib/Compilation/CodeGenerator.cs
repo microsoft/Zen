@@ -17,15 +17,17 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Compile a Zen expression to native IL.
         /// </summary>
-        /// <param name="function">The function.</param>
+        /// <param name="expression">The function expression.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>A native IL function.</returns>
-        public static Func<T> Compile<T>(Func<Zen<T>> function, int maxUnrollingDepth)
+        public static Func<T> Compile<T>(
+            Zen<T> expression,
+            ImmutableDictionary<long, Expression> arguments,
+            int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<long, Expression>.Empty;
-            var env = new ExpressionConverterEnvironment(args);
-            var e = function();
-            var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var env = new ExpressionConverterEnvironment(arguments);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T>>(expr, new ParameterExpression[] { });
             return lambda.Compile();
         }
@@ -33,20 +35,19 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Compile a Zen expression to native IL.
         /// </summary>
-        /// <param name="function">The function.</param>
+        /// <param name="expression">The function expression.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="param1">The first parameter.</param>
         /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>A native IL function.</returns>
-        public static Func<T1, T2> Compile<T1, T2>(Func<Zen<T1>, Zen<T2>> function, int maxUnrollingDepth)
+        public static Func<T1, T2> Compile<T1, T2>(
+            Zen<T2> expression,
+            ImmutableDictionary<long, Expression> arguments,
+            ParameterExpression param1,
+            int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<long, Expression>.Empty;
-
-            var arg1 = new ZenArgumentExpr<T1>();
-            var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.ArgumentId, param1);
-
-            var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1);
-            var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var env = new ExpressionConverterEnvironment(arguments);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2>>(expr, new ParameterExpression[] { param1 });
             return lambda.Compile();
         }
@@ -54,24 +55,21 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Compile a Zen expression to native IL.
         /// </summary>
-        /// <param name="function">The function.</param>
+        /// <param name="expression">The function expression.</param>
+        /// <param name="arguments">The function arguments.</param>
+        /// <param name="param1">The first parameter.</param>
+        /// <param name="param2">The second parameter.</param>
         /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>A native IL function.</returns>
-        public static Func<T1, T2, T3> Compile<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> function, int maxUnrollingDepth)
+        public static Func<T1, T2, T3> Compile<T1, T2, T3>(
+            Zen<T3> expression,
+            ImmutableDictionary<long, Expression> arguments,
+            ParameterExpression param1,
+            ParameterExpression param2,
+            int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<long, Expression>.Empty;
-
-            var arg1 = new ZenArgumentExpr<T1>();
-            var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.ArgumentId, param1);
-
-            var arg2 = new ZenArgumentExpr<T2>();
-            var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.ArgumentId, param2);
-
-            var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2);
-            var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var env = new ExpressionConverterEnvironment(arguments);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3>>(expr, new ParameterExpression[] { param1, param2 });
             return lambda.Compile();
         }
@@ -79,28 +77,23 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Compile a Zen expression to native IL.
         /// </summary>
-        /// <param name="function">The function.</param>
+        /// <param name="expression">The function expression.</param>
+        /// <param name="arguments">The function arguments.</param>
+        /// <param name="param1">The first parameter.</param>
+        /// <param name="param2">The second parameter.</param>
+        /// <param name="param3">The third parameter.</param>
         /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>A native IL function.</returns>
-        public static Func<T1, T2, T3, T4> Compile<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function, int maxUnrollingDepth)
+        public static Func<T1, T2, T3, T4> Compile<T1, T2, T3, T4>(
+            Zen<T4> expression,
+            ImmutableDictionary<long, Expression> arguments,
+            ParameterExpression param1,
+            ParameterExpression param2,
+            ParameterExpression param3,
+            int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<long, Expression>.Empty;
-
-            var arg1 = new ZenArgumentExpr<T1>();
-            var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.ArgumentId, param1);
-
-            var arg2 = new ZenArgumentExpr<T2>();
-            var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.ArgumentId, param2);
-
-            var arg3 = new ZenArgumentExpr<T3>();
-            var param3 = Expression.Parameter(typeof(T3));
-            args = args.Add(arg3.ArgumentId, param3);
-
-            var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2, arg3);
-            var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var env = new ExpressionConverterEnvironment(arguments);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4>>(expr, new ParameterExpression[] { param1, param2, param3 });
             return lambda.Compile();
         }
@@ -108,32 +101,25 @@ namespace ZenLib.Compilation
         /// <summary>
         /// Compile a Zen expression to native IL.
         /// </summary>
-        /// <param name="function">The function.</param>
+        /// <param name="expression">The function.</param>
+        /// <param name="arguments">The function arguments.</param>
+        /// <param name="param1">The first parameter.</param>
+        /// <param name="param2">The second parameter.</param>
+        /// <param name="param3">The third parameter.</param>
+        /// <param name="param4">The fourth parameter.</param>
         /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>A native IL function.</returns>
-        public static Func<T1, T2, T3, T4, T5> Compile<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function, int maxUnrollingDepth)
+        public static Func<T1, T2, T3, T4, T5> Compile<T1, T2, T3, T4, T5>(
+            Zen<T5> expression,
+            ImmutableDictionary<long, Expression> arguments,
+            ParameterExpression param1,
+            ParameterExpression param2,
+            ParameterExpression param3,
+            ParameterExpression param4,
+            int maxUnrollingDepth)
         {
-            var args = ImmutableDictionary<long, Expression>.Empty;
-
-            var arg1 = new ZenArgumentExpr<T1>();
-            var param1 = Expression.Parameter(typeof(T1));
-            args = args.Add(arg1.ArgumentId, param1);
-
-            var arg2 = new ZenArgumentExpr<T2>();
-            var param2 = Expression.Parameter(typeof(T2));
-            args = args.Add(arg2.ArgumentId, param2);
-
-            var arg3 = new ZenArgumentExpr<T3>();
-            var param3 = Expression.Parameter(typeof(T3));
-            args = args.Add(arg3.ArgumentId, param3);
-
-            var arg4 = new ZenArgumentExpr<T4>();
-            var param4 = Expression.Parameter(typeof(T4));
-            args = args.Add(arg4.ArgumentId, param4);
-
-            var env = new ExpressionConverterEnvironment(args);
-            var e = function(arg1, arg2, arg3, arg4);
-            var expr = CompileToBlock(e, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var env = new ExpressionConverterEnvironment(arguments);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4, T5>>(expr, new ParameterExpression[] { param1, param2, param3, param4 });
             return lambda.Compile();
         }

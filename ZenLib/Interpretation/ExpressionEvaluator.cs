@@ -67,27 +67,24 @@ namespace ZenLib.Interpretation
 
         public object VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return LookupOrCompute(expression, parameter, () =>
-            {
-                if (parameter.ArbitraryAssignment == null)
-                    return ReflectionUtilities.GetDefaultValue<T>();
-                if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
-                    return ReflectionUtilities.GetDefaultValue<T>();
+            if (parameter.ArbitraryAssignment == null)
+                return ReflectionUtilities.GetDefaultValue<T>();
+            if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
+                return ReflectionUtilities.GetDefaultValue<T>();
 
-                // the library doesn't distinguish between signed and unsigned,
-                // so we must perform this conversion manually.
-                var type = typeof(T);
-                if (type != value.GetType())
-                {
-                    if (type == ReflectionUtilities.UshortType)
-                        return (ushort)(short)value;
-                    if (type == ReflectionUtilities.UintType)
-                        return (uint)(int)value;
-                    if (type == ReflectionUtilities.UlongType)
-                        return (ulong)(long)value;
-                }
-                return value;
-            });
+            // the library doesn't distinguish between signed and unsigned,
+            // so we must perform this conversion manually.
+            var type = typeof(T);
+            if (type != value.GetType())
+            {
+                if (type == ReflectionUtilities.UshortType)
+                    return (ushort)(short)value;
+                if (type == ReflectionUtilities.UintType)
+                    return (uint)(int)value;
+                if (type == ReflectionUtilities.UlongType)
+                    return (ulong)(long)value;
+            }
+            return value;
         }
 
         public object VisitZenAndExpr(ZenAndExpr expression, ExpressionEvaluatorEnvironment parameter)

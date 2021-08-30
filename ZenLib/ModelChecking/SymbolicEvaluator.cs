@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System.Collections.Generic;
     using ZenLib.Interpretation;
 
     /// <summary>
@@ -15,12 +16,13 @@ namespace ZenLib.ModelChecking
         /// Determine if an expression has a satisfying assignment.
         /// </summary>
         /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static bool Find(Zen<bool> expression, Backend backend)
+        public static bool Find(Zen<bool> expression, Dictionary<long, object> arguments, Backend backend)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
-            var assignment = modelChecker.ModelCheck(expression);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
+            var assignment = modelChecker.ModelCheck(expression, arguments);
             return assignment != null;
         }
 
@@ -28,16 +30,18 @@ namespace ZenLib.ModelChecking
         /// Find an input to a function satisfying some condition.
         /// </summary>
         /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="input">The Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>An optional input value.</returns>
         public static Option<T> Find<T>(
             Zen<bool> expression,
+            Dictionary<long, object> arguments,
             Zen<T> input,
             Backend backend)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
-            var assignment = modelChecker.ModelCheck(expression);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
+            var assignment = modelChecker.ModelCheck(expression, arguments);
             if (assignment == null)
             {
                 return Option.None<T>();
@@ -52,19 +56,21 @@ namespace ZenLib.ModelChecking
         /// Find an input to a function satisfying some condition.
         /// </summary>
         /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="input1">The first Zen expression for the input to the function.</param>
         /// <param name="input2">The second Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
             Zen<bool> expression,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Backend backend)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
 
-            var assignment = modelChecker.ModelCheck(expression);
+            var assignment = modelChecker.ModelCheck(expression, arguments);
 
             if (assignment == null)
             {
@@ -82,6 +88,7 @@ namespace ZenLib.ModelChecking
         /// Find an input to a function satisfying some condition.
         /// </summary>
         /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="input1">The first Zen expression for the input to the function.</param>
         /// <param name="input2">The second Zen expression for the input to the function.</param>
         /// <param name="input3">The third Zen expression for the input to the function.</param>
@@ -89,13 +96,14 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
             Zen<bool> expression,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
             Backend backend)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
-            var assignment = modelChecker.ModelCheck(expression);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
+            var assignment = modelChecker.ModelCheck(expression, arguments);
 
             if (assignment == null)
             {
@@ -115,6 +123,7 @@ namespace ZenLib.ModelChecking
         /// Find an input to a function satisfying some condition.
         /// </summary>
         /// <param name="expression">The Zen expression for the function.</param>
+        /// <param name="arguments">The arguments.</param>
         /// <param name="input1">The first Zen expression for the input to the function.</param>
         /// <param name="input2">The second Zen expression for the input to the function.</param>
         /// <param name="input3">The third Zen expression for the input to the function.</param>
@@ -123,14 +132,15 @@ namespace ZenLib.ModelChecking
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
             Zen<bool> expression,
+            Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
             Zen<T4> input4,
             Backend backend)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression);
-            var assignment = modelChecker.ModelCheck(expression);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
+            var assignment = modelChecker.ModelCheck(expression, arguments);
 
             if (assignment == null)
             {
