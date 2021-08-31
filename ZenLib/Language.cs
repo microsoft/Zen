@@ -437,8 +437,8 @@ namespace ZenLib
             foreach (var field in ReflectionUtilities.GetAllFields(type))
             {
                 var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
-                dynamic field1 = method.Invoke(null, new object[] { expr1, field.Name });
-                dynamic field2 = method.Invoke(null, new object[] { expr2, field.Name });
+                object field1 = method.Invoke(null, new object[] { expr1, field.Name });
+                object field2 = method.Invoke(null, new object[] { expr2, field.Name });
                 var emethod = eqMethod.MakeGenericMethod(field.FieldType);
                 acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
             }
@@ -446,8 +446,8 @@ namespace ZenLib
             foreach (var property in ReflectionUtilities.GetAllProperties(type))
             {
                 var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
-                dynamic prop1 = method.Invoke(null, new object[] { expr1, property.Name });
-                dynamic prop2 = method.Invoke(null, new object[] { expr2, property.Name });
+                object prop1 = method.Invoke(null, new object[] { expr1, property.Name });
+                object prop2 = method.Invoke(null, new object[] { expr2, property.Name });
                 var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
                 acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
             }

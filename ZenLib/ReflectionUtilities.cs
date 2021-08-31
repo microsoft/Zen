@@ -618,13 +618,12 @@ namespace ZenLib
         internal static object CreateZenConstant<T>(T value)
         {
             var type = typeof(T);
-            dynamic v = value;
 
             if (value is bool || value is byte || value is short || value is ushort || value is int ||
                 value is uint || value is long || value is ulong || value is string || value is BigInteger ||
                 IsFixedIntegerType(type))
             {
-                return ZenConstantExpr<T>.Create(v);
+                return ZenConstantExpr<T>.Create((dynamic)value);
             }
 
             var typeArgs = type.GetGenericArgumentsCached();
