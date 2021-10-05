@@ -73,8 +73,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringOperations()
         {
+            Settings.PreserveBranches = true;
             var f = new ZenFunction<string, string, string, string, bool>((w, x, y, z) => If(w.EndsWith(x), True(), If(w.StartsWith(y), True(), w.Contains(z))));
             Assert.AreEqual(3, f.GenerateInputs().Count());
+            Settings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -83,8 +85,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionListContains()
         {
+            Settings.PreserveBranches = true;
             var f = new ZenFunction<IList<int>, bool>(x => x.Contains(3));
             Assert.AreEqual(6, f.GenerateInputs().Count());
+            Settings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -125,6 +129,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionPacketAcl()
         {
+            Settings.PreserveBranches = true;
             var p1 = new Prefix { Length = 24, Address = Ip.Parse("72.1.2.0").Value };
             var p2 = new Prefix { Length = 24, Address = Ip.Parse("1.2.3.0").Value };
             var p3 = new Prefix { Length = 32, Address = Ip.Parse("8.8.8.8").Value };
@@ -136,6 +141,7 @@ namespace ZenLib.Tests
 
             var f = new ZenFunction<IpHeader, bool>(h => acl.Process(h, 0));
             Assert.AreEqual(3, f.GenerateInputs().Count());
+            Settings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -295,6 +301,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionAcl()
         {
+            Settings.PreserveBranches = true;
             var random = new Random(1);
             var lines = new List<AclLine>();
 
@@ -324,6 +331,7 @@ namespace ZenLib.Tests
 
             var function = new ZenFunction<IpHeader, bool>(p => acl.Process(p, 0));
             Assert.AreEqual(20, function.GenerateInputs().Count());
+            Settings.PreserveBranches = false;
         }
     }
 }
