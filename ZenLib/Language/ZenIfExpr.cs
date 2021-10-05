@@ -41,32 +41,35 @@ namespace ZenLib
                 return ce.Value ? t : f;
             }
 
-            /* if g then e else e = e
-            if (ReferenceEquals(t, f))
+            if (!Settings.PreserveBranches)
             {
-                return t;
+                // if g then e else e = e
+                if (ReferenceEquals(t, f))
+                {
+                    return t;
+                }
+
+                if (typeof(T) == ReflectionUtilities.BoolType)
+                {
+                    // if e1 then true else e2 = Or(e1, e2)
+                    // if e1 then false else e2 = And(Not(e1), e2)
+                    if (t is ZenConstantExpr<bool> te)
+                    {
+                        return te.Value ?
+                            ZenOrExpr.Create((dynamic)g, (dynamic)f) :
+                            ZenAndExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)f);
+                    }
+
+                    // if e1 then e2 else true = Or(Not(e1), e2)
+                    // if e1 then e2 else false = And(e1, e2)
+                    if (f is ZenConstantExpr<bool> fe)
+                    {
+                        return fe.Value ?
+                            ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :
+                            ZenAndExpr.Create((dynamic)g, (dynamic)t);
+                    }
+                }
             }
-
-            if (typeof(T) == ReflectionUtilities.BoolType)
-            {
-                // if e1 then true else e2 = Or(e1, e2)
-                // if e1 then false else e2 = And(Not(e1), e2)
-                if (t is ZenConstantExpr<bool> te)
-                {
-                    return te.Value ?
-                        ZenOrExpr.Create((dynamic)g, (dynamic)f) :
-                        ZenAndExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)f);
-                }
-
-                // if e1 then e2 else true = Or(Not(e1), e2)
-                // if e1 then e2 else false = And(e1, e2)
-                if (f is ZenConstantExpr<bool> fe)
-                {
-                    return fe.Value ?
-                        ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :
-                        ZenAndExpr.Create((dynamic)g, (dynamic)t);
-                }
-            } */
 
             return new ZenIfExpr<T>(g, t, f);
         }

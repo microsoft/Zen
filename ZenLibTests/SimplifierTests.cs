@@ -494,6 +494,11 @@ namespace ZenLib.Tests
             Assert.AreEqual(If(x == 0, false, b), And(Not(x == 0), b));
             Assert.AreEqual(If(x == 0, b, true), Or(Not(x == 0), b));
             Assert.AreEqual(If(x == 0, b, false), And(x == 0, b));
+            Assert.AreEqual(If<bool>(x == 0, false, false), False());
+            Assert.AreEqual(If<bool>(x == 0, true, b), Or(x == 0, b));
+            Assert.AreEqual(If<bool>(x == 0, false, b), And(Not(x == 0), b));
+            Assert.AreEqual(If<bool>(x == 0, b, true), Or(Not(x == 0), b));
+            Assert.AreEqual(If<bool>(x == 0, b, false), And(x == 0, b));
         }
 
         /// <summary>
