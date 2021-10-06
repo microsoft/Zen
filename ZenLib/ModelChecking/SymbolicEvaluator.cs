@@ -19,11 +19,10 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static bool Find(Zen<bool> expression, Dictionary<long, object> arguments, Backend backend)
+        public static Dictionary<object, object> Find(Zen<bool> expression, Dictionary<long, object> arguments, Backend backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, expression, arguments);
-            var assignment = modelChecker.ModelCheck(expression, arguments);
-            return assignment != null;
+            return modelChecker.ModelCheck(expression, arguments);
         }
 
         /// <summary>

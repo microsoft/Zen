@@ -393,6 +393,8 @@ namespace ZenLib.Solver
 
             // must be a fixed width integer
             var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
+            RemoveTrailingZeroes(ref bytes);
+
             Array.Reverse(bytes);
             return bytes;
         }
@@ -407,6 +409,12 @@ namespace ZenLib.Solver
             }
 
             return Option.Some(this.solver.Model);
+        }
+
+        public static void RemoveTrailingZeroes(ref byte[] array)
+        {
+            int lastIndex = Array.FindLastIndex(array, b => b != 0);
+            Array.Resize(ref array, lastIndex + 1);
         }
     }
 }
