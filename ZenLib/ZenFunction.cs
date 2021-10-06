@@ -97,7 +97,7 @@ namespace ZenLib
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
         {
             var result = invariant(this.function());
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend) != null);
         }
     }
 

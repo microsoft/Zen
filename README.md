@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a research library and verification toolbox that allows for creating models of functionality. The Zen library has a number of built-in tools for processing these models, including a compiler, model checker, and test input generator. 
+Zen is a research library that provides high-level abstractions in C# to make it easier to leverage high-performance constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to C# objects. It makes it easier to construct complex encodings and and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler, model checker, and test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
 
 # Installation
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
@@ -18,7 +18,45 @@ using ZenLib;
 using static ZenLib.Language;
 ```
 
-The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that the library knows how to manipulate. As a simple example, consider the following code that computes a new integer from two integer inputs `x` and `y`:
+The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can take on any value. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., bool, int, string, IList) and then encodes constraints over those variables.
+
+```csharp
+// create symbolic variables of different types
+var b = Arbitrary<bool>();
+var i = Arbitrary<int>();
+var s = Arbitrary<string>();
+var o = Arbitrary<Option<ulong>>();
+var l = Arbitrary<IList<int>>(listSize: 10, checkSmallerLists: false);
+
+// build constraints on these variables
+var c1 = Or(b, i <= 10);
+var c2 = Or(Not(b), o == Option.Some(1UL));
+var c3 = Or(s.Contains("hello"), Not(o.HasValue()));
+var c4 = l.Where(x => x <= i).Length() == 5;
+var c5 = l.All(x => And(x >= 0, x <= 100));
+var expr = And(c1, c2, c3, c4, c5);
+
+// solve the constraints to get a solution
+var solution = expr.Solve();
+
+System.Console.WriteLine("b: " + solution.Get(b));
+System.Console.WriteLine("i: " + solution.Get(i));
+System.Console.WriteLine("s: " + solution.Get(s));
+System.Console.WriteLine("o: " + solution.Get(o));
+System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
+```
+
+The output of this example produces the following values for me:
+
+```
+b: True
+i: 52
+s: hello
+o: Some(1)
+l: 54,53,54,53,37,53,37,37,37,37
+```
+
+Since `Zen<T>` objects are just normal C# objects, we can pass them and return them from functions. For isntance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
 
 ```csharp
 Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
@@ -27,13 +65,15 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 }
 ```
 
-Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between C# values and Zen values. To use Zen, we must next create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
+Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between C# values and Zen values. 
+
+Rather than manually building constraints as shown previously, we can also ask Zen to represent a "function" from some inputs to an output. To do so, we create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
 ZenFunction<int, int, int> function = new ZenFunction<int, int, int>(MultiplyAndAdd);
 ```
 
-Given a `ZenFunction` we can leverage the library to perform multiple tasks.
+Given a `ZenFunction` we can leverage the library to perform several additional tasks.
 
 ### Executing a function
 

@@ -37,7 +37,7 @@ namespace ZenLib
 
             if (bytes.Length > numBytes)
             {
-                throw new ArgumentException($"Invalid byte[] length, expected {this.Size % 8} but got {bytes.Length}");
+                throw new ArgumentException($"Invalid byte[] length, expected {this.Size / 8} but got {bytes.Length}");
             }
 
             this.Signed = typeof(TSign) == typeof(Signed);
