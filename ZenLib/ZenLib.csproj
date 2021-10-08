@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/microsoft/Zen</RepositoryUrl>
     <Description>A library that simplifies building verification tools in .NET</Description>
     <PackageTags>zen zenlib modeling constraint solving verification smt solver binary decision diagrams diagram</PackageTags>
-    <Version>1.1.9</Version>
+    <Version>1.2.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
