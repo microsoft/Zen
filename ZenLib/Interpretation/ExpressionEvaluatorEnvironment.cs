@@ -6,7 +6,6 @@ namespace ZenLib.Interpretation
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// An environment for the interpreter.
@@ -25,7 +24,7 @@ namespace ZenLib.Interpretation
         /// Initializes a new instance of the <see cref="ExpressionEvaluatorEnvironment"/> class.
         /// </summary>
         /// <param name="argumentAssignment">The initial argument assignment.</param>
-        public ExpressionEvaluatorEnvironment(ImmutableDictionary<long, object> argumentAssignment)
+        public ExpressionEvaluatorEnvironment(Dictionary<long, object> argumentAssignment)
         {
             this.ArgumentAssignment = argumentAssignment;
         }
@@ -33,35 +32,11 @@ namespace ZenLib.Interpretation
         /// <summary>
         /// Gets the argument assignment.
         /// </summary>
-        public ImmutableDictionary<long, object> ArgumentAssignment { get; } = ImmutableDictionary<long, object>.Empty;
+        public Dictionary<long, object> ArgumentAssignment { get; } = new Dictionary<long, object>();
 
         /// <summary>
         /// Get the arbitrary assignment.
         /// </summary>
         public Dictionary<object, object> ArbitraryAssignment { get; }
-
-        /// <summary>
-        /// Equality of type environments.
-        /// </summary>
-        /// <param name="obj">The other environment.</param>
-        /// <returns>True or false.</returns>
-        [ExcludeFromCodeCoverage]
-        public override bool Equals(object obj)
-        {
-            var e = (ExpressionEvaluatorEnvironment)obj;
-
-            return object.Equals(this.ArbitraryAssignment, e.ArbitraryAssignment) &&
-                   this.ArgumentAssignment.Equals(e.ArgumentAssignment);
-        }
-
-        /// <summary>
-        /// Hash code for an environment.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            return (this.ArbitraryAssignment == null ? 0 : this.ArbitraryAssignment.GetHashCode()) +
-                   this.ArgumentAssignment.GetHashCode();
-        }
     }
 }

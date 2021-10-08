@@ -66,7 +66,7 @@ namespace ZenLib
                 return compiledFunction();
             }
 
-            var args = ImmutableDictionary<long, object>.Empty;
+            var args = new Dictionary<long, object>();
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -161,8 +161,7 @@ namespace ZenLib
                 return compiledFunction(value);
             }
 
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(argument1.ArgumentId, value);
+            var args = new Dictionary<long, object> { { argument1.ArgumentId, value } };
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -352,9 +351,12 @@ namespace ZenLib
                 return compiledFunction(value1, value2);
             }
 
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(argument1.ArgumentId, value1)
-                .Add(argument2.ArgumentId, value2);
+            var args = new Dictionary<long, object>()
+            {
+                { argument1.ArgumentId, value1 },
+                { argument2.ArgumentId, value2 },
+            };
+
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -566,10 +568,13 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3);
             }
 
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(argument1.ArgumentId, value1)
-                .Add(argument2.ArgumentId, value2)
-                .Add(argument3.ArgumentId, value3);
+            var args = new Dictionary<long, object>()
+            {
+                { argument1.ArgumentId, value1 },
+                { argument2.ArgumentId, value2 },
+                { argument3.ArgumentId, value3 },
+            };
+
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
@@ -802,11 +807,14 @@ namespace ZenLib
                 return compiledFunction(value1, value2, value3, value4);
             }
 
-            var args = ImmutableDictionary<long, object>.Empty
-                .Add(argument1.ArgumentId, value1)
-                .Add(argument2.ArgumentId, value2)
-                .Add(argument3.ArgumentId, value3)
-                .Add(argument4.ArgumentId, value4);
+            var args = new Dictionary<long, object>()
+            {
+                { argument1.ArgumentId, value1 },
+                { argument2.ArgumentId, value2 },
+                { argument3.ArgumentId, value3 },
+                { argument4.ArgumentId, value4 },
+            };
+
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
         }
 
