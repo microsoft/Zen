@@ -5,6 +5,7 @@
 namespace ZenLib.Interpretation
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using ZenLib.SymbolicExecution;
     using static ZenLib.Language;
@@ -21,12 +22,12 @@ namespace ZenLib.Interpretation
         /// <param name="args">The arguments with values as C# values.</param>
         /// <param name="trackBranches">Whether to track branches.</param>
         /// <returns>The result and any path constraint.</returns>
-        public static (T, PathConstraint) Run<T>(Zen<T> expression, ImmutableDictionary<long, object> args, bool trackBranches = false)
+        public static (T, PathConstraint) Run<T>(Zen<T> expression, Dictionary<long, object> args, bool trackBranches = false)
         {
             return Interpret(expression, args, trackBranches);
         }
 
-        private static (T, PathConstraint) Interpret<T>(Zen<T> expression, ImmutableDictionary<long, object> arguments, bool trackBranches)
+        private static (T, PathConstraint) Interpret<T>(Zen<T> expression, Dictionary<long, object> arguments, bool trackBranches)
         {
             var environment = new ExpressionEvaluatorEnvironment(arguments);
             var interpreter = new ExpressionEvaluator(trackBranches);
@@ -41,7 +42,7 @@ namespace ZenLib.Interpretation
             ImmutableDictionary<long, object> args)
         {
             var expression = function(Constant(value1), Constant(value2));
-            return Interpret(expression, args, false).Item1;
+            return Interpret(expression, new Dictionary<long, object>(args), false).Item1;
         }
     }
 }

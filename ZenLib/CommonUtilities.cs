@@ -411,24 +411,5 @@ namespace ZenLib
 
             return s[(int)index].ToString();
         }
-
-        /// <summary>
-        ///     Tries to run a callback and, if the callback
-        ///     triggers a target invocation exception, then
-        ///     it rethrows with the original exception.
-        /// </summary>
-        /// <param name="action">The callback.</param>
-        /// <returns>The value from the callback.</returns>
-        public static T RunAndPreserveExceptions<T>(Func<T> action)
-        {
-            try
-            {
-                return action();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                throw e.InnerException;
-            }
-        }
     }
 }
