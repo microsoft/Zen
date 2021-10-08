@@ -18,14 +18,16 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            for (int i = 0; i < 1000; i++)
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            for (int i = 0; i < 32; i++)
             {
                 var b = new AclBench();
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
-                b.NumLines = 100;
+                b.NumLines = 2000;
                 b.CreateAcl();
                 b.VerifyAclProvenance();
             }
+            Console.WriteLine($"Time: {timer.ElapsedMilliseconds / 32}ms");
 
             // _ = BenchmarkRunner.Run<AclBench>();
             // _ = BenchmarkRunner.Run<RouteBench>();
