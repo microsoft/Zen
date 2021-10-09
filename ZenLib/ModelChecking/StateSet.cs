@@ -72,6 +72,23 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Covert a state set to contain the desired decision diagram variables.
+        /// </summary>
+        /// <param name="conversionData">The conversion variables.</param>
+        /// <returns>A converted state set.</returns>
+        internal StateSet<T> ConvertTo(StateSetMetadata conversionData)
+        {
+            var x = new HashSet<Variable<BDDNode>>(this.VariableSet.Variables);
+            var y = new HashSet<Variable<BDDNode>>(conversionData.BddVariableSet.Variables);
+            if (x.SetEquals(y))
+            {
+                return this;
+            }
+
+            return this.ConvertSetVariables(conversionData.BddVariableSet, (Zen<T>)conversionData.ZenParameter, conversionData.ZenArbitraryMapping);
+        }
+
+        /// <summary>
         /// Converts between a the decision diagram variables used to represent the set.
         /// </summary>
         /// <param name="newVariableSet">The new decision diagram variables.</param>

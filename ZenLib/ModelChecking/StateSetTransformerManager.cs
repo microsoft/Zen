@@ -22,8 +22,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Canonical variables used for a given type.
         /// </summary>
-        internal Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)> CanonicalValues =
-            new Dictionary<Type, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>)>();
+        internal Dictionary<Type, StateSetMetadata> CanonicalValues = new Dictionary<Type, StateSetMetadata>();
 
         /// <summary>
         /// Keep track of, for each type, if there is an output

@@ -16,10 +16,13 @@ namespace ZenLib.ModelChecking
     /// </summary>
     internal static class StateSetTransformerFactory
     {
+        /// <summary>
+        /// Empty arguments for interleaving heuristic.
+        /// </summary>
         private static Dictionary<long, object> arguments = new Dictionary<long, object>();
 
         /// <summary>
-        ///     Default manager object will allocate all objects.
+        /// Default manager object will allocate all objects.
         /// </summary>
         private static StateSetTransformerManager DefaultManager = new StateSetTransformerManager();
 
@@ -68,7 +71,7 @@ namespace ZenLib.ModelChecking
                 {
                     for (int i = 0; i < arbitrariesForInput.Count; i++)
                     {
-                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.Item2.Variables[i]);
+                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.BddVariableSet.Variables[i]);
                     }
                 }
 
@@ -137,12 +140,22 @@ namespace ZenLib.ModelChecking
 
             if (!manager.CanonicalValues.ContainsKey(typeof(T1)))
             {
-                manager.CanonicalValues[typeof(T1)] = (input, inputVariableSet, arbitraryMappingInput);
+                manager.CanonicalValues[typeof(T1)] = new StateSetMetadata
+                {
+                    ZenParameter = input,
+                    BddVariableSet = inputVariableSet,
+                    ZenArbitraryMapping = arbitraryMappingInput,
+                };
             }
 
             if (!manager.CanonicalValues.ContainsKey(typeof(T2)))
             {
-                manager.CanonicalValues[typeof(T2)] = (output, outputVariableSet, arbitraryMappingOutput);
+                manager.CanonicalValues[typeof(T2)] = new StateSetMetadata
+                {
+                    ZenParameter = output,
+                    BddVariableSet = outputVariableSet,
+                    ZenArbitraryMapping = arbitraryMappingOutput,
+                };
             }
 
             return new StateSetTransformer<T1, T2>(
@@ -153,6 +166,102 @@ namespace ZenLib.ModelChecking
                 arbitraryMappingInput,
                 arbitraryMappingOutput,
                 manager);
+        }
+
+        /// <summary>
+        /// Create a state set transformer from a zen function.
+        /// </summary>
+        /// <param name="function">The Zen function to make into a transformer.</param>
+        /// <param name="manager">The transformation manager object to use.</param>
+        /// <returns>A state set transformer between input and output types.</returns>
+        public static StateSet<T> CreateStateSet<T>(Func<Zen<T>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        {
+            if (manager == null)
+            {
+                manager = DefaultManager;
+            }
+
+            // create an arbitrary input and invoke the function
+            var generator = new SymbolicInputGenerator(0, false);
+            var input = Language.Arbitrary<T>(generator);
+            var arbitrariesForInput = generator.ArbitraryExpressions;
+
+            var expression = function(input);
+
+            // initialize the decision diagram solver
+            var heuristic = new InterleavingHeuristic();
+            var mustInterleave = heuristic.Compute(expression, arguments);
+            var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
+
+            // optimization: if there are no variable ordering dependencies,
+            // then we can reuse the input variables from the canonical variable case.
+            var maxDependenciesPerType = mustInterleave.Values
+                .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
+                .MaxOrDefault();
+
+            bool isDependencyFree = maxDependenciesPerType <= 1;
+
+            if (isDependencyFree)
+            {
+                if (manager.CanonicalValues.TryGetValue(typeof(T), out var canonicalInput))
+                {
+                    for (int i = 0; i < arbitrariesForInput.Count; i++)
+                    {
+                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.BddVariableSet.Variables[i]);
+                    }
+                }
+            }
+
+            solver.Init();
+
+            // get the decision diagram representing the equality.
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
+            var symbolicValue = expression.Accept(symbolicEvaluator, env);
+            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)symbolicValue;
+            DD result = (DD)(object)symbolicResult.Value;
+
+            // forces all arbitrary expressions to get evaluated even if not used in the invariant.
+            var arbitraryToVariable = new Dictionary<object, Variable<BDDNode>>();
+            foreach (var arbitrary in arbitrariesForInput)
+            {
+                forceVariableAssignment(solver, arbitraryToVariable, arbitrary);
+            }
+
+            // we get the actual assignment from arbitrary to bdd variable
+            // note that this will override the temporary assignments set above.
+            // this is done to ensure unused arguments are still allocated variables.
+            foreach (var kv in symbolicEvaluator.ArbitraryVariables)
+            {
+                arbitraryToVariable[kv.Key] = kv.Value;
+            }
+
+            // collect information about input and output manager variables
+            var inputVariables = new List<Variable<BDDNode>>();
+            var arbitraryMappingInput = new Dictionary<object, Variable<BDDNode>>();
+
+            foreach (var arbitrary in arbitrariesForInput)
+            {
+                var variable = arbitraryToVariable[arbitrary];
+                arbitraryMappingInput[arbitrary] = variable;
+                inputVariables.Add(variable);
+            }
+
+            // create variable sets for easy quantification
+            var inputVariableSet = solver.Manager.CreateVariableSet(inputVariables.ToArray());
+
+            if (!manager.CanonicalValues.ContainsKey(typeof(T)))
+            {
+                manager.CanonicalValues[typeof(T)] = new StateSetMetadata
+                {
+                    ZenParameter = input,
+                    BddVariableSet = inputVariableSet,
+                    ZenArbitraryMapping = arbitraryMappingInput,
+                };
+            }
+
+            var stateSet = new StateSet<T>(manager, solver, result, arbitraryMappingInput, input, inputVariableSet);
+            return stateSet.ConvertTo(manager.CanonicalValues[typeof(T)]);
         }
 
         /// <summary>
@@ -214,6 +323,11 @@ namespace ZenLib.ModelChecking
             }
 
             throw new ZenException($"Unsupported type: {zenExpr.GetType()} in transformer.");
+        }
+
+        private static int MaxOrDefault(this IEnumerable<int> enumerable)
+        {
+            return enumerable.Count() == 0 ? 0 : enumerable.Max();
         }
     }
 }

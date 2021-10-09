@@ -1,0 +1,278 @@
+﻿// <copyright file="StateSetTests.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace ZenLib.Tests
+{
+    using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib.ModelChecking;
+    using ZenLib.Tests.Network;
+    using static ZenLib.Language;
+
+    /// <summary>
+    /// Tests for state sets.
+    /// </summary>
+    [TestClass]
+    [ExcludeFromCodeCoverage]
+    public class StateSetTests
+    {
+        /// <summary>
+        /// Test a transformer fails for unbounded types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestStateSetExceptionForUnboundedTypes1()
+        {
+            new ZenFunction<BigInteger, bool>(i => i > new BigInteger(0)).StateSet();
+        }
+
+        /// <summary>
+        /// Test a stateset fails for unbounded types.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetExceptionForUnboundedTypes2()
+        {
+            Settings.UseLargeStack = true;
+
+            try
+            {
+                new ZenFunction<BigInteger, bool>(i => i > new BigInteger(0)).StateSet();
+                Assert.Fail();
+            }
+            catch
+            {
+                Settings.UseLargeStack = false;
+            }
+        }
+
+        /// <summary>
+        /// Test a stateset with an abitrary works.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetArbitrary()
+        {
+            var b = Arbitrary<bool>();
+            var f1 = new ZenFunction<uint, bool>(i => Or(b, i <= 10));
+            var s1 = f1.StateSet();
+        }
+
+        /// <summary>
+        /// Test getting an element for a stateset.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetElements()
+        {
+            var f = new ZenFunction<uint, bool>(i => (i + 1U) == 10U);
+            var s = f.StateSet();
+            Assert.AreEqual(9U, s.Element());
+        }
+
+        /// <summary>
+        /// Test the variables are made canonical for state sets.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetVariablesAlign()
+        {
+            var s1 = new ZenFunction<uint, bool>(i => i + 1 == 10).StateSet();
+            var s2 = new ZenFunction<uint, bool>(i => i + 2 >= 10).StateSet();
+            var s3 = s1.Intersect(s2);
+
+            Assert.AreEqual(s1, s3);
+            Assert.AreEqual(9U, s3.Element());
+        }
+
+        /// <summary>
+        /// Test checking if a set is full.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetIsFull()
+        {
+            var set = new ZenFunction<bool, bool>(b => true).StateSet();
+            Assert.IsTrue(set.IsFull());
+        }
+
+        /// <summary>
+        /// Test checking if a set is empty.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetIsEmpty()
+        {
+            var set = new ZenFunction<bool, bool>(b => true).StateSet();
+            Assert.IsTrue(set.Complement().IsEmpty());
+        }
+
+        /// <summary>
+        /// Test for different types.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetArgTypes()
+        {
+            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<short, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<int, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<long, bool>(b => true).StateSet().IsFull());
+            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).StateSet().IsFull());
+        }
+
+        /// <summary>
+        /// Test state sets with fixed width integers.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetFixedWidthInteger()
+        {
+            var set = new ZenFunction<Int5, bool>(i => i <= new Int5(0)).StateSet();
+            Assert.IsTrue(set.Element() <= new Int5(0));
+        }
+
+        /// <summary>
+        /// Test state set equality.
+        /// </summary>
+        [TestMethod]
+        public void TestSetSetEquality()
+        {
+            var set1 = new ZenFunction<bool, bool>(b => true).StateSet().Complement();
+            var set2 = new ZenFunction<bool, bool>(b => true).StateSet().Complement();
+            Assert.IsTrue(set1.Equals(set2));
+            Assert.IsFalse(set1.Equals(2));
+        }
+
+        /// <summary>
+        /// Test getting an element for an empty set.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestTransformerNoElement()
+        {
+            var stateSet = new ZenFunction<uint, bool>(i => i + 2 == i + 1).StateSet();
+            stateSet.Element();
+        }
+
+        /// <summary>
+        /// Test a transformer over an object.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerObject()
+        {
+            new ZenFunction<IpHeader, bool>(p => And(p.GetDstIp().GetValue() <= 4, p.GetSrcIp().GetValue() <= 5)).StateSet();
+        }
+
+        /// <summary>
+        /// Test packet transformations.
+        /// </summary>
+        [TestMethod]
+        public void TestPacketSet()
+        {
+            var rnd = new System.Random();
+            for (int j = 0; j < 2; j++)
+            {
+                var i = (uint)rnd.Next();
+                var f = new ZenFunction<IpHeader, bool>(p =>
+                {
+                    return p.GetDstIp().GetValue() == i;
+                });
+
+                StateSet<IpHeader> set = f.StateSet();
+                Assert.AreEqual(i, set.Element().DstIp.Value);
+            }
+        }
+
+        /// <summary>
+        /// Test packet transformations.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleStateSets()
+        {
+            var set1 = new ZenFunction<IpHeader, bool>(p => true).StateSet();
+            var set2 = new ZenFunction<IpHeader, bool>(p => p.GetDstIp().GetValue() == 1).StateSet();
+            var set3 = new ZenFunction<uint, bool>(u => u == 2).StateSet();
+            Assert.IsTrue(set1.IsFull());
+            Assert.AreEqual(1U, set2.Element().DstIp.Value);
+            Assert.AreEqual(2U, set3.Element());
+        }
+
+        /// <summary>
+        /// Test that multiple arguments works with tuples.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleArguments()
+        {
+            var set = new ZenFunction<IpHeader, IpHeader, bool>((x, y) => x == y).StateSet();
+            var e = set.Element();
+            Assert.AreEqual(e.Item1.DstIp, e.Item2.DstIp);
+            Assert.AreEqual(e.Item1.SrcIp, e.Item2.SrcIp);
+            Assert.AreEqual(e.Item1.SrcPort, e.Item2.DstPort);
+            Assert.AreEqual(e.Item1.DstPort, e.Item2.DstPort);
+        }
+
+        /// <summary>
+        /// Test that multiple arguments works with tuples.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleArguments2()
+        {
+            var set = new ZenFunction<IpHeader, IpHeader, IpHeader, bool>((x, y, z) => And(x == y, y == z)).StateSet();
+            var e = set.Element();
+            Assert.AreEqual(e.Item1.DstIp, e.Item2.DstIp);
+            Assert.AreEqual(e.Item1.DstIp, e.Item3.DstIp);
+            Assert.AreEqual(e.Item1.SrcIp, e.Item2.SrcIp);
+            Assert.AreEqual(e.Item1.SrcIp, e.Item3.SrcIp);
+            Assert.AreEqual(e.Item1.SrcPort, e.Item2.DstPort);
+            Assert.AreEqual(e.Item1.SrcPort, e.Item3.DstPort);
+            Assert.AreEqual(e.Item1.DstPort, e.Item2.DstPort);
+            Assert.AreEqual(e.Item1.DstPort, e.Item3.DstPort);
+        }
+
+        /// <summary>
+        /// Test that multiple arguments works with tuples.
+        /// </summary>
+        [TestMethod]
+        public void TestMultipleArguments3()
+        {
+            var set = new ZenFunction<int, int, int, int, bool>((a, b, c, d) => And(a == 1, b == 2, c == 3, d == 4)).StateSet();
+            var e = set.Element();
+            Assert.AreEqual(1, e.Item1);
+            Assert.AreEqual(2, e.Item2);
+            Assert.AreEqual(3, e.Item3);
+            Assert.AreEqual(4, e.Item4);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void TestStateSetDifferentManagers()
+        {
+            var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            var set2 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            set1.Union(set2);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void TestStateSetInvalidArguments2()
+        {
+            var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            var set2 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            set1.Intersect(set2);
+        }
+
+        /// <summary>
+        /// Test that using different manager objects works as expected.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestStateSetInvalidType()
+        {
+            new ZenFunction<string, bool>(x => true).StateSet(new StateSetTransformerManager());
+        }
+    }
+}

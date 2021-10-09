@@ -28,7 +28,7 @@ namespace ZenLib
         /// <summary>
         /// User provided function.
         /// </summary>
-        private Func<Zen<T>> function;
+        public Func<Zen<T>> Function;
 
         /// <summary>
         /// The compiled function as C# IL.
@@ -51,8 +51,8 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            this.functionBodyExpr = this.function();
+            this.Function = function;
+            this.functionBodyExpr = this.Function();
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ZenLib
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
         {
-            var result = invariant(this.function());
+            var result = invariant(this.Function());
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend) != null);
         }
     }
@@ -121,7 +121,7 @@ namespace ZenLib
         /// <summary>
         /// The callback for the Zen function.
         /// </summary>
-        private Func<Zen<T1>, Zen<T2>> function;
+        public Func<Zen<T1>, Zen<T2>> Function;
 
         /// <summary>
         /// The compiled C# version of the function.
@@ -144,9 +144,9 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
+            this.Function = function;
             argument1 = argument1 ?? new ZenArgumentExpr<T1>();
-            this.functionBodyExpr = this.function(argument1);
+            this.functionBodyExpr = this.Function(argument1);
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer(StateSetTransformerManager manager = null)
         {
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.function, manager));
+            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace ZenLib
         {
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             precondition = precondition == null ? (x) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input, backend));
         }
     }
 
@@ -309,7 +309,7 @@ namespace ZenLib
         /// <summary>
         /// User provided function.
         /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>> function;
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>> Function;
 
         /// <summary>
         /// Compiled function to C# IL.
@@ -332,10 +332,10 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
+            this.Function = function;
             argument1 = argument1 ?? new ZenArgumentExpr<T1>();
             argument2 = argument2 ?? new ZenArgumentExpr<T2>();
-            this.functionBodyExpr = this.function(argument1, argument2);
+            this.functionBodyExpr = this.Function(argument1, argument2);
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2>, T3> Transformer()
         {
-            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.function(p.Item1(), p.Item2());
+            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
             return StateSetTransformerFactory.CreateTransformer(f);
         }
 
@@ -488,7 +488,7 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             precondition = precondition == null ? (x, y) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, backend));
         }
     }
 
@@ -524,7 +524,7 @@ namespace ZenLib
         /// <summary>
         /// User-provided function.
         /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function;
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> Function;
 
         /// <summary>
         /// Compiled function as C# IL.
@@ -547,11 +547,11 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
+            this.Function = function;
             argument1 = argument1 ?? new ZenArgumentExpr<T1>();
             argument2 = argument2 ?? new ZenArgumentExpr<T2>();
             argument3 = argument3 ?? new ZenArgumentExpr<T3>();
-            this.functionBodyExpr = this.function(argument1, argument2, argument3);
+            this.functionBodyExpr = this.Function(argument1, argument2, argument3);
         }
 
         /// <summary>
@@ -607,7 +607,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer()
         {
-            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.function(p.Item1(), p.Item2(), p.Item3());
+            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
             return StateSetTransformerFactory.CreateTransformer(f);
         }
 
@@ -719,7 +719,7 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             precondition = precondition == null ? (x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, backend));
         }
     }
 
@@ -761,7 +761,7 @@ namespace ZenLib
         /// <summary>
         /// User-provided function.
         /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function;
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> Function;
 
         /// <summary>
         /// Compiled function as C# IL.
@@ -784,12 +784,12 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
+            this.Function = function;
             argument1 = argument1 ?? new ZenArgumentExpr<T1>();
             argument2 = argument2 ?? new ZenArgumentExpr<T2>();
             argument3 = argument3 ?? new ZenArgumentExpr<T3>();
             argument4 = argument4 ?? new ZenArgumentExpr<T4>();
-            this.functionBodyExpr = this.function(argument1, argument2, argument3, argument4);
+            this.functionBodyExpr = this.Function(argument1, argument2, argument3, argument4);
         }
 
         /// <summary>
@@ -849,7 +849,7 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer()
         {
-            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
+            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
             return StateSetTransformerFactory.CreateTransformer(f);
         }
 
@@ -972,7 +972,7 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             precondition = precondition == null ? (w, x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, input4, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, input4, backend));
         }
     }
 }
