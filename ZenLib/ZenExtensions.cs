@@ -39,7 +39,7 @@ namespace ZenLib
             }
 
             stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(function.Function, manager));
-            ZenFunction<T, bool>.StateSetCache[key] = stateSet;
+            ZenFunction<T, bool>.StateSetCache.Add(key, stateSet);
             return stateSet;
         }
 
@@ -59,7 +59,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2());
             stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
-            ZenFunction<T1, T2, bool>.StateSetCache[key] = stateSet;
+            ZenFunction<T1, T2, bool>.StateSetCache.Add(key, stateSet);
             return stateSet;
         }
 
@@ -79,7 +79,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2, T3>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3());
             stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
-            ZenFunction<T1, T2, T3, bool>.StateSetCache[key] = stateSet;
+            ZenFunction<T1, T2, T3, bool>.StateSetCache.Add(key, stateSet);
             return stateSet;
         }
 
@@ -99,7 +99,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
             stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
-            ZenFunction<T1, T2, T3, T4, bool>.StateSetCache[key] = stateSet;
+            ZenFunction<T1, T2, T3, T4, bool>.StateSetCache.Add(key, stateSet);
             return stateSet;
         }
     }

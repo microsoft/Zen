@@ -111,14 +111,14 @@ namespace ZenLib
         /// <summary>
         /// Cache for transformers.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>> TransformerCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>> TransformerCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>>(1024);
 
         /// <summary>
         /// Cache for state set translations.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSet<T1>> StateSetCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSet<T1>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<T1>> StateSetCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSet<T1>>(1024);
 
         /// <summary>
         /// First argument expression.
@@ -210,7 +210,7 @@ namespace ZenLib
             }
 
             transformer = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
-            TransformerCache[key] = transformer;
+            TransformerCache.Add(key, transformer);
             return transformer;
         }
 
@@ -314,14 +314,14 @@ namespace ZenLib
         /// <summary>
         /// Cache for transformers.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>> TransformerCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>> TransformerCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>>(1024);
 
         /// <summary>
         /// Cache for state set translations.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>> StateSetCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>> StateSetCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>>(1024);
 
         /// <summary>
         /// First argument expression.
@@ -428,7 +428,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
             transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache[key] = transformer;
+            TransformerCache.Add(key, transformer);
             return transformer;
         }
 
@@ -545,14 +545,14 @@ namespace ZenLib
         /// <summary>
         /// Cache for transformers.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>> TransformerCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>> TransformerCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>>(1024);
 
         /// <summary>
         /// Cache for state set translations.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>> StateSetCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>> StateSetCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>>(1024);
 
         /// <summary>
         /// First argument expression.
@@ -669,7 +669,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
             transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache[key] = transformer;
+            TransformerCache.Add(key, transformer);
             return transformer;
         }
 
@@ -798,14 +798,14 @@ namespace ZenLib
         /// <summary>
         /// Cache for transformers.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>> TransformerCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>> TransformerCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>>(1024);
 
         /// <summary>
         /// Cache for state set translations.
         /// </summary>
-        internal static Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>> StateSetCache =
-            new Dictionary<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>>();
+        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>> StateSetCache =
+            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>>(1024);
 
         /// <summary>
         /// First argument expression.
@@ -932,7 +932,7 @@ namespace ZenLib
 
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
             transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache[key] = transformer;
+            TransformerCache.Add(key, transformer);
             return transformer;
         }
 

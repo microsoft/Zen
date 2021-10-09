@@ -5,10 +5,6 @@
 namespace ZenLibBench
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using BenchmarkDotNet.Running;
     using ZenLib;
 
     /// <summary>
@@ -25,6 +21,8 @@ namespace ZenLibBench
                 var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
                 zf.StateSet();
             }
+            Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms");
+
             /* for (int i = 0; i < 32; i++)
             {
                 var b = new AclBench();
@@ -33,17 +31,6 @@ namespace ZenLibBench
                 b.CreateAcl();
                 b.VerifyAclProvenance();
             } */
-            Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms");
-
-            // _ = BenchmarkRunner.Run<AclBench>();
-            // _ = BenchmarkRunner.Run<RouteBench>();
-            
-            /* var watch = System.Diagnostics.Stopwatch.StartNew();
-            foreach (var input in PfcModel.GenerateTests().Take(10))
-            {
-            }
-
-            Console.WriteLine($"Time: {watch.ElapsedMilliseconds}"); */
         }
     }
 }
