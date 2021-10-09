@@ -109,6 +109,12 @@ namespace ZenLib
     public class ZenFunction<T1, T2>
     {
         /// <summary>
+        /// Cache for transformers.
+        /// </summary>
+        private static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>> transformerCache =
+            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>>();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         private static ZenArgumentExpr<T1> argument1;
@@ -191,7 +197,15 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer(StateSetTransformerManager manager = null)
         {
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
+            var key = (this.functionBodyExpr.Id, manager);
+            if (transformerCache.TryGetValue(key, out var transformer))
+            {
+                return transformer;
+            }
+
+            transformer = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
+            transformerCache[key] = transformer;
+            return transformer;
         }
 
         /// <summary>
@@ -292,6 +306,12 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3>
     {
         /// <summary>
+        /// Cache for transformers.
+        /// </summary>
+        private static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>> transformerCache =
+            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>>();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         private static ZenArgumentExpr<T1> argument1;
@@ -384,11 +404,20 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2>, T3> Transformer()
+        public StateSetTransformer<Pair<T1, T2>, T3> Transformer(StateSetTransformerManager manager = null)
         {
+            var key = (this.functionBodyExpr.Id, manager);
+            if (transformerCache.TryGetValue(key, out var transformer))
+            {
+                return transformer;
+            }
+
             Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            transformer = StateSetTransformerFactory.CreateTransformer(f);
+            transformerCache[key] = transformer;
+            return transformer;
         }
 
         /// <summary>
@@ -502,6 +531,12 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4>
     {
         /// <summary>
+        /// Cache for transformers.
+        /// </summary>
+        private static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>> transformerCache =
+            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>>();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         private static ZenArgumentExpr<T1> argument1;
@@ -604,11 +639,20 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer()
+        public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer(StateSetTransformerManager manager = null)
         {
+            var key = (this.functionBodyExpr.Id, manager);
+            if (transformerCache.TryGetValue(key, out var transformer))
+            {
+                return transformer;
+            }
+
             Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            transformer = StateSetTransformerFactory.CreateTransformer(f);
+            transformerCache[key] = transformer;
+            return transformer;
         }
 
         /// <summary>
@@ -734,6 +778,12 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4, T5>
     {
         /// <summary>
+        /// Cache for transformers.
+        /// </summary>
+        private static Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>> transformerCache =
+            new Dictionary<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>>();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         private static ZenArgumentExpr<T1> argument1;
@@ -846,11 +896,20 @@ namespace ZenLib
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer()
+        public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer(StateSetTransformerManager manager = null)
         {
+            var key = (this.functionBodyExpr.Id, manager);
+            if (transformerCache.TryGetValue(key, out var transformer))
+            {
+                return transformer;
+            }
+
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            transformer = StateSetTransformerFactory.CreateTransformer(f);
+            transformerCache[key] = transformer;
+            return transformer;
         }
 
         /// <summary>

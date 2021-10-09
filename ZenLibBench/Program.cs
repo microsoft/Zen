@@ -23,7 +23,7 @@ namespace ZenLibBench
             for (int i = 0; i < 50000; i++)
             {
                 // zf.Transformer().InputSet((i, o) => o);
-                zf.StateSet();
+                zf.Transformer();
             }
             /* for (int i = 0; i < 32; i++)
             {
