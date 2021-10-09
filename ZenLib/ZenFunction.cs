@@ -109,18 +109,6 @@ namespace ZenLib
     public class ZenFunction<T1, T2>
     {
         /// <summary>
-        /// Cache for transformers.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>> TransformerCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<T1, T2>>(1024);
-
-        /// <summary>
-        /// Cache for state set translations.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<T1>> StateSetCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSet<T1>>(1024);
-
-        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -203,15 +191,17 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer(StateSetTransformerManager manager = null)
         {
-            var key = (this.FunctionBodyExpr.Id, manager);
-            if (TransformerCache.TryGetValue(key, out var transformer))
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((T1, T2)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
-                return transformer;
+                return (StateSetTransformer<T1, T2>)transformer;
             }
 
-            transformer = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
-            TransformerCache.Add(key, transformer);
-            return transformer;
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -312,18 +302,6 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3>
     {
         /// <summary>
-        /// Cache for transformers.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>> TransformerCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2>, T3>>(1024);
-
-        /// <summary>
-        /// Cache for state set translations.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>> StateSetCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2>>>(1024);
-
-        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -420,16 +398,18 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2>, T3> Transformer(StateSetTransformerManager manager = null)
         {
-            var key = (this.FunctionBodyExpr.Id, manager);
-            if (TransformerCache.TryGetValue(key, out var transformer))
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2>, T3)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
-                return transformer;
+                return (StateSetTransformer<Pair<T1, T2>, T3>)transformer;
             }
 
             Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
-            transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache.Add(key, transformer);
-            return transformer;
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -543,18 +523,6 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4>
     {
         /// <summary>
-        /// Cache for transformers.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>> TransformerCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3>, T4>>(1024);
-
-        /// <summary>
-        /// Cache for state set translations.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>> StateSetCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3>>>(1024);
-
-        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -661,16 +629,18 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer(StateSetTransformerManager manager = null)
         {
-            var key = (this.FunctionBodyExpr.Id, manager);
-            if (TransformerCache.TryGetValue(key, out var transformer))
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2, T3>, T4)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
-                return transformer;
+                return (StateSetTransformer<Pair<T1, T2, T3>, T4>)transformer;
             }
 
             Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
-            transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache.Add(key, transformer);
-            return transformer;
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -796,18 +766,6 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4, T5>
     {
         /// <summary>
-        /// Cache for transformers.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>> TransformerCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSetTransformer<Pair<T1, T2, T3, T4>, T5>>(1024);
-
-        /// <summary>
-        /// Cache for state set translations.
-        /// </summary>
-        internal static FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>> StateSetCache =
-            new FiniteCache<(long, StateSetTransformerManager), StateSet<Pair<T1, T2, T3, T4>>>(1024);
-
-        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -924,16 +882,18 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer(StateSetTransformerManager manager = null)
         {
-            var key = (this.FunctionBodyExpr.Id, manager);
-            if (TransformerCache.TryGetValue(key, out var transformer))
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2, T3, T4>, T5)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
-                return transformer;
+                return (StateSetTransformer<Pair<T1, T2, T3, T4>, T5>)transformer;
             }
 
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
-            transformer = StateSetTransformerFactory.CreateTransformer(f);
-            TransformerCache.Add(key, transformer);
-            return transformer;
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>

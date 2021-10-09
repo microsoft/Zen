@@ -24,7 +24,17 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Default manager object will allocate all objects.
         /// </summary>
-        private static StateSetTransformerManager DefaultManager = new StateSetTransformerManager();
+        internal static StateSetTransformerManager DefaultManager = new StateSetTransformerManager();
+
+        /// <summary>
+        /// Get the manager or the default if null.
+        /// </summary>
+        /// <param name="manager">The provided manager object.</param>
+        /// <returns>A non-null manager to use.</returns>
+        public static StateSetTransformerManager GetOrDefaultManager(StateSetTransformerManager manager)
+        {
+            return manager == null ? DefaultManager : manager;
+        }
 
         /// <summary>
         /// Create a state set transformer from a zen function.
@@ -32,13 +42,8 @@ namespace ZenLib.ModelChecking
         /// <param name="function">The Zen function to make into a transformer.</param>
         /// <param name="manager">The transformation manager object to use.</param>
         /// <returns>A state set transformer between input and output types.</returns>
-        public static StateSetTransformer<T1, T2> CreateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function, StateSetTransformerManager manager = null)
+        public static StateSetTransformer<T1, T2> CreateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function, StateSetTransformerManager manager)
         {
-            if (manager == null)
-            {
-                manager = DefaultManager;
-            }
-
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputGenerator(0, false);
             var input = Language.Arbitrary<T1>(generator);
@@ -174,13 +179,8 @@ namespace ZenLib.ModelChecking
         /// <param name="function">The Zen function to make into a transformer.</param>
         /// <param name="manager">The transformation manager object to use.</param>
         /// <returns>A state set transformer between input and output types.</returns>
-        public static StateSet<T> CreateStateSet<T>(Func<Zen<T>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        public static StateSet<T> CreateStateSet<T>(Func<Zen<T>, Zen<bool>> function, StateSetTransformerManager manager)
         {
-            if (manager == null)
-            {
-                manager = DefaultManager;
-            }
-
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputGenerator(0, false);
             var input = Language.Arbitrary<T>(generator);
