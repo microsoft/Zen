@@ -32,7 +32,15 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public static StateSet<T> StateSet<T>(this ZenFunction<T, bool> function, StateSetTransformerManager manager = null)
         {
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(function.Function, manager));
+            var key = (function.FunctionBodyExpr.Id, manager);
+            if (ZenFunction<T, bool>.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return stateSet;
+            }
+
+            stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(function.Function, manager));
+            ZenFunction<T, bool>.StateSetCache[key] = stateSet;
+            return stateSet;
         }
 
         /// <summary>
@@ -43,8 +51,16 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public static StateSet<Pair<T1, T2>> StateSet<T1, T2>(this ZenFunction<T1, T2, bool> function, StateSetTransformerManager manager = null)
         {
+            var key = (function.FunctionBodyExpr.Id, manager);
+            if (ZenFunction<T1, T2, bool>.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return stateSet;
+            }
+
             Func<Zen<Pair<T1, T2>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2());
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            ZenFunction<T1, T2, bool>.StateSetCache[key] = stateSet;
+            return stateSet;
         }
 
         /// <summary>
@@ -55,8 +71,16 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public static StateSet<Pair<T1, T2, T3>> StateSet<T1, T2, T3>(this ZenFunction<T1, T2, T3, bool> function, StateSetTransformerManager manager = null)
         {
+            var key = (function.FunctionBodyExpr.Id, manager);
+            if (ZenFunction<T1, T2, T3, bool>.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return stateSet;
+            }
+
             Func<Zen<Pair<T1, T2, T3>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3());
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            ZenFunction<T1, T2, T3, bool>.StateSetCache[key] = stateSet;
+            return stateSet;
         }
 
         /// <summary>
@@ -67,8 +91,16 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public static StateSet<Pair<T1, T2, T3, T4>> StateSet<T1, T2, T3, T4>(this ZenFunction<T1, T2, T3, T4, bool> function, StateSetTransformerManager manager = null)
         {
+            var key = (function.FunctionBodyExpr.Id, manager);
+            if (ZenFunction<T1, T2, T3, T4, bool>.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return stateSet;
+            }
+
             Func<Zen<Pair<T1, T2, T3, T4>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            stateSet = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            ZenFunction<T1, T2, T3, T4, bool>.StateSetCache[key] = stateSet;
+            return stateSet;
         }
     }
 }

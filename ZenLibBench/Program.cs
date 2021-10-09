@@ -19,11 +19,11 @@ namespace ZenLibBench
         static void Main(string[] args)
         {
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
             for (int i = 0; i < 50000; i++)
             {
                 // zf.Transformer().InputSet((i, o) => o);
-                zf.Transformer();
+                var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
+                zf.StateSet();
             }
             /* for (int i = 0; i < 32; i++)
             {
