@@ -103,7 +103,7 @@ namespace ZenLib.ModelChecking
 
             var dd = solver.Manager.Exists(set, this.outputVariables);
             var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
-            return ConvertTo(result, this.manager.CanonicalValues[typeof(T1)]);
+            return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace ZenLib.ModelChecking
 
             var dd = solver.Manager.Exists(set, inputVariables);
             var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
-            return ConvertTo(result, this.manager.CanonicalValues[typeof(T2)]);
+            return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
 
         /// <summary>
@@ -138,12 +138,12 @@ namespace ZenLib.ModelChecking
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
             CheckValidOperation(input);
-            input = ConvertTo(input, (this.zenInput, this.inputVariables, this.arbitraryMappingInput));
+            input = input.ConvertTo(new StateSetMetadata { ZenParameter = this.zenInput, BddVariableSet = this.inputVariables, ZenArbitraryMapping = this.arbitraryMappingInput });
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.inputVariables);
             var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
-            return ConvertTo(result, this.manager.CanonicalValues[typeof(T2)]);
+            return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
 
         /// <summary>
@@ -154,30 +154,12 @@ namespace ZenLib.ModelChecking
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
             CheckValidOperation(output);
-            output = ConvertTo(output, (this.zenOutput, this.outputVariables, this.arbitraryMappingOutput));
+            output = output.ConvertTo(new StateSetMetadata { ZenParameter = this.zenOutput, BddVariableSet = this.outputVariables, ZenArbitraryMapping = this.arbitraryMappingOutput });
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.outputVariables);
             var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
-            return ConvertTo(result, this.manager.CanonicalValues[typeof(T1)]);
-        }
-
-        /// <summary>
-        /// Covert a state set to contain the desired decision diagram variables.
-        /// </summary>
-        /// <param name="sourceStateSet">The source state set.</param>
-        /// <param name="conversionData">The conversion variables.</param>
-        /// <returns>A converted state set.</returns>
-        private StateSet<T> ConvertTo<T>(StateSet<T> sourceStateSet, (object, VariableSet<BDDNode>, Dictionary<object, Variable<BDDNode>>) conversionData)
-        {
-            var x = new HashSet<Variable<BDDNode>>(sourceStateSet.VariableSet.Variables);
-            var y = new HashSet<Variable<BDDNode>>(conversionData.Item2.Variables);
-            if (x.SetEquals(y))
-            {
-                return sourceStateSet;
-            }
-
-            return sourceStateSet.ConvertSetVariables(conversionData.Item2, (Zen<T>)conversionData.Item1, conversionData.Item3);
+            return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }
 
         /// <summary>

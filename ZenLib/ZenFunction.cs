@@ -23,17 +23,17 @@ namespace ZenLib
         /// <summary>
         /// The function body expression.
         /// </summary>
-        private Zen<T> functionBodyExpr;
-
-        /// <summary>
-        /// User provided function.
-        /// </summary>
-        private Func<Zen<T>> function;
+        internal Zen<T> FunctionBodyExpr;
 
         /// <summary>
         /// The compiled function as C# IL.
         /// </summary>
-        private Func<T> compiledFunction = null;
+        internal Func<T> CompiledFunction = null;
+
+        /// <summary>
+        /// User provided function.
+        /// </summary>
+        public Func<Zen<T>> Function;
 
         /// <summary>
         /// Convert implicitly to a function.
@@ -51,8 +51,8 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            this.functionBodyExpr = this.function();
+            this.Function = function;
+            this.FunctionBodyExpr = this.Function();
         }
 
         /// <summary>
@@ -61,13 +61,13 @@ namespace ZenLib
         /// <returns>Result.</returns>
         public T Evaluate()
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
-                return compiledFunction();
+                return CompiledFunction();
             }
 
             var args = new Dictionary<long, object>();
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -78,13 +78,13 @@ namespace ZenLib
         /// <returns>The native function.</returns>
         public void Compile(int maxUnrollingDepth = 5)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
                 return;
             }
 
             var args = ImmutableDictionary<long, Expression>.Empty;
-            this.compiledFunction = CodeGenerator.Compile(this.functionBodyExpr, args, maxUnrollingDepth);
+            this.CompiledFunction = CodeGenerator.Compile(this.FunctionBodyExpr, args, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ZenLib
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
         {
-            var result = invariant(this.function());
+            var result = invariant(this.Function());
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend) != null);
         }
     }
@@ -111,22 +111,22 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T1> argument1;
+        internal static ZenArgumentExpr<T1> Argument1;
 
         /// <summary>
         /// The expression for the function body.
         /// </summary>
-        private Zen<T2> functionBodyExpr;
-
-        /// <summary>
-        /// The callback for the Zen function.
-        /// </summary>
-        private Func<Zen<T1>, Zen<T2>> function;
+        internal Zen<T2> FunctionBodyExpr;
 
         /// <summary>
         /// The compiled C# version of the function.
         /// </summary>
-        private Func<T1, T2> compiledFunction = null;
+        internal Func<T1, T2> CompiledFunction = null;
+
+        /// <summary>
+        /// The callback for the Zen function.
+        /// </summary>
+        public Func<Zen<T1>, Zen<T2>> Function;
 
         /// <summary>
         /// Convert implicitly to a function.
@@ -144,9 +144,9 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
-            this.functionBodyExpr = this.function(argument1);
+            this.Function = function;
+            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            this.FunctionBodyExpr = this.Function(Argument1);
         }
 
         /// <summary>
@@ -156,13 +156,13 @@ namespace ZenLib
         /// <returns>Result.</returns>
         public T2 Evaluate(T1 value)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
-                return compiledFunction(value);
+                return CompiledFunction(value);
             }
 
-            var args = new Dictionary<long, object> { { argument1.ArgumentId, value } };
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
+            var args = new Dictionary<long, object> { { Argument1.ArgumentId, value } };
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -173,15 +173,15 @@ namespace ZenLib
         /// <returns>The native function.</returns>
         public void Compile(int maxUnrollingDepth = 5)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
                 return;
             }
 
             var param1 = Expression.Parameter(typeof(T1));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(argument1.ArgumentId, param1);
-            this.compiledFunction = CodeGenerator.Compile<T1, T2>(this.functionBodyExpr, args, param1, maxUnrollingDepth);
+                .Add(Argument1.ArgumentId, param1);
+            this.CompiledFunction = CodeGenerator.Compile<T1, T2>(this.FunctionBodyExpr, args, param1, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -191,7 +191,17 @@ namespace ZenLib
         /// <returns>A transformer for the function.</returns>
         public StateSetTransformer<T1, T2> Transformer(StateSetTransformerManager manager = null)
         {
-            return CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.function, manager));
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((T1, T2)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
+            {
+                return (StateSetTransformer<T1, T2>)transformer;
+            }
+
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -214,10 +224,10 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input },
+                { Argument1.ArgumentId, input },
             };
 
-            var result = invariant(argument1, this.functionBodyExpr);
+            var result = invariant(Argument1, this.FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, backend));
         }
 
@@ -240,10 +250,10 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input },
+                { Argument1.ArgumentId, input },
             };
 
-            var result = invariant(input, this.functionBodyExpr);
+            var result = invariant(input, this.FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -257,7 +267,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, argument1 == example.Value);
+                blocking = Or(blocking, Argument1 == example.Value);
             }
         }
 
@@ -279,7 +289,7 @@ namespace ZenLib
         {
             input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
             precondition = precondition == null ? (x) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input, backend));
         }
     }
 
@@ -294,27 +304,27 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T1> argument1;
+        internal static ZenArgumentExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T2> argument2;
+        internal static ZenArgumentExpr<T2> Argument2;
 
         /// <summary>
         /// Function body expression.
         /// </summary>
-        private Zen<T3> functionBodyExpr;
-
-        /// <summary>
-        /// User provided function.
-        /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>> function;
+        internal Zen<T3> FunctionBodyExpr;
 
         /// <summary>
         /// Compiled function to C# IL.
         /// </summary>
-        private Func<T1, T2, T3> compiledFunction = null;
+        internal Func<T1, T2, T3> CompiledFunction = null;
+
+        /// <summary>
+        /// User provided function.
+        /// </summary>
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>> Function;
 
         /// <summary>
         /// Convert implicitly to a function.
@@ -332,10 +342,10 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
-            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
-            this.functionBodyExpr = this.function(argument1, argument2);
+            this.Function = function;
+            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+            this.FunctionBodyExpr = this.Function(Argument1, Argument2);
         }
 
         /// <summary>
@@ -346,18 +356,18 @@ namespace ZenLib
         /// <returns>Result.</returns>
         public T3 Evaluate(T1 value1, T2 value2)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
-                return compiledFunction(value1, value2);
+                return CompiledFunction(value1, value2);
             }
 
             var args = new Dictionary<long, object>()
             {
-                { argument1.ArgumentId, value1 },
-                { argument2.ArgumentId, value2 },
+                { Argument1.ArgumentId, value1 },
+                { Argument2.ArgumentId, value2 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -368,7 +378,7 @@ namespace ZenLib
         /// <returns>The native function.</returns>
         public void Compile(int maxUnrollingDepth = 5)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
                 return;
             }
@@ -376,19 +386,30 @@ namespace ZenLib
             var param1 = Expression.Parameter(typeof(T1));
             var param2 = Expression.Parameter(typeof(T2));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(argument1.ArgumentId, param1)
-                .Add(argument2.ArgumentId, param2);
-            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.functionBodyExpr, args, param1, param2, maxUnrollingDepth);
+                .Add(Argument1.ArgumentId, param1)
+                .Add(Argument2.ArgumentId, param2);
+            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.FunctionBodyExpr, args, param1, param2, maxUnrollingDepth);
         }
 
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2>, T3> Transformer()
+        public StateSetTransformer<Pair<T1, T2>, T3> Transformer(StateSetTransformerManager manager = null)
         {
-            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.function(p.Item1(), p.Item2());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2>, T3)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
+            {
+                return (StateSetTransformer<Pair<T1, T2>, T3>)transformer;
+            }
+
+            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -414,11 +435,11 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
             };
 
-            var result = invariant(argument1, argument2, this.functionBodyExpr);
+            var result = invariant(Argument1, Argument2, this.FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend));
         }
 
@@ -444,11 +465,11 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
             };
 
-            var result = invariant(input1, input2, this.functionBodyExpr);
+            var result = invariant(input1, input2, this.FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -463,7 +484,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2));
+                blocking = Or(blocking, And(Argument1 == example.Value.Item1, Argument2 == example.Value.Item2));
             }
         }
 
@@ -488,7 +509,7 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             precondition = precondition == null ? (x, y) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, backend));
         }
     }
 
@@ -504,32 +525,32 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T1> argument1;
+        internal static ZenArgumentExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T2> argument2;
+        internal static ZenArgumentExpr<T2> Argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T3> argument3;
+        internal static ZenArgumentExpr<T3> Argument3;
 
         /// <summary>
         /// Function body expression.
         /// </summary>
-        private Zen<T4> functionBodyExpr;
-
-        /// <summary>
-        /// User-provided function.
-        /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function;
+        internal Zen<T4> FunctionBodyExpr;
 
         /// <summary>
         /// Compiled function as C# IL.
         /// </summary>
-        private Func<T1, T2, T3, T4> compiledFunction = null;
+        internal Func<T1, T2, T3, T4> CompiledFunction = null;
+
+        /// <summary>
+        /// User-provided function.
+        /// </summary>
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> Function;
 
         /// <summary>
         /// Convert implicitly to a function.
@@ -547,11 +568,11 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
-            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
-            argument3 = argument3 ?? new ZenArgumentExpr<T3>();
-            this.functionBodyExpr = this.function(argument1, argument2, argument3);
+            this.Function = function;
+            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+            Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+            this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3);
         }
 
         /// <summary>
@@ -563,19 +584,19 @@ namespace ZenLib
         /// <returns>Result.</returns>
         public T4 Evaluate(T1 value1, T2 value2, T3 value3)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
-                return compiledFunction(value1, value2, value3);
+                return CompiledFunction(value1, value2, value3);
             }
 
             var args = new Dictionary<long, object>()
             {
-                { argument1.ArgumentId, value1 },
-                { argument2.ArgumentId, value2 },
-                { argument3.ArgumentId, value3 },
+                { Argument1.ArgumentId, value1 },
+                { Argument2.ArgumentId, value2 },
+                { Argument3.ArgumentId, value3 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -586,7 +607,7 @@ namespace ZenLib
         /// <returns>The native function.</returns>
         public void Compile(int maxUnrollingDepth = 5)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
                 return;
             }
@@ -595,20 +616,31 @@ namespace ZenLib
             var param2 = Expression.Parameter(typeof(T2));
             var param3 = Expression.Parameter(typeof(T3));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(argument1.ArgumentId, param1)
-                .Add(argument2.ArgumentId, param2)
-                .Add(argument3.ArgumentId, param3);
-            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.functionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
+                .Add(Argument1.ArgumentId, param1)
+                .Add(Argument2.ArgumentId, param2)
+                .Add(Argument3.ArgumentId, param3);
+            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.FunctionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
         }
 
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer()
+        public StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer(StateSetTransformerManager manager = null)
         {
-            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.function(p.Item1(), p.Item2(), p.Item3());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2, T3>, T4)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
+            {
+                return (StateSetTransformer<Pair<T1, T2, T3>, T4>)transformer;
+            }
+
+            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -637,12 +669,12 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
-                { argument3.ArgumentId, input3 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
+                { Argument3.ArgumentId, input3 },
             };
 
-            var result = invariant(argument1, argument2, argument3, this.functionBodyExpr);
+            var result = invariant(Argument1, Argument2, Argument3, this.FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend));
         }
 
@@ -671,12 +703,12 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
-                { argument3.ArgumentId, input3 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
+                { Argument3.ArgumentId, input3 },
             };
 
-            var result = invariant(input1, input2, input3, this.functionBodyExpr);
+            var result = invariant(input1, input2, input3, this.FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -691,7 +723,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2, argument3 == example.Value.Item3));
+                blocking = Or(blocking, And(Argument1 == example.Value.Item1, Argument2 == example.Value.Item2, Argument3 == example.Value.Item3));
             }
         }
 
@@ -719,7 +751,7 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             precondition = precondition == null ? (x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, backend));
         }
     }
 
@@ -736,37 +768,37 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T1> argument1;
+        internal static ZenArgumentExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T2> argument2;
+        internal static ZenArgumentExpr<T2> Argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T3> argument3;
+        internal static ZenArgumentExpr<T3> Argument3;
 
         /// <summary>
         /// Fourth argument expression.
         /// </summary>
-        private static ZenArgumentExpr<T4> argument4;
+        internal static ZenArgumentExpr<T4> Argument4;
 
         /// <summary>
         /// Function body expression.
         /// </summary>
-        private Zen<T5> functionBodyExpr;
-
-        /// <summary>
-        /// User-provided function.
-        /// </summary>
-        private Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function;
+        internal Zen<T5> FunctionBodyExpr;
 
         /// <summary>
         /// Compiled function as C# IL.
         /// </summary>
-        private Func<T1, T2, T3, T4, T5> compiledFunction = null;
+        internal Func<T1, T2, T3, T4, T5> CompiledFunction = null;
+
+        /// <summary>
+        /// User-provided function.
+        /// </summary>
+        public Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> Function;
 
         /// <summary>
         /// Convert implicitly to a function.
@@ -784,12 +816,12 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
             CommonUtilities.ValidateNotNull(function);
-            this.function = function;
-            argument1 = argument1 ?? new ZenArgumentExpr<T1>();
-            argument2 = argument2 ?? new ZenArgumentExpr<T2>();
-            argument3 = argument3 ?? new ZenArgumentExpr<T3>();
-            argument4 = argument4 ?? new ZenArgumentExpr<T4>();
-            this.functionBodyExpr = this.function(argument1, argument2, argument3, argument4);
+            this.Function = function;
+            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+            Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+            Argument4 = Argument4 ?? new ZenArgumentExpr<T4>();
+            this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3, Argument4);
         }
 
         /// <summary>
@@ -802,20 +834,20 @@ namespace ZenLib
         /// <returns>Result.</returns>
         public T5 Evaluate(T1 value1, T2 value2, T3 value3, T4 value4)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
-                return compiledFunction(value1, value2, value3, value4);
+                return CompiledFunction(value1, value2, value3, value4);
             }
 
             var args = new Dictionary<long, object>()
             {
-                { argument1.ArgumentId, value1 },
-                { argument2.ArgumentId, value2 },
-                { argument3.ArgumentId, value3 },
-                { argument4.ArgumentId, value4 },
+                { Argument1.ArgumentId, value1 },
+                { Argument2.ArgumentId, value2 },
+                { Argument3.ArgumentId, value3 },
+                { Argument4.ArgumentId, value4 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.functionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -826,7 +858,7 @@ namespace ZenLib
         /// <returns>The native function.</returns>
         public void Compile(int maxUnrollingDepth = 5)
         {
-            if (compiledFunction != null)
+            if (CompiledFunction != null)
             {
                 return;
             }
@@ -836,21 +868,32 @@ namespace ZenLib
             var param3 = Expression.Parameter(typeof(T3));
             var param4 = Expression.Parameter(typeof(T4));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(argument1.ArgumentId, param1)
-                .Add(argument2.ArgumentId, param2)
-                .Add(argument3.ArgumentId, param3)
-                .Add(argument4.ArgumentId, param4);
-            this.compiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.functionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
+                .Add(Argument1.ArgumentId, param1)
+                .Add(Argument2.ArgumentId, param2)
+                .Add(Argument3.ArgumentId, param3)
+                .Add(Argument4.ArgumentId, param4);
+            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.FunctionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
         }
 
         /// <summary>
         /// Gets the function as a state transformer.
         /// </summary>
+        /// <param name="manager">An optional manager object.</param>
         /// <returns>A transformer for the function.</returns>
-        public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer()
+        public StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer(StateSetTransformerManager manager = null)
         {
-            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
-            return StateSetTransformerFactory.CreateTransformer(f);
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof((Pair<T1, T2, T3, T4>, T5)), this.FunctionBodyExpr.Id);
+            if (manager.TransformerCache.TryGetValue(key, out var transformer))
+            {
+                return (StateSetTransformer<Pair<T1, T2, T3, T4>, T5>)transformer;
+            }
+
+            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
+            var result = StateSetTransformerFactory.CreateTransformer(f, manager);
+            manager.TransformerCache.Add(key, result);
+            return result;
         }
 
         /// <summary>
@@ -882,13 +925,13 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
-                { argument3.ArgumentId, input3 },
-                { argument4.ArgumentId, input4 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
+                { Argument3.ArgumentId, input3 },
+                { Argument4.ArgumentId, input4 },
             };
 
-            var result = invariant(argument1, argument2, argument3, argument4, this.functionBodyExpr);
+            var result = invariant(Argument1, Argument2, Argument3, Argument4, this.FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend));
         }
 
@@ -920,13 +963,13 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             var args = new Dictionary<long, object>
             {
-                { argument1.ArgumentId, input1 },
-                { argument2.ArgumentId, input2 },
-                { argument3.ArgumentId, input3 },
-                { argument4.ArgumentId, input4 },
+                { Argument1.ArgumentId, input1 },
+                { Argument2.ArgumentId, input2 },
+                { Argument3.ArgumentId, input3 },
+                { Argument4.ArgumentId, input4 },
             };
 
-            var result = invariant(input1, input2, input3, input4, this.functionBodyExpr);
+            var result = invariant(input1, input2, input3, input4, this.FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -941,7 +984,7 @@ namespace ZenLib
                 }
 
                 yield return example.Value;
-                blocking = Or(blocking, And(argument1 == example.Value.Item1, argument2 == example.Value.Item2, argument3 == example.Value.Item3, argument4 == example.Value.Item4));
+                blocking = Or(blocking, And(Argument1 == example.Value.Item1, Argument2 == example.Value.Item2, Argument3 == example.Value.Item3, Argument4 == example.Value.Item4));
             }
         }
 
@@ -972,7 +1015,7 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
             precondition = precondition == null ? (w, x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.function, precondition, input1, input2, input3, input4, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, input4, backend));
         }
     }
 }

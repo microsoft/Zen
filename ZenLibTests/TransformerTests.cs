@@ -377,5 +377,97 @@ namespace ZenLib.Tests
         {
             var t1 = new ZenFunction<string, bool>(x => true).Transformer(new StateSetTransformerManager());
         }
+
+        /// <summary>
+        /// Test that transformers are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerCaching1()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, bool>(x => true).Transformer();
+            var f2 = new ZenFunction<byte, bool>(x => true).Transformer();
+            var f3 = new ZenFunction<byte, bool>(x => true).Transformer(m1);
+            var f4 = new ZenFunction<byte, bool>(x => true).Transformer(m1);
+            var f5 = new ZenFunction<byte, bool>(x => true).Transformer(m2);
+            var f6 = new ZenFunction<byte, bool>(x => true).Transformer(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that transformers are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerCaching2()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer();
+            var f2 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer();
+            var f3 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer(m1);
+            var f4 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer(m1);
+            var f5 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer(m2);
+            var f6 = new ZenFunction<byte, byte, bool>((x, y) => true).Transformer(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that transformers are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerCaching3()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer();
+            var f2 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer();
+            var f3 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer(m1);
+            var f4 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer(m1);
+            var f5 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer(m2);
+            var f6 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).Transformer(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that transformers are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerCaching4()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer();
+            var f2 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer();
+            var f3 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer(m1);
+            var f4 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer(m1);
+            var f5 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer(m2);
+            var f6 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).Transformer(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
     }
 }
