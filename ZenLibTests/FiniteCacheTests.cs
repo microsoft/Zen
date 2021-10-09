@@ -28,12 +28,14 @@ namespace ZenLib.Tests
             cache.Add(3, 3);
             cache.Add(4, 4);
 
+            Assert.AreEqual(4, cache.Count);
             Assert.IsTrue(cache.TryGetValue(1, out var _));
             Assert.IsTrue(cache.TryGetValue(2, out var _));
             Assert.IsTrue(cache.TryGetValue(3, out var _));
             Assert.IsTrue(cache.TryGetValue(4, out var _));
 
             cache.Add(5, 5);
+            Assert.AreEqual(4, cache.Count);
 
             var count = 0;
             if (cache.TryGetValue(1, out var _))
@@ -60,15 +62,13 @@ namespace ZenLib.Tests
             cache.Add(1, 1);
             cache.TryGetValue(1, out var x);
             Assert.AreEqual(1, x);
-
-            cache.Add(1, 2);
-            cache.TryGetValue(1, out var y);
-            Assert.AreEqual(2, y);
+            Assert.AreEqual(1, cache.Count);
 
             cache.Add(3, 4);
-            cache.TryGetValue(3, out var z);
-            Assert.AreEqual(4, z);
+            cache.TryGetValue(3, out var y);
+            Assert.AreEqual(4, y);
             Assert.IsFalse(cache.TryGetValue(1, out var _));
+            Assert.AreEqual(1, cache.Count);
         }
 
         /// <summary>
@@ -83,6 +83,8 @@ namespace ZenLib.Tests
             {
                 cache.Add(i, i);
             }
+
+            Assert.AreEqual(10, cache.Count);
         }
     }
 }

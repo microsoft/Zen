@@ -17,7 +17,6 @@ namespace ZenLibBench
             var timer = System.Diagnostics.Stopwatch.StartNew();
             for (int i = 0; i < 50000; i++)
             {
-                // zf.Transformer().InputSet((i, o) => o);
                 var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
                 zf.StateSet();
             }

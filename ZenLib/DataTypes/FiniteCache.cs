@@ -45,18 +45,18 @@ namespace ZenLib
         }
 
         /// <summary>
-        ///     Adds a key and value to the cache.
+        /// Gets the number of entries in the cache.
+        /// </summary>
+        public int Count { get => this.entries.Count; }
+
+        /// <summary>
+        ///     Adds a key and value to the cache. Assumes no duplicate key exists
+        ///     and that the user checks with TryGetValue prior to adding.
         /// </summary>
         /// <param name="key">The key to add.</param>
         /// <param name="value">The value for the key.</param>
         public void Add(TKey key, TValue value)
         {
-            if (this.cache.ContainsKey(key))
-            {
-                this.cache[key] = value;
-                return;
-            }
-
             if (this.entries.Count == maxCount)
             {
                 var toEvictIndex = this.random.Next(0, maxCount);
