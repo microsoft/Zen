@@ -274,5 +274,97 @@ namespace ZenLib.Tests
         {
             new ZenFunction<string, bool>(x => true).StateSet(new StateSetTransformerManager());
         }
+
+        /// <summary>
+        /// Test that state sets are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetCaching1()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, bool>(x => true).StateSet();
+            var f2 = new ZenFunction<byte, bool>(x => true).StateSet();
+            var f3 = new ZenFunction<byte, bool>(x => true).StateSet(m1);
+            var f4 = new ZenFunction<byte, bool>(x => true).StateSet(m1);
+            var f5 = new ZenFunction<byte, bool>(x => true).StateSet(m2);
+            var f6 = new ZenFunction<byte, bool>(x => true).StateSet(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that state sets are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetCaching2()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet();
+            var f2 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet();
+            var f3 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet(m1);
+            var f4 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet(m1);
+            var f5 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet(m2);
+            var f6 = new ZenFunction<byte, byte, bool>((x, y) => true).StateSet(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that state sets are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetCaching3()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet();
+            var f2 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet();
+            var f3 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet(m1);
+            var f4 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet(m1);
+            var f5 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet(m2);
+            var f6 = new ZenFunction<byte, byte, byte, bool>((x, y, z) => true).StateSet(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that state sets are cached.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetCaching4()
+        {
+            var m1 = new StateSetTransformerManager();
+            var m2 = new StateSetTransformerManager();
+
+            var f1 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet();
+            var f2 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet();
+            var f3 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet(m1);
+            var f4 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet(m1);
+            var f5 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet(m2);
+            var f6 = new ZenFunction<byte, byte, byte, byte, bool>((w, x, y, z) => true).StateSet(m2);
+
+            Assert.IsTrue(ReferenceEquals(f1, f2));
+            Assert.IsTrue(ReferenceEquals(f3, f4));
+            Assert.IsTrue(ReferenceEquals(f5, f6));
+            Assert.IsFalse(ReferenceEquals(f1, f3));
+            Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
     }
 }
