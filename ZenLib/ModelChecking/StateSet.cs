@@ -79,8 +79,8 @@ namespace ZenLib.ModelChecking
         internal StateSet<T> ConvertTo(StateSetMetadata conversionData)
         {
             var x = new HashSet<Variable<BDDNode>>(this.VariableSet.Variables);
-            var y = new HashSet<Variable<BDDNode>>(conversionData.BddVariableSet.Variables);
-            if (x.SetEquals(y))
+
+            if (x.SetEquals(conversionData.BddVariableSet.Variables))
             {
                 return this;
             }

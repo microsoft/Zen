@@ -19,15 +19,21 @@ namespace ZenLibBench
         static void Main(string[] args)
         {
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            for (int i = 0; i < 32; i++)
+            var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
+            for (int i = 0; i < 50000; i++)
+            {
+                // zf.Transformer().InputSet((i, o) => o);
+                zf.StateSet();
+            }
+            /* for (int i = 0; i < 32; i++)
             {
                 var b = new AclBench();
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
                 b.NumLines = 2000;
                 b.CreateAcl();
                 b.VerifyAclProvenance();
-            }
-            Console.WriteLine($"Time: {timer.ElapsedMilliseconds / 32}ms");
+            } */
+            Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms");
 
             // _ = BenchmarkRunner.Run<AclBench>();
             // _ = BenchmarkRunner.Run<RouteBench>();
