@@ -24,7 +24,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// The BDD variable set associated with the Zen Parameter. Used for quantification.
         /// </summary>
-        public VariableSet<BDDNode> BddVariableSet { get; set; }
+        public VariableSet<BDDNode> VariableSet { get; set; }
 
         /// <summary>
         /// The mappping from Zen Arbitrary expression to BDD variable doing the encoding.

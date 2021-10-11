@@ -84,6 +84,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test the variables are made canonical for state sets.
+        /// </summary>
+        [TestMethod]
+        public void TestStateSetInterleaving()
+        {
+            var s1 = new ZenFunction<ushort, ushort, bool>((x, y) => x == y).StateSet();
+            var s2 = new ZenFunction<ushort, ushort, bool>((x, y) => And(x == 1, y <= 10)).StateSet();
+            var s3 = s1.Intersect(s2);
+
+            Assert.IsFalse(s3.IsEmpty());
+            Assert.AreEqual(new Pair<ushort, ushort> { Item1 = 1, Item2 = 1 }, s3.Element());
+        }
+
+        /// <summary>
         /// Test checking if a set is full.
         /// </summary>
         [TestMethod]

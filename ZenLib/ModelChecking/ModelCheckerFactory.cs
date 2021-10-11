@@ -41,10 +41,10 @@ namespace ZenLib.ModelChecking
         {
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(expression, arguments);
-            var manager = new DDManager<BDDNode>(new BDDNodeFactory());
-            var solver = new SolverDD<BDDNode>(manager, mustInterleave);
+            var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
+            var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             solver.Init();
-            return new ModelChecker<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(solver);
+            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit>(solver);
         }
 
         /// <summary>
@@ -53,8 +53,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A model checker.</returns>
         private static IModelChecker CreateModelCheckerZ3()
         {
-            var solver = new SolverZ3();
-            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr>(solver);
+            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr>(new SolverZ3());
         }
     }
 }
