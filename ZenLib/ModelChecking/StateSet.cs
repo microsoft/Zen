@@ -78,14 +78,12 @@ namespace ZenLib.ModelChecking
         /// <returns>A converted state set.</returns>
         internal StateSet<T> ConvertTo(StateSetMetadata conversionData)
         {
-            var x = new HashSet<Variable<BDDNode>>(this.VariableSet.Variables);
-
-            if (x.SetEquals(conversionData.BddVariableSet.Variables))
+            if (this.VariableSet.AsIndex.Equals(conversionData.VariableSet.AsIndex))
             {
                 return this;
             }
 
-            return this.ConvertSetVariables(conversionData.BddVariableSet, (Zen<T>)conversionData.ZenParameter, conversionData.ZenArbitraryMapping);
+            return this.ConvertSetVariables(conversionData.VariableSet, (Zen<T>)conversionData.ZenParameter, conversionData.ZenArbitraryMapping);
         }
 
         /// <summary>

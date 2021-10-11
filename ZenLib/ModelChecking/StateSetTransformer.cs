@@ -138,7 +138,7 @@ namespace ZenLib.ModelChecking
         public StateSet<T2> TransformForward(StateSet<T1> input)
         {
             CheckValidOperation(input);
-            input = input.ConvertTo(new StateSetMetadata { ZenParameter = this.zenInput, BddVariableSet = this.inputVariables, ZenArbitraryMapping = this.arbitraryMappingInput });
+            input = input.ConvertTo(new StateSetMetadata { ZenParameter = this.zenInput, VariableSet = this.inputVariables, ZenArbitraryMapping = this.arbitraryMappingInput });
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.inputVariables);
@@ -154,7 +154,7 @@ namespace ZenLib.ModelChecking
         public StateSet<T1> TransformBackwards(StateSet<T2> output)
         {
             CheckValidOperation(output);
-            output = output.ConvertTo(new StateSetMetadata { ZenParameter = this.zenOutput, BddVariableSet = this.outputVariables, ZenArbitraryMapping = this.arbitraryMappingOutput });
+            output = output.ConvertTo(new StateSetMetadata { ZenParameter = this.zenOutput, VariableSet = this.outputVariables, ZenArbitraryMapping = this.arbitraryMappingOutput });
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.outputVariables);

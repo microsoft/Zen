@@ -76,7 +76,7 @@ namespace ZenLib.ModelChecking
                 {
                     for (int i = 0; i < arbitrariesForInput.Count; i++)
                     {
-                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.BddVariableSet.Variables[i]);
+                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.VariableSet.Variables[i]);
                     }
                 }
 
@@ -148,7 +148,7 @@ namespace ZenLib.ModelChecking
                 manager.CanonicalValues[typeof(T1)] = new StateSetMetadata
                 {
                     ZenParameter = input,
-                    BddVariableSet = inputVariableSet,
+                    VariableSet = inputVariableSet,
                     ZenArbitraryMapping = arbitraryMappingInput,
                 };
             }
@@ -158,7 +158,7 @@ namespace ZenLib.ModelChecking
                 manager.CanonicalValues[typeof(T2)] = new StateSetMetadata
                 {
                     ZenParameter = output,
-                    BddVariableSet = outputVariableSet,
+                    VariableSet = outputVariableSet,
                     ZenArbitraryMapping = arbitraryMappingOutput,
                 };
             }
@@ -207,7 +207,7 @@ namespace ZenLib.ModelChecking
                 {
                     for (int i = 0; i < arbitrariesForInput.Count; i++)
                     {
-                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.BddVariableSet.Variables[i]);
+                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.VariableSet.Variables[i]);
                     }
                 }
             }
@@ -255,7 +255,7 @@ namespace ZenLib.ModelChecking
                 manager.CanonicalValues[typeof(T)] = new StateSetMetadata
                 {
                     ZenParameter = input,
-                    BddVariableSet = inputVariableSet,
+                    VariableSet = inputVariableSet,
                     ZenArbitraryMapping = arbitraryMappingInput,
                 };
             }
