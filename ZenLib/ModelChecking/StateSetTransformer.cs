@@ -6,7 +6,6 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using DecisionDiagrams;
     using ZenLib.Solver;
 
@@ -86,23 +85,20 @@ namespace ZenLib.ModelChecking
         /// Compute the input set for the transformer.
         /// </summary>
         /// <param name="invariant">The function constraining the inputs.</param>
-        public StateSet<T1> InputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant = null)
+        public StateSet<T1> InputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant)
         {
+            CommonUtilities.ValidateNotNull(invariant);
+
             DD set = setTransformer;
-
-            if (invariant != null)
-            {
-                var expr = invariant(this.zenInput, this.zenOutput);
-                var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
-                var symbolicResult =
-                    (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
-                var ddOutput = symbolicResult.Value;
-                set = this.solver.And(set, ddOutput);
-            }
-
+            var expr = invariant(this.zenInput, this.zenOutput);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
+            var symbolicResult =
+                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
+            var ddOutput = symbolicResult.Value;
+            set = this.solver.And(set, ddOutput);
             var dd = solver.Manager.Exists(set, this.outputVariables);
-            var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }
 
@@ -110,23 +106,20 @@ namespace ZenLib.ModelChecking
         /// Compute the input set for the transformer.
         /// </summary>
         /// <param name="invariant">The invariant constraining the outputs.</param>
-        public StateSet<T2> OutputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant = null)
+        public StateSet<T2> OutputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant)
         {
+            CommonUtilities.ValidateNotNull(invariant);
+
             DD set = setTransformer;
-            if (invariant != null)
-            {
-                var expr = invariant(this.zenInput, this.zenOutput);
-
-                var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-                var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
-                var symbolicResult =
-                    (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
-                var ddInput = symbolicResult.Value;
-                set = this.solver.And(set, ddInput);
-            }
-
+            var expr = invariant(this.zenInput, this.zenOutput);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
+            var symbolicResult =
+                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
+            var ddInput = symbolicResult.Value;
+            set = this.solver.And(set, ddInput);
             var dd = solver.Manager.Exists(set, inputVariables);
-            var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
 
@@ -142,7 +135,7 @@ namespace ZenLib.ModelChecking
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.inputVariables);
-            var result = new StateSet<T2>(this.manager, this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
+            var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
 
@@ -158,7 +151,7 @@ namespace ZenLib.ModelChecking
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
             dd = this.solver.Manager.Exists(dd, this.outputVariables);
-            var result = new StateSet<T1>(this.manager, this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
+            var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }
 
@@ -168,7 +161,7 @@ namespace ZenLib.ModelChecking
         /// <param name="argument">The state set argument.</param>
         private void CheckValidOperation<T>(StateSet<T> argument)
         {
-            if (!this.manager.Equals(argument.Manager))
+            if (!this.solver.Manager.Equals(argument.Solver.Manager))
             {
                 throw new InvalidOperationException($"Attempting to combine transformations and state sets with different manager objects");
             }

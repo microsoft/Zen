@@ -17,11 +17,6 @@ namespace ZenLib.ModelChecking
     public class StateSet<T>
     {
         /// <summary>
-        /// Reference to the manager object used by this state set.
-        /// </summary>
-        internal StateSetTransformerManager Manager { get; }
-
-        /// <summary>
         /// The underlying decision diagram solver.
         /// </summary>
         internal SolverDD<BDDNode> Solver { get; }
@@ -49,21 +44,18 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Create a new instance of a <see cref="StateSet{T}"/>.
         /// </summary>
-        /// <param name="manager">The transformation manager object.</param>
         /// <param name="solver">The solver.</param>
         /// <param name="stateSet">The state set as a decision diagram.</param>
         /// <param name="arbitraryMapping">The variable cache.</param>
         /// <param name="zenExpression">The Zen expression for variables.</param>
         /// <param name="variableSet">The decision diagram variable set.</param>
         internal StateSet(
-            StateSetTransformerManager manager,
             SolverDD<BDDNode> solver,
             DD stateSet,
             Dictionary<object, Variable<BDDNode>> arbitraryMapping,
             Zen<T> zenExpression,
             VariableSet<BDDNode> variableSet)
         {
-            this.Manager = manager;
             this.Solver = solver;
             this.Set = stateSet;
             this.ArbitraryMapping = arbitraryMapping;
@@ -105,7 +97,7 @@ namespace ZenLib.ModelChecking
 
             var mapping = this.Solver.Manager.CreateVariableMap(map);
             var x = this.Solver.Manager.Replace(this.Set, mapping);
-            return new StateSet<T>(this.Manager, this.Solver, x, arbitraryMapping, newZenExpression, newVariableSet);
+            return new StateSet<T>(this.Solver, x, arbitraryMapping, newZenExpression, newVariableSet);
         }
 
         /// <summary>
@@ -117,7 +109,7 @@ namespace ZenLib.ModelChecking
         {
             CheckValidOperation(other);
             var dd = this.Solver.Manager.And(this.Set, other.Set);
-            return new StateSet<T>(this.Manager, this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
@@ -129,7 +121,7 @@ namespace ZenLib.ModelChecking
         {
             CheckValidOperation(other);
             var dd = this.Solver.Manager.Or(this.Set, other.Set);
-            return new StateSet<T>(this.Manager, this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
@@ -139,7 +131,7 @@ namespace ZenLib.ModelChecking
         public StateSet<T> Complement()
         {
             var dd = this.Solver.Manager.Not(this.Set);
-            return new StateSet<T>(this.Manager, this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
+            return new StateSet<T>(this.Solver, dd, this.ArbitraryMapping, this.ZenExpression, this.VariableSet);
         }
 
         /// <summary>
@@ -209,7 +201,7 @@ namespace ZenLib.ModelChecking
         /// <param name="argument">The state set argument.</param>
         private void CheckValidOperation<T2>(StateSet<T2> argument)
         {
-            if (!this.Manager.Equals(argument.Manager))
+            if (!this.Solver.Manager.Equals(argument.Solver.Manager))
             {
                 throw new InvalidOperationException($"Attempting to combine transformations and state sets with different manager objects");
             }

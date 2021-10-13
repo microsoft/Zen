@@ -35,11 +35,14 @@ namespace ZenLib
         /// <summary>
         ///     Creates a new instance of the <see cref="FiniteCache{TKey, TValue}"/> class.
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="count">
+        ///     The maximum number of elements stored in the cache. A negative number indicates
+        ///     that the cache has no upper limit.
+        /// </param>
         public FiniteCache(int count)
         {
             this.maxCount = count;
-            this.cache = new Dictionary<TKey, TValue>(count);
+            this.cache = count >= 0 ? new Dictionary<TKey, TValue>(count) : new Dictionary<TKey, TValue>();
             this.entries = new List<TKey>();
             this.random = new Random(0);
         }
@@ -57,6 +60,11 @@ namespace ZenLib
         /// <param name="value">The value for the key.</param>
         public void Add(TKey key, TValue value)
         {
+            if (this.maxCount == 0)
+            {
+                return;
+            }
+
             if (this.entries.Count == maxCount)
             {
                 var toEvictIndex = this.random.Next(0, maxCount);
