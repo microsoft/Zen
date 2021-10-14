@@ -844,7 +844,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Gets the substring at an offset and for a given length..
+        /// Gets the substring at an offset and for a given length.
         /// </summary>
         /// <param name="s">The string.</param>
         /// <param name="offset">The offset.</param>
@@ -920,7 +920,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<byte> Max(Zen<byte> expr1, Zen<byte> expr2)
@@ -934,7 +934,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<short> Max(Zen<short> expr1, Zen<short> expr2)
@@ -948,7 +948,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Max(Zen<ushort> expr1, Zen<ushort> expr2)
@@ -962,7 +962,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<int> Max(Zen<int> expr1, Zen<int> expr2)
@@ -976,7 +976,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<uint> Max(Zen<uint> expr1, Zen<uint> expr2)
@@ -990,7 +990,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<long> Max(Zen<long> expr1, Zen<long> expr2)
@@ -1004,7 +1004,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Max(Zen<ulong> expr1, Zen<ulong> expr2)
@@ -1018,7 +1018,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the maximum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Max(Zen<BigInteger> expr1, Zen<BigInteger> expr2)
@@ -1032,7 +1032,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<byte> Min(Zen<byte> expr1, Zen<byte> expr2)
@@ -1046,7 +1046,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<short> Min(Zen<short> expr1, Zen<short> expr2)
@@ -1060,7 +1060,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Min(Zen<ushort> expr1, Zen<ushort> expr2)
@@ -1074,7 +1074,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<int> Min(Zen<int> expr1, Zen<int> expr2)
@@ -1088,7 +1088,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<uint> Min(Zen<uint> expr1, Zen<uint> expr2)
@@ -1102,7 +1102,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<long> Min(Zen<long> expr1, Zen<long> expr2)
@@ -1116,7 +1116,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Min(Zen<ulong> expr1, Zen<ulong> expr2)
@@ -1130,7 +1130,7 @@ namespace ZenLib
         /// <summary>
         /// Compute the minimum of two values.
         /// </summary>
-        /// <param name="expr1">First value..</param>
+        /// <param name="expr1">First value.</param>
         /// <param name="expr2">Second value.</param>
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Min(Zen<BigInteger> expr1, Zen<BigInteger> expr2)

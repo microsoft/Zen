@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -12,6 +13,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringSubstringExpr : Zen<string>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<string>, Zen<BigInteger>, Zen<BigInteger>), Zen<string>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
         /// <summary>
         /// Hash cons table for ZenStringSubstringExpr.
         /// </summary>
@@ -57,7 +63,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, expr3), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);
             return value;
         }
 

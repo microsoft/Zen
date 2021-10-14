@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -11,6 +12,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenConstantExpr<T> : Zen<T>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<T, Zen<T>> createFunc = (v) => new ZenConstantExpr<T>(v);
+
         /// <summary>
         /// Hash cons table.
         /// </summary>
@@ -37,7 +43,7 @@ namespace ZenLib
         /// <returns>The Zen expr.</returns>
         public static Zen<T> Create(T value)
         {
-            hashConsTable.GetOrAdd(value, () => new ZenConstantExpr<T>(value), out var v);
+            hashConsTable.GetOrAdd(value, value, createFunc, out var v);
             return v;
         }
 

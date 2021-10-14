@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
@@ -12,6 +13,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenListAddFrontExpr<T> : Zen<IList<T>>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<IList<T>>, Zen<T>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
+
         /// <summary>
         /// Hash cons table for ZenListAddFrontExpr.
         /// </summary>
@@ -38,7 +44,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(element);
 
             var key = (expr.Id, element.Id);
-            hashConsTable.GetOrAdd(key, () => new ZenListAddFrontExpr<T>(expr, element), out var value);
+            hashConsTable.GetOrAdd(key, (expr, element), createFunc, out var value);
             return value;
         }
 

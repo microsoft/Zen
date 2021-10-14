@@ -14,6 +14,11 @@ namespace ZenLib
     internal sealed class ZenComparisonExpr<T> : Zen<bool>
     {
         /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<T>, Zen<T>, ComparisonType), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
+        /// <summary>
         /// Hash cons table for ZenComparisonExpr.
         /// </summary>
         private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
@@ -110,7 +115,7 @@ namespace ZenLib
             }
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, comparisonType), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), createFunc, out var value);
             return value;
         }
 

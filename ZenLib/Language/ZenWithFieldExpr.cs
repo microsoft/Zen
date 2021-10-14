@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -11,6 +12,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenWithFieldExpr<T1, T2> : Zen<T1>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<T1>, string, Zen<T2>), ZenWithFieldExpr<T1, T2>> createFunc = (v) => new ZenWithFieldExpr<T1, T2>(v.Item1, v.Item2, v.Item3);
+
         /// <summary>
         /// Hash cons table for ZenWithFieldExpr.
         /// </summary>
@@ -40,7 +46,7 @@ namespace ZenLib
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName, fieldValue.Id);
-            hashConsTable.GetOrAdd(key, () => new ZenWithFieldExpr<T1, T2>(expr, fieldName, fieldValue), out var value);
+            hashConsTable.GetOrAdd(key, (expr, fieldName, fieldValue), createFunc, out var value);
             return value;
         }
 

@@ -44,10 +44,11 @@ namespace ZenLib
         /// Gets an element if it exists, or adds a new one if not.
         /// </summary>
         /// <param name="key">The key to use.</param>
+        /// <param name="context">Context for the callback.</param>
         /// <param name="createFunc">The callback to create a fresh value.</param>
         /// <param name="result">The value either existing or added.</param>
         /// <returns>True if the element was added.</returns>
-        public bool GetOrAdd(TKey key, Func<TValue> createFunc, out TValue result)
+        public bool GetOrAdd<T>(TKey key, T context, Func<T, TValue> createFunc, out TValue result)
         {
             lock (this.lockObj)
             {
@@ -94,12 +95,12 @@ namespace ZenLib
                         return false;
                     }
 
-                    result = createFunc();
+                    result = createFunc(context);
                     wref.SetTarget(result);
                     return true;
                 }
 
-                result = createFunc();
+                result = createFunc(context);
                 this.table[key] = new WeakReference<TValue>(result);
                 return true;
             }

@@ -58,9 +58,9 @@ namespace ZenLib.Tests
         /// <param name="ht">The table to use.</param>
         private void Check(HashConsTable<int, object> ht)
         {
-            Assert.IsTrue(ht.GetOrAdd(1, () => 1, out var _));
-            Assert.IsTrue(ht.GetOrAdd(2, () => 2, out var _));
-            Assert.IsFalse(ht.GetOrAdd(1, () => 1, out var _));
+            Assert.IsTrue(ht.GetOrAdd(1, 1, (v) => v, out var _));
+            Assert.IsTrue(ht.GetOrAdd(2, 2, (v) => v, out var _));
+            Assert.IsFalse(ht.GetOrAdd(1, 1, (v) => v, out var _));
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace ZenLib.Tests
 
             for (int i = 0; i < 1000; i++)
             {
-                Assert.IsTrue(ht.GetOrAdd(i, () => i, out var _));
+                Assert.IsTrue(ht.GetOrAdd(i, i, (v) => v, out var _));
             }
         }
     }

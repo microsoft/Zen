@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -11,6 +12,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenConcatExpr : Zen<string>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<string>, Zen<string>), Zen<string>> createFunc = (v) => Simplify(v.Item1, v.Item2);
+
         /// <summary>
         /// Hash cons table for ZenConcatExpr.
         /// </summary>
@@ -41,12 +47,12 @@ namespace ZenLib
                 return ReflectionUtilities.CreateConstantString(x + y);
             }
 
-            if (x == "")
+            if (x == string.Empty)
             {
                 return e2;
             }
 
-            if (y == "")
+            if (y == string.Empty)
             {
                 return e1;
             }
@@ -66,7 +72,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2), createFunc, out var value);
             return value;
         }
 
