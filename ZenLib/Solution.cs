@@ -15,7 +15,7 @@ namespace ZenLib
         /// <summary>
         /// Assignment from arbitrary variables to C# values.
         /// </summary>
-        private Dictionary<object, object> arbitraryAssignment;
+        internal Dictionary<object, object> ArbitraryAssignment;
 
         /// <summary>
         /// Creates a new instance of the <see cref="Solution"/> class.
@@ -23,7 +23,7 @@ namespace ZenLib
         /// <param name="arbitraryAssignment">The arbitrary assignment.</param>
         internal Solution(Dictionary<object, object> arbitraryAssignment)
         {
-            this.arbitraryAssignment = arbitraryAssignment;
+            this.ArbitraryAssignment = arbitraryAssignment;
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace ZenLib
         /// <returns>The C# value associated with the expression.</returns>
         public T Get<T>(Zen<T> expr)
         {
-            if (this.arbitraryAssignment.TryGetValue(expr, out var value))
+            if (this.ArbitraryAssignment.TryGetValue(expr, out var value))
             {
                 return (T)value;
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(this.arbitraryAssignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment(this.ArbitraryAssignment);
             var result = expr.Accept(new ExpressionEvaluator(false), interpreterEnv);
             return CommonUtilities.ConvertSymbolicResultToCSharp<T>(result);
         }

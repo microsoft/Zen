@@ -84,7 +84,7 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null field does not work.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestConvertNullClass()
         {
             var o = new NestedClass { };
@@ -95,7 +95,7 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null tuple inner value.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestConvertNullTupleValue()
         {
             var o = new Pair<Object1, Object1> { Item1 = null, Item2 = null };
@@ -106,7 +106,7 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null option inner value.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestConvertNullOptionValue()
         {
             Option<Object1> o = Option.Some<Object1>(null);
@@ -127,7 +127,7 @@ namespace ZenLib.Tests
             }
             catch (System.Reflection.TargetInvocationException e)
             {
-                Assert.AreEqual(typeof(ArgumentException), e.InnerException.GetType());
+                Assert.AreEqual(typeof(ZenException), e.InnerException.GetType());
             }
         }
 

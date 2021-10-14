@@ -454,7 +454,7 @@ namespace ZenLib.Tests
         /// Test invalid null string literal.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestInvalidStringLiteralNull()
         {
             Constant<string>(null);
@@ -464,7 +464,7 @@ namespace ZenLib.Tests
         /// Test invalid string literal.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestInvalidStringLiteral2()
         {
             char c = (char)960; // greek pi
@@ -505,7 +505,7 @@ namespace ZenLib.Tests
         /// Test an exception is thrown for non-strings.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestConcatException()
         {
             _ = EmptyList<string>() + EmptyList<string>();

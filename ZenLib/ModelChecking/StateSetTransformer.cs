@@ -163,7 +163,7 @@ namespace ZenLib.ModelChecking
         {
             if (!this.solver.Manager.Equals(argument.Solver.Manager))
             {
-                throw new InvalidOperationException($"Attempting to combine transformations and state sets with different manager objects");
+                throw new ZenException($"Attempting to combine transformations and state sets with different manager objects");
             }
         }
     }

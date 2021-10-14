@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
 
     /// <summary>
@@ -13,6 +14,11 @@ namespace ZenLib
     /// </summary>
     public static class ZenExtensions
     {
+        /// <summary>
+        /// Error message for mismatched types in evaluation.
+        /// </summary>
+        private const string mismatchMessage = "Type mismatch in assignment between key and value";
+
         /// <summary>
         /// Solves for an assignment to Arbitrary variables in a boolean expression.
         /// </summary>
@@ -22,6 +28,29 @@ namespace ZenLib
         public static Solution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
         {
             return new Solution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+        }
+
+        /// <summary>
+        /// Evaluates a Zen expression given an assignment from arbitrary variable to C# object.
+        /// </summary>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static T Evaluate<T>(this Zen<T> expr, Dictionary<object, object> assignment)
+        {
+            Zen<bool> constraints = true;
+            foreach (var kv in assignment)
+            {
+                var keyType = kv.Key.GetType();
+                var valueType = kv.Value.GetType();
+                ReflectionUtilities.ValidateIsZenType(keyType);
+                var innerType = keyType.GetGenericArgumentsCached()[0];
+                CommonUtilities.ValidateIsTrue(innerType.IsAssignableFrom(valueType), mismatchMessage);
+                constraints = Language.And(constraints, Language.Eq((dynamic)kv.Key, (dynamic)kv.Value));
+            }
+
+            var solution = constraints.Solve();
+            var environment = new ExpressionEvaluatorEnvironment(solution.ArbitraryAssignment);
+            var interpreter = new ExpressionEvaluator(false);
+            return (T)expr.Accept(interpreter, environment);
         }
 
         /// <summary>

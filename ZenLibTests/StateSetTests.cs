@@ -259,7 +259,7 @@ namespace ZenLib.Tests
         /// Test that using different manager objects works as expected.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestStateSetDifferentManagers()
         {
             var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
@@ -271,7 +271,7 @@ namespace ZenLib.Tests
         /// Test that using different manager objects works as expected.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestStateSetInvalidArguments2()
         {
             var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());

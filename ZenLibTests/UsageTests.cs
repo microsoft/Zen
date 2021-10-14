@@ -24,7 +24,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddException1()
         {
             Language.Add(null, Constant(1), Constant(1));
@@ -34,7 +34,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddException2()
         {
             Language.Add(EmptyDict<int, int>(), null, 1);
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddException3()
         {
             Language.Add(EmptyDict<int, int>(), 1, null);
@@ -54,7 +54,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddBackException1()
         {
             Language.AddBack(null, Constant(1));
@@ -64,7 +64,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddBackException2()
         {
             Language.AddBack(EmptyList<int>(), null);
@@ -74,7 +74,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException1()
         {
             Language.AddFront(null, Constant(1));
@@ -84,7 +84,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException2()
         {
             Language.AddFront(EmptyList<int>(), null);
@@ -94,7 +94,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAllException1()
         {
             Language.All<int>(null, null);
@@ -104,7 +104,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAllException2()
         {
             Language.All(EmptyList<int>(), null);
@@ -114,7 +114,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAnyException1()
         {
             Language.Any<int>(null, null);
@@ -124,7 +124,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAnyException2()
         {
             Language.Any(EmptyList<int>(), null);
@@ -134,7 +134,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAndException1()
         {
             Language.And(null, true);
@@ -144,7 +144,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAndException2()
         {
             Language.And(true, null);
@@ -154,7 +154,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAppendException1()
         {
             Language.Append(null, EmptyList<int>());
@@ -164,7 +164,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAppendException2()
         {
             Language.Append(EmptyList<int>(), null);
@@ -174,7 +174,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAtException1()
         {
             Language.At<int>(null, 0);
@@ -184,7 +184,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestAtException2()
         {
             Language.At(EmptyList<int>(), null);
@@ -194,7 +194,7 @@ namespace ZenLib.Tests
         /// Exception thrown for adding big integers.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseBigIntegerException()
         {
             Language.BitwiseAnd<BigInteger>(new BigInteger(0), new BigInteger(1));
@@ -204,7 +204,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseAndException1()
         {
             Language.BitwiseAnd<byte>(null, 0);
@@ -214,7 +214,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseAndException2()
         {
             Language.BitwiseAnd<byte>(0, null);
@@ -224,7 +224,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseNotException()
         {
             Language.BitwiseNot<byte>(null);
@@ -234,7 +234,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseOrException1()
         {
             Language.BitwiseOr<byte>(null, 0);
@@ -244,7 +244,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseOrException2()
         {
             Language.BitwiseOr<byte>(0, null);
@@ -254,7 +254,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseXorException1()
         {
             Language.BitwiseXor<byte>(null, 0);
@@ -264,7 +264,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestBitwiseXorException2()
         {
             Language.BitwiseXor<byte>(0, null);
@@ -274,7 +274,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestContainsException1()
         {
             Language.Contains<int>(null, 0);
@@ -284,7 +284,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestContainsException2()
         {
             Language.Contains(EmptyList<int>(), null);
@@ -294,7 +294,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException1()
         {
             Language.ContainsKey<int, int>(null, 0);
@@ -304,7 +304,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException2()
         {
             Language.ContainsKey(EmptyDict<int, int>(), null);
@@ -314,7 +314,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDropException1()
         {
             Language.Drop<int>(null, 0);
@@ -324,7 +324,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDropException2()
         {
             Language.Drop(EmptyList<int>(), null);
@@ -334,7 +334,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDropWhileException1()
         {
             Language.DropWhile<int>(null, null);
@@ -344,7 +344,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDropWhileException2()
         {
             Language.DropWhile(EmptyList<int>(), null);
@@ -354,7 +354,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDuplicatesException1()
         {
             Language.Duplicates<int>(null, null);
@@ -364,7 +364,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestDuplicatesException2()
         {
             Language.Duplicates(EmptyList<int>(), null);
@@ -374,7 +374,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestEqException1()
         {
             Language.Eq<int>(null, null);
@@ -384,7 +384,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestEqException2()
         {
             Language.Eq<int>(0, null);
@@ -394,7 +394,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFindException1()
         {
             Language.Find<int>(null, null);
@@ -404,7 +404,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFindException2()
         {
             Language.Find(EmptyList<int>(), null);
@@ -414,7 +414,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFoldException1()
         {
             Language.Fold<int, int>(null, null, null);
@@ -424,7 +424,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFoldException2()
         {
             Language.Fold<int, int>(EmptyList<int>(), null, null);
@@ -434,7 +434,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFoldException3()
         {
             Language.Fold<int, int>(EmptyList<int>(), 0, null);
@@ -444,7 +444,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestFunctionException()
         {
             new ZenFunction<int, int>(null);
@@ -454,7 +454,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGeqException1()
         {
             Language.Geq<byte>(null, null);
@@ -464,7 +464,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGeqException2()
         {
             Language.Geq<byte>(0, null);
@@ -474,7 +474,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGetException1()
         {
             Language.Get<int, int>(null, null);
@@ -484,7 +484,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGetException2()
         {
             Language.Get(EmptyDict<int, int>(), null);
@@ -494,7 +494,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGetFieldException1()
         {
             Language.GetField<Object1, int>(null, null);
@@ -504,7 +504,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGetFieldException2()
         {
             Language.GetField<Object1, int>(Language.Create<Object1>(("Field1", Constant(0))), null);
@@ -514,7 +514,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGtException1()
         {
             Language.Gt<byte>(null, null);
@@ -524,7 +524,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestGtException2()
         {
             Language.Gt<byte>(0, null);
@@ -534,7 +534,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestHasValueException()
         {
             Language.HasValue<int>(null);
@@ -544,7 +544,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIfException1()
         {
             Language.If<int>(null, null, null);
@@ -554,7 +554,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIfException2()
         {
             Language.If<int>(true, null, null);
@@ -564,7 +564,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIfException3()
         {
             Language.If<int>(true, 3, null);
@@ -574,7 +574,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestImpliesException1()
         {
             Language.Implies(null, null);
@@ -584,7 +584,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestImpliesException2()
         {
             Language.Implies(true, null);
@@ -594,7 +594,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIndexOfException1()
         {
             Language.IndexOf<int>(null, null);
@@ -604,7 +604,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIndexOfException2()
         {
             Language.IndexOf(EmptyList<int>(), null);
@@ -614,7 +614,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestInsertException1()
         {
             Language.Insert<int>(null, null);
@@ -624,7 +624,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestInsertException2()
         {
             Language.Insert<int>(0, null);
@@ -634,7 +634,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIntersperseException1()
         {
             Language.Intersperse<int>(null, null);
@@ -644,7 +644,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIntersperseException2()
         {
             Language.Intersperse(EmptyList<int>(), null);
@@ -654,7 +654,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIsEmptyException1()
         {
             Language.IsEmpty<int>(null);
@@ -664,7 +664,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestIsSortedException1()
         {
             Language.IsSorted<int>(null);
@@ -674,7 +674,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem1Exception1()
         {
             Zen<Pair<int, int>> x = null;
@@ -685,7 +685,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem1Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
@@ -696,7 +696,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem1Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
@@ -707,7 +707,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem1Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
@@ -718,7 +718,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem2Exception1()
         {
             Zen<Pair<int, int>> x = null;
@@ -729,7 +729,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem2Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
@@ -740,7 +740,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem2Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
@@ -751,7 +751,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem2Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
@@ -762,7 +762,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem3Exception1()
         {
             Zen<Pair<int, int, int>> x = null;
@@ -773,7 +773,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem3Exception2()
         {
             Zen<Pair<int, int, int, int>> x = null;
@@ -784,7 +784,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem3Exception3()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
@@ -795,7 +795,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem4Exception1()
         {
             Zen<Pair<int, int, int, int>> x = null;
@@ -806,7 +806,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem4Exception2()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
@@ -817,7 +817,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestItem5Exception1()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
@@ -828,7 +828,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestLengthException()
         {
             Language.Length<int>(null);
@@ -838,7 +838,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestLeqException1()
         {
             Language.Leq<int>(null, null);
@@ -848,7 +848,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestLeqException2()
         {
             Language.Leq<int>(0, null);
@@ -858,7 +858,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestListException()
         {
             Language.List<int>(null);
@@ -868,7 +868,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestLtException1()
         {
             Language.Lt<int>(null, null);
@@ -878,7 +878,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestLtException2()
         {
             Language.Lt<int>(0, null);
@@ -888,7 +888,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException1()
         {
             Language.Case<int, int>(null, null, (Func<Zen<int>, Zen<int>>)null);
@@ -898,7 +898,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException2()
         {
             Language.Case<int, int>(Language.Null<int>(), null, null);
@@ -908,7 +908,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException3()
         {
             Language.Case<int, int>(Language.Null<int>(), () => 0, null);
@@ -918,7 +918,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseListException1()
         {
             Zen<IList<int>> x = null;
@@ -929,7 +929,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseListException2()
         {
             Language.Case<int, int>(EmptyList<int>(), null, null);
@@ -939,7 +939,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestCaseListException3()
         {
             Language.Case<int, int>(EmptyList<int>(), 0, null);
@@ -949,7 +949,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMaxException1()
         {
             Language.Max(null, Constant<byte>(0));
@@ -959,7 +959,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMaxException2()
         {
             Language.Max(Constant<byte>(0), null);
@@ -969,7 +969,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMinException1()
         {
             Language.Min(null, Constant<byte>(0));
@@ -979,7 +979,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMinException2()
         {
             Language.Min(Constant<byte>(0), null);
@@ -989,7 +989,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMinusException1()
         {
             Language.Minus(null, Constant<byte>(0));
@@ -999,7 +999,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMinusException2()
         {
             Language.Minus(Constant<byte>(0), null);
@@ -1009,7 +1009,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException1()
         {
             Language.Multiply(null, Constant<byte>(0));
@@ -1019,7 +1019,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException2()
         {
             Language.Multiply(Constant<byte>(0), null);
@@ -1029,7 +1029,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestNotException()
         {
             Language.Not(null);
@@ -1039,7 +1039,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestOrException1()
         {
             Language.Or(null, null);
@@ -1049,7 +1049,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestOrException2()
         {
             Language.Or(true, null);
@@ -1059,7 +1059,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestPlusException1()
         {
             Language.Plus<int>(null, null);
@@ -1069,7 +1069,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestPlusException2()
         {
             Language.Plus<int>(0, null);
@@ -1079,7 +1079,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestRemoveAllException1()
         {
             Language.RemoveAll<int>(null, null);
@@ -1089,7 +1089,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestRemoveAllException2()
         {
             Language.RemoveAll(EmptyList<int>(), null);
@@ -1099,7 +1099,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestRemoveFirstException1()
         {
             Language.RemoveFirst<int>(null, null);
@@ -1109,7 +1109,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestRemoveFirstException2()
         {
             Language.RemoveFirst(EmptyList<int>(), null);
@@ -1119,7 +1119,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestReverseException()
         {
             Language.Reverse<int>(null);
@@ -1129,7 +1129,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSelectException1()
         {
             Zen<Option<int>> x = null;
@@ -1140,7 +1140,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSelectException2()
         {
             Zen<Option<int>> x = Null<int>();
@@ -1151,7 +1151,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSelectException3()
         {
             Zen<IList<int>> x = null;
@@ -1162,7 +1162,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSelectException4()
         {
             Zen<IList<int>> x = EmptyList<int>();
@@ -1173,7 +1173,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSingletonException()
         {
             Language.Singleton<int>(null);
@@ -1183,7 +1183,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSomeException()
         {
             Language.Some<int>(null);
@@ -1193,7 +1193,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSortException()
         {
             Language.Sort<int>(null);
@@ -1203,7 +1203,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSplitAtException1()
         {
             Language.SplitAt<int>(null, null);
@@ -1213,7 +1213,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestSplitAtException2()
         {
             Language.SplitAt(EmptyList<int>(), null);
@@ -1223,7 +1223,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTakeException1()
         {
             Language.Take<int>(null, 0);
@@ -1233,7 +1233,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTakeException2()
         {
             Language.Take(EmptyList<int>(), null);
@@ -1243,7 +1243,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTakeWhileException1()
         {
             Language.TakeWhile<int>(null, null);
@@ -1253,7 +1253,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTakeWhileException2()
         {
             Language.TakeWhile(EmptyList<int>(), null);
@@ -1263,7 +1263,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestToListException()
         {
             Language.ToList<int>(null);
@@ -1273,7 +1273,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTupleException1()
         {
             Language.Pair<int, int>(null, null);
@@ -1283,7 +1283,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTupleException2()
         {
             Language.Pair<int, int>(0, null);
@@ -1293,7 +1293,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTupleValueException()
         {
             Language.Value<int>(null);
@@ -1303,7 +1303,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestValueOrDefaultException1()
         {
             Language.ValueOrDefault<int>(null, null);
@@ -1313,7 +1313,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestValueOrDefaultException2()
         {
             Language.ValueOrDefault(Null<int>(), null);
@@ -1323,7 +1323,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestWhereException1()
         {
             Zen<Option<int>> x = null;
@@ -1334,7 +1334,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestWhereException2()
         {
             Zen<Option<int>> x = Null<int>();
@@ -1345,7 +1345,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestWhereException3()
         {
             Zen<IList<int>> x = null;
@@ -1356,7 +1356,7 @@ namespace ZenLib.Tests
         /// Exception thrown for null parameter.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestWhereException4()
         {
             Zen<IList<int>> x = EmptyList<int>();

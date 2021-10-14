@@ -122,6 +122,19 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Validate that an argument is true.
+        /// </summary>
+        /// <param name="obj">The argument.</param>
+        /// <param name="message">The error message.</param>
+        public static void ValidateIsTrue(bool obj, string message)
+        {
+            if (!obj)
+            {
+                throw new ZenException(message);
+            }
+        }
+
+        /// <summary>
         /// Validate that an argument is not null.
         /// </summary>
         /// <param name="obj">The argument.</param>
@@ -129,7 +142,7 @@ namespace ZenLib
         {
             if (obj is null)
             {
-                throw new ArgumentException($"Invalid null argument");
+                throw new ZenException($"Invalid null argument");
             }
         }
 
@@ -141,7 +154,7 @@ namespace ZenLib
         {
             if (!ReflectionUtilities.IsIntegerType(type))
             {
-                throw new ArgumentException($"Invalid non-integer type {type} used as integer.");
+                throw new ZenException($"Invalid non-integer type {type} used as integer.");
             }
         }
 
@@ -155,7 +168,7 @@ namespace ZenLib
             {
                 if (c > 255)
                 {
-                    throw new ArgumentException($"Invalid string literal with backslash character: {s}");
+                    throw new ZenException($"Invalid string literal with backslash character: {s}");
                 }
             }
         }
