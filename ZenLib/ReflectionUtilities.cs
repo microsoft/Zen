@@ -574,7 +574,7 @@ namespace ZenLib
 
             if (IsListType(type))
             {
-                throw new InvalidOperationException($"Unsupported object field type: {type}");
+                throw new ZenException($"Unsupported object field type: {type}");
             }
 
             // some class or struct
@@ -670,7 +670,7 @@ namespace ZenLib
         {
             if (obj is null)
             {
-                throw new ArgumentException($"Null constant in {where} of type {type} can not be converted to a Zen value.");
+                throw new ZenException($"Null constant in {where} of type {type} can not be converted to a Zen value.");
             }
         }
 

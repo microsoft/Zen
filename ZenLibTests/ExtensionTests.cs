@@ -1,4 +1,4 @@
-﻿// <copyright file="SolveTests.cs" company="Microsoft">
+﻿// <copyright file="ExtensionTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -12,11 +12,11 @@ namespace ZenLib.Tests
     using static ZenLib.Language;
 
     /// <summary>
-    /// Test the direct solve API.
+    /// Test the extensions APIs.
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class SolveTests
+    public class ExtensionTests
     {
         /// <summary>
         /// Test that solve works as expected for booleans.
@@ -189,6 +189,142 @@ namespace ZenLib.Tests
             System.Console.WriteLine("s: " + solution.Get(s));
             System.Console.WriteLine("o: " + solution.Get(o));
             System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
+        }
+
+        /// <summary>
+        /// Test that evaluate works as expected for booleans.
+        /// </summary>
+        [TestMethod]
+        public void TestEvaluateBooleans()
+        {
+            var a = Arbitrary<bool>();
+            var b = Arbitrary<bool>();
+            var c = Arbitrary<bool>();
+            var expr = Or(a, And(b, c));
+
+            var assignment1 = new Dictionary<object, object>
+            {
+                { a, false },
+                { b, true },
+                { c, false },
+            };
+
+            var assignment2 = new Dictionary<object, object>
+            {
+                { a, false },
+                { b, true },
+                { c, true },
+            };
+
+            Assert.AreEqual(false, expr.Evaluate(assignment1));
+            Assert.AreEqual(true, expr.Evaluate(assignment2));
+        }
+
+        /// <summary>
+        /// Test that evaluate works as expected for booleans.
+        /// </summary>
+        [TestMethod]
+        public void TestEvaluateList()
+        {
+            var a = Arbitrary<IList<int>>();
+            var expr = a.Sort();
+
+            var assignment = new Dictionary<object, object>
+            {
+                { a, new List<int> { 3, 2, 1 } },
+            };
+
+            var l = expr.Evaluate(assignment);
+
+            Assert.AreEqual(3, l.Count);
+            Assert.AreEqual(1, l[0]);
+            Assert.AreEqual(2, l[1]);
+            Assert.AreEqual(3, l[2]);
+        }
+
+        /// <summary>
+        /// Test that evaluate works with unassigned variables.
+        /// </summary>
+        [TestMethod]
+        public void TestEvaluateMissingVariables()
+        {
+            try
+            {
+                var a = Arbitrary<bool>();
+                var b = Arbitrary<bool>();
+                var c = Arbitrary<bool>();
+                var expr = Or(a, And(b, c));
+
+                var assignment = new Dictionary<object, object>
+                {
+                    { a, false },
+                    { b, true },
+                };
+
+                expr.Evaluate(assignment);
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Test that evaluate works with unassigned variables.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEvaluateWrongTypes1()
+        {
+            var a = Arbitrary<bool>();
+            var b = Arbitrary<bool>();
+            var c = Arbitrary<bool>();
+            var expr = Or(a, And(b, c));
+
+            var assignment = new Dictionary<object, object>
+            {
+                { a, 1 },
+            };
+
+            expr.Evaluate(assignment);
+        }
+
+        /// <summary>
+        /// Test that evaluate works with unassigned variables.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEvaluateWrongTypes2()
+        {
+            var a = Arbitrary<bool>();
+            var b = Arbitrary<bool>();
+            var c = Arbitrary<bool>();
+            var expr = Or(a, And(b, c));
+
+            var assignment = new Dictionary<object, object>
+            {
+                { 1, a },
+            };
+
+            expr.Evaluate(assignment);
+        }
+
+        /// <summary>
+        /// Test that evaluate works with unassigned variables.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestEvaluateWrongTypes3()
+        {
+            var a = Arbitrary<IList<int>>();
+            var expr = a.Sort();
+
+            var assignment = new Dictionary<object, object>
+            {
+                { a, new LinkedList<int>(new List<int> { 3, 2, 1 }) },
+            };
+
+            expr.Evaluate(assignment);
         }
     }
 }

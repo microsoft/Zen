@@ -123,7 +123,7 @@ namespace ZenLib
             if ((type == ReflectionUtilities.BigIntType && IsBitwiseOp(op)) ||
                 (ReflectionUtilities.IsFixedIntegerType(type) && op == Op.Multiplication))
             {
-                throw new ArgumentException($"Operation: {op} is not supported for type {type}");
+                throw new ZenException($"Operation: {op} is not supported for type {type}");
             }
 
             var key = (expr1.Id, expr2.Id, (int)op);

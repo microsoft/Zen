@@ -59,8 +59,8 @@ namespace ZenLib.Tests
             var f2 = new ZenFunction<bool, uint>(b => 3);
             var t1 = f1.Transformer();
             var t2 = f2.Transformer();
-            var set1 = t1.InputSet();
-            var set2 = t2.OutputSet();
+            var set1 = t1.InputSet((i, o) => o);
+            var set2 = t2.OutputSet((i, o) => o == 3);
             t1.TransformForward(set2);
         }
 
@@ -142,7 +142,7 @@ namespace ZenLib.Tests
         public void TestTransformerSetIsFull()
         {
             var t = new ZenFunction<bool, bool>(b => true).Transformer();
-            var set = t.InputSet();
+            var set = t.InputSet((i, o) => o);
 
             Assert.IsTrue(set.IsFull());
         }
@@ -154,7 +154,7 @@ namespace ZenLib.Tests
         public void TestTransformerSetIsEmpty()
         {
             var t = new ZenFunction<bool, bool>(b => true).Transformer();
-            var set = t.InputSet().Complement();
+            var set = t.InputSet((i, o) => o).Complement();
 
             Assert.IsTrue(set.IsEmpty());
         }
@@ -165,14 +165,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerArgTypes()
         {
-            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<short, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<int, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<long, bool>(b => true).Transformer().InputSet().IsFull());
-            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).Transformer().InputSet().IsFull());
+            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<short, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<int, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<long, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace ZenLib.Tests
             var t4 = new ZenFunction<IpHeader, ushort>(x => x.GetSrcPort()).Transformer();
             var t5 = new ZenFunction<IpHeader, byte>(x => x.GetProtocol()).Transformer();
 
-            var allHeaders = new ZenFunction<IpHeader, bool>(x => true).Transformer().InputSet();
+            var allHeaders = new ZenFunction<IpHeader, bool>(x => true).Transformer().InputSet((i, o) => o);
             var s1 = t1.InputSet((x, ip) => true);
             var s2 = t2.InputSet((x, ip) => true);
             var s3 = t3.InputSet((x, ip) => true);
@@ -328,7 +328,7 @@ namespace ZenLib.Tests
         /// Test that using different manager objects works as expected.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTransformerInvalidArguments1()
         {
             var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
@@ -342,7 +342,7 @@ namespace ZenLib.Tests
         /// Test that using different manager objects works as expected.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTransformerInvalidArguments2()
         {
             var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
@@ -357,7 +357,7 @@ namespace ZenLib.Tests
         /// Test that using different manager objects works as expected.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTransformerInvalidArguments3()
         {
             var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());

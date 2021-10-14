@@ -260,7 +260,7 @@ namespace ZenLib.ModelChecking
                 };
             }
 
-            var stateSet = new StateSet<T>(manager, solver, result, arbitraryMappingInput, input, inputVariableSet);
+            var stateSet = new StateSet<T>(solver, result, arbitraryMappingInput, input, inputVariableSet);
             return stateSet.ConvertTo(manager.CanonicalValues[typeof(T)]);
         }
 

@@ -72,6 +72,37 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that insertion is with 0 elements.
+        /// </summary>
+        [TestMethod]
+        public void TestInsertionSizeZero()
+        {
+            var cache = new FiniteCache<int, int>(0);
+            cache.Add(1, 1);
+            Assert.IsFalse(cache.TryGetValue(1, out var _));
+        }
+
+        /// <summary>
+        /// Test that insertion is with negative elements.
+        /// </summary>
+        [TestMethod]
+        public void TestInsertionSizeNegative()
+        {
+            var cache = new FiniteCache<int, int>(-1);
+
+            for (int i = 0; i < 1000; i++)
+            {
+                cache.Add(i, i);
+            }
+
+            for (int i = 0; i < 1000; i++)
+            {
+                Assert.IsTrue(cache.TryGetValue(i, out var x));
+                Assert.AreEqual(i, x);
+            }
+        }
+
+        /// <summary>
         /// Test that insertion is working.
         /// </summary>
         [TestMethod]

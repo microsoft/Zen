@@ -88,7 +88,7 @@ namespace ZenLib.Tests
         /// Test a type not supported by Zen.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTypeVisitorListException()
         {
             TestHelper.CheckAgreement<List<int>>(l => Language.True());
@@ -98,7 +98,7 @@ namespace ZenLib.Tests
         /// Test a type not supported by Zen.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(ZenException))]
         public void TestTypeVisitorDictionaryException()
         {
             TestHelper.CheckAgreement<List<int>>(d => Language.True());
