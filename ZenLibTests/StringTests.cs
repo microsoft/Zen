@@ -128,17 +128,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test startswith and replace interactions.
+        /// Test startswith and contains interactions.
         /// </summary>
         [TestMethod]
-        public void TestReplaceStartsWith()
+        public void TestReplaceContains()
         {
             RandomStrings(sub =>
             {
                 if (sub != "")
                 {
-                    CheckValid<string, string>((s1, s2) =>
-                        Implies(s1.StartsWith(sub), s1.ReplaceFirst(sub, s2).StartsWith(s2)));
+                    CheckAgreement<string, string>((s1, s2) => s1.ReplaceFirst(sub, s2).Contains(s2));
                 }
             });
         }
