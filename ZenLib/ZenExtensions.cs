@@ -25,9 +25,9 @@ namespace ZenLib
         /// <param name="expr">The boolean expression.</param>
         /// <param name="backend">The solver backend to use.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static Solution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
         {
-            return new Solution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            return new ZenSolution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenFunction.cs" company="Microsoft">
+﻿// <copyright file="ZenSolution.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// Represents a solution to a zen boolean expression.
     /// </summary>
-    public class Solution
+    public class ZenSolution
     {
         /// <summary>
         /// Assignment from arbitrary variables to C# values.
@@ -18,10 +18,10 @@ namespace ZenLib
         internal Dictionary<object, object> ArbitraryAssignment;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="Solution"/> class.
+        /// Creates a new instance of the <see cref="ZenSolution"/> class.
         /// </summary>
         /// <param name="arbitraryAssignment">The arbitrary assignment.</param>
-        internal Solution(Dictionary<object, object> arbitraryAssignment)
+        internal ZenSolution(Dictionary<object, object> arbitraryAssignment)
         {
             this.ArbitraryAssignment = arbitraryAssignment;
         }
