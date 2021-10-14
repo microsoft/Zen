@@ -52,7 +52,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            hashConsTable.GetOrAdd(expr.Id, () => Simplify(expr), out var value);
+            hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }
 

@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -11,6 +12,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenStringReplaceExpr : Zen<string>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<string>, Zen<string>, Zen<string>), Zen<string>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
         /// <summary>
         /// Hash cons table for ZenStringReplaceExpr.
         /// </summary>
@@ -40,9 +46,9 @@ namespace ZenLib
 
             if (x != null && y != null && z != null)
                 return CommonUtilities.ReplaceFirst(x, y, z);
-            if (x == "")
-                return "";
-            if (y == "")
+            if (x == string.Empty)
+                return string.Empty;
+            if (y == string.Empty)
                 return e1 + e3;
 
             return new ZenStringReplaceExpr(e1, e2, e3);
@@ -62,7 +68,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, expr3), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);
             return value;
         }
 

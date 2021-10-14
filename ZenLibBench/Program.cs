@@ -23,15 +23,17 @@ namespace ZenLibBench
             Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms"); */
 
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < 50; i++)
             {
                 var b = new AclBench();
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
-                b.NumLines = 2000;
+                b.NumLines = 10000;
                 b.CreateAcl();
-                b.VerifyAclProvenance();
+                b.Acl.ProcessProvenance(Language.Arbitrary<ZenLib.Tests.Network.IpHeader>());
+                // b.VerifyAclProvenance();
             }
-            Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Time: {timer.ElapsedMilliseconds / 50}ms");
+            Console.WriteLine($"Memory: {GC.GetTotalMemory(false) / 1000 / 1000}mb");
         }
     }
 }

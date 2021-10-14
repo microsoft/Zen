@@ -13,6 +13,11 @@ namespace ZenLib
     internal sealed class ZenStringContainmentExpr : Zen<bool>
     {
         /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<string>, Zen<string>, ContainmentType), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
+        /// <summary>
         /// Hash cons table for ZenStringContainmentExpr.
         /// </summary>
         private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
@@ -54,9 +59,9 @@ namespace ZenLib
                 return f(x, y);
             }
 
-            if (y == "")
+            if (y == string.Empty)
                 return true;
-            if (x == "")
+            if (x == string.Empty)
                 return false;
 
             return new ZenStringContainmentExpr(e1, e2, containmentType);
@@ -75,7 +80,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)containmentType);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, containmentType), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, containmentType), createFunc, out var value);
             return value;
         }
 

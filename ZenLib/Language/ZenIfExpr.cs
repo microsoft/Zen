@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -11,6 +12,11 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenIfExpr<T> : Zen<T>
     {
+        /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<bool>, Zen<T>, Zen<T>), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
         /// <summary>
         /// Hash cons table for ZenIfExpr.
         /// </summary>
@@ -52,21 +58,15 @@ namespace ZenLib
                 if (typeof(T) == ReflectionUtilities.BoolType)
                 {
                     // if e1 then true else e2 = Or(e1, e2)
-                    // if e1 then false else e2 = And(Not(e1), e2)
-                    if (t is ZenConstantExpr<bool> te)
+                    if (t is ZenConstantExpr<bool> te && te.Value)
                     {
-                        return te.Value ?
-                            ZenOrExpr.Create((dynamic)g, (dynamic)f) :
-                            ZenAndExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)f);
+                        return ZenOrExpr.Create((dynamic)g, (dynamic)f);
                     }
 
-                    // if e1 then e2 else true = Or(Not(e1), e2)
                     // if e1 then e2 else false = And(e1, e2)
-                    if (f is ZenConstantExpr<bool> fe)
+                    if (f is ZenConstantExpr<bool> fe && !fe.Value)
                     {
-                        return fe.Value ?
-                            ZenOrExpr.Create(ZenNotExpr.Create((dynamic)g), (dynamic)t) :
-                            ZenAndExpr.Create((dynamic)g, (dynamic)t);
+                        return ZenAndExpr.Create((dynamic)g, (dynamic)t);
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(falseExpr);
 
             var key = (guardExpr.Id, trueExpr.Id, falseExpr.Id);
-            hashConsTable.GetOrAdd(key, () => Simplify(guardExpr, trueExpr, falseExpr), out var value);
+            hashConsTable.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), createFunc, out var value);
             return value;
         }
 

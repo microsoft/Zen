@@ -14,6 +14,11 @@ namespace ZenLib
     internal sealed class ZenIntegerBinopExpr<T> : Zen<T>
     {
         /// <summary>
+        /// Static creation function for hash consing.
+        /// </summary>
+        private static Func<(Zen<T>, Zen<T>, Op), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+
+        /// <summary>
         /// The operation strings for integer operations.
         /// </summary>
         private static string[] opStrings = new string[] { "&", "|", "^", "+", "-", "*" };
@@ -127,7 +132,7 @@ namespace ZenLib
             }
 
             var key = (expr1.Id, expr2.Id, (int)op);
-            hashConsTable.GetOrAdd(key, () => Simplify(expr1, expr2, op), out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);
             return value;
         }
 

@@ -57,7 +57,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateIsIntegerType(typeof(T));
 
-            hashConsTable.GetOrAdd(expr.Id, () => Simplify(expr), out var value);
+            hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }
 

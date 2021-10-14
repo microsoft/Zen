@@ -33,7 +33,10 @@ namespace ZenLibBench
         [Params(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000)]
         public int NumLines { get; set; }
 
-        private Acl acl;
+        /// <summary>
+        /// The ACL.
+        /// </summary>
+        public Acl Acl;
 
         /// <summary>
         /// Create a deterministic random ACL of a given size.
@@ -59,7 +62,7 @@ namespace ZenLibBench
             var defaultPrefix = new Prefix { Length = 0, Address = 0U };
             lines.Add(new AclLine { DstIp = defaultPrefix, SrcIp = defaultPrefix });
 
-            this.acl = new Acl { Lines = lines.ToArray() };
+            this.Acl = new Acl { Lines = lines.ToArray() };
         }
 
         /// <summary>
@@ -68,8 +71,8 @@ namespace ZenLibBench
         [Benchmark]
         public void VerifyAclProvenance()
         {
-            var f = new ZenFunction<IpHeader, Pair<bool, ushort>>(h => this.acl.ProcessProvenance(h));
-            var packet = f.Find((p, o) => o.Item2() == (ushort)(this.acl.Lines.Length + 1), backend: this.Backend);
+            var f = new ZenFunction<IpHeader, Pair<bool, ushort>>(h => this.Acl.ProcessProvenance(h));
+            var packet = f.Find((p, o) => o.Item2() == (ushort)(this.Acl.Lines.Length + 1), backend: this.Backend);
             f.Evaluate(packet.Value);
         }
     }
