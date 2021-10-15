@@ -51,10 +51,12 @@ namespace ZenLib.Tests
             var f2 = new ZenFunction<int, int, bool>((x, y) => Or(x == 1, y == 2));
             var f3 = new ZenFunction<int, int, bool>((x, y) => Not(Or(x == 1, y == 2)));
             var f4 = new ZenFunction<int, bool>(x => Or(x == 1, x == 2, x == 3));
+            var f5 = new ZenFunction<int, bool>(x => true);
             Assert.AreEqual(1, f1.GenerateInputs().Count());
             Assert.AreEqual(1, f2.GenerateInputs().Count());
             Assert.AreEqual(1, f3.GenerateInputs().Count());
             Assert.AreEqual(1, f4.GenerateInputs().Count());
+            Assert.AreEqual(1, f5.GenerateInputs().Count());
         }
 
         /// <summary>

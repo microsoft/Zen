@@ -187,51 +187,30 @@ namespace ZenLib.SymbolicExecution
             Func<Zen<bool>, Option<T1>> findFunction,
             Func<T1, (T2, PathConstraint)> interpretFunction)
         {
-            var potentialSeed = findFunction(precondition);
-
-            if (!potentialSeed.HasValue)
-            {
-                yield break;
-            }
-
-            var seed = potentialSeed.Value;
-
-            var queue = new Queue<(T1, int)>();
-            queue.Enqueue((seed, 0));
+            var queue = new Queue<(Zen<bool>, int)>();
+            queue.Enqueue((precondition, 0));
 
             while (queue.Count > 0)
             {
-                var (example, bound) = queue.Dequeue();
+                var (expr, bound) = queue.Dequeue();
+                var example = findFunction(expr);
+
+                if (!example.HasValue)
+                {
+                    continue;
+                }
 
                 // return the next example.
-                yield return example;
+                yield return example.Value;
 
-                var (output, pathConstraint) = interpretFunction(example);
+                var (_, pathConstraint) = interpretFunction(example.Value);
 
                 // generate all the children by negating some path constraint.
-                var childInputs = new List<(T1, int)>();
                 for (int j = bound; j < pathConstraint.Conjuncts.Count; j++)
                 {
                     var pc = pathConstraint.GetRange(0, j - 1);
-                    var expr = And(precondition, pc.GetExpr(), Not(pathConstraint.Conjuncts[j]));
-                    var found = findFunction(expr);
-
-                    if (found.HasValue)
-                    {
-                        childInputs.Add((found.Value, j + 1));
-                    }
-                }
-
-                // run the child inputs and order them by score (lower is better).
-                var results = childInputs.Select(c => (c, interpretFunction(c.Item1))).ToList();
-
-                // eventually, prioritize paths that uncover new more new guards
-                results.Sort((x, y) => 0);
-
-                // add all the children to the queue.
-                foreach (var result in results)
-                {
-                    queue.Enqueue(result.Item1);
+                    var e = And(precondition, pc.GetExpr(), Not(pathConstraint.Conjuncts[j]));
+                    queue.Enqueue((e, j + 1));
                 }
             }
         }
