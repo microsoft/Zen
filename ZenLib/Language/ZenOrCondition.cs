@@ -23,15 +23,6 @@ namespace ZenLib
         private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
 
         /// <summary>
-        /// Unroll a ZenOrExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenOrExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

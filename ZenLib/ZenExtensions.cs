@@ -27,7 +27,8 @@ namespace ZenLib
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
         public static ZenSolution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
         {
-            return new ZenSolution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            return CommonUtilities.RunWithLargeStack(() =>
+                new ZenSolution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend)));
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace ZenLib
             var solution = constraints.Solve();
             var environment = new ExpressionEvaluatorEnvironment(solution.ArbitraryAssignment);
             var interpreter = new ExpressionEvaluator(false);
-            return (T)expr.Accept(interpreter, environment);
+            return CommonUtilities.RunWithLargeStack(() => (T)expr.Accept(interpreter, environment));
         }
 
         /// <summary>

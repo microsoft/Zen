@@ -25,26 +25,6 @@ namespace ZenLib
         private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
 
         /// <summary>
-        /// Unroll a ZenCreateObjectExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<TObject> Unroll()
-        {
-            var newFields = new (string, object)[this.Fields.Count];
-
-            int i = 0;
-            foreach (var kv in this.Fields)
-            {
-                var value = kv.Value.GetType()
-                    .GetMethodCached("Unroll")
-                    .Invoke(kv.Value, CommonUtilities.EmptyArray);
-                newFields[i++] = (kv.Key, value);
-            }
-
-            return CreateFast(newFields);
-        }
-
-        /// <summary>
         /// Creates a new ZenCreateObjectExpr.
         /// </summary>
         /// <param name="fields">The fields and their values.</param>
@@ -73,24 +53,6 @@ namespace ZenLib
             }
 
             hashConsTable.GetOrAdd(fieldIds, fields, createFunc, out var value);
-            return value;
-        }
-
-        /// <summary>
-        /// Creates a ZenCreateObjectExpr without the sorting and checks.
-        /// </summary>
-        /// <param name="fields">The already sorted fields.</param>
-        /// <returns>The new ZenExpr.</returns>
-        private static Zen<TObject> CreateFast(params (string, object)[] fields)
-        {
-            (string, long)[] fieldIds = new (string, long)[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var f = fields[i];
-                fieldIds[i] = (f.Item1, (long)((dynamic)f.Item2).Id);
-            }
-
-            hashConsTable.GetOrAdd(fieldIds, fields, (v) => new ZenCreateObjectExpr<TObject>(v), out var value);
             return value;
         }
 

@@ -17,11 +17,6 @@ namespace ZenLib
         /// </summary>
         public ZenArbitraryExpr() { }
 
-        public override Zen<T> Unroll()
-        {
-            return this;
-        }
-
         /// <summary>
         /// Convert the expression to a string.
         /// </summary>
