@@ -15,30 +15,20 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<T1>, string, bool), Zen<T2>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<T1>, string), Zen<T2>> createFunc = (v) => Simplify(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenGetFieldExpr.
         /// </summary>
-        private static HashConsTable<(long, string, bool), Zen<T2>> hashConsTable = new HashConsTable<(long, string, bool), Zen<T2>>();
-
-        /// <summary>
-        /// Unroll a ZenGetFieldExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<T2> Unroll()
-        {
-            return Create(this.Expr.Unroll(), this.FieldName, true);
-        }
+        private static HashConsTable<(long, string), Zen<T2>> hashConsTable = new HashConsTable<(long, string), Zen<T2>>();
 
         /// <summary>
         /// Simplify and create a new ZenGetFieldExpr.
         /// </summary>
         /// <param name="expr">The object expr.</param>
         /// <param name="fieldName">The field name.</param>
-        /// <param name="unroll">Whether to unroll.</param>
         /// <returns></returns>
-        private static Zen<T2> Simplify(Zen<T1> expr, string fieldName, bool unroll)
+        private static Zen<T2> Simplify(Zen<T1> expr, string fieldName)
         {
             // get(with(o, name, f), name) == f
             // get(with(o, name', f), name) == get(o, name)
@@ -52,14 +42,6 @@ namespace ZenLib
                 return ((string)fieldNameProperty.GetValue(expr) == fieldName) ?
                         (Zen<T2>)fieldValueProperty.GetValue(expr) :
                         Create((Zen<T1>)exprProperty.GetValue(expr), fieldName); // recurse
-            }
-
-            // get(if e1 then e2 else e3, name) = if e1 then get(e2, name) else get(e3, name)
-            if (unroll && expr is ZenIfExpr<T1> e2)
-            {
-                var trueBranch = Create(e2.TrueExpr, fieldName);
-                var falseBranch = Create(e2.FalseExpr, fieldName);
-                return ZenIfExpr<T2>.Create(e2.GuardExpr, trueBranch.Unroll(), falseBranch.Unroll());
             }
 
             // get(createobject(p1, ..., pn), namei) == pi
@@ -76,16 +58,15 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The object expr.</param>
         /// <param name="fieldName">The field name.</param>
-        /// <param name="unroll">Whether to unroll the expr.</param>
         /// <returns></returns>
-        public static Zen<T2> Create(Zen<T1> expr, string fieldName, bool unroll = false)
+        public static Zen<T2> Create(Zen<T1> expr, string fieldName)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
-            var key = (expr.Id, fieldName, unroll);
-            hashConsTable.GetOrAdd(key, (expr, fieldName, unroll), createFunc, out var value);
+            var key = (expr.Id, fieldName);
+            hashConsTable.GetOrAdd(key, (expr, fieldName), createFunc, out var value);
             return value;
         }
 

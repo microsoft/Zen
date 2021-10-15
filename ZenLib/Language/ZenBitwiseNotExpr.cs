@@ -17,15 +17,6 @@ namespace ZenLib
         private static HashConsTable<long, Zen<T>> hashConsTable = new HashConsTable<long, Zen<T>>();
 
         /// <summary>
-        /// Unroll a ZenBitwiseNotExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.Expr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenBitwiseNot expr.
         /// </summary>
         /// <param name="e">The expr to bitwise negate.</param>

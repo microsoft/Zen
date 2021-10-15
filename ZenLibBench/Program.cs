@@ -5,6 +5,7 @@
 namespace ZenLibBench
 {
     using System;
+    using System.Collections.Generic;
     using ZenLib;
 
     /// <summary>
@@ -22,7 +23,7 @@ namespace ZenLibBench
             }
             Console.WriteLine($"Time: {timer.ElapsedMilliseconds}ms"); */
 
-            var timer = System.Diagnostics.Stopwatch.StartNew();
+            /* var timer = System.Diagnostics.Stopwatch.StartNew();
             for (int i = 0; i < 50; i++)
             {
                 var b = new AclBench();
@@ -32,6 +33,18 @@ namespace ZenLibBench
                 b.Acl.ProcessProvenance(Language.Arbitrary<ZenLib.Tests.Network.IpHeader>());
                 // b.VerifyAclProvenance();
             }
+            Console.WriteLine($"Time: {timer.ElapsedMilliseconds / 50}ms");
+            Console.WriteLine($"Memory: {GC.GetTotalMemory(false) / 1000 / 1000}mb"); */
+
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+
+            var zf = new ZenFunction<IList<byte>, IList<byte>>(Language.Sort);
+
+            foreach (var input in zf.GenerateInputs(listSize: 3, checkSmallerLists: false))
+            {
+                Console.WriteLine(string.Join(",", input));
+            }
+
             Console.WriteLine($"Time: {timer.ElapsedMilliseconds / 50}ms");
             Console.WriteLine($"Memory: {GC.GetTotalMemory(false) / 1000 / 1000}mb");
         }

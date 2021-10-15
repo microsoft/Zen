@@ -24,15 +24,6 @@ namespace ZenLib
         private static HashConsTable<(long, long, long), Zen<BigInteger>> hashConsTable = new HashConsTable<(long, long, long), Zen<BigInteger>>();
 
         /// <summary>
-        /// Unroll a ZenStringIndexOfExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<BigInteger> Unroll()
-        {
-            return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.OffsetExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenStringIndexOfExpr.
         /// </summary>
         /// <param name="e1">The string expr.</param>

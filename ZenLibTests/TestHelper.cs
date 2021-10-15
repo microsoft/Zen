@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.ModelChecking;
@@ -22,7 +23,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// Number of random inputs to try per test.
         /// </summary>
-        private static int numRandomTests = 12;
+        private static int numRandomTests = 15;
 
         /// <summary>
         /// Deterministic random number generator.
@@ -80,19 +81,12 @@ namespace ZenLib.Tests
             return (byte)random.Next(0, 255);
         }
 
-        private static Zen<T> Simplify<T>(Zen<T> expr, TestParameter p)
-        {
-            return p.Simplify ? expr.Simplify() : expr;
-        }
-
         private static TestParameter[] GetBoundedParameters(int bddListSize)
         {
             return new TestParameter[]
             {
-                new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
-                new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = false, ListSize = 1 },
-                new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                new TestParameter { Backend = Backend.DecisionDiagrams, ListSize = bddListSize },
+                new TestParameter { Backend = Backend.Z3, ListSize = 5 },
             };
         }
 
@@ -100,24 +94,14 @@ namespace ZenLib.Tests
         {
             return new TestParameter[]
             {
-                new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                new TestParameter { Backend = Backend.Z3, ListSize = 5 },
             };
         }
 
         private static TestParameter[] SetParameters(int bddListSize, params Type[] types)
         {
-            var ps = GetBoundedParameters(bddListSize);
-
-            foreach (var type in types)
-            {
-                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType)
-                {
-                    ps = GetUnboundedParameters();
-                }
-            }
-
-            return ps;
+            var hasUnboundedType = types.Any(t => t == ReflectionUtilities.StringType || t == ReflectionUtilities.BigIntType);
+            return hasUnboundedType ? GetUnboundedParameters() : GetBoundedParameters(bddListSize);
         }
 
         /// <summary>
@@ -133,7 +117,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
@@ -161,11 +145,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -189,11 +173,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -218,11 +202,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => o, listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -244,7 +228,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is not valid
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -267,7 +251,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Not(o), listSize: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -286,7 +270,7 @@ namespace ZenLib.Tests
             foreach (var p in GetBoundedParameters(defaultBddListSize))
             {
                 var f = new ZenFunction<bool>(function);
-                var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
+                var result = f.Assert(o => o, backend: p.Backend);
 
                 Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
@@ -306,7 +290,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => o, listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
@@ -331,7 +315,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => o, listSize: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
@@ -544,8 +528,6 @@ namespace ZenLib.Tests
         private class TestParameter
         {
             public Backend Backend { get; set; }
-
-            public bool Simplify { get; set; }
 
             public int ListSize { get; set; }
         }

@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Threading;
-
 namespace ZenLib
 {
+    using System.Threading;
+
     /// <summary>
     /// A Zen expression object parameterized over the C# type.
     /// </summary>
@@ -23,25 +23,10 @@ namespace ZenLib
         internal long Id = Interlocked.Increment(ref nextId);
 
         /// <summary>
-        /// Simplify an expression by unrolling.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Zen<T> Unroll();
-
-        /// <summary>
         /// Accept a visitor for the ZenExpr object.
         /// </summary>
         /// <returns>A value of the return type.</returns>
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
-
-        /// <summary>
-        /// Simplify an expression recursively.
-        /// </summary>
-        /// <returns></returns>
-        public Zen<T> Simplify()
-        {
-            return CommonUtilities.RunWithLargeStack(() => this.Unroll());
-        }
 
         /// <summary>
         /// Convert a C# value to a Zen value.
@@ -208,7 +193,12 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is Zen<T> other)
+            {
+                return this.Id == other.Id;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -217,7 +207,7 @@ namespace ZenLib
         /// <returns>Hash code.</returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (int)this.Id;
         }
     }
 }

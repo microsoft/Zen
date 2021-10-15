@@ -130,7 +130,7 @@ namespace ZenLib.Tests
                 y = Language.If(x >= i, i, y);
             }
 
-            y.Simplify();
+            y.Evaluate(new Dictionary<object, object>());
             Settings.UseLargeStack = false;
         }
 

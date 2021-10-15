@@ -33,15 +33,6 @@ namespace ZenLib
         };
 
         /// <summary>
-        /// Unroll a ZenStringContainmentExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ContainmentType);
-        }
-
-        /// <summary>
         /// Simplify and create a ZenStringContainmentExpr.
         /// </summary>
         /// <param name="e1">The string expr.</param>

@@ -23,15 +23,6 @@ namespace ZenLib
         private static HashConsTable<(long, long, long), Zen<string>> hashConsTable = new HashConsTable<(long, long, long), Zen<string>>();
 
         /// <summary>
-        /// Unroll a ZenStringReplaceExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<string> Unroll()
-        {
-            return Create(this.StringExpr.Unroll(), this.SubstringExpr.Unroll(), this.ReplaceExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenStringReplaceExpr.
         /// </summary>
         /// <param name="e1">The string expr.</param>

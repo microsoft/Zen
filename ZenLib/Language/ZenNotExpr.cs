@@ -17,15 +17,6 @@ namespace ZenLib
         private static HashConsTable<long, Zen<bool>> hashConsTable = new HashConsTable<long, Zen<bool>>();
 
         /// <summary>
-        /// Unroll a ZenNotExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenNotExpr.
         /// </summary>
         /// <param name="e">The expr.</param>

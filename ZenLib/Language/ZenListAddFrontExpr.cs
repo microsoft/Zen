@@ -24,15 +24,6 @@ namespace ZenLib
         private static HashConsTable<(long, long), ZenListAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenListAddFrontExpr<T>>();
 
         /// <summary>
-        /// Unroll a ZenListAddFrontExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<IList<T>> Unroll()
-        {
-            return Create(this.Expr.Unroll(), this.Element.Unroll());
-        }
-
-        /// <summary>
         /// Create a new ZenListAddFrontExpr.
         /// </summary>
         /// <param name="expr">The list expr.</param>

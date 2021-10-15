@@ -22,15 +22,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Unroll this expression.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Gets the unique id for the object.
         /// </summary>
         public long ArgumentId { get; }

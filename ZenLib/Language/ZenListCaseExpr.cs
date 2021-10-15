@@ -14,23 +14,13 @@ namespace ZenLib
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
         /// <summary>
-        /// Unroll the ZenListCaseExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<TResult> Unroll()
-        {
-            return Create(this.ListExpr.Unroll(), this.EmptyCase.Unroll(), this.ConsCase, true);
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenListCaseExpr.
         /// </summary>
         /// <param name="e">The list expr.</param>
         /// <param name="emptyCase">The empty case.</param>
         /// <param name="consCase">The cons case.</param>
-        /// <param name="unroll">Whether to unroll the expr.</param>
         /// <returns></returns>
-        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase, bool unroll)
+        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase)
         {
             if (e is ZenListEmptyExpr<T> l1)
             {
@@ -42,13 +32,6 @@ namespace ZenLib
                 return consCase(l2.Element, l2.Expr);
             }
 
-            if (unroll && e is ZenIfExpr<IList<T>> l3)
-            {
-                var tbranch = Create(l3.TrueExpr, emptyCase, consCase);
-                var fbranch = Create(l3.FalseExpr, emptyCase, consCase);
-                return ZenIfExpr<TResult>.Create(l3.GuardExpr, tbranch.Unroll(), fbranch.Unroll());
-            }
-
             return new ZenListCaseExpr<T, TResult>(e, emptyCase, consCase);
         }
 
@@ -58,19 +41,17 @@ namespace ZenLib
         /// <param name="listExpr">TThe list expr.</param>
         /// <param name="empty">The empty case.</param>
         /// <param name="cons">The cons case.</param>
-        /// <param name="unroll">Whether to unroll the expr.</param>
         /// <returns>The new expr.</returns>
         public static Zen<TResult> Create(
             Zen<IList<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons,
-            bool unroll = false)
+            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
         {
             CommonUtilities.ValidateNotNull(listExpr);
             CommonUtilities.ValidateNotNull(empty);
             CommonUtilities.ValidateNotNull(cons);
 
-            return Simplify(listExpr, empty, cons, unroll);
+            return Simplify(listExpr, empty, cons);
         }
 
         /// <summary>

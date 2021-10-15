@@ -18,15 +18,6 @@ namespace ZenLib
         private static HashConsTable<long, Zen<BigInteger>> hashConsTable = new HashConsTable<long, Zen<BigInteger>>();
 
         /// <summary>
-        /// Unroll a ZenStringLengthExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<BigInteger> Unroll()
-        {
-            return Create(this.Expr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenStringLengthExpr.
         /// </summary>
         /// <param name="e1">The string expr.</param>

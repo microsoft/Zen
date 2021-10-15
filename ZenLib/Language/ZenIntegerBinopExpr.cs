@@ -52,15 +52,6 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Zen<T>> hashConsTable = new HashConsTable<(long, long, int), Zen<T>>();
 
         /// <summary>
-        /// Unroll the ZenIntegerBinopExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenIntegerBinopExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

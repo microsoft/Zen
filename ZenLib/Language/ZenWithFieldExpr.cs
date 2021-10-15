@@ -23,15 +23,6 @@ namespace ZenLib
         private static HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>> hashConsTable = new HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>>();
 
         /// <summary>
-        /// Unroll the ZenWithFieldExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<T1> Unroll()
-        {
-            return Create(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
-        }
-
-        /// <summary>
         /// Create a new ZenWithFieldExpr.
         /// </summary>
         /// <param name="expr">The object expr.</param>
