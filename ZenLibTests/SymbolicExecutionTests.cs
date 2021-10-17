@@ -99,6 +99,7 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<IList<int>, IList<int>>(x => x.Sort());
             Assert.AreEqual(6, f.GenerateInputs(listSize: 3, checkSmallerLists: false).Count());
+            Assert.AreEqual(10, f.GenerateInputs(listSize: 3, checkSmallerLists: true).Count());
         }
 
         /// <summary>

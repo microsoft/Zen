@@ -37,7 +37,7 @@ namespace ZenLib.Tests
             var totalMemory2 = GC.GetTotalMemory(true) / 1000 / 1000;
             Console.WriteLine($"Using: {totalMemory2} MB");
 
-            Assert.IsTrue(Math.Abs(totalMemory2 - totalMemory1) < 5);
+            Assert.IsTrue(Math.Abs(totalMemory2 - totalMemory1) < 10);
         }
 
         /// <summary>
