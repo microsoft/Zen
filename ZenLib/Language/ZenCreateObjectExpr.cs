@@ -69,7 +69,6 @@ namespace ZenLib
             for (int i = 0; i < fields.Length; i++)
             {
                 var f = fields[i];
-                Console.WriteLine(f.Item2.GetType());
                 var id = (long)f.Item2.GetType().GetFieldCached("Id").GetValue(f.Item2);
                 fieldIds[i] = (f.Item1, id);
             }
