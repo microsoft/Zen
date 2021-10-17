@@ -176,7 +176,7 @@ namespace ZenLib.ModelChecking
                     this.Cache[expression] = result;
                     return result;
                 }
-                catch (System.Reflection.TargetInvocationException e)
+                catch (TargetInvocationException e)
                 {
                     throw e.InnerException;
                 }
@@ -371,18 +371,30 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
-            foreach (var fieldValuePair in expression.Fields)
+            try
             {
-                var field = fieldValuePair.Key;
-                dynamic fieldValue = fieldValuePair.Value;
-                fields = fields.Add(field, fieldValue.Accept(this, parameter));
+                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
+                foreach (var fieldValuePair in expression.Fields)
+                {
+                    var field = fieldValuePair.Key;
+                    var acceptMethod = fieldValuePair.Value.GetType()
+                        .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(
+                            typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>),
+                            typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>));
+
+                    fields = fields.Add(field, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter })); // fieldValue.Accept(this, parameter));
+                }
+
+                var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, fields);
+
+                this.Cache[expression] = result;
+                return result;
             }
-
-            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, fields);
-
-            this.Cache[expression] = result;
-            return result;
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)

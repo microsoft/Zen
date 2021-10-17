@@ -4,7 +4,7 @@
 
 namespace ZenLib.Tests
 {
-    using System.Collections.Generic;
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -468,6 +468,34 @@ namespace ZenLib.Tests
             Assert.IsTrue(ReferenceEquals(f5, f6));
             Assert.IsFalse(ReferenceEquals(f1, f3));
             Assert.IsFalse(ReferenceEquals(f3, f5));
+        }
+
+        /// <summary>
+        /// Test that transformers work with complex expressions.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerComplex()
+        {
+            var f = new Func<Zen<TestHelper.Object2>, Zen<Option<TestHelper.Object2>>>(p =>
+            {
+                return If(
+                    p.GetField<TestHelper.Object2, int>("Field1") == 1,
+                    Some(p.WithField<TestHelper.Object2, int>("Field1", 2)),
+                    If(
+                        p.GetField<TestHelper.Object2, int>("Field1") == 3,
+                        Some(p.WithField<TestHelper.Object2, int>("Field1", 4)),
+                        Some(p)));
+            });
+
+            var set1 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 1).StateSet();
+            var set2 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 4).StateSet();
+            var t = new ZenFunction<TestHelper.Object2, TestHelper.Object2>(p => f(p).Value()).Transformer();
+
+            var x = t.TransformForward(set1).Element();
+            var y = t.TransformBackwards(set2).Element();
+
+            Assert.AreEqual(2, x.Field1);
+            Assert.AreEqual(3, y.Field1);
         }
     }
 }

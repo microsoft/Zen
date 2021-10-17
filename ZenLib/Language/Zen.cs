@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Threading;
-
 namespace ZenLib
 {
+    using System.Threading;
+
     /// <summary>
     /// A Zen expression object parameterized over the C# type.
     /// </summary>
@@ -20,7 +20,7 @@ namespace ZenLib
         /// <summary>
         /// The unique id for the given Zen expression.
         /// </summary>
-        internal long Id = Interlocked.Increment(ref nextId);
+        public long Id = Interlocked.Increment(ref nextId);
 
         /// <summary>
         /// Simplify an expression by unrolling.

@@ -69,7 +69,8 @@ namespace ZenLib
             for (int i = 0; i < fields.Length; i++)
             {
                 var f = fields[i];
-                fieldIds[i] = (f.Item1, (long)((dynamic)f.Item2).Id);
+                var id = (long)f.Item2.GetType().GetFieldCached("Id").GetValue(f.Item2);
+                fieldIds[i] = (f.Item1, id);
             }
 
             hashConsTable.GetOrAdd(fieldIds, fields, createFunc, out var value);
@@ -87,7 +88,8 @@ namespace ZenLib
             for (int i = 0; i < fields.Length; i++)
             {
                 var f = fields[i];
-                fieldIds[i] = (f.Item1, (long)((dynamic)f.Item2).Id);
+                var id = (long)f.Item2.GetType().GetFieldCached("Id").GetValue(f.Item2);
+                fieldIds[i] = (f.Item1, id);
             }
 
             hashConsTable.GetOrAdd(fieldIds, fields, (v) => new ZenCreateObjectExpr<TObject>(v), out var value);

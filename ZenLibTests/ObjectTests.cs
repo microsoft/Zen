@@ -955,6 +955,21 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test object agreement.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectAgreement()
+        {
+            CheckAgreement<ObjectField1, int>((o, i) =>
+            {
+                var o2 = If(i == 2, o.WithField<ObjectField1, int>("Field1", 2), o.WithField<ObjectField1, int>("Field1", 3));
+                return o2.GetField<ObjectField1, int>("Field1") == 3;
+            });
+
+            CheckAgreement<ObjectField1>(o => o.GetField<ObjectField1, int>("Field1") == 2);
+        }
+
+        /// <summary>
         /// Test encapsulating a packet.
         /// </summary>
         [TestMethod]

@@ -64,12 +64,15 @@ namespace ZenLib.Tests
         {
             var f1 = new ZenFunction<IList<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
             var f2 = new ZenFunction<IList<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7).Simplify());
+            var f3 = new ZenFunction<IList<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field2") == 7));
 
             var input1 = f1.Find((i, o) => o);
             var input2 = f2.Find((i, o) => o);
+            var input3 = f3.Find((i, o) => o);
 
             Assert.IsTrue(input1.Value.Where(x => x.Field1 == 7).Count() > 0);
             Assert.IsTrue(input2.Value.Where(x => x.Field1 == 7).Count() > 0);
+            Assert.IsTrue(input3.Value.Where(x => x.Field2 == 7).Count() > 0);
         }
 
         /// <summary>

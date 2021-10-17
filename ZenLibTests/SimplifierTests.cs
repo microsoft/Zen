@@ -530,6 +530,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify get field.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectWithCreateSimplification()
+        {
+            var x = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));
+            var y = x.WithField("Field1", Constant(3));
+            var z = Create<Object2>(("Field1", Constant(3)), ("Field2", Constant(2)));
+            Assert.AreEqual(y, z);
+        }
+
+        /// <summary>
         /// Simplify object get throws.
         /// </summary>
         [TestMethod]
