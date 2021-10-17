@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -15,17 +14,23 @@ namespace ZenLib.ModelChecking
     /// Class to conservatively estimate which variables
     /// must be interleaved to avoid exponential blowup in the encoding.
     /// </summary>
-    internal sealed class InterleavingHeuristic : IZenExprVisitor<Dictionary<long, object>, ImmutableHashSet<object>>
+    internal sealed class InterleavingHeuristic : IZenExprVisitor<Dictionary<long, object>, InterleavingResult>
     {
-        private static Type ZenBoolType = typeof(Zen<bool>);
+        /// <summary>
+        /// The disjoint sets of variables that must be interleaved.
+        /// Should replace this with a union find at some point.
+        /// </summary>
+        public Dictionary<object, ImmutableHashSet<object>> DisjointSets { get; } = new Dictionary<object, ImmutableHashSet<object>>();
 
-        public Dictionary<object, ImmutableHashSet<object>> DisjointSets { get; } =
-            new Dictionary<object, ImmutableHashSet<object>>();
+        /// <summary>
+        /// An empty set of variables.
+        /// </summary>
+        private ImmutableHashSet<object> emptyVariableSet = ImmutableHashSet<object>.Empty;
 
-        private ImmutableHashSet<object> emptySet = ImmutableHashSet<object>.Empty;
-
-        private Dictionary<object, ImmutableHashSet<object>> cache =
-            new Dictionary<object, ImmutableHashSet<object>>();
+        /// <summary>
+        /// Expression cache to avoid redundant work.
+        /// </summary>
+        private Dictionary<object, InterleavingResult> cache = new Dictionary<object, InterleavingResult>();
 
         public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr, Dictionary<long, object> arguments)
         {
@@ -33,7 +38,7 @@ namespace ZenLib.ModelChecking
             return this.DisjointSets;
         }
 
-        public ImmutableHashSet<object> VisitZenAndExpr(ZenAndExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenAndExpr(ZenAndExpr expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -48,7 +53,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenOrExpr(ZenOrExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenOrExpr(ZenOrExpr expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -63,7 +68,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenNotExpr(ZenNotExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenNotExpr(ZenNotExpr expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -75,28 +80,27 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenIfExpr<T>(ZenIfExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenIfExpr<T>(ZenIfExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var g = expression.GuardExpr.Accept(this, parameter);
+            expression.GuardExpr.Accept(this, parameter);
             var t = expression.TrueExpr.Accept(this, parameter);
             var f = expression.FalseExpr.Accept(this, parameter);
-            var result = g.Union(t).Union(f);
-
+            var result = t.Union(f);
             this.cache[expression] = result;
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
         {
-            return emptySet;
+            return new InterleavingSet(emptyVariableSet);
         }
 
-        public ImmutableHashSet<object> VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -124,7 +128,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public ImmutableHashSet<object> VisitZenConcatExpr(ZenConcatExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenConcatExpr(ZenConcatExpr expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -141,42 +145,42 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringAtExpr(ZenStringAtExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringAtExpr(ZenStringAtExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringLengthExpr(ZenStringLengthExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringLengthExpr(ZenStringLengthExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
-        public ImmutableHashSet<object> VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -189,12 +193,12 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
-            return emptySet;
+            return new InterleavingSet(emptyVariableSet);
         }
 
-        public ImmutableHashSet<object> VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -209,7 +213,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -224,7 +228,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -232,11 +236,16 @@ namespace ZenLib.ModelChecking
             }
 
             var result = expression.Expr.Accept(this, parameter);
+            if (result is InterleavingClass rc)
+            {
+                result = rc.Fields[expression.FieldName];
+            }
+
             this.cache[expression] = result;
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -245,43 +254,52 @@ namespace ZenLib.ModelChecking
 
             var x = expression.Expr.Accept(this, parameter);
             var y = expression.FieldValue.Accept(this, parameter);
+
+            if (x is InterleavingClass xc)
+            {
+                x = new InterleavingClass(xc.Fields.SetItem(expression.FieldName, y));
+                this.cache[expression] = x;
+                return x;
+            }
+
             var result = x.Union(y);
             this.cache[expression] = result;
             return result;
         }
 
-        public ImmutableHashSet<object> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var set = ImmutableHashSet<object>.Empty;
-            foreach (var fieldValue in expression.Fields.Values)
+            var fieldMapping = ImmutableDictionary<string, InterleavingResult>.Empty;
+            foreach (var fieldValuePair in expression.Fields)
             {
-                ImmutableHashSet<object> valueResult;
+                InterleavingResult valueResult;
                 try
                 {
-                    var valueType = fieldValue.GetType();
+                    var valueType = fieldValuePair.Value.GetType();
                     var acceptMethod = valueType
                         .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(typeof(Dictionary<long, object>), typeof(ImmutableHashSet<object>));
-                    valueResult = (ImmutableHashSet<object>)acceptMethod.Invoke(fieldValue, new object[] { this, parameter });
+                        .MakeGenericMethod(typeof(Dictionary<long, object>), typeof(InterleavingResult));
+                    valueResult = (InterleavingResult)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter });
                 }
-                catch (System.Reflection.TargetInvocationException e)
+                catch (TargetInvocationException e)
                 {
                     throw e.InnerException;
                 }
 
-                set = set.Union(valueResult);
+                fieldMapping = fieldMapping.Add(fieldValuePair.Key, valueResult);
             }
 
-            this.cache[expression] = set;
-            return set;
+            var result = new InterleavingClass(fieldMapping);
+            this.cache[expression] = result;
+            return result;
         }
 
-        public ImmutableHashSet<object> VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -297,7 +315,7 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public ImmutableHashSet<object> VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -309,48 +327,62 @@ namespace ZenLib.ModelChecking
                 var expr = parameter[expression.ArgumentId];
                 var acceptMethod = expr.GetType()
                     .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .MakeGenericMethod(typeof(Dictionary<long, object>), typeof(ImmutableHashSet<object>));
-                var result = (ImmutableHashSet<object>)acceptMethod.Invoke(expr, new object[] { this, parameter });
+                    .MakeGenericMethod(typeof(Dictionary<long, object>), typeof(InterleavingResult));
+                var result = (InterleavingResult)acceptMethod.Invoke(expr, new object[] { this, parameter });
                 this.cache[expression] = result;
                 return result;
             }
-            catch (System.Reflection.TargetInvocationException e)
+            catch (TargetInvocationException e)
             {
                 throw e.InnerException;
             }
         }
 
-        public ImmutableHashSet<object> VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var result = emptySet.Add(expression);
+            var variableSet = emptyVariableSet.Add(expression);
             if (!this.DisjointSets.ContainsKey(expression))
             {
-                this.DisjointSets[expression] = result;
+                this.DisjointSets[expression] = variableSet;
             }
 
+            var result = new InterleavingSet(variableSet);
             this.cache[expression] = result;
             return result;
         }
 
-        private bool IsSafeSet(ImmutableHashSet<object> set)
+        /// <summary>
+        /// Determines if a set of variables is comprised only of boolean values, which do not need interleaving.
+        /// </summary>
+        /// <param name="variableSet">The set of variables.</param>
+        /// <returns>True or false.</returns>
+        private bool IsBoolVariableSet(ImmutableHashSet<object> variableSet)
         {
-            return set.All(x => ZenBoolType.IsAssignableFrom(x.GetType()));
+            return variableSet.All(x => typeof(Zen<bool>).IsAssignableFrom(x.GetType()));
         }
 
-        private void Combine(ImmutableHashSet<object> set1, ImmutableHashSet<object> set2)
+        /// <summary>
+        /// Combines two results to indicate that they depend on each other.
+        /// Should replace this with a proper union-find data structure later.
+        /// </summary>
+        /// <param name="result1">The first result.</param>
+        /// <param name="result2">The second result.</param>
+        private void Combine(InterleavingResult result1, InterleavingResult result2)
         {
-            // don't need to combine when one side is only a boolean
-            if (IsSafeSet(set1) || IsSafeSet(set2))
+            var variableSet1 = result1.GetAllVariables();
+            var variableSet2 = result2.GetAllVariables();
+
+            if (IsBoolVariableSet(variableSet1) || IsBoolVariableSet(variableSet2))
             {
                 return;
             }
 
-            var all = set1.Union(set2);
+            var all = variableSet1.Union(variableSet2);
             int previousCount;
 
             do
