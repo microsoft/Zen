@@ -66,12 +66,16 @@ namespace ZenLib.ModelChecking
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression, arguments);
 
-            foreach (var kv in mustInterleave)
+            foreach (var grouping in mustInterleave.Values.Select(v => v.GroupBy(e => e.GetType())))
             {
-                Console.WriteLine($"key: {kv.Key}");
-                foreach (var must in kv.Value)
+                Console.WriteLine("-----");
+                foreach (var value in grouping)
                 {
-                    Console.WriteLine($"  depends on: {must}");
+                    Console.WriteLine($"Type: {value.Key}");
+                    foreach (var v in value)
+                    {
+                        Console.WriteLine($"  value: {v}");
+                    }
                 }
             }
 

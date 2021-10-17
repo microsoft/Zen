@@ -25,20 +25,20 @@ namespace ZenLibBench
         {
             Benchmark(nameof(BenchmarkAllocation), 1, () =>
             {
-                var f = new Func<Zen<Packet>, Zen<Option<Packet>>>(p =>
+                var f = new Func<Zen<TestObject>, Zen<Option<TestObject>>>(p =>
                 {
                     return Language.If(
-                        p.GetField<Packet, uint>("DstIp") == 1,
-                        Language.Some(p.WithField<Packet, uint>("DstIp", 2)),
+                        p.GetField<TestObject, uint>("DstIp") == 1,
+                        Language.Some(p.WithField<TestObject, uint>("DstIp", 2)),
                         Language.If(
-                            p.GetField<Packet, uint>("DstIp") == 3,
-                            Language.Some(p.WithField<Packet, uint>("DstIp", 4)),
+                            p.GetField<TestObject, uint>("DstIp") == 3,
+                            Language.Some(p.WithField<TestObject, uint>("DstIp", 4)),
                             Language.Some(p)
                             ));
                 });
 
-                var zf1 = new ZenFunction<Packet, bool>(p => f(p).HasValue());
-                var zf2 = new ZenFunction<Packet, Packet>(p => f(p).Value().Unroll());
+                var zf1 = new ZenFunction<TestObject, bool>(p => f(p).HasValue());
+                var zf2 = new ZenFunction<TestObject, TestObject>(p => f(p).Value().Unroll());
 
                 // var set1 = zf1.Transformer().InputSet((i, o) => o);
                 var t = zf2.Transformer();
@@ -96,5 +96,21 @@ namespace ZenLibBench
             timer.Stop();
             Console.WriteLine($"[{name}]: Total: {timer.ElapsedMilliseconds}ms, Avg {timer.ElapsedMilliseconds / iterations}ms");
         }
+    }
+
+    /// <summary>
+    ///     A test class.
+    /// </summary>
+    public class TestObject
+    {
+        /// <summary>
+        ///     Gets or sets the destination IP address.
+        /// </summary>
+        public uint DstIp { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the source IP address.
+        /// </summary>
+        public uint SrcIp { get; set; }
     }
 }
