@@ -58,10 +58,22 @@ namespace ZenLib.ModelChecking
 
             // create an expression relating input and output.
             Zen<bool> newExpression = (expression == output);
+            Console.WriteLine(input + "\n");
+            Console.WriteLine(output + "\n");
+            Console.WriteLine(newExpression);
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression, arguments);
+
+            foreach (var kv in mustInterleave)
+            {
+                Console.WriteLine($"key: {kv.Key}");
+                foreach (var must in kv.Value)
+                {
+                    Console.WriteLine($"  depends on: {must}");
+                }
+            }
 
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 

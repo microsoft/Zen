@@ -15,12 +15,12 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<T1>, string, Zen<T2>), ZenWithFieldExpr<T1, T2>> createFunc = (v) => new ZenWithFieldExpr<T1, T2>(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<T1>, string, Zen<T2>), Zen<T1>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenWithFieldExpr.
         /// </summary>
-        private static HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>> hashConsTable = new HashConsTable<(long, string, long), ZenWithFieldExpr<T1, T2>>();
+        private static HashConsTable<(long, string, long), Zen<T1>> hashConsTable = new HashConsTable<(long, string, long), Zen<T1>>();
 
         /// <summary>
         /// Unroll the ZenWithFieldExpr.
@@ -32,13 +32,38 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Simplify and create a ZenWithFieldExpr.
+        /// </summary>
+        /// <param name="objectExpr">The object expr.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="fieldExpr">The field value expr.</param>
+        /// <returns>The new Zen expr.</returns>
+        public static Zen<T1> Simplify(Zen<T1> objectExpr, string fieldName, Zen<T2> fieldExpr)
+        {
+            if (objectExpr is ZenCreateObjectExpr<T1> oe)
+            {
+                int i = 0;
+                var newFields = new (string, object)[oe.Fields.Count];
+                foreach (var fieldValue in oe.Fields)
+                {
+                    var newValue = fieldValue.Key == fieldName ? fieldExpr : fieldValue.Value;
+                    newFields[i++] = (fieldValue.Key, newValue);
+                }
+
+                return ZenCreateObjectExpr<T1>.Create(newFields);
+            }
+
+            return new ZenWithFieldExpr<T1, T2>(objectExpr, fieldName, fieldExpr);
+        }
+
+        /// <summary>
         /// Create a new ZenWithFieldExpr.
         /// </summary>
         /// <param name="expr">The object expr.</param>
         /// <param name="fieldName">The field name.</param>
         /// <param name="fieldValue">The field value.</param>
         /// <returns></returns>
-        public static ZenWithFieldExpr<T1, T2> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
+        public static Zen<T1> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(fieldName);
