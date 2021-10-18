@@ -62,12 +62,14 @@ namespace ZenLib.ModelChecking
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression, arguments);
-
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
-            var maxDependenciesPerType = mustInterleave.Values.Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).Max()).Max();
+            var maxDependenciesPerType = mustInterleave
+                .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
+                .MaxOrDefault();
+
             bool isDependencyFree = maxDependenciesPerType <= 1;
 
             if (isDependencyFree)
@@ -96,7 +98,6 @@ namespace ZenLib.ModelChecking
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
             var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)symbolicValue;
-
             DD result = (DD)(object)symbolicResult.Value;
 
             // forces all arbitrary expressions to get evaluated even if not used in the invariant.
@@ -195,7 +196,7 @@ namespace ZenLib.ModelChecking
 
             // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
-            var maxDependenciesPerType = mustInterleave.Values
+            var maxDependenciesPerType = mustInterleave
                 .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
                 .MaxOrDefault();
 

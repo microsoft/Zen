@@ -30,7 +30,7 @@ namespace ZenLib.Solver
         /// <summary>
         /// The variable "must interleave" dependencies.
         /// </summary>
-        private Dictionary<object, ImmutableHashSet<object>> interleavingDependencies { get; }
+        private List<List<object>> interleavingDependencies { get; }
 
         /// <summary>
         /// The existing assignment provided.
@@ -42,7 +42,7 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="manager">The manager object.</param>
         /// <param name="interleavingDependencies">Variable interleaving data.</param>
-        public SolverDD(DDManager<T> manager, Dictionary<object, ImmutableHashSet<object>> interleavingDependencies)
+        public SolverDD(DDManager<T> manager, List<List<object>> interleavingDependencies)
         {
             this.Manager = manager;
             this.ExistingAssignment = new Dictionary<object, Variable<T>>();
@@ -54,7 +54,7 @@ namespace ZenLib.Solver
         /// </summary>
         public void Init()
         {
-            foreach (var set in this.interleavingDependencies.Values)
+            foreach (var dependentVariableSet in this.interleavingDependencies)
             {
                 var objsByte = new List<object>();
                 var objsShort = new List<object>();
@@ -65,48 +65,48 @@ namespace ZenLib.Solver
                 var objsUlong = new List<object>();
                 var objsFixedInt = new Dictionary<int, List<object>>();
 
-                foreach (var elt in set)
+                foreach (var arbitraryVariable in dependentVariableSet)
                 {
-                    if (this.ExistingAssignment.ContainsKey(elt))
+                    if (this.ExistingAssignment.ContainsKey(arbitraryVariable))
                     {
                         continue;
                     }
 
-                    var type = elt.GetType();
+                    var type = arbitraryVariable.GetType();
 
                     if (type == typeof(ZenArbitraryExpr<byte>))
                     {
-                        objsByte.Add(elt);
+                        objsByte.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<short>))
                     {
-                        objsShort.Add(elt);
+                        objsShort.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<ushort>))
                     {
-                        objsUshort.Add(elt);
+                        objsUshort.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<int>))
                     {
-                        objsInt.Add(elt);
+                        objsInt.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<uint>))
                     {
-                        objsUint.Add(elt);
+                        objsUint.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<long>))
                     {
-                        objsLong.Add(elt);
+                        objsLong.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<ulong>))
                     {
-                        objsUlong.Add(elt);
+                        objsUlong.Add(arbitraryVariable);
                     }
 
                     if (type.IsGenericType &&
@@ -121,7 +121,7 @@ namespace ZenLib.Solver
                             objsFixedInt[size] = list;
                         }
 
-                        list.Add(elt);
+                        list.Add(arbitraryVariable);
                     }
                 }
 
