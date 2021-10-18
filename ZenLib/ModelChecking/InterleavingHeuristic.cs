@@ -18,10 +18,9 @@ namespace ZenLib.ModelChecking
     internal sealed class InterleavingHeuristic : IZenExprVisitor<Dictionary<long, object>, InterleavingResult>
     {
         /// <summary>
-        /// The disjoint sets of variables that must be interleaved.
-        /// Should replace this with a union find at some point.
+        /// Set of disjoint variable sets to track must-interleave dependencies, implemented as a union find.
         /// </summary>
-        public Dictionary<object, ImmutableHashSet<object>> DisjointSets { get; } = new Dictionary<object, ImmutableHashSet<object>>();
+        public UnionFind<object> DisjointSets { get; } = new UnionFind<object>();
 
         /// <summary>
         /// An empty set of variables.
@@ -39,10 +38,10 @@ namespace ZenLib.ModelChecking
         /// <param name="expr">The Zen expression.</param>
         /// <param name="arguments">The argument to expression mapping.</param>
         /// <returns></returns>
-        public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr, Dictionary<long, object> arguments)
+        public List<List<object>> Compute<T>(Zen<T> expr, Dictionary<long, object> arguments)
         {
             var _ = expr.Accept(this, arguments);
-            return this.DisjointSets;
+            return this.DisjointSets.GetDisjointSets();
         }
 
         public InterleavingResult VisitZenAndExpr(ZenAndExpr expression, Dictionary<long, object> parameter)
@@ -352,12 +351,8 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
+            this.DisjointSets.Add(expression);
             var variableSet = emptyVariableSet.Add(expression);
-            if (!this.DisjointSets.ContainsKey(expression))
-            {
-                this.DisjointSets[expression] = variableSet;
-            }
-
             var result = new InterleavingSet(variableSet);
             this.cache[expression] = result;
             return result;
@@ -389,24 +384,12 @@ namespace ZenLib.ModelChecking
                 return;
             }
 
-            var all = variableSet1.Union(variableSet2);
-            int previousCount;
-
-            do
+            foreach (var variable1 in variableSet1)
             {
-                previousCount = all.Count;
-                var newAll = all;
-                foreach (var element in all)
+                foreach (var variable2 in variableSet2)
                 {
-                    newAll = newAll.Union(this.DisjointSets[element]);
+                    this.DisjointSets.Union(variable1, variable2);
                 }
-
-                all = newAll;
-            } while (all.Count > previousCount);
-
-            foreach (var element in all)
-            {
-                this.DisjointSets[element] = all;
             }
         }
     }

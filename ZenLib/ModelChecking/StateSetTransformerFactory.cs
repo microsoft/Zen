@@ -67,7 +67,10 @@ namespace ZenLib.ModelChecking
 
             // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
-            var maxDependenciesPerType = mustInterleave.Values.Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).Max()).Max();
+            var maxDependenciesPerType = mustInterleave
+                .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
+                .MaxOrDefault();
+
             bool isDependencyFree = maxDependenciesPerType <= 1;
 
             if (isDependencyFree)
@@ -195,7 +198,7 @@ namespace ZenLib.ModelChecking
 
             // optimization: if there are no variable ordering dependencies,
             // then we can reuse the input variables from the canonical variable case.
-            var maxDependenciesPerType = mustInterleave.Values
+            var maxDependenciesPerType = mustInterleave
                 .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
                 .MaxOrDefault();
 

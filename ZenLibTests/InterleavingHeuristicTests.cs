@@ -30,8 +30,9 @@ namespace ZenLib.Tests
             var expr = (a == b);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
 
         /// <summary>
@@ -45,8 +46,9 @@ namespace ZenLib.Tests
             var expr = (a + b);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
 
         /// <summary>
@@ -60,8 +62,9 @@ namespace ZenLib.Tests
             var expr = (a - b);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
 
         /// <summary>
@@ -75,8 +78,9 @@ namespace ZenLib.Tests
             var expr = (a ^ b);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
 
         /// <summary>
@@ -90,8 +94,9 @@ namespace ZenLib.Tests
             var expr = (a & b);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
 
         /// <summary>
@@ -106,9 +111,10 @@ namespace ZenLib.Tests
             var expr = And(a == 1, Or(b == 2, c == 3));
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(1, disjointSets[a].Count);
-            Assert.AreEqual(1, disjointSets[b].Count);
-            Assert.AreEqual(1, disjointSets[c].Count);
+            Assert.AreEqual(3, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[1].Contains(b));
+            Assert.IsTrue(disjointSets[2].Contains(c));
         }
 
         /// <summary>
@@ -123,9 +129,11 @@ namespace ZenLib.Tests
             var expr = If(c == 2, And(a == b), Not(a == 3));
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
-            Assert.AreEqual(1, disjointSets[c].Count);
+
+            Assert.AreEqual(2, disjointSets.Count);
+            Assert.IsTrue(disjointSets[1].Contains(a));
+            Assert.IsTrue(disjointSets[1].Contains(b));
+            Assert.IsTrue(disjointSets[0].Contains(c));
         }
 
         /// <summary>
@@ -140,9 +148,10 @@ namespace ZenLib.Tests
             var expr = If(c == 2, a, b) == If(c == 3, b, a);
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(2, disjointSets[a].Count);
-            Assert.AreEqual(2, disjointSets[b].Count);
-            Assert.AreEqual(1, disjointSets[c].Count);
+            Assert.AreEqual(2, disjointSets.Count);
+            Assert.IsTrue(disjointSets[1].Contains(a));
+            Assert.IsTrue(disjointSets[1].Contains(b));
+            Assert.IsTrue(disjointSets[0].Contains(c));
         }
 
         /// <summary>
@@ -157,10 +166,12 @@ namespace ZenLib.Tests
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
 
+            Assert.AreEqual(2, disjointSets.Count);
+
             // each field should be equal.
-            foreach (var kv in disjointSets)
+            foreach (var disjointSet in disjointSets)
             {
-                Assert.AreEqual(2, kv.Value.Count);
+                Assert.AreEqual(2, disjointSet.Count);
             }
         }
 
@@ -177,7 +188,9 @@ namespace ZenLib.Tests
             var expr = If(c, a, b).GetField<Object2, int>("Field2") == d;
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(3, disjointSets[d].Count);
+            Assert.AreEqual(4, disjointSets.Count);
+            Assert.AreEqual(3, disjointSets[2].Count);
+            Assert.IsTrue(disjointSets[2].Contains(d));
         }
 
         /// <summary>
@@ -191,8 +204,10 @@ namespace ZenLib.Tests
             var expr = (b == 3) == a;
             var i = new InterleavingHeuristic();
             var disjointSets = i.Compute(expr, new Dictionary<long, object>());
-            Assert.AreEqual(1, disjointSets[a].Count);
-            Assert.AreEqual(1, disjointSets[b].Count);
+
+            Assert.AreEqual(2, disjointSets.Count);
+            Assert.IsTrue(disjointSets[1].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
         }
     }
 }
