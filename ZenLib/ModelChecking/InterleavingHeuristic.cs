@@ -388,7 +388,13 @@ namespace ZenLib.ModelChecking
             {
                 foreach (var variable2 in variableSet2)
                 {
-                    this.DisjointSets.Union(variable1, variable2);
+                    var type1 = variable1.GetType().GetGenericArgumentsCached()[0];
+                    var type2 = variable2.GetType().GetGenericArgumentsCached()[0];
+
+                    if (type1 == type2)
+                    {
+                        this.DisjointSets.Union(variable1, variable2);
+                    }
                 }
             }
         }

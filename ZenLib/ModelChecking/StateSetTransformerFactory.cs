@@ -62,7 +62,6 @@ namespace ZenLib.ModelChecking
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
             var mustInterleave = heuristic.Compute(newExpression, arguments);
-
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,
@@ -99,7 +98,6 @@ namespace ZenLib.ModelChecking
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
             var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)symbolicValue;
-
             DD result = (DD)(object)symbolicResult.Value;
 
             // forces all arbitrary expressions to get evaluated even if not used in the invariant.
