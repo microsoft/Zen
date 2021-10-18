@@ -13,7 +13,7 @@ namespace ZenLib.ModelChecking
 
     /// <summary>
     /// Class to conservatively estimate which variables
-    /// must be interleaved to avoid exponential blowup in the encoding.
+    /// must be interleaved to avoid exponential blowup in the BDD encoding.
     /// </summary>
     internal sealed class InterleavingHeuristic : IZenExprVisitor<Dictionary<long, object>, InterleavingResult>
     {
@@ -33,6 +33,12 @@ namespace ZenLib.ModelChecking
         /// </summary>
         private Dictionary<object, InterleavingResult> cache = new Dictionary<object, InterleavingResult>();
 
+        /// <summary>
+        /// Computes the variable ordering requirements for the expression.
+        /// </summary>
+        /// <param name="expr">The Zen expression.</param>
+        /// <param name="arguments">The argument to expression mapping.</param>
+        /// <returns></returns>
         public Dictionary<object, ImmutableHashSet<object>> Compute<T>(Zen<T> expr, Dictionary<long, object> arguments)
         {
             var _ = expr.Accept(this, arguments);
