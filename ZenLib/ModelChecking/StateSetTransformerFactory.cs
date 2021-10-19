@@ -194,22 +194,13 @@ namespace ZenLib.ModelChecking
             var mustInterleave = heuristic.Compute(expression, arguments);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
-            // optimization: if there are no variable ordering dependencies,
-            // then we can reuse the input variables from the canonical variable case.
-            var maxDependenciesPerType = mustInterleave
-                .Select(v => v.GroupBy(e => e.GetType()).Select(o => o.Count()).MaxOrDefault())
-                .MaxOrDefault();
-
-            bool isDependencyFree = maxDependenciesPerType <= 1;
-
-            if (isDependencyFree)
+            // if we already have canonical values for this type, we should use those.
+            // there is no point allocating new variables since we just convert to these.
+            if (manager.CanonicalValues.TryGetValue(typeof(T), out var canonicalInput))
             {
-                if (manager.CanonicalValues.TryGetValue(typeof(T), out var canonicalInput))
+                for (int i = 0; i < arbitrariesForInput.Count; i++)
                 {
-                    for (int i = 0; i < arbitrariesForInput.Count; i++)
-                    {
-                        solver.SetVariable(arbitrariesForInput[i], canonicalInput.VariableSet.Variables[i]);
-                    }
+                    solver.SetVariable(arbitrariesForInput[i], canonicalInput.VariableSet.Variables[i]);
                 }
             }
 
@@ -261,8 +252,7 @@ namespace ZenLib.ModelChecking
                 };
             }
 
-            var stateSet = new StateSet<T>(solver, result, arbitraryMappingInput, input, inputVariableSet);
-            return stateSet.ConvertTo(manager.CanonicalValues[typeof(T)]);
+            return new StateSet<T>(solver, result, arbitraryMappingInput, input, inputVariableSet);
         }
 
         /// <summary>

@@ -5,7 +5,6 @@
 namespace ZenLib.Solver
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using DecisionDiagrams;

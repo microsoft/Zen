@@ -6,8 +6,6 @@ namespace ZenLib.SymbolicExecution
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Linq;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
     using static ZenLib.Language;

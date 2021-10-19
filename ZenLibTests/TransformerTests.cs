@@ -54,11 +54,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerArbitrary()
         {
+            var manager = new StateSetTransformerManager(0);
             var b = Arbitrary<bool>();
             var f1 = new ZenFunction<uint, bool>(i => Or(b, i <= 10));
             var f2 = new ZenFunction<bool, uint>(b => 3);
-            var t1 = f1.Transformer();
-            var t2 = f2.Transformer();
+            var t1 = f1.Transformer(manager);
+            var t2 = f2.Transformer(manager);
             var set1 = t1.InputSet((i, o) => o);
             var set2 = t2.OutputSet((i, o) => o == 3);
             t1.TransformForward(set2);
@@ -70,10 +71,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerCombinations()
         {
+            var manager = new StateSetTransformerManager(0);
             var f1 = new ZenFunction<uint, bool>(i => i < 10);
             var f2 = new ZenFunction<bool, uint>(b => If<uint>(b, 11, 9));
-            var t1 = f1.Transformer();
-            var t2 = f2.Transformer();
+            var t1 = f1.Transformer(manager);
+            var t2 = f2.Transformer(manager);
             var set1 = t1.InputSet((i, b) => b);
             var set2 = t1.TransformForward(set1);
             var set3 = t2.TransformForward(set2);
@@ -89,8 +91,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerInputSets()
         {
+            var manager = new StateSetTransformerManager(0);
             var f = new ZenFunction<uint, uint>(i => i + 1);
-            var t = f.Transformer();
+            var t = f.Transformer(manager);
             var inSet1 = t.InputSet((x, y) => y == 10);
             var inSet2 = t.InputSet((x, y) => y == 11);
             var inSet3 = inSet1.Intersect(inSet2);
@@ -108,8 +111,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerTransformForward()
         {
+            var manager = new StateSetTransformerManager(0);
             var f = new ZenFunction<uint, bool>(i => i >= 10);
-            var t = f.Transformer();
+            var t = f.Transformer(manager);
             var inputSet1 = t.InputSet((i, b) => b);
             var outputSet = t.TransformForward(inputSet1);
             var inputSet2 = t.TransformBackwards(outputSet);
@@ -123,10 +127,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerVariablesAlign()
         {
+            var manager = new StateSetTransformerManager(0);
             var f1 = new ZenFunction<uint, uint>(i => i + 1);
             var f2 = new ZenFunction<uint, uint>(i => i + 2);
-            var t1 = f1.Transformer();
-            var t2 = f2.Transformer();
+            var t1 = f1.Transformer(manager);
+            var t2 = f2.Transformer(manager);
             var set1 = t1.InputSet((x, y) => y == 10);
             var set2 = t2.InputSet((x, y) => y == 11);
             var set3 = set1.Intersect(set2);
@@ -141,7 +146,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerSetIsFull()
         {
-            var t = new ZenFunction<bool, bool>(b => true).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t = new ZenFunction<bool, bool>(b => true).Transformer(manager);
             var set = t.InputSet((i, o) => o);
 
             Assert.IsTrue(set.IsFull());
@@ -153,7 +159,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerSetIsEmpty()
         {
-            var t = new ZenFunction<bool, bool>(b => true).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t = new ZenFunction<bool, bool>(b => true).Transformer(manager);
             var set = t.InputSet((i, o) => o).Complement();
 
             Assert.IsTrue(set.IsEmpty());
@@ -165,14 +172,15 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerArgTypes()
         {
-            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<short, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<int, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<long, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).Transformer().InputSet((i, o) => o).IsFull());
+            var manager = new StateSetTransformerManager(0);
+            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<short, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<int, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<long, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
         }
 
         /// <summary>
@@ -181,7 +189,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerFixedWidthInteger()
         {
-            var t = new ZenFunction<Int5, bool>(i => i <= new Int5(0)).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t = new ZenFunction<Int5, bool>(i => i <= new Int5(0)).Transformer(manager);
             var set = t.InputSet((x, y) => y);
             Assert.IsTrue(set.Element() <= new Int5(0));
         }
@@ -192,8 +201,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerSetEquality()
         {
-            var t1 = new ZenFunction<bool, bool>(b => true).Transformer();
-            var t2 = new ZenFunction<bool, bool>(b => true).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t1 = new ZenFunction<bool, bool>(b => true).Transformer(manager);
+            var t2 = new ZenFunction<bool, bool>(b => true).Transformer(manager);
 
             var set1 = t1.InputSet((x, y) => Not(x));
             var set2 = t2.InputSet((x, y) => Not(x));
@@ -209,8 +219,9 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTransformerNoElement()
         {
+            var manager = new StateSetTransformerManager(0);
             var f = new ZenFunction<uint, uint>(i => i + 1);
-            var t = f.Transformer();
+            var t = f.Transformer(manager);
             var emptySet = t.InputSet((x, y) => x + 2 == y);
             emptySet.Element();
         }
@@ -221,17 +232,18 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerObject()
         {
+            var manager = new StateSetTransformerManager(0);
             var f = new ZenFunction<IpHeader, bool>(p => And(p.GetDstIp().GetValue() <= 4, p.GetSrcIp().GetValue() <= 5));
-            var t = f.Transformer();
+            var t = f.Transformer(manager);
 
-            /* var set = t.InputSet((p, b) => Not(b));
-            Assert.IsFalse(set.Element().Value.DstIp.Value <= 4 && set.Element().Value.SrcIp.Value <= 5);
+            var set = t.InputSet((p, b) => Not(b));
+            Assert.IsFalse(set.Element().DstIp.Value <= 4 && set.Element().SrcIp.Value <= 5);
 
             var outputSet = t.TransformForward(set);
-            Assert.AreEqual(false, outputSet.Element().Value);
+            Assert.AreEqual(false, outputSet.Element());
 
             var inputSet = t.TransformBackwards(outputSet);
-            Assert.IsFalse(set.Element().Value.DstIp.Value <= 4 && set.Element().Value.SrcIp.Value <= 5); */
+            Assert.IsFalse(set.Element().DstIp.Value <= 4 && set.Element().SrcIp.Value <= 5);
         }
 
         /// <summary>
@@ -240,7 +252,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketSet()
         {
-            var rnd = new System.Random();
+            var manager = new StateSetTransformerManager(0);
+            var rnd = new Random();
             for (int j = 0; j < 2; j++)
             {
                 var i = (uint)rnd.Next();
@@ -249,7 +262,7 @@ namespace ZenLib.Tests
                     return p.GetDstIp().GetValue() == i;
                 });
 
-                StateSetTransformer<IpHeader, bool> transformer = f.Transformer();
+                StateSetTransformer<IpHeader, bool> transformer = f.Transformer(manager);
                 var set = transformer.InputSet((pkt, matches) => matches);
                 Assert.AreEqual(i, set.Element().DstIp.Value);
             }
@@ -261,11 +274,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultipleTransformers()
         {
-            var t1 = new ZenFunction<IpHeader, bool>(p => true).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t1 = new ZenFunction<IpHeader, bool>(p => true).Transformer(manager);
             var set1 = t1.InputSet((p, v) => v);
-            var t2 = new ZenFunction<IpHeader, bool>(p => p.GetDstIp().GetValue() == 1).Transformer();
+            var t2 = new ZenFunction<IpHeader, bool>(p => p.GetDstIp().GetValue() == 1).Transformer(manager);
             var set2 = t2.InputSet((p, v) => v);
-            var t3 = new ZenFunction<uint, bool>(u => u == 2).Transformer();
+            var t3 = new ZenFunction<uint, bool>(u => u == 2).Transformer(manager);
             var set3 = t3.InputSet((u, v) => v);
             Assert.IsTrue(set1.IsFull());
             Assert.AreEqual(1U, set2.Element().DstIp.Value);
@@ -278,7 +292,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultipleArguments()
         {
-            var t = new ZenFunction<Pair<IpHeader, IpHeader>, bool>(x => x.Item1() == x.Item2()).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t = new ZenFunction<Pair<IpHeader, IpHeader>, bool>(x => x.Item1() == x.Item2()).Transformer(manager);
             var set = t.InputSet((x, b) => b);
             var e = set.Element();
             Assert.AreEqual(e.Item1.DstIp, e.Item2.DstIp);
@@ -293,13 +308,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerFieldAccesses()
         {
-            var t1 = new ZenFunction<IpHeader, Ip>(x => x.GetDstIp()).Transformer();
-            var t2 = new ZenFunction<IpHeader, Ip>(x => x.GetSrcIp()).Transformer();
-            var t3 = new ZenFunction<IpHeader, ushort>(x => x.GetDstPort()).Transformer();
-            var t4 = new ZenFunction<IpHeader, ushort>(x => x.GetSrcPort()).Transformer();
-            var t5 = new ZenFunction<IpHeader, byte>(x => x.GetProtocol()).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t1 = new ZenFunction<IpHeader, Ip>(x => x.GetDstIp()).Transformer(manager);
+            var t2 = new ZenFunction<IpHeader, Ip>(x => x.GetSrcIp()).Transformer(manager);
+            var t3 = new ZenFunction<IpHeader, ushort>(x => x.GetDstPort()).Transformer(manager);
+            var t4 = new ZenFunction<IpHeader, ushort>(x => x.GetSrcPort()).Transformer(manager);
+            var t5 = new ZenFunction<IpHeader, byte>(x => x.GetProtocol()).Transformer(manager);
 
-            var allHeaders = new ZenFunction<IpHeader, bool>(x => true).Transformer().InputSet((i, o) => o);
+            var allHeaders = new ZenFunction<IpHeader, bool>(x => true).Transformer(manager).InputSet((i, o) => o);
             var s1 = t1.InputSet((x, ip) => true);
             var s2 = t2.InputSet((x, ip) => true);
             var s3 = t3.InputSet((x, ip) => true);
@@ -315,9 +331,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformersMultipleArguments()
         {
-            var t1 = new ZenFunction<uint, uint, uint>((x, y) => x).Transformer();
-            var t2 = new ZenFunction<uint, uint, uint, uint>((x, y, z) => y).Transformer();
-            var t3 = new ZenFunction<uint, uint, uint, uint, uint>((w, x, y, z) => y).Transformer();
+            var manager = new StateSetTransformerManager(0);
+            var t1 = new ZenFunction<uint, uint, uint>((x, y) => x).Transformer(manager);
+            var t2 = new ZenFunction<uint, uint, uint, uint>((x, y, z) => y).Transformer(manager);
+            var t3 = new ZenFunction<uint, uint, uint, uint, uint>((w, x, y, z) => y).Transformer(manager);
 
             Assert.AreEqual(3U, t1.OutputSet((p, o) => p.Item1() == 3U).Element());
             Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element());
@@ -476,6 +493,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerComplex()
         {
+            var manager = new StateSetTransformerManager(0);
+
             var f = new Func<Zen<TestHelper.Object2>, Zen<Option<TestHelper.Object2>>>(p =>
             {
                 return If(
@@ -487,9 +506,9 @@ namespace ZenLib.Tests
                         Some(p)));
             });
 
-            var set1 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 1).StateSet();
-            var set2 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 4).StateSet();
-            var t = new ZenFunction<TestHelper.Object2, TestHelper.Object2>(p => f(p).Value()).Transformer();
+            var set1 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 1).StateSet(manager);
+            var set2 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 4).StateSet(manager);
+            var t = new ZenFunction<TestHelper.Object2, TestHelper.Object2>(p => f(p).Value()).Transformer(manager);
 
             var x = t.TransformForward(set1).Element();
             var y = t.TransformBackwards(set2).Element();
