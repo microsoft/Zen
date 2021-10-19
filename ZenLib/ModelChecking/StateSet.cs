@@ -140,8 +140,9 @@ namespace ZenLib.ModelChecking
         /// <returns>An element if non-empty.</returns>
         public T Element()
         {
-            var model = this.Solver.Satisfiable(this.Set);
-            if (!model.HasValue)
+            var variables = new List<Variable<BDDNode>>(this.VariableSet.Variables);
+            var model = this.Solver.Manager.Sat(this.Set, variables);
+            if (model == null)
             {
                 throw new ZenException("No element exists in state set.");
             }
@@ -149,7 +150,7 @@ namespace ZenLib.ModelChecking
             var assignment = new Dictionary<object, object>();
             foreach (var kv in this.ArbitraryMapping)
             {
-                var value = this.Solver.Get(model.Value, kv.Value);
+                var value = this.Solver.Get(model, kv.Value);
                 assignment[kv.Key] = value;
             }
 
