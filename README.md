@@ -22,11 +22,11 @@ The main abstraction Zen provides is through the type `Zen<T>` which represents 
 
 ```csharp
 // create symbolic variables of different types
-var b = Arbitrary<bool>();
-var i = Arbitrary<int>();
-var s = Arbitrary<string>();
-var o = Arbitrary<Option<ulong>>();
-var l = Arbitrary<IList<int>>(listSize: 10, checkSmallerLists: false);
+var b = Symbolic<bool>();
+var i = Symbolic<int>();
+var s = Symbolic<string>();
+var o = Symbolic<Option<ulong>>();
+var l = Symbolic<IList<int>>(listSize: 10, checkSmallerLists: false);
 
 // build constraints on these variables
 var c1 = Or(b, i <= 10);
