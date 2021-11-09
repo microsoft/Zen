@@ -24,14 +24,28 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolveBooleans()
         {
-            var a = Arbitrary<bool>();
-            var b = Arbitrary<bool>();
-            var c = Arbitrary<bool>();
+            var a = Symbolic<bool>();
+            var b = Symbolic<bool>();
+            var c = Symbolic<bool>();
 
             var expr = Or(a, And(b, c));
             var solution = expr.Solve();
 
+            Assert.IsTrue(solution.IsSatisfiable());
             Assert.IsTrue(solution.Get(a) || (solution.Get(b) && solution.Get(c)));
+        }
+
+        /// <summary>
+        /// Test that solve works for unsat.
+        /// </summary>
+        [TestMethod]
+        public void TestSolveUnsat()
+        {
+            var a = Symbolic<bool>();
+            var expr = And(a, Not(a));
+            var solution = expr.Solve();
+
+            Assert.IsFalse(solution.IsSatisfiable());
         }
 
         /// <summary>

@@ -93,6 +93,18 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// A Zen object representing some symbolic value.
+        /// </summary>
+        /// <param name="listSize">Depth bound on the size of the object.</param>
+        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T> Symbolic<T>(int listSize = 5, bool checkSmallerLists = true)
+        {
+            var generator = new SymbolicInputGenerator(listSize, checkSmallerLists);
+            return Arbitrary<T>(generator);
+        }
+
+        /// <summary>
         /// A Zen object representing some arbitrary value.
         /// </summary>
         /// <param name="listSize">Depth bound on the size of the object.</param>

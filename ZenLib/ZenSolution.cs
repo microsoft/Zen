@@ -27,6 +27,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Returns if the solution is satisfiable.
+        /// </summary>
+        /// <returns>True if the solution exists.</returns>
+        public bool IsSatisfiable()
+        {
+            return ArbitraryAssignment != null;
+        }
+
+        /// <summary>
         /// Gets a value from the assignment.
         /// </summary>
         /// <typeparam name="T">The type of the expected value.</typeparam>
