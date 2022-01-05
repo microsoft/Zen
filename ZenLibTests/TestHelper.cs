@@ -541,6 +541,11 @@ namespace ZenLib.Tests
             public int Field1;
         }
 
+        internal class ObjectWithInt
+        {
+            public UInt10 Field1;
+        }
+
         private class TestParameter
         {
             public Backend Backend { get; set; }

@@ -243,11 +243,13 @@ namespace ZenLib
         /// <summary>
         /// Converts a solver result back to a C# result.
         /// </summary>
-        /// <param name="value">The solver result..</param>
+        /// <param name="value">The solver result.</param>
         /// <returns>The C# value.</returns>
         public static T ConvertSymbolicResultToCSharp<T>(object value)
         {
-            if (value.GetType() == typeof(byte[]))
+            return (T)ConvertSymbolicResultToCSharp(typeof(T), value);
+
+            /* if (value.GetType() == typeof(byte[]))
             {
                 var type = typeof(T);
                 var c = type.GetConstructor(new Type[] { typeof(byte[]) });
@@ -255,7 +257,41 @@ namespace ZenLib
                 return (T)intObj;
             }
 
-            return (T)value;
+            return (T)value; */
+        }
+
+        /// <summary>
+        /// Converts a solver result back to a C# result.
+        /// </summary>
+        /// <param name="type">The type of the result.</param>
+        /// <param name="value">The solver result.</param>
+        /// <returns>The C# value.</returns>
+        public static object ConvertSymbolicResultToCSharp(Type type, object value)
+        {
+            var objType = value.GetType();
+
+            if (type.IsAssignableFrom(objType))
+            {
+                return value;
+            }
+            else if (type == typeof(ushort) && objType == typeof(short))
+            {
+                return (ushort)(short)value;
+            }
+            else if (type == typeof(uint) && objType == typeof(int))
+            {
+                return (uint)(int)value;
+            }
+            else if (type == typeof(ulong) && objType == typeof(long))
+            {
+                return (ulong)(long)value;
+            }
+            else if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { value });
+            }
+
+            throw new ZenException($"Internal error: invalid conversion of type {type} to {objType}");
         }
 
         /// <summary>

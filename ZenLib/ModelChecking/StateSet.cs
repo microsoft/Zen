@@ -150,8 +150,9 @@ namespace ZenLib.ModelChecking
             var assignment = new Dictionary<object, object>();
             foreach (var kv in this.ArbitraryMapping)
             {
+                var type = kv.Key.GetType().GetGenericArgumentsCached()[0];
                 var value = this.Solver.Get(model, kv.Value);
-                assignment[kv.Key] = value;
+                assignment[kv.Key] = CommonUtilities.ConvertSymbolicResultToCSharp(type, value);
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);

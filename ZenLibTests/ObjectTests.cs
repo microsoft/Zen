@@ -1022,6 +1022,31 @@ namespace ZenLib.Tests
             Assert.AreEqual(18, function.Evaluate(x, y).v33);
         }
 
+        /// <summary>
+        /// Test that objects work with variable width integers.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectWithVariableWidthInteger1()
+        {
+            var function = new ZenConstraint<ObjectWithInt>(x => x.GetField<ObjectWithInt, UInt10>("Field1") == new UInt10(1));
+            var input = function.Find();
+            Assert.IsTrue(input.HasValue);
+            Assert.AreEqual(1L, input.Value.Field1.ToLong());
+        }
+
+        /// <summary>
+        /// Test that objects work with variable width integers.
+        /// </summary>
+        [TestMethod]
+        public void TestObjectWithVariableWidthInteger2()
+        {
+            var o1 = new ObjectWithInt { Field1 = new UInt10(0) };
+            var o2 = new ObjectWithInt { Field1 = new UInt10(1) };
+            var function = new ZenConstraint<ObjectWithInt>(x => x.GetField<ObjectWithInt, UInt10>("Field1") == new UInt10(1));
+            Assert.IsFalse(function.Evaluate(o1));
+            Assert.IsTrue(function.Evaluate(o2));
+        }
+
         private struct StructField1
         {
             public int Field1;
