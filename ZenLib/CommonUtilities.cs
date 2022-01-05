@@ -248,16 +248,6 @@ namespace ZenLib
         public static T ConvertSymbolicResultToCSharp<T>(object value)
         {
             return (T)ConvertSymbolicResultToCSharp(typeof(T), value);
-
-            /* if (value.GetType() == typeof(byte[]))
-            {
-                var type = typeof(T);
-                var c = type.GetConstructor(new Type[] { typeof(byte[]) });
-                var intObj = c.Invoke(new object[] { (byte[])value });
-                return (T)intObj;
-            }
-
-            return (T)value; */
         }
 
         /// <summary>
