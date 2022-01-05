@@ -247,6 +247,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test a transformer over an object with a variable width integer field.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerObjectWithInt()
+        {
+            var manager = new StateSetTransformerManager(0);
+            var t = new ZenFunction<TestHelper.ObjectWithInt, bool>(o => o.GetField<TestHelper.ObjectWithInt, UInt10>("Field1") == new UInt10(1))
+                .Transformer(manager);
+            var set = t.InputSet((p, o) => o);
+            Assert.AreEqual(1L, set.Element().Field1.ToLong());
+        }
+
+        /// <summary>
         /// Test packet transformations.
         /// </summary>
         [TestMethod]

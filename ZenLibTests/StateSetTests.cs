@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -184,6 +185,18 @@ namespace ZenLib.Tests
         {
             var manager = new StateSetTransformerManager(0);
             new ZenFunction<IpHeader, bool>(p => And(p.GetDstIp().GetValue() <= 4, p.GetSrcIp().GetValue() <= 5)).StateSet(manager);
+        }
+
+        /// <summary>
+        /// Test a transformer over an object with a variable width integer field.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerObjectWithInt()
+        {
+            var manager = new StateSetTransformerManager(0);
+            var set = new ZenFunction<TestHelper.ObjectWithInt, bool>(o => o.GetField<TestHelper.ObjectWithInt, UInt10>("Field1") == new UInt10(1))
+                .StateSet(manager);
+            Assert.AreEqual(1L, set.Element().Field1.ToLong());
         }
 
         /// <summary>

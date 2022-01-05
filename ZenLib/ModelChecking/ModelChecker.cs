@@ -64,28 +64,8 @@ namespace ZenLib.ModelChecking
                 var variable = kv.Value;
                 var type = expr.GetType().GetGenericArgumentsCached()[0];
                 var obj = this.solver.Get(model, variable);
-
-                if (type == typeof(ushort))
-                {
-                    obj = (ushort)(short)obj;
-                }
-
-                if (type == typeof(uint))
-                {
-                    obj = (uint)(int)obj;
-                }
-
-                if (type == typeof(ulong))
-                {
-                    obj = (ulong)(long)obj;
-                }
-
-                if (ReflectionUtilities.IsFixedIntegerType(type))
-                {
-                    obj = type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { obj });
-                }
-
-                arbitraryAssignment.Add(expr, obj);
+                var result = CommonUtilities.ConvertSymbolicResultToCSharp(type, obj);
+                arbitraryAssignment.Add(expr, result);
             }
 
             return arbitraryAssignment;
