@@ -99,6 +99,12 @@ namespace ZenLib
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
+        /// The zen constant option creation method.
+        /// </summary>
+        public static MethodInfo CreateZenOptionConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenOptionConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
         /// The zen constant tuple creation method.
         /// </summary>
         public static MethodInfo CreateZenTupleConstantMethod =
@@ -611,53 +617,84 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Create a constant Zen option value.
+        /// </summary>
+        /// <param name="value">The option value.</param>
+        /// <returns>The Zen value representing the option.</returns>
+        internal static Zen<Option<T>> CreateZenOptionConstant<T>(Option<T> value)
+        {
+            if (value.HasValue)
+            {
+                ReportIfNullConversionError(value.Value, "Value", typeof(T));
+                return Some((Zen<T>)CreateZenConstant<T>(value.Value));
+            }
+
+            return Null<T>();
+        }
+
+        /// <summary>
         /// Create a constant Zen value.
         /// </summary>
         /// <param name="value">The type.</param>
         /// <returns>The Zen value representing the constant.</returns>
         internal static object CreateZenConstant<T>(T value)
         {
-            var type = typeof(T);
-
-            if (value is bool || value is byte || value is short || value is ushort || value is int ||
-                value is uint || value is long || value is ulong || value is string || value is BigInteger ||
-                IsFixedIntegerType(type))
+            try
             {
-                return ZenConstantExpr<T>.Create((dynamic)value);
+                var type = typeof(T);
+
+                if (value is bool || value is byte || value is short || value is ushort || value is int ||
+                    value is uint || value is long || value is ulong || value is string || value is BigInteger ||
+                    IsFixedIntegerType(type))
+                {
+                    return ZenConstantExpr<T>.Create((dynamic)value);
+                }
+
+                var typeArgs = type.GetGenericArgumentsCached();
+
+                if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
+                {
+                    var innerType = typeArgs[0];
+                    return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+                }
+
+                // option type, we need this separate from classes/structs
+                // because options may create null values for the None case
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Option<>))
+                {
+                    var innerType = typeArgs[0];
+                    return CreateZenOptionConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+                }
+
+                // some class or struct
+                var fields = new SortedDictionary<string, dynamic>();
+                foreach (var field in GetAllFields(type))
+                {
+                    fields[field.Name] = field.GetValue(value);
+                }
+
+                foreach (var property in GetAllProperties(type))
+                {
+                    fields[property.Name] = property.GetValue(value);
+                }
+
+                var asList = fields.ToArray();
+                var createMethod = CreateMethod.MakeGenericMethod(type);
+
+                var args = new (string, object)[asList.Length];
+                for (int i = 0; i < asList.Length; i++)
+                {
+                    var fieldValue = asList[i].Value;
+                    ReportIfNullConversionError(fieldValue, "field", type);
+                    args[i] = (asList[i].Key, CreateZenConstant(fieldValue));
+                }
+
+                return createMethod.Invoke(null, new object[] { args });
             }
-
-            var typeArgs = type.GetGenericArgumentsCached();
-
-            if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
+            catch (TargetInvocationException e)
             {
-                var innerType = typeArgs[0];
-                return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+                throw e.InnerException;
             }
-
-            // some class or struct
-            var fields = new SortedDictionary<string, dynamic>();
-            foreach (var field in GetAllFields(type))
-            {
-                fields[field.Name] = field.GetValue(value);
-            }
-
-            foreach (var property in GetAllProperties(type))
-            {
-                fields[property.Name] = property.GetValue(value);
-            }
-
-            var asList = fields.ToArray();
-            var createMethod = CreateMethod.MakeGenericMethod(type);
-
-            var args = new (string, object)[asList.Length];
-            for (int i = 0; i < asList.Length; i++)
-            {
-                var fieldValue = asList[i].Value;
-                ReportIfNullConversionError(fieldValue, "field", type);
-                args[i] = (asList[i].Key, CreateZenConstant(fieldValue));
-            }
-
-            return createMethod.Invoke(null, new object[] { args });
         }
 
         /// <summary>
