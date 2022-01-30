@@ -114,6 +114,15 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that converting an option constant works for None.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertOptionConstantNone()
+        {
+            Zen<Option<Unit>> _ = Option.None<Unit>();
+        }
+
+        /// <summary>
         /// Test that converting a value with a null dictionary key does not work.
         /// </summary>
         [TestMethod]

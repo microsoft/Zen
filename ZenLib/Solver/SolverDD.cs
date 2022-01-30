@@ -563,15 +563,9 @@ namespace ZenLib.Solver
             return this.Manager.Or(x, y);
         }
 
-        public Option<Assignment<T>> Satisfiable(DD x)
+        public Assignment<T> Satisfiable(DD x)
         {
-            var m = this.Manager.Sat(x);
-            if (m == null)
-            {
-                return Option.None<Assignment<T>>();
-            }
-
-            return Option.Some(m);
+            return this.Manager.Sat(x);
         }
 
         [ExcludeFromCodeCoverage]

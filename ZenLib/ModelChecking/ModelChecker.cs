@@ -47,14 +47,12 @@ namespace ZenLib.ModelChecking
             var symbolicResult =
                 (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Accept(symbolicEvaluator, env);
 
-            var possibleModel = solver.Satisfiable(symbolicResult.Value);
+            var model = solver.Satisfiable(symbolicResult.Value);
 
-            if (!possibleModel.HasValue)
+            if (model == null)
             {
                 return null;
             }
-
-            var model = possibleModel.Value;
 
             // compute the input given the assignment
             var arbitraryAssignment = new Dictionary<object, object>();
