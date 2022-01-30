@@ -12,7 +12,6 @@ namespace ZenLib
     using System.Numerics;
     using System.Text;
     using System.Threading;
-    using ExceptionDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo;
 
     /// <summary>
     /// A collection of common utility functions.

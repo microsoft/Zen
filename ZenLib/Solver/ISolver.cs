@@ -426,7 +426,7 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="x">The expression.</param>
         /// <returns>A model, if satisfiable.</returns>
-        Option<TModel> Satisfiable(TBool x);
+        TModel Satisfiable(TBool x);
 
         /// <summary>
         /// Get the value for a variable in a model.

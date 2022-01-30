@@ -399,16 +399,16 @@ namespace ZenLib.Solver
             return bytes;
         }
 
-        public Option<Model> Satisfiable(BoolExpr x)
+        public Model Satisfiable(BoolExpr x)
         {
             this.solver.Assert(x);
             var status = this.solver.Check();
             if (status == Status.UNSATISFIABLE)
             {
-                return Option.None<Model>();
+                return null;
             }
 
-            return Option.Some(this.solver.Model);
+            return this.solver.Model;
         }
 
         public static void RemoveTrailingZeroes(ref byte[] array)

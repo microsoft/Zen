@@ -114,40 +114,46 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that converting an option constant works for None.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertOptionConstantNone()
+        {
+            Zen<Option<Unit>> x = Option.None<Unit>();
+            Assert.AreEqual(x, Null<Unit>());
+        }
+
+        /// <summary>
+        /// Test that converting an option constant works for Some.
+        /// </summary>
+        [TestMethod]
+        public void TestConvertOptionConstantSome()
+        {
+            Zen<Option<int>> x = Option.Some(3);
+            Assert.AreEqual(x, Some<int>(3));
+        }
+
+        /// <summary>
         /// Test that converting a value with a null dictionary key does not work.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestConvertNullListValue()
         {
-            try
-            {
-                IList<Object1> o = new List<Object1> { { null } };
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ZenException), e.InnerException.GetType());
-            }
+            IList<Object1> o = new List<Object1> { { null } };
+            var _ = Constant(o);
         }
 
         /// <summary>
         /// Test that converting a value with a null dictionary value does not work.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestConvertNullDictionaryValue()
         {
-            try
-            {
-                Dict<int, Object1> o = new Dict<int, Object1>();
-                o.Add(1, null);
-                var _ = Constant(o);
-                Assert.Fail();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Assert.AreEqual(typeof(ZenException), e.InnerException.GetType());
-            }
+            Dict<int, Object1> o = new Dict<int, Object1>();
+            o.Add(1, null);
+            var _ = Constant(o);
         }
 
         /// <summary>

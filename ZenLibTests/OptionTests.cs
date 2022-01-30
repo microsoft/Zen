@@ -4,7 +4,6 @@
 
 namespace ZenLib.Tests
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
