@@ -1394,13 +1394,13 @@ namespace ZenLib
         private static Zen<Pair<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index, int i)
         {
             return expr.Case(
-                empty: Pair(EmptyList<T>(), EmptyList<T>()),
+                empty: Pair.Create(EmptyList<T>(), EmptyList<T>()),
                 cons: (hd, tl) =>
                 {
                     var tup = tl.SplitAt(index, i + 1);
                     return If((ushort)i <= index,
-                              Pair(tup.Item1().AddFront(hd), tup.Item2()),
-                              Pair(tup.Item1(), tup.Item2().AddFront(hd)));
+                              Pair.Create(tup.Item1().AddFront(hd), tup.Item2()),
+                              Pair.Create(tup.Item1(), tup.Item2().AddFront(hd)));
                 });
         }
 
@@ -1518,7 +1518,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(valueExpr);
 
             var l = mapExpr.GetField<Dict<TKey, TValue>, IList<Pair<TKey, TValue>>>("Values");
-            return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair(keyExpr, valueExpr))));
+            return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
         }
 
         /// <summary>
@@ -1604,253 +1604,6 @@ namespace ZenLib
         public static Zen<T> Create<T>(params (string, object)[] fields)
         {
             return ZenCreateObjectExpr<T>.Create(fields);
-        }
-
-        /// <summary>
-        /// Create a new Zen value for a tuple.
-        /// </summary>
-        /// <param name="expr1">First Zen expression.</param>
-        /// <param name="expr2">Second Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Pair<T1, T2>> Pair<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
-        {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-
-            return ZenCreateObjectExpr<Pair<T1, T2>>.Create(
-                ("Item1", expr1),
-                ("Item2", expr2));
-        }
-
-        /// <summary>
-        /// Create a new Zen value for a tuple.
-        /// </summary>
-        /// <param name="expr1">First Zen expression.</param>
-        /// <param name="expr2">Second Zen expression.</param>
-        /// <param name="expr3">Third Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Pair<T1, T2, T3>> Pair<T1, T2, T3>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3)
-        {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
-
-            return ZenCreateObjectExpr<Pair<T1, T2, T3>>.Create(
-                ("Item1", expr1),
-                ("Item2", expr2),
-                ("Item3", expr3));
-        }
-
-        /// <summary>
-        /// Create a new Zen value for a tuple.
-        /// </summary>
-        /// <param name="expr1">First Zen expression.</param>
-        /// <param name="expr2">Second Zen expression.</param>
-        /// <param name="expr3">Third Zen expression.</param>
-        /// <param name="expr4">Fourth Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Pair<T1, T2, T3, T4>> Pair<T1, T2, T3, T4>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4)
-        {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
-
-            return ZenCreateObjectExpr<Pair<T1, T2, T3, T4>>.Create(
-                ("Item1", expr1),
-                ("Item2", expr2),
-                ("Item3", expr3),
-                ("Item4", expr4));
-        }
-
-        /// <summary>
-        /// Create a new Zen value for a tuple.
-        /// </summary>
-        /// <param name="expr1">First Zen expression.</param>
-        /// <param name="expr2">Second Zen expression.</param>
-        /// <param name="expr3">Third Zen expression.</param>
-        /// <param name="expr4">Fourth Zen expression.</param>
-        /// <param name="expr5">Fifth Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Pair<T1, T2, T3, T4, T5>> Pair<T1, T2, T3, T4, T5>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4, Zen<T5> expr5)
-        {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
-
-            return ZenCreateObjectExpr<Pair<T1, T2, T3, T4, T5>>.Create(
-                ("Item1", expr1),
-                ("Item2", expr2),
-                ("Item3", expr3),
-                ("Item4", expr4),
-                ("Item5", expr5));
-        }
-
-        /// <summary>
-        /// Get the first element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2>(this Zen<Pair<T1, T2>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2>, T1>("Item1");
-        }
-
-        /// <summary>
-        /// Get the first element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3>, T1>("Item1");
-        }
-
-        /// <summary>
-        /// Get the first element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4>, T1>("Item1");
-        }
-
-        /// <summary>
-        /// Get the first element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T1> Item1<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T1>("Item1");
-        }
-
-        /// <summary>
-        /// Get the second element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2>(this Zen<Pair<T1, T2>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2>, T2>("Item2");
-        }
-
-        /// <summary>
-        /// Get the second element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3>, T2>("Item2");
-        }
-
-        /// <summary>
-        /// Get the second element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4>, T2>("Item2");
-        }
-
-        /// <summary>
-        /// Get the second element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Item2<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T2>("Item2");
-        }
-
-        /// <summary>
-        /// Get the third element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T3> Item3<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3>, T3>("Item3");
-        }
-
-        /// <summary>
-        /// Get the third element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T3> Item3<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4>, T3>("Item3");
-        }
-
-        /// <summary>
-        /// Get the third element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T3> Item3<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T3>("Item3");
-        }
-
-        /// <summary>
-        /// Get the fourth element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T4> Item4<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4>, T4>("Item4");
-        }
-
-        /// <summary>
-        /// Get the fourth element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T4> Item4<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T4>("Item4");
-        }
-
-        /// <summary>
-        /// Get the fifth element of a Zen tuple.
-        /// </summary>
-        /// <param name="expr">Zen tuple expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T5> Item5<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<Pair<T1, T2, T3, T4, T5>, T5>("Item5");
         }
 
         /// <summary>

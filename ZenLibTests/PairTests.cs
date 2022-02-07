@@ -23,8 +23,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPair2()
         {
-            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item1() == i1);
-            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item2() == i2);
+            CheckValid<int, int>((i1, i2) => Pair.Create(i1, i2).Item1() == i1);
+            CheckValid<int, int>((i1, i2) => Pair.Create(i1, i2).Item2() == i2);
         }
 
         /// <summary>
@@ -33,9 +33,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPair3()
         {
-            CheckValid<int, int, int>((i1, i2, i3) => Pair(i1, i2, i3).Item1() == i1);
-            CheckValid<int, int, int>((i1, i2, i3) => Pair(i1, i2, i3).Item2() == i2);
-            CheckValid<int, int, int>((i1, i2, i3) => Pair(i1, i2, i3).Item3() == i3);
+            CheckValid<int, int, int>((i1, i2, i3) => Pair.Create(i1, i2, i3).Item1() == i1);
+            CheckValid<int, int, int>((i1, i2, i3) => Pair.Create(i1, i2, i3).Item2() == i2);
+            CheckValid<int, int, int>((i1, i2, i3) => Pair.Create(i1, i2, i3).Item3() == i3);
         }
 
         /// <summary>
@@ -44,10 +44,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPair4()
         {
-            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4).Item1() == i1);
-            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4).Item2() == i2);
-            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4).Item3() == i3);
-            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4).Item4() == i4);
+            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4).Item1() == i1);
+            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4).Item2() == i2);
+            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4).Item3() == i3);
+            CheckValid<int, int, int, int>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4).Item4() == i4);
         }
 
         /// <summary>
@@ -56,11 +56,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPair5()
         {
-            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4.Item1(), i4.Item2()).Item1() == i1);
-            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4.Item1(), i4.Item2()).Item2() == i2);
-            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4.Item1(), i4.Item2()).Item3() == i3);
-            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4.Item1(), i4.Item2()).Item4() == i4.Item1());
-            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair(i1, i2, i3, i4.Item1(), i4.Item2()).Item5() == i4.Item2());
+            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4.Item1(), i4.Item2()).Item1() == i1);
+            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4.Item1(), i4.Item2()).Item2() == i2);
+            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4.Item1(), i4.Item2()).Item3() == i3);
+            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4.Item1(), i4.Item2()).Item4() == i4.Item1());
+            CheckValid<int, int, int, Pair<int, int>>((i1, i2, i3, i4) => Pair.Create(i1, i2, i3, i4.Item1(), i4.Item2()).Item5() == i4.Item2());
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTuple()
         {
-            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item1() == i1);
-            CheckValid<int, int>((i1, i2) => Pair(i1, i2).Item2() == i2);
+            CheckValid<int, int>((i1, i2) => Pair.Create(i1, i2).Item1() == i1);
+            CheckValid<int, int>((i1, i2) => Pair.Create(i1, i2).Item2() == i2);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTupleEvaluateSwap()
         {
-            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair(y, x));
+            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair.Create(y, x));
             var r = f.Evaluate(1, 2);
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
@@ -91,7 +91,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleEvaluateSwap()
         {
-            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair(y, x));
+            var f = new ZenFunction<int, int, Pair<int, int>>((x, y) => Pair.Create(y, x));
             var r = f.Evaluate(1, 2);
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
@@ -103,7 +103,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleEvaluateSwap2()
         {
-            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair(x.Item2(), x.Item1()));
+            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair.Create(x.Item2(), x.Item1()));
             var r = f.Evaluate(new Pair<int, int> { Item1 = 1, Item2 = 2 });
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
@@ -115,7 +115,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTupleSymbolicSwap()
         {
-            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair(x.Item2(), x.Item1()));
+            var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair.Create(x.Item2(), x.Item1()));
             var result = f.Find((x, o) => o.Item1() == 2);
             Assert.IsTrue(result.HasValue);
             Assert.AreEqual(2, result.Value.Item2);
@@ -127,7 +127,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPairSymbolicSwapNested()
         {
-            var f = new ZenFunction<Pair<int, Pair<int, int>>, Pair<int, int>>(x => Pair(x.Item2().Item2(), x.Item2().Item1()));
+            var f = new ZenFunction<Pair<int, Pair<int, int>>, Pair<int, int>>(x => Pair.Create(x.Item2().Item2(), x.Item2().Item1()));
             var result = f.Find((x, o) => o.Item1() == 2);
             Assert.IsTrue(result.HasValue);
             Assert.AreEqual(2, result.Value.Item2.Item2);

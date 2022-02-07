@@ -678,7 +678,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception1()
         {
             Zen<Pair<int, int>> x = null;
-            Language.Item1(x);
+            PairExtensions.Item1(x);
         }
 
         /// <summary>
@@ -689,7 +689,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
-            Language.Item1(x);
+            PairExtensions.Item1(x);
         }
 
         /// <summary>
@@ -700,7 +700,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            Language.Item1(x);
+            PairExtensions.Item1(x);
         }
 
         /// <summary>
@@ -711,7 +711,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            Language.Item1(x);
+            PairExtensions.Item1(x);
         }
 
         /// <summary>
@@ -722,7 +722,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception1()
         {
             Zen<Pair<int, int>> x = null;
-            Language.Item2(x);
+            PairExtensions.Item2(x);
         }
 
         /// <summary>
@@ -733,7 +733,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
-            Language.Item2(x);
+            PairExtensions.Item2(x);
         }
 
         /// <summary>
@@ -744,7 +744,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            Language.Item2(x);
+            PairExtensions.Item2(x);
         }
 
         /// <summary>
@@ -755,7 +755,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            Language.Item2(x);
+            PairExtensions.Item2(x);
         }
 
         /// <summary>
@@ -766,7 +766,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception1()
         {
             Zen<Pair<int, int, int>> x = null;
-            Language.Item3(x);
+            PairExtensions.Item3(x);
         }
 
         /// <summary>
@@ -777,7 +777,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception2()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            Language.Item3(x);
+            PairExtensions.Item3(x);
         }
 
         /// <summary>
@@ -788,7 +788,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception3()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            Language.Item3(x);
+            PairExtensions.Item3(x);
         }
 
         /// <summary>
@@ -799,7 +799,7 @@ namespace ZenLib.Tests
         public void TestItem4Exception1()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            Language.Item4(x);
+            PairExtensions.Item4(x);
         }
 
         /// <summary>
@@ -810,7 +810,7 @@ namespace ZenLib.Tests
         public void TestItem4Exception2()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            Language.Item4(x);
+            PairExtensions.Item4(x);
         }
 
         /// <summary>
@@ -821,7 +821,7 @@ namespace ZenLib.Tests
         public void TestItem5Exception1()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            Language.Item5(x);
+            PairExtensions.Item5(x);
         }
 
         /// <summary>
@@ -1276,7 +1276,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTupleException1()
         {
-            Language.Pair<int, int>(null, null);
+            Pair.Create<int, int>(null, null);
         }
 
         /// <summary>
@@ -1286,7 +1286,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTupleException2()
         {
-            Language.Pair<int, int>(0, null);
+            Pair.Create<int, int>(0, null);
         }
 
         /// <summary>

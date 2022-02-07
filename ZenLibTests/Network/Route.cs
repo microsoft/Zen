@@ -94,7 +94,7 @@ namespace ZenLib.Tests.Network
         {
             return TestHelper.ApplyOrderedRules<Route, Pair<Option<Route>, int>, RouteMapLine>(
                 input: route,
-                deflt: Pair(Option.Null<Route>(), Constant<int>(this.Lines.Count)),
+                deflt: Pair.Create(Option.Null<Route>(), Constant<int>(this.Lines.Count)),
                 ruleMatch: (l, r, i) => l.Matches(r),
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
@@ -102,12 +102,12 @@ namespace ZenLib.Tests.Network
                     var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
-                        return Option.Create(Pair(Option.Null<Route>(), line));
+                        return Option.Create(Pair.Create(Option.Null<Route>(), line));
                     }
 
                     if (l.Disposition == Disposition.Allow)
                     {
-                        return Option.Create(Pair(Option.Create(r), line));
+                        return Option.Create(Pair.Create(Option.Create(r), line));
                     }
 
                     return Option.Null<Pair<Option<Route>, int>>();
