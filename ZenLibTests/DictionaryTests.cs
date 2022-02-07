@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            RandomBytes(x => CheckAgreement<Dict<int, int>>(d => Not(EmptyDict<int, int>().Get(x).HasValue())));
+            RandomBytes(x => CheckAgreement<Dict<int, int>>(d => Not(Dict.Create<int, int>().Get(x).HasValue())));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateOutput()
         {
-            var f = new ZenFunction<int, int, Dict<int, int>>((x, y) => EmptyDict<int, int>().Add(x, y));
+            var f = new ZenFunction<int, int, Dict<int, int>>((x, y) => Dict.Create<int, int>().Add(x, y));
             var d = f.Evaluate(1, 2);
             // Assert.AreEqual(1, d.Count);
             Assert.AreEqual(2, d.Get(1));

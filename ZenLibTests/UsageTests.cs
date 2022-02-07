@@ -27,7 +27,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException1()
         {
-            Language.Add(null, Constant(1), Constant(1));
+            DictExtensions.Add(null, Constant(1), Constant(1));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException2()
         {
-            Language.Add(EmptyDict<int, int>(), null, 1);
+            DictExtensions.Add(Dict.Create<int, int>(), null, 1);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException3()
         {
-            Language.Add(EmptyDict<int, int>(), 1, null);
+            DictExtensions.Add(Dict.Create<int, int>(), 1, null);
         }
 
         /// <summary>
@@ -297,7 +297,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException1()
         {
-            Language.ContainsKey<int, int>(null, 0);
+            DictExtensions.ContainsKey<int, int>(null, 0);
         }
 
         /// <summary>
@@ -307,7 +307,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException2()
         {
-            Language.ContainsKey(EmptyDict<int, int>(), null);
+            DictExtensions.ContainsKey(Dict.Create<int, int>(), null);
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException1()
         {
-            Language.Get<int, int>(null, null);
+            DictExtensions.Get<int, int>(null, null);
         }
 
         /// <summary>
@@ -487,7 +487,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException2()
         {
-            Language.Get(EmptyDict<int, int>(), null);
+            DictExtensions.Get(Dict.Create<int, int>(), null);
         }
 
         /// <summary>
