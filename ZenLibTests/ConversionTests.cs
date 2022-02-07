@@ -120,7 +120,7 @@ namespace ZenLib.Tests
         public void TestConvertOptionConstantNone()
         {
             Zen<Option<Unit>> x = Option.None<Unit>();
-            Assert.AreEqual(x, Null<Unit>());
+            Assert.AreEqual(x, Option.Null<Unit>());
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace ZenLib.Tests
         public void TestConvertOptionConstantSome()
         {
             Zen<Option<int>> x = Option.Some(3);
-            Assert.AreEqual(x, Some<int>(3));
+            Assert.AreEqual(x, Option.Create<int>(3));
         }
 
         /// <summary>

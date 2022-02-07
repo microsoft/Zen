@@ -43,7 +43,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(ReferenceEquals(~Constant<int>(10), ~Constant<int>(10)));
             Assert.IsTrue(ReferenceEquals(Constant<int>(10) - Constant<int>(10), Constant<int>(10) - Constant<int>(10)));
             Assert.IsTrue(ReferenceEquals(Constant<int>(10) * Constant<int>(10), Constant<int>(10) * Constant<int>(10)));
-            Assert.IsTrue(ReferenceEquals(Some<int>(1), Some<int>(1)));
+            Assert.IsTrue(ReferenceEquals(Option.Create<int>(1), Option.Create<int>(1)));
         }
 
         /// <summary>

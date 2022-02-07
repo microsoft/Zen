@@ -37,7 +37,7 @@ namespace ZenLib.Tests
                 header,
                 ruleMatch: (l, pkt, i) => MatchNatLine(l, pkt),
                 ruleAction: (l, pkt, i) => ApplyNatLine(l, pkt),
-                ruleReturn: (l, pkt, i) => Some(pkt),
+                ruleReturn: (l, pkt, i) => Option.Create(pkt),
                 nat.Rules);
         }
 

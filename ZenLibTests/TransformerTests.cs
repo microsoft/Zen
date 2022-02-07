@@ -512,11 +512,11 @@ namespace ZenLib.Tests
             {
                 return If(
                     p.GetField<TestHelper.Object2, int>("Field1") == 1,
-                    Some(p.WithField<TestHelper.Object2, int>("Field1", 2)),
+                    Option.Create(p.WithField<TestHelper.Object2, int>("Field1", 2)),
                     If(
                         p.GetField<TestHelper.Object2, int>("Field1") == 3,
-                        Some(p.WithField<TestHelper.Object2, int>("Field1", 4)),
-                        Some(p)));
+                        Option.Create(p.WithField<TestHelper.Object2, int>("Field1", 4)),
+                        Option.Create(p)));
             });
 
             var set1 = new ZenFunction<TestHelper.Object2, bool>(o => o.GetField<TestHelper.Object2, int>("Field1") == 1).StateSet(manager);

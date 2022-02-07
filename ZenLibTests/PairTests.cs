@@ -148,7 +148,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValueTypeNull()
         {
-            var f = new ZenFunction<Option<Pair<int, int>>>(() => Null<Pair<int, int>>());
+            var f = new ZenFunction<Option<Pair<int, int>>>(() => Option.Null<Pair<int, int>>());
             Assert.AreEqual(f.Evaluate(), Option.None<Pair<int, int>>());
         }
 

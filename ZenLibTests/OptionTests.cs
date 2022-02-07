@@ -170,7 +170,7 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<IpHeader>(() =>
             {
-                var x = Null<IpHeader>();
+                var x = Option.Null<IpHeader>();
                 return x.Value();
             });
 

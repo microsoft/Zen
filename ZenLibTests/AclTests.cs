@@ -94,10 +94,10 @@ namespace ZenLib.Tests
             var location = lp.GetNode();
             var packet = lp.GetHeader();
             return If(location == 0,
-                    Some(LocatedPacketHelper.Create(1, packet)),
+                    Option.Create(LocatedPacketHelper.Create(1, packet)),
                     If(location == 1,
-                        Some(LocatedPacketHelper.Create(2, packet)),
-                        Null<LocatedPacket>()));
+                        Option.Create(LocatedPacketHelper.Create(2, packet)),
+                        Option.Null<LocatedPacket>()));
         }
 
         private Zen<LocatedPacket> StepMany(Zen<LocatedPacket> initial, int k)

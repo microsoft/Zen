@@ -626,10 +626,10 @@ namespace ZenLib
             if (value.HasValue)
             {
                 ReportIfNullConversionError(value.Value, "Value", typeof(T));
-                return Some((Zen<T>)CreateZenConstant<T>(value.Value));
+                return Option.Create((Zen<T>)CreateZenConstant<T>(value.Value));
             }
 
-            return Null<T>();
+            return Option.Null<T>();
         }
 
         /// <summary>

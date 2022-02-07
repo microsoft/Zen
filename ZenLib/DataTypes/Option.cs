@@ -7,6 +7,8 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using ZenLib.Generation;
+    using static ZenLib.Language;
 
     /// <summary>
     /// A simple option type to parameterize over nullable
@@ -127,6 +129,75 @@ namespace ZenLib
         public static Option<T> None<T>()
         {
             return new Option<T>(false, default);
+        }
+
+        /// <summary>
+        /// The Zen value for null.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T>> Null<T>()
+        {
+            var v = (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T));
+            return Language.Create<Option<T>>(("HasValue", False()), ("Value", v));
+        }
+
+        /// <summary>
+        /// The Zen expression for Some value.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T>> Create<T>(Zen<T> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return Language.Create<Option<T>>(("HasValue", True()), ("Value", expr));
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for Zen for option types.
+    /// </summary>
+    public static class OptionExtensions
+    {
+        /// <summary>
+        /// The Zen expression for mapping over an option.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="function">The function.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T2>> Select<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T1>, Zen<T2>> function)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(function);
+
+            return If(expr.HasValue(), Option.Create(function(expr.Value())), Option.Null<T2>());
+        }
+
+        /// <summary>
+        /// The Zen expression for filtering over an option.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="function">The function.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T>> Where<T>(this Zen<Option<T>> expr, Func<Zen<T>, Zen<bool>> function)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(function);
+
+            return If(And(expr.HasValue(), function(expr.Value())), expr, Option.Null<T>());
+        }
+
+        /// <summary>
+        /// The Zen expression for an option or a default if no value.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="deflt">The default value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T> ValueOrDefault<T>(this Zen<Option<T>> expr, Zen<T> deflt)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateNotNull(deflt);
+
+            return If(expr.HasValue(), expr.Value(), deflt);
         }
     }
 }

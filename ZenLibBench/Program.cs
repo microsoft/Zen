@@ -29,11 +29,11 @@ namespace ZenLibBench
                 {
                     return Language.If(
                         p.GetField<TestObject, uint>("DstIp") == 1,
-                        Language.Some(p.WithField<TestObject, uint>("DstIp", 2)),
+                        Option.Create(p.WithField<TestObject, uint>("DstIp", 2)),
                         Language.If(
                             p.GetField<TestObject, uint>("DstIp") == 3,
-                            Language.Some(p.WithField<TestObject, uint>("DstIp", 4)),
-                            Language.Some(p)
+                            Option.Create(p.WithField<TestObject, uint>("DstIp", 4)),
+                            Option.Create(p)
                             ));
                 });
 

@@ -901,7 +901,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException2()
         {
-            Language.Case<int, int>(Language.Null<int>(), null, null);
+            Language.Case<int, int>(Option.Null<int>(), null, null);
         }
 
         /// <summary>
@@ -911,7 +911,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException3()
         {
-            Language.Case<int, int>(Language.Null<int>(), () => 0, null);
+            Language.Case<int, int>(Option.Null<int>(), () => 0, null);
         }
 
         /// <summary>
@@ -1133,7 +1133,7 @@ namespace ZenLib.Tests
         public void TestSelectException1()
         {
             Zen<Option<int>> x = null;
-            Language.Select<int, int>(x, null);
+            x.Select<int, int>(null);
         }
 
         /// <summary>
@@ -1143,8 +1143,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSelectException2()
         {
-            Zen<Option<int>> x = Null<int>();
-            Language.Select<int, int>(x, null);
+            Zen<Option<int>> x = Option.Null<int>();
+            x.Select<int, int>(null);
         }
 
         /// <summary>
@@ -1186,7 +1186,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSomeException()
         {
-            Language.Some<int>(null);
+            Option.Create<int>(null);
         }
 
         /// <summary>
@@ -1306,7 +1306,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestValueOrDefaultException1()
         {
-            Language.ValueOrDefault<int>(null, null);
+            OptionExtensions.ValueOrDefault<int>(null, null);
         }
 
         /// <summary>
@@ -1316,7 +1316,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestValueOrDefaultException2()
         {
-            Language.ValueOrDefault(Null<int>(), null);
+            Option.Null<int>().ValueOrDefault(null);
         }
 
         /// <summary>
@@ -1327,7 +1327,7 @@ namespace ZenLib.Tests
         public void TestWhereException1()
         {
             Zen<Option<int>> x = null;
-            Language.Where(x, null);
+            x.Where(null);
         }
 
         /// <summary>
@@ -1337,8 +1337,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestWhereException2()
         {
-            Zen<Option<int>> x = Null<int>();
-            Language.Where(x, null);
+            Zen<Option<int>> x = Option.Null<int>();
+            x.Where(null);
         }
 
         /// <summary>
