@@ -537,7 +537,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestHasValueException()
         {
-            Language.HasValue<int>(null);
+            OptionExtensions.HasValue<int>(null);
         }
 
         /// <summary>
@@ -1266,7 +1266,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestToListException()
         {
-            Language.ToList<int>(null);
+            OptionExtensions.ToList<int>(null);
         }
 
         /// <summary>

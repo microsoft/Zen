@@ -199,5 +199,30 @@ namespace ZenLib
 
             return If(expr.HasValue(), expr.Value(), deflt);
         }
+
+        /// <summary>
+        /// The Zen expression for whether an option has a value.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> HasValue<T>(this Zen<Option<T>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return expr.GetField<Option<T>, bool>("HasValue");
+        }
+
+        /// <summary>
+        /// The Zen expression for whether an option has a value.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<IList<T>> ToList<T>(this Zen<Option<T>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            var l = EmptyList<T>();
+            return If(expr.HasValue(), l.AddFront(expr.Value()), l);
+        }
     }
 }
