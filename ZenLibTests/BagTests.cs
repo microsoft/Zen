@@ -68,6 +68,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test the Bag add if space method is scalable.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAddIfSpaceIsScalable()
+        {
+            var zf2 = new ZenFunction<Bag<byte>, Bag<byte>>(l => l.AddIfSpace(100));
+            var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 100);
+        }
+
+        /// <summary>
         /// Test the Bag Create method works.
         /// </summary>
         [TestMethod]
