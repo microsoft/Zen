@@ -6,6 +6,7 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Numerics;
     using System.Reflection;
     using static ZenLib.Basic;
@@ -24,6 +25,16 @@ namespace ZenLib.Generation
         /// The method for creating and if expression at runtime.
         /// </summary>
         private static MethodInfo ifConditionMethod = typeof(Basic).GetMethod("If");
+
+        /// <summary>
+        /// Name of the function used to create an object via reflection.
+        /// </summary>
+        private static MethodInfo createMethod = typeof(Basic).GetMethod("Create");
+
+        /// <summary>
+        /// List method from Zen.Language.
+        /// </summary>
+        private static MethodInfo listMethod = typeof(Basic).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The arbitrary expressions generated.
@@ -78,7 +89,7 @@ namespace ZenLib.Generation
         {
             if (!exhaustiveDepth)
             {
-                return GeneratorHelper.ApplyToList(recurse, elementType, maxDepth);
+                return ApplyToList(recurse, elementType, maxDepth);
             }
 
             var length = Arbitrary<byte>();
@@ -92,11 +103,28 @@ namespace ZenLib.Generation
             for (int i = maxDepth; i > 0; i--)
             {
                 var guard = length == Constant((byte)i);
-                var trueBranch = GeneratorHelper.ApplyToList(recurse, elementType, i);
+                var trueBranch = ApplyToList(recurse, elementType, i);
                 list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
             }
 
             return list;
+        }
+
+        public static object ApplyToList(Func<Type, object> recurse, Type innerType, int size)
+        {
+            var method = listMethod.MakeGenericMethod(innerType);
+
+            var args = new object[size];
+            for (int i = 0; i < size; i++)
+            {
+                var arg = recurse(innerType);
+                args[i] = arg;
+            }
+
+            var zenType = typeof(Zen<>).MakeGenericType(innerType);
+            var finalArgs = Array.CreateInstance(zenType, args.Length);
+            Array.Copy(args, finalArgs, args.Length);
+            return method.Invoke(null, new object[] { finalArgs });
         }
 
         public object VisitLong()
@@ -108,7 +136,17 @@ namespace ZenLib.Generation
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {
-            return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
+            var asList = fields.ToArray();
+
+            var method = createMethod.MakeGenericMethod(objectType);
+
+            var args = new (string, object)[asList.Length];
+            for (int i = 0; i < asList.Length; i++)
+            {
+                args[i] = (asList[i].Key, recurse(asList[i].Value));
+            }
+
+            return method.Invoke(null, new object[] { args });
         }
 
         public object VisitShort()

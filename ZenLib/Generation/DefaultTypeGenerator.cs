@@ -6,6 +6,7 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Numerics;
     using System.Reflection;
 
@@ -18,6 +19,11 @@ namespace ZenLib.Generation
         /// Method for the creating an empty Zen list.
         /// </summary>
         private static MethodInfo emptyListMethod = typeof(Basic).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
+        /// Name of the function used to create an object via reflection.
+        /// </summary>
+        private static MethodInfo createMethod = typeof(Basic).GetMethod("Create");
 
         public object VisitBool()
         {
@@ -59,7 +65,17 @@ namespace ZenLib.Generation
 
         public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {
-            return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
+            var asList = fields.ToArray();
+
+            var method = createMethod.MakeGenericMethod(objectType);
+
+            var args = new (string, object)[asList.Length];
+            for (int i = 0; i < asList.Length; i++)
+            {
+                args[i] = (asList[i].Key, recurse(asList[i].Value));
+            }
+
+            return method.Invoke(null, new object[] { args });
         }
 
         public object VisitShort()

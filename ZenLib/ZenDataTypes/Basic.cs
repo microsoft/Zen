@@ -37,18 +37,6 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Basic).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Generates a new random value of a given type.
-        /// </summary>
-        /// <param name="magicConstants">Magic constants to use.</param>
-        /// <param name="sizeBound">The bound on the size of objects.</param>
-        /// <returns>A random value of a given type.</returns>
-        public static T Generate<T>(Dictionary<Type, ISet<object>> magicConstants = null, int sizeBound = 20)
-        {
-            var generator = new RandomValueGenerator(magicConstants, sizeBound);
-            return (T)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T));
-        }
-
-        /// <summary>
         /// Lift a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
