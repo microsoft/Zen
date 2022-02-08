@@ -20,6 +20,23 @@ namespace ZenLib.Tests
     public class BagTests
     {
         /// <summary>
+        /// Test that converting a bag to and from an array works.
+        /// </summary>
+        [TestMethod]
+        public void TestBagToArray()
+        {
+            var a1 = new int[] { 1, 2, 3, 4 };
+            var b = Bag.FromArray(a1);
+            var a2 = b.ToArray();
+            Assert.AreEqual(a1.Length, a2.Length);
+
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.AreEqual(a1[i], a2[i]);
+            }
+        }
+
+        /// <summary>
         /// Test that size constraints are enforced correctly.
         /// </summary>
         [TestMethod]
@@ -48,6 +65,19 @@ namespace ZenLib.Tests
 
             var zf2 = new ZenFunction<Bag<byte>, Bag<byte>>(l => l.Remove(100));
             var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 100);
+        }
+
+        /// <summary>
+        /// Test the Bag Create method works.
+        /// </summary>
+        [TestMethod]
+        public void TestBagCreate()
+        {
+            var b1 = Symbolic<Bag<int>>(depth: 5);
+            var b2 = Bag.Create<int>(1, 2, 3);
+            var b3 = Bag.Create<int>(1, 2, 3, 4, 5);
+            Assert.IsFalse((b1 == b2).Solve().IsSatisfiable());
+            Assert.IsTrue((b1 == b3).Solve().IsSatisfiable());
         }
 
         /// <summary>

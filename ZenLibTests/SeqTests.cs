@@ -20,6 +20,23 @@ namespace ZenLib.Tests
     public class SeqTests
     {
         /// <summary>
+        /// Test that converting a sequence to and from an array works.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqToArray()
+        {
+            var a1 = new int[] { 1, 2, 3, 4 };
+            var s = Seq.FromArray(a1);
+            var a2 = s.Values.ToArray();
+            Assert.AreEqual(a1.Length, a2.Length);
+
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.AreEqual(a1[i], a2[i]);
+            }
+        }
+
+        /// <summary>
         /// Test List contains.
         /// </summary>
         [TestMethod]

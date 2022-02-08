@@ -21,15 +21,6 @@ namespace ZenLib
         public Seq<Option<T>> Values { get; set; } = new Seq<Option<T>>();
 
         /// <summary>
-        /// Convert a collection of items to a Zen Bag.
-        /// </summary>
-        /// <param name="values">The items to add to the bag.</param>
-        public static Bag<T> FromArray(T[] values)
-        {
-            return new Bag<T> { Values = new Seq<Option<T>> { Values = values.Select(Option.Some).ToList() } };
-        }
-
-        /// <summary>
         /// Convert this Zen Bag to a C# array.
         /// </summary>
         /// <returns>A C# array.</returns>
@@ -56,6 +47,15 @@ namespace ZenLib
     public static class Bag
     {
         /// <summary>
+        /// Convert a collection of items to a Bag.
+        /// </summary>
+        /// <param name="values">The items to add to the bag.</param>
+        public static Bag<T> FromArray<T>(params T[] values)
+        {
+            return new Bag<T> { Values = new Seq<Option<T>> { Values = values.Select(Option.Some).ToList() } };
+        }
+
+        /// <summary>
         /// The Zen value for a bag from a sequence.
         /// </summary>
         /// <param name="seqExpr">The sequence expr.</param>
@@ -70,7 +70,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="elements">Zen elements.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Bag<T>> Create<T>(IEnumerable<Zen<T>> elements)
+        public static Zen<Bag<T>> Create<T>(params Zen<T>[] elements)
         {
             CommonUtilities.ValidateNotNull(elements);
 

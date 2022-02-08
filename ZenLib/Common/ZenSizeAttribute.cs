@@ -18,12 +18,10 @@ namespace ZenLib
         /// </summary>
         /// <param name="depth">The depth for this field.</param>
         /// <param name="enumerationType">The exhaustiveness of the depth parameter..</param>
-        /// <param name="recursive">Whether to apply these setting recursively.</param>
-        public ZenSizeAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User, bool recursive = false)
+        public ZenSizeAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User)
         {
             this.Depth = depth;
             this.EnumerationType = enumerationType;
-            this.Recursive = recursive;
         }
 
         /// <summary>
@@ -35,11 +33,6 @@ namespace ZenLib
         /// Gets a value indicating whether to generate exhaustive depth objects.
         /// </summary>
         public EnumerationType EnumerationType { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to apply these settings recursively.
-        /// </summary>
-        public bool Recursive { get; }
     }
 
     /// <summary>

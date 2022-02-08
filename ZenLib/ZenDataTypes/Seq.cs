@@ -37,6 +37,15 @@ namespace ZenLib
     public static class Seq
     {
         /// <summary>
+        /// Convert a collection of items to a sequence.
+        /// </summary>
+        /// <param name="values">The items to add to the sequence.</param>
+        public static Seq<T> FromArray<T>(params T[] values)
+        {
+            return new Seq<T> { Values = values.ToList() };
+        }
+
+        /// <summary>
         /// The Zen value for an empty sequence.
         /// </summary>
         /// <returns>Zen value.</returns>
