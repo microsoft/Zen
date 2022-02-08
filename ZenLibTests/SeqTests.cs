@@ -126,6 +126,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test Seq set.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqSet()
+        {
+            CheckValid<Seq<byte>>(l =>
+                Implies(l.Length() >= 2, l.Set(1, 7).Contains(7)));
+
+            CheckValid<Seq<byte>>(l =>
+                Implies(l.Length() >= 2, l.Set(1, 7).At(1).Value() == 7));
+
+            CheckValid<Seq<byte>>(l =>
+                Implies(l.Length() == 0, l.Set(1, 7) == l));
+        }
+
+        /// <summary>
         /// Test Seq length.
         /// </summary>
         [TestMethod]

@@ -539,6 +539,37 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Sets the value of the sequence at a given index and returns a new sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <param name="value">Zen value expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Seq<T>> Set<T>(this Zen<Seq<T>> seqExpr, Zen<ushort> index, Zen<T> value)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(index);
+            CommonUtilities.ValidateNotNull(value);
+
+            return Set(seqExpr, index, value, 0);
+        }
+
+        /// <summary>
+        /// Sets the value of the sequence at a given index and returns a new sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <param name="value">Zen value expression.</param>
+        /// <param name="i">Current index.</param>
+        /// <returns>Zen value.</returns>
+        private static Zen<Seq<T>> Set<T>(this Zen<Seq<T>> seqExpr, Zen<ushort> index, Zen<T> value, int i)
+        {
+            return seqExpr.Case(
+                empty: seqExpr,
+                cons: (hd, tl) => If(Constant((ushort)i) == index, tl.AddFront(value), tl.Set(index, value, i + 1).AddFront(hd)));
+        }
+
+        /// <summary>
         /// Get the value of a sequence at an index.
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>

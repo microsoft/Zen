@@ -136,28 +136,32 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { args });
         }
 
-        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenSizeAttribute attribute)
+        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenDepthConfigurationAttribute attribute)
         {
             if (attribute == null)
             {
                 return config;
             }
 
-            var depth = attribute.Depth.HasValue ? attribute.Depth.Value : config.Depth;
-            var exhaustive = attribute.ExhaustiveDepth.HasValue ? attribute.ExhaustiveDepth.Value : config.ExhaustiveDepth;
+            var depth = attribute.Depth > 0 ? attribute.Depth : config.Depth;
+
+            var exhaustive = attribute.EnumerationType == EnumerationType.User ?
+                config.ExhaustiveDepth :
+                attribute.EnumerationType == EnumerationType.Exhaustive;
+
             return new DepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustive };
         }
 
-        private ZenSizeAttribute GetSizeAttribute(Type type, string fieldName)
+        private ZenDepthConfigurationAttribute GetSizeAttribute(Type type, string fieldName)
         {
             var fieldInfo = type.GetField(fieldName);
             if (fieldInfo != null)
             {
-                return (ZenSizeAttribute)fieldInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
+                return (ZenDepthConfigurationAttribute)fieldInfo.GetCustomAttribute(typeof(ZenDepthConfigurationAttribute));
             }
 
             var propertyInfo = type.GetPropertyCached(fieldName);
-            return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
+            return (ZenDepthConfigurationAttribute)propertyInfo.GetCustomAttribute(typeof(ZenDepthConfigurationAttribute));
         }
 
         public object VisitShort()

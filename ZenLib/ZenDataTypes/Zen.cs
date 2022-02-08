@@ -969,8 +969,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(elements);
 
             Zen<T>[] copy = new Zen<T>[elements.Length];
-            Array.Copy(elements, copy, elements.Length);
-            Array.Reverse(copy);
+            System.Array.Copy(elements, copy, elements.Length);
+            System.Array.Reverse(copy);
             var list = EmptyList<T>();
             foreach (var element in copy)
             {
