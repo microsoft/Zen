@@ -221,7 +221,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var l = Seq.Create<T>();
+            var l = Seq.Empty<T>();
             return If(expr.HasValue(), l.AddFront(expr.Value()), l);
         }
     }

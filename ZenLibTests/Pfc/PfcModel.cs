@@ -50,7 +50,7 @@ namespace ZenLib.Tests
                 ("StormStartedTime2", Constant<ushort>(0)),
                 ("StormEndedTime1", Constant<ushort>(0)),
                 ("StormEndedTime2", Constant<ushort>(0)),
-                ("Packets", Seq.Create<Pair<ushort, Pair<byte, bool>>>()));
+                ("Packets", Seq.Empty<Pair<ushort, Pair<byte, bool>>>()));
         }
 
         /// <summary>

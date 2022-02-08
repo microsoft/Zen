@@ -136,7 +136,7 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { args });
         }
 
-        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenDepthConfigurationAttribute attribute)
+        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenSizeAttribute attribute)
         {
             if (attribute == null)
             {
@@ -152,16 +152,16 @@ namespace ZenLib.Generation
             return new DepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustive };
         }
 
-        private ZenDepthConfigurationAttribute GetSizeAttribute(Type type, string fieldName)
+        private ZenSizeAttribute GetSizeAttribute(Type type, string fieldName)
         {
             var fieldInfo = type.GetField(fieldName);
             if (fieldInfo != null)
             {
-                return (ZenDepthConfigurationAttribute)fieldInfo.GetCustomAttribute(typeof(ZenDepthConfigurationAttribute));
+                return (ZenSizeAttribute)fieldInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
             }
 
             var propertyInfo = type.GetPropertyCached(fieldName);
-            return (ZenDepthConfigurationAttribute)propertyInfo.GetCustomAttribute(typeof(ZenDepthConfigurationAttribute));
+            return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
         }
 
         public object VisitShort()

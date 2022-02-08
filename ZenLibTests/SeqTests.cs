@@ -311,7 +311,7 @@ namespace ZenLib.Tests
         public void TestSeqArbitrary()
         {
             var f = new ZenFunction<Seq<int>, bool>(l => And(l.Contains(1), l.Contains(2)));
-            var arbitrarySeq = Seq.Create<int>().AddFront(Arbitrary<int>()).AddFront(Arbitrary<int>());
+            var arbitrarySeq = Seq.Empty<int>().AddFront(Arbitrary<int>()).AddFront(Arbitrary<int>());
             var input = f.Find((l, o) => o, arbitrarySeq);
             Assert.IsTrue(input.Value.Values.Contains(1));
             Assert.IsTrue(input.Value.Values.Contains(2));

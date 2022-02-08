@@ -66,7 +66,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddBackException2()
         {
-            SeqExtensions.AddBack(Seq.Create<int>(), null);
+            SeqExtensions.AddBack(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException2()
         {
-            SeqExtensions.AddFront(Seq.Create<int>(), null);
+            SeqExtensions.AddFront(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAllException2()
         {
-            SeqExtensions.All(Seq.Create<int>(), null);
+            SeqExtensions.All(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAnyException2()
         {
-            SeqExtensions.Any(Seq.Create<int>(), null);
+            SeqExtensions.Any(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAppendException1()
         {
-            SeqExtensions.Append(null, Seq.Create<int>());
+            SeqExtensions.Append(null, Seq.Empty<int>());
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAppendException2()
         {
-            SeqExtensions.Append(Seq.Create<int>(), null);
+            SeqExtensions.Append(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAtException2()
         {
-            SeqExtensions.At(Seq.Create<int>(), null);
+            SeqExtensions.At(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsException2()
         {
-            SeqExtensions.Contains(Seq.Create<int>(), null);
+            SeqExtensions.Contains(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropException2()
         {
-            SeqExtensions.Drop(Seq.Create<int>(), null);
+            SeqExtensions.Drop(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -346,7 +346,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropWhileException2()
         {
-            SeqExtensions.DropWhile(Seq.Create<int>(), null);
+            SeqExtensions.DropWhile(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDuplicatesException2()
         {
-            SeqExtensions.Duplicates(Seq.Create<int>(), null);
+            SeqExtensions.Duplicates(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFindException2()
         {
-            SeqExtensions.Find(Seq.Create<int>(), null);
+            SeqExtensions.Find(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -426,7 +426,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFoldException2()
         {
-            SeqExtensions.Fold<int, int>(Seq.Create<int>(), null, null);
+            SeqExtensions.Fold<int, int>(Seq.Empty<int>(), null, null);
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFoldException3()
         {
-            SeqExtensions.Fold<int, int>(Seq.Create<int>(), 0, null);
+            SeqExtensions.Fold<int, int>(Seq.Empty<int>(), 0, null);
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIndexOfException2()
         {
-            SeqExtensions.IndexOf(Seq.Create<int>(), null);
+            SeqExtensions.IndexOf(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -646,7 +646,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIntersperseException2()
         {
-            SeqExtensions.Intersperse(Seq.Create<int>(), null);
+            SeqExtensions.Intersperse(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -942,7 +942,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseSeqException2()
         {
-            SeqExtensions.Case<int, int>(Seq.Create<int>(), null, null);
+            SeqExtensions.Case<int, int>(Seq.Empty<int>(), null, null);
         }
 
         /// <summary>
@@ -952,7 +952,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseSeqException3()
         {
-            SeqExtensions.Case<int, int>(Seq.Create<int>(), 0, null);
+            SeqExtensions.Case<int, int>(Seq.Empty<int>(), 0, null);
         }
 
         /// <summary>
@@ -1102,7 +1102,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveAllException2()
         {
-            SeqExtensions.RemoveAll(Seq.Create<int>(), null);
+            SeqExtensions.RemoveAll(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1122,7 +1122,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveFirstException2()
         {
-            SeqExtensions.RemoveFirst(Seq.Create<int>(), null);
+            SeqExtensions.RemoveFirst(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1175,7 +1175,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSelectException4()
         {
-            Zen<Seq<int>> x = Seq.Create<int>();
+            Zen<Seq<int>> x = Seq.Empty<int>();
             SeqExtensions.Select<int, int>(x, null);
         }
 
@@ -1227,7 +1227,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSplitAtException2()
         {
-            SeqExtensions.SplitAt(Seq.Create<int>(), null);
+            SeqExtensions.SplitAt(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1247,7 +1247,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeException2()
         {
-            SeqExtensions.Take(Seq.Create<int>(), null);
+            SeqExtensions.Take(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1267,7 +1267,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeWhileException2()
         {
-            SeqExtensions.TakeWhile(Seq.Create<int>(), null);
+            SeqExtensions.TakeWhile(Seq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1370,7 +1370,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestWhereException4()
         {
-            Zen<Seq<int>> x = Seq.Create<int>();
+            Zen<Seq<int>> x = Seq.Empty<int>();
             SeqExtensions.Where(x, null);
         }
 

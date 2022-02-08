@@ -138,7 +138,7 @@ namespace ZenLib
         /// <returns>The string value.</returns>
         public static Zen<FiniteString> Create(string s)
         {
-            var l = Seq.Create<ushort>();
+            var l = Seq.Empty<ushort>();
             foreach (var c in s.Reverse())
             {
                 l = l.AddFront(c);

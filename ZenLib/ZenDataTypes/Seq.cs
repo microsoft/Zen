@@ -40,7 +40,7 @@ namespace ZenLib
         /// The Zen value for an empty sequence.
         /// </summary>
         /// <returns>Zen value.</returns>
-        public static Zen<Seq<T>> Create<T>()
+        public static Zen<Seq<T>> Empty<T>()
         {
             return Zen.Create<Seq<T>>(("Values", ZenListEmptyExpr<T>.Instance));
         }
@@ -64,7 +64,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(element);
 
-            return Seq.Create<T>().AddFront(element);
+            return Seq.Empty<T>().AddFront(element);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(function);
 
             return seqExpr.Case(
-                empty: Seq.Create<T2>(),
+                empty: Seq.Empty<T2>(),
                 cons: (hd, tl) => tl.Select(function).AddFront(function(hd)));
         }
 
@@ -204,7 +204,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(predicate);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
+                empty: Seq.Empty<T>(),
                 cons: (hd, tl) =>
                 {
                     var x = tl.Where(predicate);
@@ -263,7 +263,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(seqExpr);
 
-            return Reverse(seqExpr, Seq.Create<T>());
+            return Reverse(seqExpr, Seq.Empty<T>());
         }
 
         private static Zen<Seq<T>> Reverse<T>(this Zen<Seq<T>> expr, Zen<Seq<T>> acc)
@@ -285,7 +285,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(element);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
+                empty: Seq.Empty<T>(),
                 cons: (hd, tl) => If(IsEmpty(tl), Seq.Create(hd), tl.Intersperse(element).AddFront(hd)));
         }
 
@@ -318,7 +318,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(valueExpr);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
+                empty: Seq.Empty<T>(),
                 cons: (hd, tl) => If(hd == valueExpr, tl, tl.RemoveFirst(valueExpr).AddFront(hd)));
         }
 
@@ -334,7 +334,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(valueExpr);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
+                empty: Seq.Empty<T>(),
                 cons: (hd, tl) =>
                 {
                     var tlRemoved = tl.RemoveAll(valueExpr);
@@ -412,8 +412,8 @@ namespace ZenLib
         private static Zen<Seq<T>> Take<T>(this Zen<Seq<T>> seqExpr, Zen<ushort> numElements, int i)
         {
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
-                cons: (hd, tl) => If(Constant((ushort)i) == numElements, Seq.Create<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
+                empty: Seq.Empty<T>(),
+                cons: (hd, tl) => If(Constant((ushort)i) == numElements, Seq.Empty<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
         }
 
         /// <summary>
@@ -428,8 +428,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(predicate);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
-                cons: (hd, tl) => If(predicate(hd), tl.TakeWhile(predicate).AddFront(hd), Seq.Create<T>()));
+                empty: Seq.Empty<T>(),
+                cons: (hd, tl) => If(predicate(hd), tl.TakeWhile(predicate).AddFront(hd), Seq.Empty<T>()));
         }
 
         /// <summary>
@@ -456,7 +456,7 @@ namespace ZenLib
         private static Zen<Seq<T>> Drop<T>(this Zen<Seq<T>> seqExpr, Zen<ushort> numElements, int i)
         {
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
+                empty: Seq.Empty<T>(),
                 cons: (hd, tl) => If(Constant((ushort)i) == numElements, seqExpr, tl.Drop(numElements, i + 1)));
         }
 
@@ -472,8 +472,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(predicate);
 
             return seqExpr.Case(
-                empty: Seq.Create<T>(),
-                cons: (hd, tl) => If(predicate(hd), Seq.Create<T>(), tl.DropWhile(predicate).AddFront(hd)));
+                empty: Seq.Empty<T>(),
+                cons: (hd, tl) => If(predicate(hd), Seq.Empty<T>(), tl.DropWhile(predicate).AddFront(hd)));
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace ZenLib
         private static Zen<Pair<Seq<T>, Seq<T>>> SplitAt<T>(this Zen<Seq<T>> seqExpr, Zen<ushort> index, int i)
         {
             return seqExpr.Case(
-                empty: Pair.Create(Seq.Create<T>(), Seq.Create<T>()),
+                empty: Pair.Create(Seq.Empty<T>(), Seq.Empty<T>()),
                 cons: (hd, tl) =>
                 {
                     var tup = tl.SplitAt(index, i + 1);
@@ -622,7 +622,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(seqExpr);
 
-            return seqExpr.Case(empty: Seq.Create<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
+            return seqExpr.Case(empty: Seq.Empty<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
         }
 
         /// <summary>

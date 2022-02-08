@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenDepthConfigurationAttribute.cs" company="Microsoft">
+﻿// <copyright file="ZenSizeAttribute.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -11,15 +11,15 @@ namespace ZenLib
     /// generating symbolic values of a given type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-    public class ZenDepthConfigurationAttribute : Attribute
+    public class ZenSizeAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenDepthConfigurationAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ZenSizeAttribute"/> class.
         /// </summary>
         /// <param name="depth">The depth for this field.</param>
         /// <param name="enumerationType">The exhaustiveness of the depth parameter..</param>
         /// <param name="recursive">Whether to apply these setting recursively.</param>
-        public ZenDepthConfigurationAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User, bool recursive = false)
+        public ZenSizeAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User, bool recursive = false)
         {
             this.Depth = depth;
             this.EnumerationType = enumerationType;

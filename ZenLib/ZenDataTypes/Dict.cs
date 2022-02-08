@@ -96,7 +96,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Dict<TKey, TValue>> Create<TKey, TValue>()
         {
-            return Create<Dict<TKey, TValue>>(("Values", Seq.Create<Pair<TKey, TValue>>()));
+            return Create<Dict<TKey, TValue>>(("Values", Seq.Empty<Pair<TKey, TValue>>()));
         }
     }
 
