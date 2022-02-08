@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using static ZenLib.Basic;
 
     /// <summary>
@@ -71,11 +72,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="elements">Zen elements.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Seq<T>> Create<T>(params Zen<T>[] elements)
+        public static Zen<Seq<T>> Create<T>(IEnumerable<Zen<T>> elements)
         {
             CommonUtilities.ValidateNotNull(elements);
 
-            return Seq.Create(Basic.List(elements));
+            return Seq.Create(Basic.List(elements.ToArray()));
         }
     }
 

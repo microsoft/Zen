@@ -185,7 +185,7 @@ namespace ZenLib.Tests
             var i = Arbitrary<int>();
             var s = Arbitrary<string>();
             var o = Arbitrary<Option<ulong>>();
-            var l = Arbitrary<Seq<int>>(listSize: 10, checkSmallerLists: false);
+            var l = Arbitrary<Seq<int>>(depth: 10, exhaustiveDepth: false);
 
             // build constraints on these variables
             var c1 = Or(b, i <= 10);

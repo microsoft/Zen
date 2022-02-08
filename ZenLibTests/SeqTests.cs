@@ -23,43 +23,43 @@ namespace ZenLib.Tests
         /// Test List contains.
         /// </summary>
         [TestMethod]
-        public void TestListContains()
+        public void TestSeqContains()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => And(l.Contains(x), l.Contains(7))));
         }
 
         /// <summary>
-        /// Test list contains.
+        /// Test Seq contains.
         /// </summary>
         [TestMethod]
-        public void TestListContainsVariable()
+        public void TestSeqContainsVariable()
         {
             CheckAgreement<Seq<byte>, byte>((l, x) => l.Contains(x), bddListSize: 2);
         }
 
         /// <summary>
-        /// Test List all.
+        /// Test Seq all.
         /// </summary>
         [TestMethod]
-        public void TestListAll()
+        public void TestSeqAll()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.All(e => e == x)));
         }
 
         /// <summary>
-        /// Test List any.
+        /// Test Seq any.
         /// </summary>
         [TestMethod]
-        public void TestListAny()
+        public void TestSeqAny()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.Any(e => e >= x)));
         }
 
         /// <summary>
-        /// Test List any.
+        /// Test Seq any.
         /// </summary>
         [TestMethod]
-        public void TestListAnyObjects()
+        public void TestSeqAnyObjects()
         {
             var f1 = new ZenFunction<Seq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
             var f2 = new ZenFunction<Seq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7).Simplify());
@@ -75,48 +75,48 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List map.
+        /// Test Seq map.
         /// </summary>
         [TestMethod]
-        public void TestListMap()
+        public void TestSeqMap()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.Select(e => e + 1).Contains(x)));
         }
 
         /// <summary>
-        /// Test List filter.
+        /// Test Seq filter.
         /// </summary>
         [TestMethod]
-        public void TestListFilter()
+        public void TestSeqFilter()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.Where(e => e < (x + 1)).Contains(x)));
         }
 
         /// <summary>
-        /// Test List find implies contains.
+        /// Test Seq find implies contains.
         /// </summary>
         [TestMethod]
-        public void TestListContainsFind()
+        public void TestSeqContainsFind()
         {
             RandomBytes(x => CheckValid<Seq<byte>>(l =>
                 Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).HasValue())));
         }
 
         /// <summary>
-        /// Test List index of.
+        /// Test Seq index of.
         /// </summary>
         [TestMethod]
-        public void TestListIndexOf()
+        public void TestSeqIndexOf()
         {
             RandomBytes(x => CheckValid<Seq<byte>>(l =>
                 Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x).HasValue())));
         }
 
         /// <summary>
-        /// Test List at.
+        /// Test Seq at.
         /// </summary>
         [TestMethod]
-        public void TestListAt()
+        public void TestSeqAt()
         {
             CheckValid<Seq<byte>>(l =>
                 Implies(l.Length() >= 2, l.At(1).HasValue()));
@@ -126,101 +126,101 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List length.
+        /// Test Seq length.
         /// </summary>
         [TestMethod]
-        public void TestListLength()
+        public void TestSeqLength()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.AddFront(x).Length() > 0));
         }
 
         /// <summary>
-        /// Test List length.
+        /// Test Seq length.
         /// </summary>
         [TestMethod]
-        public void TestListLength2()
+        public void TestSeqLength2()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.AddBack(x).Length() > 0));
         }
 
         /// <summary>
-        /// Test List sort.
+        /// Test Seq sort.
         /// </summary>
         [TestMethod]
-        public void TestListSort()
+        public void TestSeqSort()
         {
             CheckAgreement<Seq<int>>(l => l.Sort().IsSorted(), bddListSize: 1);
         }
 
         /// <summary>
-        /// Test List reverse.
+        /// Test Seq reverse.
         /// </summary>
         [TestMethod]
-        public void TestListReverse()
+        public void TestSeqReverse()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.Reverse().Contains(x)));
         }
 
         /// <summary>
-        /// Test List intersperse.
+        /// Test Seq intersperse.
         /// </summary>
         [TestMethod]
-        public void TestListIntersperse()
+        public void TestSeqIntersperse()
         {
             RandomBytes(x => CheckAgreement<Seq<int>>(l => l.Intersperse(Constant<int>(x)).Contains(3)));
         }
 
         /// <summary>
-        /// Test List split at.
+        /// Test Seq split at.
         /// </summary>
         [TestMethod]
-        public void TestListSplitAt()
+        public void TestSeqSplitAt()
         {
             CheckAgreement<Seq<int>>(l => l.SplitAt(2).Item1().Length() == 1);
         }
 
         /// <summary>
-        /// Test that List remove all does not contain that element.
+        /// Test that Seq remove all does not contain that element.
         /// </summary>
         [TestMethod]
-        public void TestListRemoveAllNotContains()
+        public void TestSeqRemoveAllNotContains()
         {
             RandomBytes(x => CheckValid<Seq<int>>(l => Not(l.RemoveAll(Constant<int>(x)).Contains(x))));
         }
 
         /// <summary>
-        /// Test List remove all results in a smaller list.
+        /// Test Seq remove all results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestListRemoveAllSmaller()
+        public void TestSeqRemoveAllSmaller()
         {
             RandomBytes(x => CheckValid<Seq<int>>(l => l.RemoveAll(x).Length() <= l.Length()));
         }
 
         /// <summary>
-        /// Test List remove first.
+        /// Test Seq remove first.
         /// </summary>
         [TestMethod]
-        public void TestListRemoveFirstCount()
+        public void TestSeqRemoveFirstCount()
         {
             RandomBytes(x => CheckValid<Seq<int>>(l => l.RemoveFirst(x).Duplicates(x) == l.Duplicates(x)));
         }
 
         /// <summary>
-        /// Test that List take results in a smaller list.
+        /// Test that Seq take results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestListTakeSmaller()
+        public void TestSeqTakeSmaller()
         {
             RandomBytes(x => CheckValid<Seq<int>>(l =>
                 l.Take(x).Length() <= l.Length()));
         }
 
         /// <summary>
-        /// Test List take.
+        /// Test Seq take.
         /// </summary>
         [TestMethod]
-        public void TestListTakeExact()
+        public void TestSeqTakeExact()
         {
             RandomBytes(x =>
             {
@@ -231,27 +231,27 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that List drop results in a smaller list.
+        /// Test that Seq drop results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestListDropSmaller()
+        public void TestSeqDropSmaller()
         {
             RandomBytes(x => CheckValid<Seq<int>>(l =>
                 l.Drop(x).Length() <= l.Length()));
         }
 
         /// <summary>
-        /// Test List drop.
+        /// Test Seq drop.
         /// </summary>
         [TestMethod]
-        public void TestListDropExact()
+        public void TestSeqDropExact()
         {
             CheckValid<Seq<byte>>(l =>
                 Implies(l.Length() >= 2, l.At(1).Value() == l.Drop(1).At(0).Value()));
         }
 
         /// <summary>
-        /// Test List drop while.
+        /// Test Seq drop while.
         /// </summary>
         [TestMethod]
         public void TestDropWhile()
@@ -265,7 +265,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List take while.
+        /// Test Seq take while.
         /// </summary>
         [TestMethod]
         public void TestTakeWhile()
@@ -279,20 +279,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List append.
+        /// Test Seq append.
         /// </summary>
         [TestMethod]
-        public void TestListAppend()
+        public void TestSeqAppend()
         {
             CheckValid<Seq<byte>, Seq<byte>>((l1, l2) => l1.Append(l2).Length() >= l1.Length());
             CheckValid<Seq<byte>, Seq<byte>>((l1, l2) => l1.Append(l2).Length() >= l2.Length());
         }
 
         /// <summary>
-        /// Test List arbitrary.
+        /// Test Seq arbitrary.
         /// </summary>
         [TestMethod]
-        public void TestListArbitrary()
+        public void TestSeqArbitrary()
         {
             var f = new ZenFunction<Seq<int>, bool>(l => And(l.Contains(1), l.Contains(2)));
             var arbitrarySeq = Seq.Create<int>().AddFront(Arbitrary<int>()).AddFront(Arbitrary<int>());
@@ -302,10 +302,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List reverse and append.
+        /// Test Seq reverse and append.
         /// </summary>
         [TestMethod]
-        public void TestListReverseAppend()
+        public void TestSeqReverseAppend()
         {
             CheckValid<Seq<byte>, Seq<byte>>((l1, l2) =>
             {
@@ -319,14 +319,14 @@ namespace ZenLib.Tests
         /// Test that size constraints are enforced correctly.
         /// </summary>
         [TestMethod]
-        public void TestListSizeConstraints()
+        public void TestSeqSizeConstraints()
         {
             var zf = new ZenFunction<Seq<byte>, bool>(l => l.Length() == 4);
-            var example1 = zf.Find((l, b) => b, listSize: 3);
+            var example1 = zf.Find((l, b) => b, depth: 3);
             Assert.IsFalse(example1.HasValue);
 
             var zfNested = new ZenFunction<Seq<Seq<byte>>, bool>(l => l.Any(x => x.Length() == 4));
-            var example2 = zfNested.Find((l, b) => b, listSize: 3);
+            var example2 = zfNested.Find((l, b) => b, depth: 3);
             Assert.IsFalse(example2.HasValue);
         }
     }

@@ -31,19 +31,19 @@ namespace ZenLib.Generation
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
 
         /// <summary>
-        /// Maximum length of a list.
+        /// Maximum length of an input.
         /// </summary>
-        private int maxSize;
+        private int maxDepth;
 
         /// <summary>
-        /// Whether to exhaustively test list sizes.
+        /// Whether to exhaustively test sizes.
         /// </summary>
-        private bool exhaustiveLists;
+        private bool exhaustiveDepth;
 
-        public SymbolicInputGenerator(int maxSize, bool exhaustiveLists = true)
+        public SymbolicInputGenerator(int maxDepth, bool exhaustiveDepth = true)
         {
-            this.maxSize = maxSize;
-            this.exhaustiveLists = exhaustiveLists;
+            this.maxDepth = maxDepth;
+            this.exhaustiveDepth = exhaustiveDepth;
         }
 
         public object VisitBool()
@@ -76,9 +76,9 @@ namespace ZenLib.Generation
 
         public object VisitList(Func<Type, object> recurse, Type listType, Type elementType)
         {
-            if (!exhaustiveLists)
+            if (!exhaustiveDepth)
             {
-                return GeneratorHelper.ApplyToList(recurse, elementType, maxSize);
+                return GeneratorHelper.ApplyToList(recurse, elementType, maxDepth);
             }
 
             var length = Arbitrary<byte>();
@@ -89,7 +89,7 @@ namespace ZenLib.Generation
 
             var list = emptyMethod.Invoke(null, CommonUtilities.EmptyArray);
 
-            for (int i = maxSize; i > 0; i--)
+            for (int i = maxDepth; i > 0; i--)
             {
                 var guard = length == Constant((byte)i);
                 var trueBranch = GeneratorHelper.ApplyToList(recurse, elementType, i);

@@ -398,7 +398,7 @@ namespace ZenLib.Tests
             var f = new ZenFunction<FiniteString, FiniteString, FiniteString, bool>(
                 (fs1, fs2, fs3) => Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3)));
 
-            var ex = f.Find((fs1, fs2, fs3, b) => Not(b), listSize: 4, checkSmallerLists: true);
+            var ex = f.Find((fs1, fs2, fs3, b) => Not(b), depth: 4, exhaustiveDepth: true);
             Assert.IsFalse(ex.HasValue);
         }
     }

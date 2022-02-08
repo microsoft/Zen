@@ -32,7 +32,7 @@ namespace ZenLib.Tests
         public static IEnumerable<Seq<Event>> GenerateTests()
         {
             var f = new ZenFunction<Seq<Event>, SwitchState>(es => ProcessEvents(es, InitialState()));
-            return f.GenerateInputs(precondition: IsValidSequence, listSize: 2, checkSmallerLists: false);
+            return f.GenerateInputs(precondition: IsValidSequence, depth: 2, exhaustiveDepth: false);
         }
 
         /// <summary>

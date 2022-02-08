@@ -90,7 +90,7 @@ namespace ZenLibBench
             var f = new ZenFunction<Route, Pair<Option<Route>, int>>(this.routeMap.ProcessProvenance);
             var packet = f.Find(
                 (p, o) => o.Item2() == (this.routeMap.Lines.Count + 1),
-                listSize: this.ListSize,
+                depth: this.ListSize,
                 backend: this.Backend);
         }
 
@@ -103,7 +103,7 @@ namespace ZenLibBench
             var f = new ZenFunction<Route, Option<Route>>(this.routeMap.Process);
             var packet = f.Find(
                 (p, o) => Not(o.HasValue()),
-                listSize: this.ListSize,
+                depth: this.ListSize,
                 backend: this.Backend);
         }
     }

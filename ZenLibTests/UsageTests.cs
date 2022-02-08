@@ -859,10 +859,20 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestListException()
+        public void TestSeqException()
         {
             Zen<int>[] x = null;
-            Seq.Create<int>(x);
+            Seq.Create(x);
+        }
+
+        /// <summary>
+        /// No exception thrown for non-null parameter.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqNoException()
+        {
+            Zen<int>[] x = new Zen<int>[] { 1, 2 };
+            Seq.Create(x);
         }
 
         /// <summary>
@@ -920,7 +930,7 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestCaseListException1()
+        public void TestCaseSeqException1()
         {
             Zen<Seq<int>> x = null;
             SeqExtensions.Case<int, int>(x, null, null);
@@ -931,7 +941,7 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestCaseListException2()
+        public void TestCaseSeqException2()
         {
             SeqExtensions.Case<int, int>(Seq.Create<int>(), null, null);
         }
@@ -941,7 +951,7 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestCaseListException3()
+        public void TestCaseSeqException3()
         {
             SeqExtensions.Case<int, int>(Seq.Create<int>(), 0, null);
         }
@@ -1266,7 +1276,7 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestToListException()
+        public void TestToSeqException()
         {
             OptionExtensions.ToSequence<int>(null);
         }
@@ -1428,10 +1438,10 @@ namespace ZenLib.Tests
         /// Pass explicit input.
         /// </summary>
         [TestMethod]
-        public void TestExactLists()
+        public void TestExactSeqs()
         {
             var f = new ZenFunction<Seq<int>, ushort>(l => l.Length());
-            f.Find((i, o) => true, checkSmallerLists: false);
+            f.Find((i, o) => true, exhaustiveDepth: false);
         }
 
         /// <summary>

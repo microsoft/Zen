@@ -98,8 +98,8 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListSorting()
         {
             var f = new ZenFunction<Seq<int>, Seq<int>>(x => x.Sort());
-            Assert.AreEqual(6, f.GenerateInputs(listSize: 3, checkSmallerLists: false).Count());
-            Assert.AreEqual(10, f.GenerateInputs(listSize: 3, checkSmallerLists: true).Count());
+            Assert.AreEqual(6, f.GenerateInputs(depth: 3, exhaustiveDepth: false).Count());
+            Assert.AreEqual(10, f.GenerateInputs(depth: 3, exhaustiveDepth: true).Count());
         }
 
         /// <summary>
