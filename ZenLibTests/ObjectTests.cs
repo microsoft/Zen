@@ -975,7 +975,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketEncapsulation()
         {
-            var encap = new ZenFunction<IList<IpHeader>, IList<IpHeader>>(headers =>
+            var encap = new ZenFunction<Seq<IpHeader>, Seq<IpHeader>>(headers =>
             {
                 var currentHeader = headers.At(0);
                 var newHeader = currentHeader.Value().WithField("DstIp", Ip.Create(5));
@@ -987,8 +987,8 @@ namespace ZenLib.Tests
             Assert.IsTrue(input.HasValue);
 
             var o = encap.Evaluate(input.Value);
-            Assert.IsTrue(o.Count >= 1);
-            Assert.AreEqual(5U, o.First().DstIp.Value);
+            Assert.IsTrue(o.Values.Count >= 1);
+            Assert.AreEqual(5U, o.Values.First().DstIp.Value);
         }
 
         /// <summary>

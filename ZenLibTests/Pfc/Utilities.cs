@@ -21,7 +21,7 @@ namespace ZenLib.Tests
         /// <param name="list">The list.</param>
         /// <param name="f">The pairwise invariant.</param>
         /// <returns>A zen value for the invariant.</returns>
-        internal static Zen<bool> PairwiseInvariant<T>(Zen<IList<T>> list, Func<Zen<T>, Zen<T>, Zen<bool>> f)
+        internal static Zen<bool> PairwiseInvariant<T>(Zen<Seq<T>> list, Func<Zen<T>, Zen<T>, Zen<bool>> f)
         {
             return list.Case(
                 empty: true,

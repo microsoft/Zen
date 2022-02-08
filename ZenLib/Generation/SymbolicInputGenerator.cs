@@ -18,7 +18,7 @@ namespace ZenLib.Generation
         /// <summary>
         /// The method for creating the empty list at runtime.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
+        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating and if expression at runtime.

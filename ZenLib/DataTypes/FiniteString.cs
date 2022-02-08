@@ -37,13 +37,13 @@ namespace ZenLib
                 chars.Add(c);
             }
 
-            this.Characters = chars;
+            this.Characters = new Seq<ushort> { Values = chars };
         }
 
         /// <summary>
         /// Gets the underlying characters.
         /// </summary>
-        public IList<ushort> Characters { get; set; }
+        public Seq<ushort> Characters { get; set; }
 
         /// <summary>
         /// Convert the finite string to a string.
@@ -53,7 +53,7 @@ namespace ZenLib
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var c in this.Characters)
+            foreach (var c in this.Characters.Values)
             {
                 sb.Append((char)c);
             }
@@ -78,12 +78,12 @@ namespace ZenLib
         /// <returns>Whether they are equal.</returns>
         public bool Equals(FiniteString other)
         {
-            if (this.Characters.Count != other.Characters.Count)
+            if (this.Characters.Values.Count != other.Characters.Values.Count)
             {
                 return false;
             }
 
-            return Enumerable.SequenceEqual(this.Characters, other.Characters);
+            return Enumerable.SequenceEqual(this.Characters.Values, other.Characters.Values);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace ZenLib
         public override int GetHashCode()
         {
             int hash = 7;
-            foreach (var c in this.Characters)
+            foreach (var c in this.Characters.Values)
             {
                 hash = 31 * hash + c;
             }
@@ -127,7 +127,7 @@ namespace ZenLib
         /// Creates an FiniteString.
         /// </summary>
         /// <returns>The finite string.</returns>
-        public static Zen<FiniteString> Create(Zen<IList<ushort>> values)
+        public static Zen<FiniteString> Create(Zen<Seq<ushort>> values)
         {
             return Create<FiniteString>(("Characters", values));
         }
@@ -138,7 +138,7 @@ namespace ZenLib
         /// <returns>The string value.</returns>
         public static Zen<FiniteString> Create(string s)
         {
-            var l = EmptyList<ushort>();
+            var l = Seq.Create<ushort>();
             foreach (var c in s.Reverse())
             {
                 l = l.AddFront(c);
@@ -153,7 +153,7 @@ namespace ZenLib
         /// <returns>The finite string.</returns>
         public static Zen<FiniteString> Create(Zen<ushort> b)
         {
-            return Create(Language.Singleton(b));
+            return Create(Seq.Create(b));
         }
     }
 
@@ -177,9 +177,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="s">The string.</param>
         /// <returns>The bytes.</returns>
-        public static Zen<IList<ushort>> GetCharacters(this Zen<FiniteString> s)
+        public static Zen<Seq<ushort>> GetCharacters(this Zen<FiniteString> s)
         {
-            return s.GetField<FiniteString, IList<ushort>>("Characters");
+            return s.GetField<FiniteString, Seq<ushort>>("Characters");
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace ZenLib
             return StartsWith(s.GetCharacters(), pre.GetCharacters());
         }
 
-        private static Zen<bool> StartsWith(Zen<IList<ushort>> s, Zen<IList<ushort>> pre)
+        private static Zen<bool> StartsWith(Zen<Seq<ushort>> s, Zen<Seq<ushort>> pre)
         {
             return pre.Case(
                 empty: true,
@@ -246,7 +246,7 @@ namespace ZenLib
             return At(s.GetCharacters(), i, 0);
         }
 
-        private static Zen<FiniteString> At(Zen<IList<ushort>> s, Zen<ushort> i, int current)
+        private static Zen<FiniteString> At(Zen<Seq<ushort>> s, Zen<ushort> i, int current)
         {
             return s.Case(
                 empty: FiniteString.Create(""),
@@ -265,7 +265,7 @@ namespace ZenLib
             return Contains(s.GetCharacters(), sub.GetCharacters());
         }
 
-        private static Zen<bool> Contains(Zen<IList<ushort>> s, Zen<IList<ushort>> sub)
+        private static Zen<bool> Contains(Zen<Seq<ushort>> s, Zen<Seq<ushort>> sub)
         {
             return s.Case(
                 empty: sub.IsEmpty(),
@@ -283,7 +283,7 @@ namespace ZenLib
             return IndexOf(s.GetCharacters(), sub.GetCharacters(), 0);
         }
 
-        private static Zen<Option<ushort>> IndexOf(Zen<IList<ushort>> s, Zen<IList<ushort>> sub, int current)
+        private static Zen<Option<ushort>> IndexOf(Zen<Seq<ushort>> s, Zen<Seq<ushort>> sub, int current)
         {
             return s.Case(
                 empty: If(sub.IsEmpty(), Option.Create<ushort>((ushort)current), Option.Null<ushort>()),
@@ -346,7 +346,7 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         /// <param name="f">The transformation function.</param>
         /// <returns>A new string.</returns>
-        public static Zen<FiniteString> Transform(this Zen<FiniteString> s, Func<Zen<IList<ushort>>, Zen<IList<ushort>>> f)
+        public static Zen<FiniteString> Transform(this Zen<FiniteString> s, Func<Zen<Seq<ushort>>, Zen<Seq<ushort>>> f)
         {
             return FiniteString.Create(f(s.GetCharacters()));
         }

@@ -86,7 +86,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             Settings.PreserveBranches = true;
-            var f = new ZenFunction<IList<int>, bool>(x => x.Contains(3));
+            var f = new ZenFunction<Seq<int>, bool>(x => x.Contains(3));
             Assert.AreEqual(6, f.GenerateInputs().Count());
             Settings.PreserveBranches = false;
         }
@@ -97,7 +97,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionListSorting()
         {
-            var f = new ZenFunction<IList<int>, IList<int>>(x => x.Sort());
+            var f = new ZenFunction<Seq<int>, Seq<int>>(x => x.Sort());
             Assert.AreEqual(6, f.GenerateInputs(listSize: 3, checkSmallerLists: false).Count());
             Assert.AreEqual(10, f.GenerateInputs(listSize: 3, checkSmallerLists: true).Count());
         }
@@ -264,8 +264,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionPrecondition()
         {
-            var f = new ZenFunction<IList<byte>, bool>(l => l.IsSorted());
-            var f1 = new ZenFunction<IList<byte>, bool>(l1 => l1.Contains(2));
+            var f = new ZenFunction<Seq<byte>, bool>(l => l.IsSorted());
+            var f1 = new ZenFunction<Seq<byte>, bool>(l1 => l1.Contains(2));
             Assert.IsTrue(f1.GenerateInputs(precondition: l => l.IsSorted()).All(i => f.Evaluate(i)));
         }
 

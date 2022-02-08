@@ -29,9 +29,9 @@ namespace ZenLib.Tests
         /// Gets the Zen function for the model.
         /// </summary>
         /// <returns>An input if one exists.</returns>
-        public static IEnumerable<IList<Event>> GenerateTests()
+        public static IEnumerable<Seq<Event>> GenerateTests()
         {
-            var f = new ZenFunction<IList<Event>, SwitchState>(es => ProcessEvents(es, InitialState()));
+            var f = new ZenFunction<Seq<Event>, SwitchState>(es => ProcessEvents(es, InitialState()));
             return f.GenerateInputs(precondition: IsValidSequence, listSize: 2, checkSmallerLists: false);
         }
 
@@ -50,7 +50,7 @@ namespace ZenLib.Tests
                 ("StormStartedTime2", Constant<ushort>(0)),
                 ("StormEndedTime1", Constant<ushort>(0)),
                 ("StormEndedTime2", Constant<ushort>(0)),
-                ("Packets", EmptyList<Pair<ushort, Pair<byte, bool>>>()));
+                ("Packets", Seq.Create<Pair<ushort, Pair<byte, bool>>>()));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace ZenLib.Tests
         /// </summary>
         /// <param name="es">The events.</param>
         /// <returns>A Zen value for if the sequence is valid.</returns>
-        private static Zen<bool> IsValidSequence(Zen<IList<Event>> es)
+        private static Zen<bool> IsValidSequence(Zen<Seq<Event>> es)
         {
             var areTimesAscending = Utilities.PairwiseInvariant(es, (x, y) => x.GetTimeStamp() < y.GetTimeStamp());
 
@@ -83,7 +83,7 @@ namespace ZenLib.Tests
         /// <param name="isPreviousStart">Whether a start is open and waiting to be closed.</param>
         /// <param name="priorityClass">The priority class.</param>
         /// <returns></returns>
-        private static Zen<bool> AreStartEndStormsValid(Zen<IList<Event>> es, Zen<bool> isPreviousStart, byte priorityClass)
+        private static Zen<bool> AreStartEndStormsValid(Zen<Seq<Event>> es, Zen<bool> isPreviousStart, byte priorityClass)
         {
             var startType = Event.EventTypeAsByte(EventType.PfcStormStartEvent);
             var endType = Event.EventTypeAsByte(EventType.PfcStormEndEvent);
@@ -106,9 +106,9 @@ namespace ZenLib.Tests
         /// <param name="es">The events.</param>
         /// <param name="initialState">The initial state.</param>
         /// <returns>The updated switch state.</returns>
-        private static Zen<SwitchState> ProcessEvents(Zen<IList<Event>> es, Zen<SwitchState> initialState)
+        private static Zen<SwitchState> ProcessEvents(Zen<Seq<Event>> es, Zen<SwitchState> initialState)
         {
-            return Language.Fold(es, initialState, ProcessEvent);
+            return es.Fold(initialState, ProcessEvent);
         }
 
         /// <summary>

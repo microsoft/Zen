@@ -17,7 +17,7 @@ namespace ZenLib.Generation
         /// <summary>
         /// Method for the creating an empty Zen list.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
+        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         public object VisitBool()
         {

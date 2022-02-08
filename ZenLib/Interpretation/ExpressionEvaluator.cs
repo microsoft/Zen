@@ -8,6 +8,7 @@ namespace ZenLib.Interpretation
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
+    using System.Reflection;
     using ZenLib.SymbolicExecution;
     using static ZenLib.Language;
 
@@ -208,10 +209,22 @@ namespace ZenLib.Interpretation
             foreach (var fieldValuePair in expression.Fields)
             {
                 var field = fieldValuePair.Key;
-                dynamic fieldValue = fieldValuePair.Value;
-                var valueResult = fieldValue.Accept(this, parameter);
-                fieldNames.Add(field);
-                parameters.Add(valueResult);
+                var acceptMethod = fieldValuePair.Value
+                    .GetType()
+                    .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .MakeGenericMethod(
+                        typeof(ExpressionEvaluatorEnvironment),
+                        typeof(object));
+                try
+                {
+                    var valueResult = acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter });
+                    fieldNames.Add(field);
+                    parameters.Add(valueResult);
+                }
+                catch (TargetInvocationException e)
+                {
+                    throw e.InnerException;
+                }
             }
 
             var result = ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());

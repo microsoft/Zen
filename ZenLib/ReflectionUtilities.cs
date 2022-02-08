@@ -606,11 +606,11 @@ namespace ZenLib
         /// <returns>The Zen value representing the list.</returns>
         internal static Zen<IList<T>> CreateZenListConstant<T>(IList<T> value)
         {
-            var list = EmptyList<T>();
+            Zen<IList<T>> list = ZenListEmptyExpr<T>.Instance;
             foreach (var elt in value.Reverse())
             {
                 ReportIfNullConversionError(elt, "element", typeof(IList<T>));
-                list = list.AddFront(elt);
+                list = ZenListAddFrontExpr<T>.Create(list, elt);
             }
 
             return list;

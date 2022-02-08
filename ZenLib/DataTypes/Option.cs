@@ -217,11 +217,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> ToList<T>(this Zen<Option<T>> expr)
+        public static Zen<Seq<T>> ToSequence<T>(this Zen<Option<T>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var l = EmptyList<T>();
+            var l = Seq.Create<T>();
             return If(expr.HasValue(), l.AddFront(expr.Value()), l);
         }
     }

@@ -17,7 +17,7 @@ namespace ZenLib.Generation
         /// <summary>
         /// List method from Zen.Language.
         /// </summary>
-        private static MethodInfo listMethod = typeof(Language).GetMethod("List");
+        private static MethodInfo listMethod = typeof(Language).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// Name of the function used to create an object via reflection.

@@ -17,7 +17,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
         /// </summary>
-        public IList<Pair<TKey, TValue>> Values { get; set; } = new List<Pair<TKey, TValue>>();
+        public Seq<Pair<TKey, TValue>> Values { get; set; } = new Seq<Pair<TKey, TValue>>();
 
         /// <summary>
         /// Add a key and value to the Dict.
@@ -26,7 +26,7 @@ namespace ZenLib
         /// <param name="value">The value to add.</param>
         public void Add(TKey key, TValue value)
         {
-            this.Values.Insert(0, (key, value));
+            this.Values.Values.Insert(0, (key, value));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib
                 throw new System.IndexOutOfRangeException($"Missing key: {key} from Dict.");
             }
 
-            return this.Values[idx].Item2;
+            return this.Values.Values[idx].Item2;
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace ZenLib
         /// <returns>The index, or -1 if none.</returns>
         private int IndexOf(TKey key)
         {
-            for (int i = 0; i < this.Values.Count; i++)
+            for (int i = 0; i < this.Values.Values.Count; i++)
             {
-                if (this.Values[i].Item1.Equals(key))
+                if (this.Values.Values[i].Item1.Equals(key))
                 {
                     return i;
                 }
@@ -81,7 +81,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "{" + string.Join(", ", this.Values.Select(kv => $"{kv.Item1} => {kv.Item2}")) + "}";
+            return "{" + string.Join(", ", this.Values.Values.Select(kv => $"{kv.Item1} => {kv.Item2}")) + "}";
         }
     }
 
@@ -96,7 +96,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Dict<TKey, TValue>> Create<TKey, TValue>()
         {
-            return Create<Dict<TKey, TValue>>(("Values", EmptyList<Pair<TKey, TValue>>()));
+            return Create<Dict<TKey, TValue>>(("Values", Seq.Create<Pair<TKey, TValue>>()));
         }
     }
 
@@ -118,7 +118,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, IList<Pair<TKey, TValue>>>("Values");
+            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
             return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
         }
 
@@ -133,8 +133,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, IList<Pair<TKey, TValue>>>("Values");
-            return l.ListGet(keyExpr);
+            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
+            return l.SeqGet(keyExpr);
         }
 
         /// <summary>
@@ -157,14 +157,14 @@ namespace ZenLib
         /// <param name="expr">Zen list expression.</param>
         /// <param name="key">The key.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<Option<TValue>> ListGet<TKey, TValue>(this Zen<IList<Pair<TKey, TValue>>> expr, Zen<TKey> key)
+        private static Zen<Option<TValue>> SeqGet<TKey, TValue>(this Zen<Seq<Pair<TKey, TValue>>> expr, Zen<TKey> key)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(key);
 
             return expr.Case(
                 empty: Option.Null<TValue>(),
-                cons: (hd, tl) => If(hd.Item1() == key, Option.Create(hd.Item2()), tl.ListGet(key)));
+                cons: (hd, tl) => If(hd.Item1() == key, Option.Create(hd.Item2()), tl.SeqGet(key)));
         }
     }
 }

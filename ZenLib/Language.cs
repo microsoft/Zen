@@ -122,22 +122,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Create a list of arbitrary elements.
-        /// </summary>
-        /// <param name="count">Zen elements.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> ArbitraryList<T>(ushort count)
-        {
-            var elements = new Zen<T>[count];
-            for (int i = 0; i < count; i++)
-            {
-                elements[i] = Arbitrary<T>();
-            }
-
-            return List(elements);
-        }
-
-        /// <summary>
         /// The Zen expression for an option match.
         /// </summary>
         /// <param name="expr">The expression.</param>
@@ -163,15 +147,6 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
 
             return expr.GetField<Option<T>, T>("Value");
-        }
-
-        /// <summary>
-        /// The Zen value for an empty List.
-        /// </summary>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> EmptyList<T>()
-        {
-            return ZenListEmptyExpr<T>.Instance;
         }
 
         /// <summary>
@@ -325,10 +300,10 @@ namespace ZenLib
 
         private static Zen<bool> EqLists<T>(Zen<IList<T>> expr1, Zen<IList<T>> expr2)
         {
-            return expr1.Case(
-                empty: expr2.IsEmpty(),
-                cons: (hd1, tl1) =>
-                    expr2.Case(empty: false, cons: (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
+            return ZenListCaseExpr<T, bool>.Create(
+                expr1,
+                ZenListCaseExpr<T, bool>.Create(expr2, True(), (hd, tl) => False()),
+                (hd1, tl1) => ZenListCaseExpr<T, bool>.Create(expr2, False(), (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
         }
 
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
@@ -925,552 +900,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Add a value to the back of a Zen list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="valueExpr">Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> AddBack<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
-
-            return listExpr.Case(
-                empty: Singleton(valueExpr),
-                cons: (hd, tl) => AddBack(tl, valueExpr).AddFront(hd));
-        }
-
-        /// <summary>
-        /// Add a value to the front of a Zen list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="valueExpr">Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> AddFront<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
-
-            return ZenListAddFrontExpr<T>.Create(listExpr, valueExpr);
-        }
-
-        /// <summary>
-        /// Count the occurences of an element in a list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="valueExpr">Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<ushort> Duplicates<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
-
-            return listExpr.Case(
-                empty: Constant<ushort>(0),
-                cons: (hd, tl) =>
-                    If(hd == valueExpr, tl.Duplicates(valueExpr), tl.Duplicates(valueExpr) + Constant<ushort>(1)));
-        }
-
-        /// <summary>
-        /// Remove the first instance of a value from a list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="valueExpr">Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> RemoveFirst<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
-
-            return listExpr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(hd == valueExpr, tl, tl.RemoveFirst(valueExpr).AddFront(hd)));
-        }
-
-        /// <summary>
-        /// Remove the first instance of a value from a list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="valueExpr">Zen expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> RemoveAll<T>(this Zen<IList<T>> listExpr, Zen<T> valueExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
-
-            return listExpr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) =>
-                {
-                    var tlRemoved = tl.RemoveAll(valueExpr);
-                    return If(hd == valueExpr, tlRemoved, tlRemoved.AddFront(hd));
-                });
-        }
-
-        /// <summary>
-        /// Match and deconstruct a Zen list.
-        /// </summary>
-        /// <param name="listExpr">The list expression.</param>
-        /// <param name="empty">The empty case.</param>
-        /// <param name="cons">The cons case.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<TResult> Case<T, TResult>(
-            this Zen<IList<T>> listExpr,
-            Zen<TResult> empty,
-            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(empty);
-            CommonUtilities.ValidateNotNull(cons);
-
-            return ZenListCaseExpr<T, TResult>.Create(listExpr, empty, cons);
-        }
-
-        /// <summary>
-        /// Map over a list to create a new list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="function">The map function.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T2>> Select<T1, T2>(this Zen<IList<T1>> listExpr, Func<Zen<T1>, Zen<T2>> function)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(function);
-
-            return listExpr.Case(
-                empty: EmptyList<T2>(),
-                cons: (hd, tl) => tl.Select(function).AddFront(function(hd)));
-        }
-
-        /// <summary>
-        /// Filter a list to create a new list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="predicate">The filtering function.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Where<T>(this Zen<IList<T>> listExpr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return listExpr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) =>
-                {
-                    var x = tl.Where(predicate);
-                    return If(predicate(hd), x.AddFront(hd), x);
-                });
-        }
-
-        /// <summary>
-        /// Find an element that satisfies a predicate.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="predicate">The filtering function.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> Find<T>(this Zen<IList<T>> listExpr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return listExpr.Case(
-                empty: Option.Null<T>(),
-                cons: (hd, tl) => If(predicate(hd), Option.Create(hd), tl.Find(predicate)));
-        }
-
-        /// <summary>
-        /// Get the length of the list.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<ushort> Length<T>(this Zen<IList<T>> listExpr)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-
-            return listExpr.Case(
-                empty: Constant<ushort>(0),
-                cons: (hd, tl) => tl.Length() + 1);
-        }
-
-        /// <summary>
-        /// Check if a list contains an element.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="element">The element.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> Contains<T>(this Zen<IList<T>> listExpr, Zen<T> element)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(element);
-
-            return listExpr.Any((x) => Eq(x, element));
-        }
-
-        /// <summary>
-        /// Append two lists together.
-        /// </summary>
-        /// <param name="expr1">First Zen list expression.</param>
-        /// <param name="expr2">Second Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Append<T>(this Zen<IList<T>> expr1, Zen<IList<T>> expr2)
-        {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-
-            return expr1.Case(
-                empty: expr2,
-                cons: (hd, tl) => tl.Append(expr2).AddFront(hd));
-        }
-
-        /// <summary>
-        /// Whether a list is empty.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> IsEmpty<T>(this Zen<IList<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.Case(empty: True(), cons: (hd, tl) => False());
-        }
-
-        /// <summary>
-        /// Create a singleton list.
-        /// </summary>
-        /// <param name="element">Zen element.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Singleton<T>(this Zen<T> element)
-        {
-            CommonUtilities.ValidateNotNull(element);
-
-            return EmptyList<T>().AddFront(element);
-        }
-
-        /// <summary>
-        /// Create a list from some number of elements.
-        /// </summary>
-        /// <param name="elements">Zen elements.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> List<T>(params Zen<T>[] elements)
-        {
-            CommonUtilities.ValidateNotNull(elements);
-
-            Zen<T>[] copy = new Zen<T>[elements.Length];
-            Array.Copy(elements, copy, elements.Length);
-            Array.Reverse(copy);
-            var list = EmptyList<T>();
-            foreach (var element in copy)
-            {
-                list = list.AddFront(element);
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// Reverse a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Reverse<T>(this Zen<IList<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return Reverse(expr, EmptyList<T>());
-        }
-
-        private static Zen<IList<T>> Reverse<T>(this Zen<IList<T>> expr, Zen<IList<T>> acc)
-        {
-            return expr.Case(
-                empty: acc,
-                cons: (hd, tl) => tl.Reverse(acc.AddFront(hd)));
-        }
-
-        /// <summary>
-        /// Intersperse a list with an element.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="element">The element to intersperse.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Intersperse<T>(this Zen<IList<T>> expr, Zen<T> element)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(element);
-
-            return expr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(IsEmpty(tl), Singleton(hd), tl.Intersperse(element).AddFront(hd)));
-        }
-
-        /// <summary>
-        /// Fold a function over a Zen list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="acc">The initial value.</param>
-        /// <param name="function">The fold function.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<T2> Fold<T1, T2>(this Zen<IList<T1>> expr, Zen<T2> acc, Func<Zen<T1>, Zen<T2>, Zen<T2>> function)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(acc);
-            CommonUtilities.ValidateNotNull(function);
-
-            return expr.Case(
-                empty: acc,
-                cons: (hd, tl) => tl.Fold(function(hd, acc), function));
-        }
-
-        /// <summary>
-        /// Check if any element satisfies a predicate.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="predicate">The predicate to check.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> Any<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return expr.Fold(False(), (x, y) => Or(predicate(x), y));
-        }
-
-        /// <summary>
-        /// Check if all elements satisfy a predicate.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="predicate">The predicate to check.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> All<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return expr.Fold(True(), (x, y) => And(predicate(x), y));
-        }
-
-        /// <summary>
-        /// Take n elements from a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="numElements">The number of elements to take.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Take<T>(this Zen<IList<T>> expr, Zen<ushort> numElements)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(numElements);
-
-            return Take(expr, numElements, 0);
-        }
-
-        /// <summary>
-        /// Take n elements from a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="numElements">The number of elements to take.</param>
-        /// <param name="i">The current index.</param>
-        /// <returns>Zen value.</returns>
-        private static Zen<IList<T>> Take<T>(this Zen<IList<T>> expr, Zen<ushort> numElements, int i)
-        {
-            return expr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == numElements, EmptyList<T>(), tl.Take(numElements, i + 1).AddFront(hd)));
-        }
-
-        /// <summary>
-        /// Take elements from a list while a predicate is true.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> TakeWhile<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return expr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(predicate(hd), tl.TakeWhile(predicate).AddFront(hd), EmptyList<T>()));
-        }
-
-        /// <summary>
-        /// Drop n elements from a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="numElements">The number of elements to take.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Drop<T>(this Zen<IList<T>> expr, Zen<ushort> numElements)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(numElements);
-
-            return Drop(expr, numElements, 0);
-        }
-
-        /// <summary>
-        /// Drop n elements from a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="numElements">The number of elements to take.</param>
-        /// <param name="i">The current index.</param>
-        /// <returns>Zen value.</returns>
-        private static Zen<IList<T>> Drop<T>(this Zen<IList<T>> expr, Zen<ushort> numElements, int i)
-        {
-            return expr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == numElements, expr, tl.Drop(numElements, i + 1)));
-        }
-
-        /// <summary>
-        /// Drop elements from a list while a predicate is true.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> DropWhile<T>(this Zen<IList<T>> expr, Func<Zen<T>, Zen<bool>> predicate)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(predicate);
-
-            return expr.Case(
-                empty: EmptyList<T>(),
-                cons: (hd, tl) => If(predicate(hd), EmptyList<T>(), tl.DropWhile(predicate).AddFront(hd)));
-        }
-
-        /// <summary>
-        /// Split a list at an element.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="index">The index to split at.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Pair<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(index);
-
-            return SplitAt(expr, index, 0);
-        }
-
-        /// <summary>
-        /// Split a list at an element.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <param name="index">The index to split at.</param>
-        /// <param name="i">The current index.</param>
-        /// <returns>Zen value.</returns>
-        private static Zen<Pair<IList<T>, IList<T>>> SplitAt<T>(this Zen<IList<T>> expr, Zen<ushort> index, int i)
-        {
-            return expr.Case(
-                empty: Pair.Create(EmptyList<T>(), EmptyList<T>()),
-                cons: (hd, tl) =>
-                {
-                    var tup = tl.SplitAt(index, i + 1);
-                    return If((ushort)i <= index,
-                              Pair.Create(tup.Item1().AddFront(hd), tup.Item2()),
-                              Pair.Create(tup.Item1(), tup.Item2().AddFront(hd)));
-                });
-        }
-
-        /// <summary>
-        /// Get the value of a list at an index.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="index">Zen index expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> At<T>(this Zen<IList<T>> listExpr, Zen<ushort> index)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(index);
-
-            return At(listExpr, index, 0);
-        }
-
-        /// <summary>
-        /// Get the value of a list at an index.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="index">Zen index expression.</param>
-        /// <param name="i">Current index.</param>
-        /// <returns>Zen value.</returns>
-        private static Zen<Option<T>> At<T>(this Zen<IList<T>> listExpr, Zen<ushort> index, int i)
-        {
-            return listExpr.Case(
-                empty: Option.Null<T>(),
-                cons: (hd, tl) => If(Constant<ushort>((ushort)i) == index, Option.Create(hd), tl.At(index, i + 1)));
-        }
-
-        /// <summary>
-        /// Get the value of a list at an index.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="value">Zen value expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Option<ushort>> IndexOf<T>(this Zen<IList<T>> listExpr, Zen<T> value)
-        {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(value);
-
-            return listExpr.IndexOf(value, 0);
-        }
-
-        /// <summary>
-        /// Get the value of a list at an index.
-        /// </summary>
-        /// <param name="listExpr">Zen list expression.</param>
-        /// <param name="value">Zen value expression.</param>
-        /// <param name="i">Current index.</param>
-        /// <returns>Zen value.</returns>
-        private static Zen<Option<ushort>> IndexOf<T>(this Zen<IList<T>> listExpr, Zen<T> value, int i)
-        {
-            return listExpr.Case(
-                empty: Option.Null<ushort>(),
-                cons: (hd, tl) => If(value == hd, Option.Create(Constant((ushort)i)), tl.IndexOf(value, i + 1)));
-        }
-
-        /// <summary>
-        /// Check if a list is sorted.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> IsSorted<T>(this Zen<IList<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.Case(
-                empty: True(),
-                cons: (hd1, tl1) =>
-                    tl1.Case(empty: True(),
-                              cons: (hd2, tl2) => And(hd1 <= hd2, tl1.IsSorted())));
-        }
-
-        /// <summary>
-        /// Sort a list.
-        /// </summary>
-        /// <param name="expr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Sort<T>(this Zen<IList<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.Case(empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
-        }
-
-        /// <summary>
-        /// Insert a value into a sorted list.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="expr">Zen list expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<IList<T>> Insert<T>(Zen<T> element, Zen<IList<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(element);
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.Case(
-                empty: Singleton(element),
-                cons: (hd, tl) => If(element <= hd, expr.AddFront(element), Insert(element, tl).AddFront(hd)));
-        }
-
-        /// <summary>
         /// Get a field from a Zen value.
         /// </summary>
         /// <param name="expr">Zen object expression.</param>
@@ -1508,6 +937,36 @@ namespace ZenLib
         public static Zen<T> Create<T>(params (string, object)[] fields)
         {
             return ZenCreateObjectExpr<T>.Create(fields);
+        }
+
+        /// <summary>
+        /// The Zen value for an empty List.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IList<T>> EmptyList<T>()
+        {
+            return ZenListEmptyExpr<T>.Instance;
+        }
+
+        /// <summary>
+        /// Create a list from some number of elements.
+        /// </summary>
+        /// <param name="elements">Zen elements.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IList<T>> List<T>(params Zen<T>[] elements)
+        {
+            CommonUtilities.ValidateNotNull(elements);
+
+            Zen<T>[] copy = new Zen<T>[elements.Length];
+            Array.Copy(elements, copy, elements.Length);
+            Array.Reverse(copy);
+            var list = EmptyList<T>();
+            foreach (var element in copy)
+            {
+                list = ZenListAddFrontExpr<T>.Create(list, element);
+            }
+
+            return list;
         }
 
         /// <summary>
