@@ -129,8 +129,8 @@ namespace ZenLib.Generation
             {
                 var fieldName = asList[i].Key;
                 var fieldType = asList[i].Value;
-                config = UpdateDepthConfiguration(config, GetSizeAttribute(objectType, fieldName));
-                args[i] = (fieldName, recurse(fieldType, config));
+                var newConfig = UpdateDepthConfiguration(config, GetSizeAttribute(objectType, fieldName));
+                args[i] = (fieldName, recurse(fieldType, newConfig));
             }
 
             return method.Invoke(null, new object[] { args });
@@ -144,7 +144,6 @@ namespace ZenLib.Generation
             }
 
             var depth = attribute.Depth > 0 ? attribute.Depth : config.Depth;
-
             var exhaustive = attribute.EnumerationType == EnumerationType.User ?
                 config.ExhaustiveDepth :
                 attribute.EnumerationType == EnumerationType.Exhaustive;

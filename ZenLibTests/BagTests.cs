@@ -96,6 +96,23 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test the Bag add if space method works.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAddIfSpace()
+        {
+            var b1 = Symbolic<Bag<int>>();
+            var b2 = Symbolic<Bag<int>>();
+            var b3 = b1.AddIfSpace(5);
+
+            var sol = (b2 == b3).Solve();
+            var r1 = sol.Get(b1);
+            var r2 = sol.Get(b3);
+            Console.WriteLine(r1);
+            Console.WriteLine(r2);
+        }
+
+        /// <summary>
         /// Test the Bag remove method works.
         /// </summary>
         [TestMethod]
@@ -131,6 +148,24 @@ namespace ZenLib.Tests
         public void TestBagAddContains()
         {
             RandomBytes(x => CheckValid<Bag<byte>>(l => l.Add(x).Contains(x)));
+        }
+
+        /// <summary>
+        /// Test that adding to the bag works when there is space.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAddIfSpaceContains1()
+        {
+            RandomBytes(x => CheckValid<Bag<byte>>(l => Implies(l.Size() == 0, l.AddIfSpace(x).Contains(x))));
+        }
+
+        /// <summary>
+        /// Test that adding to the bag works when there is no space.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAddIfSpaceNotContains1()
+        {
+            RandomBytes(x => CheckValid<Bag<byte>>(l => Implies(l.Size() >= 5, l.AddIfSpace(x) == l)));
         }
 
         /// <summary>

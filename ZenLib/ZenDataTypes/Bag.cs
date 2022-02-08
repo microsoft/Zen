@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -115,13 +114,44 @@ namespace ZenLib
         /// </summary>
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <param name="value">The value to add to the bag.</param>
-        /// <returns>The new bag from adding the value..</returns>
+        /// <returns>The new bag from adding the value.</returns>
         public static Zen<Bag<T>> Add<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
             return Bag.Create(bagExpr.Values().AddFront(Option.Create(value)));
+        }
+
+        /// <summary>
+        /// Add a value to a bag if space given the maximum size.
+        /// If no space, then replace the last value.
+        /// </summary>
+        /// <param name="bagExpr">Zen bag expression.</param>
+        /// <param name="value">The value to add to the bag.</param>
+        /// <returns>The new bag from adding the value.</returns>
+        public static Zen<Bag<T>> AddIfSpace<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
+        {
+            CommonUtilities.ValidateNotNull(bagExpr);
+            CommonUtilities.ValidateNotNull(value);
+
+            return Bag.Create(AddIfSpace(bagExpr.Values(), value));
+        }
+
+        /// <summary>
+        /// Add a value to a sequence if there is space.
+        /// Otherwise, replace the last value.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="value">The value to add to the sequence.</param>
+        /// <returns>The new bag from adding the value.</returns>
+        public static Zen<Seq<Option<T>>> AddIfSpace<T>(this Zen<Seq<Option<T>>> seqExpr, Zen<T> value)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(value);
+
+            return seqExpr.Case(seqExpr, (hd, tl) =>
+                If(hd.HasValue(), AddIfSpace(tl, value).AddFront(hd), tl.AddFront(Option.Create(value))));
         }
 
         /// <summary>
