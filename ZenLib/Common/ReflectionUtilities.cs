@@ -545,9 +545,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="visitor">The type visitor object.</param>
         /// <param name="type">The type.</param>
+        /// <param name="parameter">The parameter.</param>
         /// <typeparam name="T">The return type.</typeparam>
+        /// <typeparam name="TParam">The parameter type.</typeparam>
         /// <returns>A value.</returns>
-        internal static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
+        internal static T ApplyTypeVisitor<T, TParam>(ITypeVisitor<T, TParam> visitor, Type type, TParam parameter)
         {
             if (type == BoolType)
                 return visitor.VisitBool();
@@ -575,7 +577,7 @@ namespace ZenLib
             if (IsIListType(type))
             {
                 var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
+                return visitor.VisitList((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
             }
 
             if (IsListType(type))
@@ -596,7 +598,7 @@ namespace ZenLib
                 dict[property.Name] = property.PropertyType;
             }
 
-            return visitor.VisitObject(t => ApplyTypeVisitor(visitor, t), type, dict);
+            return visitor.VisitObject((t, p) => ApplyTypeVisitor(visitor, t, p), type, dict, parameter);
         }
 
         /// <summary>

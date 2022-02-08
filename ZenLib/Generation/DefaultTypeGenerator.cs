@@ -13,7 +13,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to help generate a default symbolic value.
     /// </summary>
-    internal class DefaultTypeGenerator : ITypeVisitor<object>
+    internal class DefaultTypeGenerator : ITypeVisitor<object, Unit>
     {
         /// <summary>
         /// Method for the creating an empty Zen list.
@@ -40,7 +40,7 @@ namespace ZenLib.Generation
             return ZenConstantExpr<int>.Create(0);
         }
 
-        public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
+        public object VisitList(Func<Type, Unit, object> recurse, Type listType, Type innerType, Unit u)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
@@ -63,7 +63,7 @@ namespace ZenLib.Generation
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
 
-        public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
+        public object VisitObject(Func<Type, Unit, object> recurse, Type objectType, SortedDictionary<string, Type> fields, Unit u)
         {
             var asList = fields.ToArray();
 
@@ -72,7 +72,7 @@ namespace ZenLib.Generation
             var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                args[i] = (asList[i].Key, recurse(asList[i].Value));
+                args[i] = (asList[i].Key, recurse(asList[i].Value, new Unit()));
             }
 
             return method.Invoke(null, new object[] { args });

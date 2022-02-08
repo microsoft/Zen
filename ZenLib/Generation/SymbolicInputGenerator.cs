@@ -14,7 +14,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to help generate a symbolic input.
     /// </summary>
-    internal class SymbolicInputGenerator : ITypeVisitor<object>
+    internal class SymbolicInputGenerator : ITypeVisitor<object, DepthConfiguration>
     {
         /// <summary>
         /// The method for creating the empty list at runtime.
@@ -40,22 +40,6 @@ namespace ZenLib.Generation
         /// The arbitrary expressions generated.
         /// </summary>
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
-
-        /// <summary>
-        /// Maximum length of an input.
-        /// </summary>
-        private int maxDepth;
-
-        /// <summary>
-        /// Whether to exhaustively test sizes.
-        /// </summary>
-        private bool exhaustiveDepth;
-
-        public SymbolicInputGenerator(int maxDepth, bool exhaustiveDepth = true)
-        {
-            this.maxDepth = maxDepth;
-            this.exhaustiveDepth = exhaustiveDepth;
-        }
 
         public object VisitBool()
         {
@@ -85,11 +69,11 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitList(Func<Type, object> recurse, Type listType, Type elementType)
+        public object VisitList(Func<Type, DepthConfiguration, object> recurse, Type listType, Type elementType, DepthConfiguration config)
         {
-            if (!exhaustiveDepth)
+            if (!config.ExhaustiveDepth)
             {
-                return ApplyToList(recurse, elementType, maxDepth);
+                return ApplyToList(recurse, elementType, config, config.Depth);
             }
 
             var length = Arbitrary<byte>();
@@ -100,24 +84,24 @@ namespace ZenLib.Generation
 
             var list = emptyMethod.Invoke(null, CommonUtilities.EmptyArray);
 
-            for (int i = maxDepth; i > 0; i--)
+            for (int i = config.Depth; i > 0; i--)
             {
                 var guard = length == Constant((byte)i);
-                var trueBranch = ApplyToList(recurse, elementType, i);
+                var trueBranch = ApplyToList(recurse, elementType, config, i);
                 list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
             }
 
             return list;
         }
 
-        public static object ApplyToList(Func<Type, object> recurse, Type innerType, int size)
+        public static object ApplyToList(Func<Type, DepthConfiguration, object> recurse, Type innerType, DepthConfiguration config, int size)
         {
             var method = listMethod.MakeGenericMethod(innerType);
 
             var args = new object[size];
             for (int i = 0; i < size; i++)
             {
-                var arg = recurse(innerType);
+                var arg = recurse(innerType, config);
                 args[i] = arg;
             }
 
@@ -134,7 +118,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
+        public object VisitObject(Func<Type, DepthConfiguration, object> recurse, Type objectType, SortedDictionary<string, Type> fields, DepthConfiguration config)
         {
             var asList = fields.ToArray();
 
@@ -143,7 +127,7 @@ namespace ZenLib.Generation
             var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                args[i] = (asList[i].Key, recurse(asList[i].Value));
+                args[i] = (asList[i].Key, recurse(asList[i].Value, config));
             }
 
             return method.Invoke(null, new object[] { args });

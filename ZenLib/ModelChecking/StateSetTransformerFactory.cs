@@ -45,15 +45,15 @@ namespace ZenLib.ModelChecking
         public static StateSetTransformer<T1, T2> CreateTransformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function, StateSetTransformerManager manager)
         {
             // create an arbitrary input and invoke the function
-            var generator = new SymbolicInputGenerator(0, false);
-            var input = Basic.Arbitrary<T1>(generator);
+            var generator = new SymbolicInputGenerator();
+            var input = Basic.Arbitrary<T1>(generator, 0, false);
             var arbitrariesForInput = generator.ArbitraryExpressions;
 
             var expression = function(input);
 
             // create an arbitrary output value
-            generator = new SymbolicInputGenerator(0, false);
-            var output = Basic.Arbitrary<T2>(generator);
+            generator = new SymbolicInputGenerator();
+            var output = Basic.Arbitrary<T2>(generator, 0, false);
             var arbitrariesForOutput = generator.ArbitraryExpressions;
 
             // create an expression relating input and output.
@@ -183,8 +183,8 @@ namespace ZenLib.ModelChecking
         public static StateSet<T> CreateStateSet<T>(Func<Zen<T>, Zen<bool>> function, StateSetTransformerManager manager)
         {
             // create an arbitrary input and invoke the function
-            var generator = new SymbolicInputGenerator(0, false);
-            var input = Basic.Arbitrary<T>(generator);
+            var generator = new SymbolicInputGenerator();
+            var input = Basic.Arbitrary<T>(generator, 0, false);
             var arbitrariesForInput = generator.ArbitraryExpressions;
 
             var expression = function(input);
