@@ -8,7 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Tests for finding multiple inputs.

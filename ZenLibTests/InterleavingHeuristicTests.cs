@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.ModelChecking;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// A class representing a simple sequence.
@@ -41,7 +41,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Create<T>()
         {
-            return Language.Create<Seq<T>>(("Values", ZenListEmptyExpr<T>.Instance));
+            return Basic.Create<Seq<T>>(("Values", ZenListEmptyExpr<T>.Instance));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<Seq<T>> Create<T>(Zen<IList<T>> listExpr)
         {
-            return Language.Create<Seq<T>>(("Values", listExpr));
+            return Basic.Create<Seq<T>>(("Values", listExpr));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(elements);
 
-            return Seq.Create(Language.List(elements));
+            return Seq.Create(Basic.List(elements));
         }
     }
 

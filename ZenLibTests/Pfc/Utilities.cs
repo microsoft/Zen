@@ -27,7 +27,7 @@ namespace ZenLib.Tests
                 empty: true,
                 cons: (hd1, tl1) => tl1.Case(
                     empty: true,
-                    cons: (hd2, tl2) => Language.And(f(hd1, hd2), PairwiseInvariant(tl1, f))));
+                    cons: (hd2, tl2) => Basic.And(f(hd1, hd2), PairwiseInvariant(tl1, f))));
         }
     }
 }

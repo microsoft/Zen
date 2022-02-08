@@ -91,7 +91,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTypeVisitorListException()
         {
-            TestHelper.CheckAgreement<List<int>>(l => Language.True());
+            TestHelper.CheckAgreement<List<int>>(l => Basic.True());
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTypeVisitorDictionaryException()
         {
-            TestHelper.CheckAgreement<List<int>>(d => Language.True());
+            TestHelper.CheckAgreement<List<int>>(d => Basic.True());
         }
 
         /// <summary>
@@ -122,12 +122,12 @@ namespace ZenLib.Tests
         public void TestStackOverflow()
         {
             Settings.UseLargeStack = true;
-            Zen<int> x = Language.Arbitrary<int>();
-            Zen<int> y = Language.Arbitrary<int>();
+            Zen<int> x = Basic.Arbitrary<int>();
+            Zen<int> y = Basic.Arbitrary<int>();
 
             for (int i = 0; i < 20000; i++)
             {
-                y = Language.If(x >= i, i, y);
+                y = Basic.If(x >= i, i, y);
             }
 
             y.Simplify();

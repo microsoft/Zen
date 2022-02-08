@@ -82,7 +82,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestRandomGenerationHelper()
         {
-            var o2 = Language.Generate<TestHelper.Object2>();
+            var o2 = Basic.Generate<TestHelper.Object2>();
             Assert.IsTrue(o2 is TestHelper.Object2);
         }
     }

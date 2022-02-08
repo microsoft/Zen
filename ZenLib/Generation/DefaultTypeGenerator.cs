@@ -17,7 +17,7 @@ namespace ZenLib.Generation
         /// <summary>
         /// Method for the creating an empty Zen list.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo emptyListMethod = typeof(Basic).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         public object VisitBool()
         {
@@ -49,7 +49,7 @@ namespace ZenLib.Generation
         {
             var c = intType.GetConstructor(new Type[] { typeof(long) });
             dynamic value = c.Invoke(new object[] { 0L });
-            return Language.Constant(value);
+            return Basic.Constant(value);
         }
 
         public object VisitBigInteger()

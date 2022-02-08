@@ -10,7 +10,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.ModelChecking;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Tests for state sets.

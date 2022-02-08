@@ -10,7 +10,7 @@ namespace ZenLib.Interpretation
     using System.Numerics;
     using System.Reflection;
     using ZenLib.SymbolicExecution;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Interpret a Zen expression.

@@ -7,7 +7,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Class representing the model for Pfc and the watchdog.

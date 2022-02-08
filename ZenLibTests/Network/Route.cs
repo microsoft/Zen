@@ -9,7 +9,7 @@ namespace ZenLib.Tests.Network
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Simple packet class for testing.

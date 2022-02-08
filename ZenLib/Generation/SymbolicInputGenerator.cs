@@ -8,7 +8,7 @@ namespace ZenLib.Generation
     using System.Collections.Generic;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Class to help generate a symbolic input.
@@ -18,12 +18,12 @@ namespace ZenLib.Generation
         /// <summary>
         /// The method for creating the empty list at runtime.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo emptyListMethod = typeof(Basic).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
-        private static MethodInfo ifConditionMethod = typeof(Language).GetMethod("If");
+        private static MethodInfo ifConditionMethod = typeof(Basic).GetMethod("If");
 
         /// <summary>
         /// The arbitrary expressions generated.

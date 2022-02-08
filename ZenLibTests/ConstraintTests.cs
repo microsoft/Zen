@@ -8,7 +8,7 @@ namespace ZenLib.Tests
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Test the ZenConstraint implementation.

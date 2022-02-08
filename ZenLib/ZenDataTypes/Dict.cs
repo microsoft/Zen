@@ -7,7 +7,7 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// A class representing a simple list-backed dictionary.

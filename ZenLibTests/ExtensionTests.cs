@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// Test the extensions APIs.

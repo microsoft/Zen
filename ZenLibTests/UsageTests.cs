@@ -10,7 +10,7 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>
@@ -137,7 +137,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAndException1()
         {
-            Language.And(null, true);
+            Basic.And(null, true);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAndException2()
         {
-            Language.And(true, null);
+            Basic.And(true, null);
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseBigIntegerException()
         {
-            Language.BitwiseAnd<BigInteger>(new BigInteger(0), new BigInteger(1));
+            Basic.BitwiseAnd<BigInteger>(new BigInteger(0), new BigInteger(1));
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseAndException1()
         {
-            Language.BitwiseAnd<byte>(null, 0);
+            Basic.BitwiseAnd<byte>(null, 0);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseAndException2()
         {
-            Language.BitwiseAnd<byte>(0, null);
+            Basic.BitwiseAnd<byte>(0, null);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseNotException()
         {
-            Language.BitwiseNot<byte>(null);
+            Basic.BitwiseNot<byte>(null);
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseOrException1()
         {
-            Language.BitwiseOr<byte>(null, 0);
+            Basic.BitwiseOr<byte>(null, 0);
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseOrException2()
         {
-            Language.BitwiseOr<byte>(0, null);
+            Basic.BitwiseOr<byte>(0, null);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseXorException1()
         {
-            Language.BitwiseXor<byte>(null, 0);
+            Basic.BitwiseXor<byte>(null, 0);
         }
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseXorException2()
         {
-            Language.BitwiseXor<byte>(0, null);
+            Basic.BitwiseXor<byte>(0, null);
         }
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestEqException1()
         {
-            Language.Eq<int>(null, null);
+            Basic.Eq<int>(null, null);
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestEqException2()
         {
-            Language.Eq<int>(0, null);
+            Basic.Eq<int>(0, null);
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGeqException1()
         {
-            Language.Geq<byte>(null, null);
+            Basic.Geq<byte>(null, null);
         }
 
         /// <summary>
@@ -467,7 +467,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGeqException2()
         {
-            Language.Geq<byte>(0, null);
+            Basic.Geq<byte>(0, null);
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetFieldException1()
         {
-            Language.GetField<Object1, int>(null, null);
+            Basic.GetField<Object1, int>(null, null);
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetFieldException2()
         {
-            Language.GetField<Object1, int>(Language.Create<Object1>(("Field1", Constant(0))), null);
+            Basic.GetField<Object1, int>(Basic.Create<Object1>(("Field1", Constant(0))), null);
         }
 
         /// <summary>
@@ -517,7 +517,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGtException1()
         {
-            Language.Gt<byte>(null, null);
+            Basic.Gt<byte>(null, null);
         }
 
         /// <summary>
@@ -527,7 +527,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGtException2()
         {
-            Language.Gt<byte>(0, null);
+            Basic.Gt<byte>(0, null);
         }
 
         /// <summary>
@@ -547,7 +547,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIfException1()
         {
-            Language.If<int>(null, null, null);
+            Basic.If<int>(null, null, null);
         }
 
         /// <summary>
@@ -557,7 +557,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIfException2()
         {
-            Language.If<int>(true, null, null);
+            Basic.If<int>(true, null, null);
         }
 
         /// <summary>
@@ -567,7 +567,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIfException3()
         {
-            Language.If<int>(true, 3, null);
+            Basic.If<int>(true, 3, null);
         }
 
         /// <summary>
@@ -577,7 +577,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestImpliesException1()
         {
-            Language.Implies(null, null);
+            Basic.Implies(null, null);
         }
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestImpliesException2()
         {
-            Language.Implies(true, null);
+            Basic.Implies(true, null);
         }
 
         /// <summary>
@@ -841,7 +841,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLeqException1()
         {
-            Language.Leq<int>(null, null);
+            Basic.Leq<int>(null, null);
         }
 
         /// <summary>
@@ -851,7 +851,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLeqException2()
         {
-            Language.Leq<int>(0, null);
+            Basic.Leq<int>(0, null);
         }
 
         /// <summary>
@@ -872,7 +872,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLtException1()
         {
-            Language.Lt<int>(null, null);
+            Basic.Lt<int>(null, null);
         }
 
         /// <summary>
@@ -882,7 +882,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLtException2()
         {
-            Language.Lt<int>(0, null);
+            Basic.Lt<int>(0, null);
         }
 
         /// <summary>
@@ -892,7 +892,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException1()
         {
-            Language.Case<int, int>(null, null, (Func<Zen<int>, Zen<int>>)null);
+            Basic.Case<int, int>(null, null, (Func<Zen<int>, Zen<int>>)null);
         }
 
         /// <summary>
@@ -902,7 +902,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException2()
         {
-            Language.Case<int, int>(Option.Null<int>(), null, null);
+            Basic.Case<int, int>(Option.Null<int>(), null, null);
         }
 
         /// <summary>
@@ -912,7 +912,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseOptionException3()
         {
-            Language.Case<int, int>(Option.Null<int>(), () => 0, null);
+            Basic.Case<int, int>(Option.Null<int>(), () => 0, null);
         }
 
         /// <summary>
@@ -953,7 +953,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMaxException1()
         {
-            Language.Max(null, Constant<byte>(0));
+            Basic.Max(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -963,7 +963,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMaxException2()
         {
-            Language.Max(Constant<byte>(0), null);
+            Basic.Max(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -973,7 +973,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMinException1()
         {
-            Language.Min(null, Constant<byte>(0));
+            Basic.Min(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -983,7 +983,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMinException2()
         {
-            Language.Min(Constant<byte>(0), null);
+            Basic.Min(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -993,7 +993,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMinusException1()
         {
-            Language.Minus(null, Constant<byte>(0));
+            Basic.Minus(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -1003,7 +1003,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMinusException2()
         {
-            Language.Minus(Constant<byte>(0), null);
+            Basic.Minus(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -1013,7 +1013,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException1()
         {
-            Language.Multiply(null, Constant<byte>(0));
+            Basic.Multiply(null, Constant<byte>(0));
         }
 
         /// <summary>
@@ -1023,7 +1023,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException2()
         {
-            Language.Multiply(Constant<byte>(0), null);
+            Basic.Multiply(Constant<byte>(0), null);
         }
 
         /// <summary>
@@ -1033,7 +1033,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestNotException()
         {
-            Language.Not(null);
+            Basic.Not(null);
         }
 
         /// <summary>
@@ -1043,7 +1043,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestOrException1()
         {
-            Language.Or(null, null);
+            Basic.Or(null, null);
         }
 
         /// <summary>
@@ -1053,7 +1053,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestOrException2()
         {
-            Language.Or(true, null);
+            Basic.Or(true, null);
         }
 
         /// <summary>
@@ -1063,7 +1063,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestPlusException1()
         {
-            Language.Plus<int>(null, null);
+            Basic.Plus<int>(null, null);
         }
 
         /// <summary>
@@ -1073,7 +1073,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestPlusException2()
         {
-            Language.Plus<int>(0, null);
+            Basic.Plus<int>(0, null);
         }
 
         /// <summary>
@@ -1298,7 +1298,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTupleValueException()
         {
-            Language.Value<int>(null);
+            Basic.Value<int>(null);
         }
 
         /// <summary>
@@ -1501,7 +1501,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestImplicitObjectFieldConversionException()
         {
-            Language.Create<Object1>(("Field1", 0));
+            Basic.Create<Object1>(("Field1", 0));
         }
 
         /// <summary>
@@ -1511,7 +1511,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCreationIncorrectType1()
         {
-            Language.Create<Object1>(("Field1", Constant(false)));
+            Basic.Create<Object1>(("Field1", Constant(false)));
         }
 
         /// <summary>
@@ -1521,7 +1521,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCreationIncorrectType2()
         {
-            Language.Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(false)));
+            Basic.Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(false)));
         }
 
         /// <summary>
@@ -1531,7 +1531,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestInvalidFieldZenType()
         {
-            Language.Create<Object1>(("Field1", Constant(0))).WithField("Field1", Constant(true));
+            Basic.Create<Object1>(("Field1", Constant(0))).WithField("Field1", Constant(true));
         }
     }
 }

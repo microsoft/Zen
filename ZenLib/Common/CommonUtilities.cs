@@ -224,7 +224,7 @@ namespace ZenLib
         /// <returns>An arbitrary Zen value.</returns>
         public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
         {
-            return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
+            return (input is null) ? Basic.Arbitrary<T>(listSize, checkSmallerLists) : input;
         }
 
         /// <summary>

@@ -17,12 +17,12 @@ namespace ZenLib.Generation
         /// <summary>
         /// List method from Zen.Language.
         /// </summary>
-        private static MethodInfo listMethod = typeof(Language).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo listMethod = typeof(Basic).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// Name of the function used to create an object via reflection.
         /// </summary>
-        private static MethodInfo createMethod = typeof(Language).GetMethod("Create");
+        private static MethodInfo createMethod = typeof(Basic).GetMethod("Create");
 
         public static object ApplyToObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
         {

@@ -26,7 +26,7 @@ namespace ZenLib.Tests.Network
         /// <returns>The ip.</returns>
         public static Zen<Ip> Create(Zen<uint> value)
         {
-            return Language.Create<Ip>(("Value", value));
+            return Basic.Create<Ip>(("Value", value));
         }
 
         /// <summary>

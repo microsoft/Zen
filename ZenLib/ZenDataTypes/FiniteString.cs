@@ -9,7 +9,7 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
 
     /// <summary>
     /// A class representing a finite unicode string.

@@ -78,12 +78,12 @@ namespace ZenLib
         {
             if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
             {
-                return Language.Constant(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
+                return Basic.Constant(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
             }
 
             if (e1 is ZenConstantExpr<ulong> ue1 && e2 is ZenConstantExpr<ulong> ue2)
             {
-                return Language.Constant(constantUlongFuncs[(int)comparisonType](ue1.Value, ue2.Value));
+                return Basic.Constant(constantUlongFuncs[(int)comparisonType](ue1.Value, ue2.Value));
             }
 
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);

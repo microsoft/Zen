@@ -11,7 +11,7 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>

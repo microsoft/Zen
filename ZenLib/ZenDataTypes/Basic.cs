@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenFunctions.cs" company="Microsoft">
+﻿// <copyright file="Basic.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -14,27 +14,27 @@ namespace ZenLib
     /// <summary>
     /// Collection of helper functions for building Zen programs.
     /// </summary>
-    public static class Language
+    public static class Basic
     {
         /// <summary>
         /// Get field method for reflection.
         /// </summary>
-        private static MethodInfo getFieldMethod = typeof(Language).GetMethod("GetField");
+        private static MethodInfo getFieldMethod = typeof(Basic).GetMethod("GetField");
 
         /// <summary>
         /// Equality method for reflection.
         /// </summary>
-        private static MethodInfo eqMethod = typeof(Language).GetMethod("Eq");
+        private static MethodInfo eqMethod = typeof(Basic).GetMethod("Eq");
 
         /// <summary>
         /// Boolean equality method for reflection.
         /// </summary>
-        private static MethodInfo eqBoolMethod = typeof(Language).GetMethod("Eq").MakeGenericMethod(typeof(bool));
+        private static MethodInfo eqBoolMethod = typeof(Basic).GetMethod("Eq").MakeGenericMethod(typeof(bool));
 
         /// <summary>
         /// List equality method for reflection.
         /// </summary>
-        private static MethodInfo eqListsMethod = typeof(Language).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo eqListsMethod = typeof(Basic).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// Generates a new random value of a given type.

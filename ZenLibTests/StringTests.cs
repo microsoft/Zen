@@ -11,7 +11,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>

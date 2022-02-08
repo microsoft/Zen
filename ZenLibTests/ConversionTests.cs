@@ -8,7 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static ZenLib.Language;
+    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
 
     /// <summary>
