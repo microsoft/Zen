@@ -8,7 +8,7 @@ namespace ZenLib.SymbolicExecution
     using System.Collections.Generic;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Generate inputs to a function that exercise all paths.

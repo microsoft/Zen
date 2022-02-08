@@ -12,7 +12,7 @@ namespace ZenLib
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
     using ZenLib.SymbolicExecution;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Zen function representation.

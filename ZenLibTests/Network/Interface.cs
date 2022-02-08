@@ -6,7 +6,7 @@ namespace ZenLib.Tests.Network
 {
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// A device interface object.

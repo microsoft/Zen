@@ -59,7 +59,7 @@ namespace ZenLib.SymbolicExecution
         /// <returns>The Zen expression.</returns>
         public Zen<bool> GetExpr()
         {
-            return Basic.And(this.Conjuncts.ToArray());
+            return Zen.And(this.Conjuncts.ToArray());
         }
 
         /// <summary>

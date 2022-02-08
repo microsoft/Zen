@@ -8,7 +8,7 @@ namespace ZenLib.Tests.Network
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using ZenLib;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// An access control list object.

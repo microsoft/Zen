@@ -11,7 +11,7 @@ namespace ZenLibBench
     using ZenLib.ModelChecking;
     using ZenLib.Tests.Network;
 
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Benchmark for encoding ACLs of various sizes.

@@ -9,7 +9,7 @@ namespace ZenLib.Generation
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Class to help generate a symbolic input.
@@ -19,22 +19,22 @@ namespace ZenLib.Generation
         /// <summary>
         /// The method for creating the empty list at runtime.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Basic).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
-        private static MethodInfo ifConditionMethod = typeof(Basic).GetMethod("If");
+        private static MethodInfo ifConditionMethod = typeof(Zen).GetMethod("If");
 
         /// <summary>
         /// Name of the function used to create an object via reflection.
         /// </summary>
-        private static MethodInfo createMethod = typeof(Basic).GetMethod("Create");
+        private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");
 
         /// <summary>
         /// List method from Zen.Language.
         /// </summary>
-        private static MethodInfo listMethod = typeof(Basic).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo listMethod = typeof(Zen).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The arbitrary expressions generated.

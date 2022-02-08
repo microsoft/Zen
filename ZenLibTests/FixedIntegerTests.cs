@@ -11,7 +11,7 @@ namespace ZenLib.Tests
     using System.Net;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.ModelChecking;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests fixed integer operations.

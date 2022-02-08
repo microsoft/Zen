@@ -8,7 +8,7 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib.Generation;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// A simple option type to parameterize over nullable
@@ -138,7 +138,7 @@ namespace ZenLib
         public static Zen<Option<T>> Null<T>()
         {
             var v = (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T), new Unit());
-            return Basic.Create<Option<T>>(("HasValue", False()), ("Value", v));
+            return Zen.Create<Option<T>>(("HasValue", False()), ("Value", v));
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            return Basic.Create<Option<T>>(("HasValue", True()), ("Value", expr));
+            return Zen.Create<Option<T>>(("HasValue", True()), ("Value", expr));
         }
     }
 

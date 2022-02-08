@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.Tests.Network;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for Zen working with classes.

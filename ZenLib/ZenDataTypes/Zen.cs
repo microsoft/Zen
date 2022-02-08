@@ -14,27 +14,27 @@ namespace ZenLib
     /// <summary>
     /// Collection of helper functions for building Zen programs.
     /// </summary>
-    public static class Basic
+    public static class Zen
     {
         /// <summary>
         /// Get field method for reflection.
         /// </summary>
-        private static MethodInfo getFieldMethod = typeof(Basic).GetMethod("GetField");
+        private static MethodInfo getFieldMethod = typeof(Zen).GetMethod("GetField");
 
         /// <summary>
         /// Equality method for reflection.
         /// </summary>
-        private static MethodInfo eqMethod = typeof(Basic).GetMethod("Eq");
+        private static MethodInfo eqMethod = typeof(Zen).GetMethod("Eq");
 
         /// <summary>
         /// Boolean equality method for reflection.
         /// </summary>
-        private static MethodInfo eqBoolMethod = typeof(Basic).GetMethod("Eq").MakeGenericMethod(typeof(bool));
+        private static MethodInfo eqBoolMethod = typeof(Zen).GetMethod("Eq").MakeGenericMethod(typeof(bool));
 
         /// <summary>
         /// List equality method for reflection.
         /// </summary>
-        private static MethodInfo eqListsMethod = typeof(Basic).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo eqListsMethod = typeof(Zen).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// Lift a C# value to a Zen value.

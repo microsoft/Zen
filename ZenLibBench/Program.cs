@@ -27,10 +27,10 @@ namespace ZenLibBench
             {
                 var f = new Func<Zen<TestObject>, Zen<Option<TestObject>>>(p =>
                 {
-                    return Basic.If(
+                    return Zen.If(
                         p.GetField<TestObject, uint>("DstIp") == 1,
                         Option.Create(p.WithField<TestObject, uint>("DstIp", 2)),
-                        Basic.If(
+                        Zen.If(
                             p.GetField<TestObject, uint>("DstIp") == 3,
                             Option.Create(p.WithField<TestObject, uint>("DstIp", 4)),
                             Option.Create(p)
@@ -50,8 +50,8 @@ namespace ZenLibBench
 
                 var largeSet = new ZenFunction<TestObject, bool>(p =>
                 {
-                    var constraints = randoms.Select(x => Basic.And(p.GetField<TestObject, uint>("DstIp") == x.Item1, p.GetField<TestObject, uint>("SrcIp") == x.Item2));
-                    return Basic.Or(constraints.ToArray());
+                    var constraints = randoms.Select(x => Zen.And(p.GetField<TestObject, uint>("DstIp") == x.Item1, p.GetField<TestObject, uint>("SrcIp") == x.Item2));
+                    return Zen.Or(constraints.ToArray());
                 }).StateSet();
 
                 var t = zf2.Transformer();
@@ -65,7 +65,7 @@ namespace ZenLibBench
         {
             Benchmark(nameof(BenchmarkAllocation), 20000, () =>
             {
-                var zf = new ZenFunction<uint, bool>(x => Basic.And(x <= 90, x >= 30));
+                var zf = new ZenFunction<uint, bool>(x => Zen.And(x <= 90, x >= 30));
                 zf.StateSet();
                 zf.Transformer();
             });
@@ -79,7 +79,7 @@ namespace ZenLibBench
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
                 b.NumLines = 10000;
                 b.CreateAcl();
-                b.Acl.ProcessProvenance(Basic.Arbitrary<ZenLib.Tests.Network.IpHeader>());
+                b.Acl.ProcessProvenance(Zen.Arbitrary<ZenLib.Tests.Network.IpHeader>());
             });
         }
 

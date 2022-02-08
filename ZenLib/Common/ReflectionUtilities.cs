@@ -9,7 +9,7 @@ namespace ZenLib
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Basic;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// A collection of helper functions for manipulating Zen
@@ -90,7 +90,7 @@ namespace ZenLib
         /// <summary>
         /// The object creation method.
         /// </summary>
-        public static MethodInfo CreateMethod = typeof(Basic).GetMethod("Create");
+        public static MethodInfo CreateMethod = typeof(Zen).GetMethod("Create");
 
         /// <summary>
         /// The zen constant list creation method.

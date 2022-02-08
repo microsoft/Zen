@@ -9,8 +9,8 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for simplification.
@@ -457,9 +457,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthHashCons()
         {
-            var e1 = Basic.Length("abc");
-            var e2 = Basic.Length("abc");
-            var e3 = Basic.Length("ab");
+            var e1 = Zen.Length("abc");
+            var e2 = Zen.Length("abc");
+            var e3 = Zen.Length("ab");
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
         }
@@ -470,10 +470,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfHashCons()
         {
-            var e1 = Basic.IndexOf("abc", "a", new BigInteger(0));
-            var e2 = Basic.IndexOf("abc", "a", new BigInteger(0));
-            var e3 = Basic.IndexOf("abc", "a", new BigInteger(1));
-            var e4 = Basic.IndexOf("abc", "b", new BigInteger(0));
+            var e1 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e2 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e3 = Zen.IndexOf("abc", "a", new BigInteger(1));
+            var e4 = Zen.IndexOf("abc", "b", new BigInteger(0));
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
             Assert.IsFalse(ReferenceEquals(e1, e4));

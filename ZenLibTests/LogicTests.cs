@@ -6,8 +6,8 @@ namespace ZenLib.Tests
 {
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static ZenLib.Basic;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for primitive types.
