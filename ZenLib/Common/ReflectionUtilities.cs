@@ -387,7 +387,19 @@ namespace ZenLib
             }
 
             var propertyInfo = type.GetPropertyCached(fieldName);
-            propertyInfo.SetValue(obj, fieldValue);
+            if (propertyInfo == null)
+            {
+                throw new ZenException($"Unable to set field or property {fieldName} for an object of type {type}.");
+            }
+
+            try
+            {
+                propertyInfo.SetValue(obj, fieldValue);
+            }
+            catch (ArgumentException)
+            {
+                throw new ZenException($"Unable to set field or property {propertyInfo.Name} for an object of type {type}");
+            }
         }
 
         /// <summary>
@@ -411,6 +423,18 @@ namespace ZenLib
         /// <returns>An instance of the object.</returns>
         public static object CreateInstance(Type type, string[] fieldNames, object[] values)
         {
+            // first try to find if there is a constructor with parameter names matching the fields.
+            // this helps in some cases and for F# where constructors are generated for records.
+            foreach (var c in type.GetConstructors())
+            {
+                var parameters = FindMatchingParameters(c, fieldNames, values);
+                if (parameters != null)
+                {
+                    return Activator.CreateInstance(type, parameters);
+                }
+            }
+
+            // otherwise, use a default constructor then set the fields.
             var obj = Activator.CreateInstance(type);
             for (int i = 0; i < fieldNames.Length; i++)
             {
@@ -420,6 +444,53 @@ namespace ZenLib
             }
 
             return obj;
+        }
+
+        private static object[] FindMatchingParameters(ConstructorInfo c, string[] fieldNames, object[] values)
+        {
+            var parameters = c.GetParameters();
+            if (parameters.Length != values.Length)
+            {
+                return null;
+            }
+
+            var result = new object[values.Length];
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                var fieldName = fieldNames[i];
+                var value = values[i];
+
+                var parameterIndex = FindMatchingParamter(parameters, fieldName, value.GetType());
+                if (parameterIndex < 0)
+                {
+                    return null;
+                }
+
+                // matched the same parameter twice.
+                if (result[parameterIndex] != null)
+                {
+                    return null;
+                }
+
+                result[parameterIndex] = values[i];
+            }
+
+            return result;
+        }
+
+        private static int FindMatchingParamter(ParameterInfo[] parameters, string fieldName, Type fieldType)
+        {
+            for (int j = 0; j < parameters.Length; j++)
+            {
+                var parameterNameMatchesField = string.Compare(parameters[j].Name, fieldName, true) == 0;
+
+                if (parameterNameMatchesField && parameters[j].ParameterType == fieldType)
+                {
+                    return j;
+                }
+            }
+
+            return -1;
         }
 
         /// <summary>
