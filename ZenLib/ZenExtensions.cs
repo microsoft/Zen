@@ -44,7 +44,7 @@ namespace ZenLib
                 ReflectionUtilities.ValidateIsZenType(keyType);
                 var innerType = keyType.GetGenericArgumentsCached()[0];
                 CommonUtilities.ValidateIsTrue(innerType.IsAssignableFrom(valueType), mismatchMessage);
-                constraints = Language.And(constraints, Language.Eq((dynamic)kv.Key, (dynamic)kv.Value));
+                constraints = Zen.And(constraints, Zen.Eq((dynamic)kv.Key, (dynamic)kv.Value));
             }
 
             var solution = constraints.Solve();

@@ -8,7 +8,7 @@ namespace ZenLib.Interpretation
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using ZenLib.SymbolicExecution;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Helper functions to interpret a Zen function.

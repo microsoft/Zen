@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a research library that provides high-level abstractions in C# to make it easier to leverage high-performance constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to C# objects. It makes it easier to construct complex encodings and and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler, model checker, and test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
+Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
 
 # Installation
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
@@ -15,26 +15,25 @@ To import the Zen library, add the following lines to your source file:
 
 ```csharp
 using ZenLib;
-using static ZenLib.Language;
 ```
 
 The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can take on any value. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., bool, int, string, IList) and then encodes constraints over those variables.
 
 ```csharp
 // create symbolic variables of different types
-var b = Symbolic<bool>();
-var i = Symbolic<int>();
-var s = Symbolic<string>();
-var o = Symbolic<Option<ulong>>();
-var l = Symbolic<IList<int>>(listSize: 10, checkSmallerLists: false);
+var b = Zen.Symbolic<bool>();
+var i = Zen.Symbolic<int>();
+var s = Zen.Symbolic<string>();
+var o = Zen.Symbolic<Option<ulong>>();
+var l = Zen.Symbolic<Seq<int>>(depth: 10, exhaustiveDepth: false);
 
 // build constraints on these variables
-var c1 = Or(b, i <= 10);
-var c2 = Or(Not(b), o == Option.Some(1UL));
-var c3 = Or(s.Contains("hello"), Not(o.HasValue()));
+var c1 = Zen.Or(b, i <= 10);
+var c2 = Zen.Or(Zen.Not(b), o == Option.Some(1UL));
+var c3 = Zen.Or(s.Contains("hello"), Zen.Not(o.HasValue()));
 var c4 = l.Where(x => x <= i).Length() == 5;
-var c5 = l.All(x => And(x >= 0, x <= 100));
-var expr = And(c1, c2, c3, c4, c5);
+var c5 = l.All(x => Zen.And(x >= 0, x <= 100));
+var expr = Zen.And(c1, c2, c3, c4, c5);
 
 // solve the constraints to get a solution
 var solution = expr.Solve();
@@ -46,17 +45,17 @@ System.Console.WriteLine("o: " + solution.Get(o));
 System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
 ```
 
-The output of this example produces the following values for me:
+The output of this example produces the following values:
 
 ```
 b: True
-i: 52
-s: hello
+i: 20
+s: !0!hello!1!
 o: Some(1)
-l: 54,53,54,53,37,53,37,37,37,37
+l: [37,5,21,6,21,21,6,6,6,21]
 ```
 
-Since `Zen<T>` objects are just normal C# objects, we can pass them and return them from functions. For isntance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
+Since `Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
 
 ```csharp
 Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
@@ -70,7 +69,7 @@ Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, fa
 Rather than manually building constraints as shown previously, we can also ask Zen to represent a "function" from some inputs to an output. To do so, we create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
-ZenFunction<int, int, int> function = new ZenFunction<int, int, int>(MultiplyAndAdd);
+var function = new ZenFunction<int, int, int>(MultiplyAndAdd);
 ```
 
 Given a `ZenFunction` we can leverage the library to perform several additional tasks.
@@ -125,7 +124,7 @@ compiled function time: 2ms
 A powerful feature Zen supports is the ability to find function inputs that lead to some (un)desirable outcome. For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
 
 ```csharp
-var input = function.Find((x, y, result) => And(x <= 0, result == 11)); 
+var input = function.Find((x, y, result) => Zen.And(x <= 0, result == 11)); 
 // input.Value = (-1883171776, 1354548043)
 ```
 
@@ -134,32 +133,34 @@ The type of the result in this case is `Option<(int, int)>`, which will have a p
 To find multiple inputs, Zen supports an equivalent `FindAll` method, which returns an `IEnumerable` of inputs.
 
 ```csharp
-var inputs = function.FindAll((x, y, result) => And(x <= 0, result == 11)).Take(5);
+using System.Linq;
+...
+var inputs = function.FindAll((x, y, result) => Zen.And(x <= 0, result == 11)).Take(5);
 ```
 
 Each input in `inputs` will be unique so there will be no duplicates.
 
-Zen also supports richer data types such as lists. For example, we can write an implementation for the insertion sort algorithm using recursion:
+Zen also supports richer data types such as sequences. For example, we can write an implementation for the insertion sort algorithm using recursion:
 
 ```csharp
-Zen<IList<T>> Sort<T>(Zen<IList<T>> expr)
+Zen<Seq<T>> Sort<T>(Zen<Seq<T>> expr)
 {
-    return expr.Case(empty: EmptyList<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
+    return expr.Case(empty: Seq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
 }
 
-Zen<IList<T>> Insert<T>(Zen<T> elt, Zen<IList<T>> list)
+Zen<Seq<T>> Insert<T>(Zen<T> elt, Zen<Seq<T>> list)
 {
     return list.Case(
-        empty: Singleton(elt),
-        cons: (hd, tl) => If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
+        empty: Seq.Create(elt),
+        cons: (hd, tl) => Zen.If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
 }
 ```
 
 We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
 
 ```csharp
-var f = new ZenFunction<IList<byte>, IList<byte>>(l => Sort(l));
-var input = f.Find((inlist, outlist) => inlist.Length() != outlist.Length());
+var f = new ZenFunction<Seq<byte>, IList<Seq>>(l => Sort(l));
+var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
 // input = None
 ```
 
@@ -172,7 +173,7 @@ While the `Find` function provides a way to find a single input to a function, Z
 It does this through a `StateSetTransformer` API. A transformer is created by calling the `Transformer()` method on a `ZenFunction`:
 
 ```csharp
-ZenFunction<uint, uint> f = new ZenFunction<uint, uint>(i => i + 1);
+var f = new ZenFunction<uint, uint>(i => i + 1);
 
 // create a set transformer from the function
 StateSetTransformer<uint, uint> t = f.Transformer();
@@ -206,11 +207,11 @@ Internally, transformers leverage [binary decision diagrams](https://github.com/
 As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
 ```csharp
-var f = new ZenFunction<IList<byte>, IList<byte>>(l => Sort(l));
+var f = new ZenFunction<Seq<byte>, Seq<byte>>(l => Sort(l));
 
-foreach (var list in f.GenerateInputs(listSize: 3))
+foreach (var seq in f.GenerateInputs(depth: 3))
 {
-    Console.WriteLine($"[{string.Join(",", list)}]");
+    Console.WriteLine($"[{string.Join(",", seq)}]");
 }
 ```
 
@@ -233,7 +234,30 @@ The test generation approach uses [symbolic execution](https://en.wikipedia.org/
 
 # Supported data types
 
-Zen currently supports a subset of the C# language, described in more detail below.
+Zen currently supports a subset of .NET types and also introduces some of its own data types summarized below.
+
+| Type   | Description          | Supported by Z3 backend | Supported by BDD backend | Supported by `StateSetTransformers`
+| ------ | -------------------- | ----------------------- | ------------------------ | ------------|
+| `bool`   | {true, false}        | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `byte`   | 8-bit value          | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `short`  | 16-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `ushort` | 16-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `int`    | 32-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `uint`   | 32-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `long`   | 64-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `ulong`  | 64-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `Int1`, `Int2`, ..., `IntN` | N-bit signed value| :heavy_check_mark:      | :heavy_check_mark:  | :heavy_check_mark: |
+| `UInt1`, `UInt2`, ..., `UIntN` | N-bit unsigned value| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: |
+| `string`     | arbitrary length string | :heavy_check_mark:           | :x:                 | :x:  |
+| `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
+| `FiniteString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
+| `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
+| `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
+| `Seq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `Bag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `Dict<T1, T2>` | finite size dictionary of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
+
 
 ### Primitive types
 
@@ -241,56 +265,89 @@ Zen supports the following primitive types: `bool, byte, short, ushort, int, uin
 
 ### String types
 
-Zen supports the `string` type for reasoning about unbounded strings. However, string theories are generally incomplete in SMT solvers so  there may be problems that they can not solve. 
+Zen supports the `string` type for reasoning about unbounded strings. However, string theories are generally incomplete in SMT solvers so there may be problems that they can not solve. 
 
-For this reason, Zen also includes a library-defined `FiniteString` type for reasoning about strings with bounded size. The is done by treating a string as a list of characters `IList<ushort>`. The implementation of this class is [here](https://github.com/microsoft/Zen/blob/master/ZenLib/DataTypes/FiniteString.cs).
+For this reason, Zen also includes a library-defined `FiniteString` type for reasoning about strings with bounded size. The is done by treating a string as a list of characters `Seq<ushort>`. You can see the implementation of this class [here](https://github.com/microsoft/Zen/blob/master/ZenLib/DataTypes/FiniteString.cs).
 
 ### Integer types
 
-Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers.
-
-Zen also supports other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer).
+Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers. Zen also supports other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer).
 
 Out of the box, Zen provides the types `Int1`, `UInt1`, `Int2`, `UInt2`, `Int3`, `UInt3` ..., `Int64`, `UInt64` as well as the types `Int128`, `UInt128`, `Int256`, `UInt256`.
 
 You can also create a custom fixed-width integer of a given length. For example, to create a 65-bit integer, just add the following code:
 
 ```csharp
-    public class Int65 : IntN<Int65, Signed> 
-    { 
-        public override int Size { get { return 65; } } 
-        public Int65(byte[] bytes) : base(bytes) { } 
-        public Int65(long value) : base(value) { } 
-    }
+public class Int65 : IntN<Int65, Signed> 
+{ 
+    public override int Size { get { return 65; } } 
+    public Int65(byte[] bytes) : base(bytes) { } 
+    public Int65(long value) : base(value) { } 
+}
 ```
 The library should take care of the rest. Or equivalently, for unsigned integer semantics.
 
 ```csharp
-    public class UInt65 : IntN<UInt65, Unsigned> 
-    { 
-        public override int Size { get { return 65; } } 
-        public UInt65(byte[] bytes) : base(bytes) { } 
-        public UInt65(long value) : base(value) { } 
-    }
+public class UInt65 : IntN<UInt65, Unsigned> 
+{ 
+    public override int Size { get { return 65; } } 
+    public UInt65(byte[] bytes) : base(bytes) { } 
+    public UInt65(long value) : base(value) { } 
+}
 ```
 
-### Lists, Dictionaries, Options, Tuples
+### Sequences, Bags, Dictionaries, Options, Tuples
 
-Zen supports values with type `IList<T>` out of the box. It also provides several library types to model other useful data structures. For example, it provides a `Dict<T1, T2>` type to emulate finite dictionaries. It also supports pair types, e.g., `Pair<T1, T2>` as a lightweight alternative to classes. 
+Zen supports values with type `Seq<T>` for reasoning about variable length sequences of values. It also provides several library types based on `Seq<T>` to model other useful data structures. For example, it provides a `Dict<T1, T2>` type to emulate finite dictionaries, `Bag<T>` to represent unordered multi-sets, and pair types, e.g., `Pair<T1, T2>` as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 
-By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
+Note: When the order of elements is not important, it is usually preferred to use `Bag<T>` if possible compared to `Seq<T>` as it will frequently scale better.
 
 ### Custom classes and structs
 
-Zen supports custom `class` and `struct` types with some limitations. It will attempt to model all public fields and properties. For these types to work, the class/struct must also have a default constructor.
+Zen supports custom `class` and `struct` types with some limitations. It will attempt to model all public fields and properties. For these types to work, either (1) the class/struct must also have a default constructor and all properties must be allowed to be set, or (2) there must be a constructor with matching parameter names and types for all the public fields. For example, the following are examples that are and are not allowed:
+
+```csharp
+// this will work because the fields are public
+public class Point 
+{ 
+    public int X;
+    public int Y;
+}
+
+// this will work because the properties are public and can be set.
+public class Point 
+{ 
+    public int X { get; set; }
+    public int Y { get; set; }
+}
+
+// this will NOT work because X can not be set.
+public class Point 
+{ 
+    public int X { get; }
+    public int Y { get; set; }
+}
+
+// this will work as well since there is a constructor with the same parameter names.
+// note that _z will not be modeled by Zen.
+public class Point 
+{ 
+    public int X { get; }
+    public int Y { get; set; }
+    private int _z;
+
+    public Point(int x, int y) 
+    {
+        this.X = x;
+        this.Y = y;
+    }
+}
+
+```
 
 # Solver backends
 
-Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). 
-
-The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. 
-
-The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `IList<T>` and `IDictionary<T>` can not be used with transformers.
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `Seq<T>`, `Bag<T>`, and `Dict<T1, T2>` can not be used with transformers.
 
 # Example: Network access control lists
 

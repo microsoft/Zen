@@ -6,18 +6,24 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Numerics;
     using System.Reflection;
 
     /// <summary>
     /// Class to help generate a default symbolic value.
     /// </summary>
-    internal class DefaultTypeGenerator : ITypeVisitor<object>
+    internal class DefaultTypeGenerator : ITypeVisitor<object, Unit>
     {
         /// <summary>
         /// Method for the creating an empty Zen list.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
+        private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
+        /// Name of the function used to create an object via reflection.
+        /// </summary>
+        private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");
 
         public object VisitBool()
         {
@@ -34,7 +40,7 @@ namespace ZenLib.Generation
             return ZenConstantExpr<int>.Create(0);
         }
 
-        public object VisitList(Func<Type, object> recurse, Type listType, Type innerType)
+        public object VisitList(Func<Type, Unit, object> recurse, Type listType, Type innerType, Unit u)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
@@ -49,7 +55,7 @@ namespace ZenLib.Generation
         {
             var c = intType.GetConstructor(new Type[] { typeof(long) });
             dynamic value = c.Invoke(new object[] { 0L });
-            return Language.Constant(value);
+            return Zen.Constant(value);
         }
 
         public object VisitBigInteger()
@@ -57,9 +63,19 @@ namespace ZenLib.Generation
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
 
-        public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
+        public object VisitObject(Func<Type, Unit, object> recurse, Type objectType, SortedDictionary<string, Type> fields, Unit u)
         {
-            return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
+            var asList = fields.ToArray();
+
+            var method = createMethod.MakeGenericMethod(objectType);
+
+            var args = new (string, object)[asList.Length];
+            for (int i = 0; i < asList.Length; i++)
+            {
+                args[i] = (asList[i].Key, recurse(asList[i].Value, new Unit()));
+            }
+
+            return method.Invoke(null, new object[] { args });
         }
 
         public object VisitShort()

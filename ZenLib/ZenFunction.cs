@@ -12,7 +12,7 @@ namespace ZenLib
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
     using ZenLib.SymbolicExecution;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Zen function representation.
@@ -210,18 +210,18 @@ namespace ZenLib
         /// </summary>
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<T1> Find(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
+            input = CommonUtilities.GetArbitraryIfNull(input, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input },
@@ -236,18 +236,18 @@ namespace ZenLib
         /// </summary>
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T1> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
+            input = CommonUtilities.GetArbitraryIfNull(input, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input },
@@ -276,18 +276,18 @@ namespace ZenLib
         /// </summary>
         /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T1> GenerateInputs(
             Zen<T1> input = null,
             Func<Zen<T1>, Zen<bool>> precondition = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input = CommonUtilities.GetArbitraryIfNull(input, listSize, checkSmallerLists);
+            input = CommonUtilities.GetArbitraryIfNull(input, depth, exhaustiveDepth);
             precondition = precondition == null ? (x) => true : precondition;
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input, backend));
         }
@@ -419,20 +419,20 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
-        /// <param name="listSize">The depth bound for any given object.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2)> Find(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -449,20 +449,20 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -494,20 +494,20 @@ namespace ZenLib
         /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> GenerateInputs(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
             precondition = precondition == null ? (x, y) => true : precondition;
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, backend));
         }
@@ -651,8 +651,8 @@ namespace ZenLib
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
-        /// <param name="listSize">The depth bound for any given object.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3)> Find(
@@ -660,13 +660,13 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -685,8 +685,8 @@ namespace ZenLib
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> FindAll(
@@ -694,13 +694,13 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -734,8 +734,8 @@ namespace ZenLib
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> GenerateInputs(
@@ -743,13 +743,13 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
             precondition = precondition == null ? (x, y, z) => true : precondition;
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, backend));
         }
@@ -905,8 +905,8 @@ namespace ZenLib
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="input4">Default fourth input that captures structural constraints.</param>
-        /// <param name="listSize">The depth bound for any given object.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3, T4)> Find(
@@ -915,14 +915,14 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -943,8 +943,8 @@ namespace ZenLib
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="input4">Fourth input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3, T4)> FindAll(
@@ -953,14 +953,14 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, depth, exhaustiveDepth);
             var args = new Dictionary<long, object>
             {
                 { Argument1.ArgumentId, input1 },
@@ -996,8 +996,8 @@ namespace ZenLib
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="input4">Default fourth input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3, T4)> GenerateInputs(
@@ -1006,14 +1006,14 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            input1 = CommonUtilities.GetArbitraryIfNull(input1, listSize, checkSmallerLists);
-            input2 = CommonUtilities.GetArbitraryIfNull(input2, listSize, checkSmallerLists);
-            input3 = CommonUtilities.GetArbitraryIfNull(input3, listSize, checkSmallerLists);
-            input4 = CommonUtilities.GetArbitraryIfNull(input4, listSize, checkSmallerLists);
+            input1 = CommonUtilities.GetArbitraryIfNull(input1, depth, exhaustiveDepth);
+            input2 = CommonUtilities.GetArbitraryIfNull(input2, depth, exhaustiveDepth);
+            input3 = CommonUtilities.GetArbitraryIfNull(input3, depth, exhaustiveDepth);
+            input4 = CommonUtilities.GetArbitraryIfNull(input4, depth, exhaustiveDepth);
             precondition = precondition == null ? (w, x, y, z) => true : precondition;
             return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, input4, backend));
         }

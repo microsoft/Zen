@@ -23,7 +23,7 @@ namespace ZenLib.Tests
         {
             for (int i = 0; i < 1000000; i++)
             {
-                var x = Language.Constant(i);
+                var x = Zen.Constant(i);
             }
 
             var totalMemory1 = GC.GetTotalMemory(true) / 1000 / 1000;
@@ -31,7 +31,7 @@ namespace ZenLib.Tests
 
             for (int i = 1000000; i < 2000000; i++)
             {
-                var x = Language.Constant(i);
+                var x = Zen.Constant(i);
             }
 
             var totalMemory2 = GC.GetTotalMemory(true) / 1000 / 1000;
@@ -71,7 +71,7 @@ namespace ZenLib.Tests
                 return 100;
             }
 
-            return Language.If(x == i, 100 - i, CreateFunction(x, i + 1));
+            return Zen.If(x == i, 100 - i, CreateFunction(x, i + 1));
         }
     }
 }

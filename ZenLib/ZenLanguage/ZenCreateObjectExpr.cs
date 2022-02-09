@@ -63,7 +63,7 @@ namespace ZenLib
                     field.Item1);
             }
 
-            Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));
+            System.Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));
 
             (string, long)[] fieldIds = new (string, long)[fields.Length];
             for (int i = 0; i < fields.Length; i++)

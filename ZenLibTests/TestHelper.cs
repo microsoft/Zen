@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.ModelChecking;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Test helper functions for checking correctness.
@@ -133,11 +133,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, o) => o, listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, o) => o, depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value));
@@ -161,11 +161,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -189,11 +189,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -218,11 +218,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -244,7 +244,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is not valid
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -267,7 +267,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -306,7 +306,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {
@@ -331,7 +331,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = new ZenFunction<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(o, p), listSize: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {

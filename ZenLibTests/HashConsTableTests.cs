@@ -21,8 +21,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestZenIds()
         {
-            var x = Language.Constant(1);
-            var y = Language.Constant(2);
+            var x = Zen.Constant(1);
+            var y = Zen.Constant(2);
             var z = x + x;
 
             Assert.AreEqual(y.Id, z.Id);

@@ -43,7 +43,7 @@ namespace ZenLib
         /// <returns>The C# value associated with the expression.</returns>
         public T Get<T>(Zen<T> expr)
         {
-            if (this.ArbitraryAssignment.TryGetValue(expr, out var value))
+            if (this.ArbitraryAssignment != null && this.ArbitraryAssignment.TryGetValue(expr, out var value))
             {
                 return (T)value;
             }

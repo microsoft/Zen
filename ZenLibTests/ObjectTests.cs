@@ -4,14 +4,13 @@
 
 namespace ZenLib.Tests
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for the Zen object type.
@@ -975,7 +974,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketEncapsulation()
         {
-            var encap = new ZenFunction<IList<IpHeader>, IList<IpHeader>>(headers =>
+            var encap = new ZenFunction<Seq<IpHeader>, Seq<IpHeader>>(headers =>
             {
                 var currentHeader = headers.At(0);
                 var newHeader = currentHeader.Value().WithField("DstIp", Ip.Create(5));
@@ -987,8 +986,8 @@ namespace ZenLib.Tests
             Assert.IsTrue(input.HasValue);
 
             var o = encap.Evaluate(input.Value);
-            Assert.IsTrue(o.Count >= 1);
-            Assert.AreEqual(5U, o.First().DstIp.Value);
+            Assert.IsTrue(o.Values.Count >= 1);
+            Assert.AreEqual(5U, o.Values.First().DstIp.Value);
         }
 
         /// <summary>

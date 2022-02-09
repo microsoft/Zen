@@ -4,14 +4,13 @@
 
 namespace ZenLib.Tests
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.ModelChecking;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for primitive types.
@@ -448,17 +447,17 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDefaultValues()
         {
-            Assert.IsTrue(new ZenFunction<Option<bool>>(() => Null<bool>()).Assert(v => v.Value() == false));
-            Assert.IsTrue(new ZenFunction<Option<byte>>(() => Null<byte>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<short>>(() => Null<short>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<ushort>>(() => Null<ushort>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<int>>(() => Null<int>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<uint>>(() => Null<uint>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<long>>(() => Null<long>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<ulong>>(() => Null<ulong>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<BigInteger>>(() => Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
-            Assert.IsTrue(new ZenFunction<Option<IList<bool>>>(() => Null<IList<bool>>()).Assert(v => v.Value().IsEmpty()));
-            Assert.IsTrue(new ZenFunction<Option<Dict<bool, bool>>>(() => Null<Dict<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
+            Assert.IsTrue(new ZenFunction<Option<bool>>(() => Option.Null<bool>()).Assert(v => v.Value() == false));
+            Assert.IsTrue(new ZenFunction<Option<byte>>(() => Option.Null<byte>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<short>>(() => Option.Null<short>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<ushort>>(() => Option.Null<ushort>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<int>>(() => Option.Null<int>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<uint>>(() => Option.Null<uint>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<long>>(() => Option.Null<long>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<ulong>>(() => Option.Null<ulong>()).Assert(v => v.Value() == 0));
+            Assert.IsTrue(new ZenFunction<Option<BigInteger>>(() => Option.Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
+            Assert.IsTrue(new ZenFunction<Option<Seq<bool>>>(() => Option.Null<Seq<bool>>()).Assert(v => v.Value().IsEmpty()));
+            Assert.IsTrue(new ZenFunction<Option<Dict<bool, bool>>>(() => Option.Null<Dict<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
         }
 
         /// <summary>

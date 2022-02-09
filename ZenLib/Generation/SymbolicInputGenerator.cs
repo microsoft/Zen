@@ -6,45 +6,40 @@ namespace ZenLib.Generation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Class to help generate a symbolic input.
     /// </summary>
-    internal class SymbolicInputGenerator : ITypeVisitor<object>
+    internal class SymbolicInputGenerator : ITypeVisitor<object, DepthConfiguration>
     {
         /// <summary>
         /// The method for creating the empty list at runtime.
         /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Language).GetMethod("EmptyList");
+        private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
-        private static MethodInfo ifConditionMethod = typeof(Language).GetMethod("If");
+        private static MethodInfo ifConditionMethod = typeof(Zen).GetMethod("If");
+
+        /// <summary>
+        /// Name of the function used to create an object via reflection.
+        /// </summary>
+        private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");
+
+        /// <summary>
+        /// List method from Zen.Language.
+        /// </summary>
+        private static MethodInfo listMethod = typeof(Zen).GetMethod("List", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The arbitrary expressions generated.
         /// </summary>
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
-
-        /// <summary>
-        /// Maximum length of a list.
-        /// </summary>
-        private int maxSize;
-
-        /// <summary>
-        /// Whether to exhaustively test list sizes.
-        /// </summary>
-        private bool exhaustiveLists;
-
-        public SymbolicInputGenerator(int maxSize, bool exhaustiveLists = true)
-        {
-            this.maxSize = maxSize;
-            this.exhaustiveLists = exhaustiveLists;
-        }
 
         public object VisitBool()
         {
@@ -74,11 +69,11 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitList(Func<Type, object> recurse, Type listType, Type elementType)
+        public object VisitList(Func<Type, DepthConfiguration, object> recurse, Type listType, Type elementType, DepthConfiguration config)
         {
-            if (!exhaustiveLists)
+            if (!config.ExhaustiveDepth)
             {
-                return GeneratorHelper.ApplyToList(recurse, elementType, maxSize);
+                return ApplyToList(recurse, elementType, config, config.Depth);
             }
 
             var length = Arbitrary<byte>();
@@ -89,14 +84,31 @@ namespace ZenLib.Generation
 
             var list = emptyMethod.Invoke(null, CommonUtilities.EmptyArray);
 
-            for (int i = maxSize; i > 0; i--)
+            for (int i = config.Depth; i > 0; i--)
             {
                 var guard = length == Constant((byte)i);
-                var trueBranch = GeneratorHelper.ApplyToList(recurse, elementType, i);
+                var trueBranch = ApplyToList(recurse, elementType, config, i);
                 list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
             }
 
             return list;
+        }
+
+        public static object ApplyToList(Func<Type, DepthConfiguration, object> recurse, Type innerType, DepthConfiguration config, int size)
+        {
+            var method = listMethod.MakeGenericMethod(innerType);
+
+            var args = new object[size];
+            for (int i = 0; i < size; i++)
+            {
+                var arg = recurse(innerType, config);
+                args[i] = arg;
+            }
+
+            var zenType = typeof(Zen<>).MakeGenericType(innerType);
+            var finalArgs = Array.CreateInstance(zenType, args.Length);
+            Array.Copy(args, finalArgs, args.Length);
+            return method.Invoke(null, new object[] { finalArgs });
         }
 
         public object VisitLong()
@@ -106,9 +118,49 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitObject(Func<Type, object> recurse, Type objectType, SortedDictionary<string, Type> fields)
+        public object VisitObject(Func<Type, DepthConfiguration, object> recurse, Type objectType, SortedDictionary<string, Type> fields, DepthConfiguration config)
         {
-            return GeneratorHelper.ApplyToObject(recurse, objectType, fields);
+            var asList = fields.ToArray();
+
+            var method = createMethod.MakeGenericMethod(objectType);
+
+            var args = new (string, object)[asList.Length];
+            for (int i = 0; i < asList.Length; i++)
+            {
+                var fieldName = asList[i].Key;
+                var fieldType = asList[i].Value;
+                var newConfig = UpdateDepthConfiguration(config, GetSizeAttribute(objectType, fieldName));
+                args[i] = (fieldName, recurse(fieldType, newConfig));
+            }
+
+            return method.Invoke(null, new object[] { args });
+        }
+
+        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenSizeAttribute attribute)
+        {
+            if (attribute == null)
+            {
+                return config;
+            }
+
+            var depth = attribute.Depth > 0 ? attribute.Depth : config.Depth;
+            var exhaustive = attribute.EnumerationType == EnumerationType.User ?
+                config.ExhaustiveDepth :
+                attribute.EnumerationType == EnumerationType.Exhaustive;
+
+            return new DepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustive };
+        }
+
+        private ZenSizeAttribute GetSizeAttribute(Type type, string fieldName)
+        {
+            var fieldInfo = type.GetField(fieldName);
+            if (fieldInfo != null)
+            {
+                return (ZenSizeAttribute)fieldInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
+            }
+
+            var propertyInfo = type.GetPropertyCached(fieldName);
+            return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
         }
 
         public object VisitShort()

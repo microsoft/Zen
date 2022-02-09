@@ -9,7 +9,7 @@ namespace ZenLib.Tests.Network
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Simple packet class for testing.
@@ -25,12 +25,12 @@ namespace ZenLib.Tests.Network
         /// <summary>
         /// The list of communities.
         /// </summary>
-        public IList<uint> Communities { get; set; }
+        public Seq<uint> Communities { get; set; }
 
         /// <summary>
         /// The AS path.
         /// </summary>
-        public IList<uint> AsPath { get; set; }
+        public Seq<uint> AsPath { get; set; }
 
         /// <summary>
         /// Convert a route to a string.
@@ -64,7 +64,7 @@ namespace ZenLib.Tests.Network
         {
             return TestHelper.ApplyOrderedRules<Route, Option<Route>, RouteMapLine>(
                 input: route,
-                deflt: Null<Route>(),
+                deflt: Option.Null<Route>(),
                 ruleMatch: (l, r, i) => l.Matches(r),
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
@@ -72,15 +72,15 @@ namespace ZenLib.Tests.Network
                     var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
-                        return Some(Null<Route>());
+                        return Option.Create(Option.Null<Route>());
                     }
 
                     if (l.Disposition == Disposition.Allow)
                     {
-                        return Some(Some(r));
+                        return Option.Create(Option.Create(r));
                     }
 
-                    return Null<Option<Route>>();
+                    return Option.Null<Option<Route>>();
                 },
                 this.Lines.ToArray());
         }
@@ -94,7 +94,7 @@ namespace ZenLib.Tests.Network
         {
             return TestHelper.ApplyOrderedRules<Route, Pair<Option<Route>, int>, RouteMapLine>(
                 input: route,
-                deflt: Pair(Null<Route>(), Constant<int>(this.Lines.Count)),
+                deflt: Pair.Create(Option.Null<Route>(), Constant<int>(this.Lines.Count)),
                 ruleMatch: (l, r, i) => l.Matches(r),
                 ruleAction: (l, r, i) => l.ApplyAction(r),
                 ruleReturn: (l, r, i) =>
@@ -102,15 +102,15 @@ namespace ZenLib.Tests.Network
                     var line = Constant<int>(i);
                     if (l.Disposition == Disposition.Deny)
                     {
-                        return Some(Pair(Null<Route>(), line));
+                        return Option.Create(Pair.Create(Option.Null<Route>(), line));
                     }
 
                     if (l.Disposition == Disposition.Allow)
                     {
-                        return Some(Pair(Some(r), line));
+                        return Option.Create(Pair.Create(Option.Create(r), line));
                     }
 
-                    return Null<Pair<Option<Route>, int>>();
+                    return Option.Null<Pair<Option<Route>, int>>();
                 },
                 this.Lines.ToArray());
         }
@@ -172,7 +172,7 @@ namespace ZenLib.Tests.Network
             var prefix = route.GetField<Route, Prefix>("Prefix");
             var dstIp = prefix.GetField<Prefix, uint>("Address");
             var prefixLen = prefix.GetField<Prefix, byte>("Length");
-            var communities = route.GetField<Route, IList<uint>>("Communities");
+            var communities = route.GetField<Route, Seq<uint>>("Communities");
 
             var (addr, lenLow, lenHi) = this.PrefixGuard;
             var mask = (uint)(0xFFFFFF << (32 - lenLow));
@@ -193,8 +193,8 @@ namespace ZenLib.Tests.Network
         /// <returns>A new modified route.</returns>
         public Zen<Route> ApplyAction(Zen<Route> route)
         {
-            var communities = route.GetField<Route, IList<uint>>("Communities");
-            var aspath = route.GetField<Route, IList<uint>>("AsPath");
+            var communities = route.GetField<Route, Seq<uint>>("Communities");
+            var aspath = route.GetField<Route, Seq<uint>>("AsPath");
 
             foreach (var c in this.CommunityDeletes)
             {

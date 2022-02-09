@@ -9,7 +9,7 @@ namespace ZenLib
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// A collection of helper functions for manipulating Zen
@@ -90,7 +90,7 @@ namespace ZenLib
         /// <summary>
         /// The object creation method.
         /// </summary>
-        public static MethodInfo CreateMethod = typeof(Language).GetMethod("Create");
+        public static MethodInfo CreateMethod = typeof(Zen).GetMethod("Create");
 
         /// <summary>
         /// The zen constant list creation method.
@@ -387,7 +387,19 @@ namespace ZenLib
             }
 
             var propertyInfo = type.GetPropertyCached(fieldName);
-            propertyInfo.SetValue(obj, fieldValue);
+            if (propertyInfo == null)
+            {
+                throw new ZenException($"Unable to set field or property {fieldName} for an object of type {type}.");
+            }
+
+            try
+            {
+                propertyInfo.SetValue(obj, fieldValue);
+            }
+            catch (ArgumentException)
+            {
+                throw new ZenException($"Unable to set field or property {propertyInfo.Name} for an object of type {type}");
+            }
         }
 
         /// <summary>
@@ -411,6 +423,18 @@ namespace ZenLib
         /// <returns>An instance of the object.</returns>
         public static object CreateInstance(Type type, string[] fieldNames, object[] values)
         {
+            // first try to find if there is a constructor with parameter names matching the fields.
+            // this helps in some cases and for F# where constructors are generated for records.
+            foreach (var c in type.GetConstructors())
+            {
+                var parameters = FindMatchingParameters(c, fieldNames, values);
+                if (parameters != null)
+                {
+                    return Activator.CreateInstance(type, parameters);
+                }
+            }
+
+            // otherwise, use a default constructor then set the fields.
             var obj = Activator.CreateInstance(type);
             for (int i = 0; i < fieldNames.Length; i++)
             {
@@ -420,6 +444,53 @@ namespace ZenLib
             }
 
             return obj;
+        }
+
+        private static object[] FindMatchingParameters(ConstructorInfo c, string[] fieldNames, object[] values)
+        {
+            var parameters = c.GetParameters();
+            if (parameters.Length != values.Length)
+            {
+                return null;
+            }
+
+            var result = new object[values.Length];
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                var fieldName = fieldNames[i];
+                var value = values[i];
+
+                var parameterIndex = FindMatchingParamter(parameters, fieldName, value.GetType());
+                if (parameterIndex < 0)
+                {
+                    return null;
+                }
+
+                // matched the same parameter twice.
+                if (result[parameterIndex] != null)
+                {
+                    return null;
+                }
+
+                result[parameterIndex] = values[i];
+            }
+
+            return result;
+        }
+
+        private static int FindMatchingParamter(ParameterInfo[] parameters, string fieldName, Type fieldType)
+        {
+            for (int j = 0; j < parameters.Length; j++)
+            {
+                var parameterNameMatchesField = string.Compare(parameters[j].Name, fieldName, true) == 0;
+
+                if (parameterNameMatchesField && parameters[j].ParameterType == fieldType)
+                {
+                    return j;
+                }
+            }
+
+            return -1;
         }
 
         /// <summary>
@@ -545,9 +616,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="visitor">The type visitor object.</param>
         /// <param name="type">The type.</param>
+        /// <param name="parameter">The parameter.</param>
         /// <typeparam name="T">The return type.</typeparam>
+        /// <typeparam name="TParam">The parameter type.</typeparam>
         /// <returns>A value.</returns>
-        internal static T ApplyTypeVisitor<T>(ITypeVisitor<T> visitor, Type type)
+        internal static T ApplyTypeVisitor<T, TParam>(ITypeVisitor<T, TParam> visitor, Type type, TParam parameter)
         {
             if (type == BoolType)
                 return visitor.VisitBool();
@@ -575,7 +648,7 @@ namespace ZenLib
             if (IsIListType(type))
             {
                 var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitList(ty => ApplyTypeVisitor(visitor, ty), type, t);
+                return visitor.VisitList((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
             }
 
             if (IsListType(type))
@@ -596,7 +669,7 @@ namespace ZenLib
                 dict[property.Name] = property.PropertyType;
             }
 
-            return visitor.VisitObject(t => ApplyTypeVisitor(visitor, t), type, dict);
+            return visitor.VisitObject((t, p) => ApplyTypeVisitor(visitor, t, p), type, dict, parameter);
         }
 
         /// <summary>
@@ -606,11 +679,11 @@ namespace ZenLib
         /// <returns>The Zen value representing the list.</returns>
         internal static Zen<IList<T>> CreateZenListConstant<T>(IList<T> value)
         {
-            var list = EmptyList<T>();
+            Zen<IList<T>> list = ZenListEmptyExpr<T>.Instance;
             foreach (var elt in value.Reverse())
             {
                 ReportIfNullConversionError(elt, "element", typeof(IList<T>));
-                list = list.AddFront(elt);
+                list = ZenListAddFrontExpr<T>.Create(list, elt);
             }
 
             return list;
@@ -626,10 +699,10 @@ namespace ZenLib
             if (value.HasValue)
             {
                 ReportIfNullConversionError(value.Value, "Value", typeof(T));
-                return Some((Zen<T>)CreateZenConstant<T>(value.Value));
+                return Option.Create((Zen<T>)CreateZenConstant<T>(value.Value));
             }
 
-            return Null<T>();
+            return Option.Null<T>();
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace ZenLib.Tests
         /// <returns></returns>
         public static Zen<Event> Create(Zen<ushort> time, Zen<byte> eventType, Zen<byte> priorityClass)
         {
-            return Language.Create<Event>(("TimeStamp", time), ("EventType", eventType), ("PriorityClass", priorityClass));
+            return Zen.Create<Event>(("TimeStamp", time), ("EventType", eventType), ("PriorityClass", priorityClass));
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace ZenLib.Tests
     using System.Net;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib.ModelChecking;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests fixed integer operations.
@@ -603,7 +603,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConstructingOptions()
         {
-            var f = new ZenFunction<Option<Int5>, Option<Int5>>(x => Null<Int5>());
+            var f = new ZenFunction<Option<Int5>, Option<Int5>>(x => Option.Null<Int5>());
             var input = f.Find((x, y) => true);
             Assert.IsTrue(input.HasValue);
         }

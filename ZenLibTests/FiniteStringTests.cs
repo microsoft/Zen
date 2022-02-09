@@ -8,8 +8,8 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for the Zen FiniteString type.
@@ -73,7 +73,7 @@ namespace ZenLib.Tests
         [DataRow("endline\r\n")]
         public void TestConstants(string s)
         {
-            var fs = FiniteString(s);
+            var fs = FiniteString.Create(s);
             var f = new ZenFunction<FiniteString>(() => fs);
             Assert.IsTrue(f.Assert(x => x == fs));
         }
@@ -160,7 +160,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestPrefixOf(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<FiniteString, bool>(fs => Language.StartsWith(fs, new FiniteString(sub)));
+            var f = new ZenFunction<FiniteString, bool>(fs => fs.StartsWith(new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -173,7 +173,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString(s).StartsWith(fs));
+                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString.Create(s).StartsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.StartsWith(ex));
             });
@@ -189,7 +189,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestSuffixOf(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<FiniteString, bool>(fs => Language.EndsWith(fs, new FiniteString(sub)));
+            var f = new ZenFunction<FiniteString, bool>(fs => fs.EndsWith(new FiniteString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -202,7 +202,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString(s).EndsWith(fs));
+                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString.Create(s).EndsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.EndsWith(ex));
             });
@@ -398,7 +398,7 @@ namespace ZenLib.Tests
             var f = new ZenFunction<FiniteString, FiniteString, FiniteString, bool>(
                 (fs1, fs2, fs3) => Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3)));
 
-            var ex = f.Find((fs1, fs2, fs3, b) => Not(b), listSize: 4, checkSmallerLists: true);
+            var ex = f.Find((fs1, fs2, fs3, b) => Not(b), depth: 4, exhaustiveDepth: true);
             Assert.IsFalse(ex.HasValue);
         }
     }

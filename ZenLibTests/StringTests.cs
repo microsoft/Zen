@@ -11,8 +11,8 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
     using ZenLib;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for the string type.
@@ -507,7 +507,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConcatException()
         {
-            _ = EmptyList<string>() + EmptyList<string>();
+            _ = Seq.Empty<string>() + Seq.Empty<string>();
         }
 
         /// <summary>

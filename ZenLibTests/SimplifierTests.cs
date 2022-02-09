@@ -9,8 +9,8 @@ namespace ZenLib.Tests
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for simplification.
@@ -43,7 +43,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(ReferenceEquals(~Constant<int>(10), ~Constant<int>(10)));
             Assert.IsTrue(ReferenceEquals(Constant<int>(10) - Constant<int>(10), Constant<int>(10) - Constant<int>(10)));
             Assert.IsTrue(ReferenceEquals(Constant<int>(10) * Constant<int>(10), Constant<int>(10) * Constant<int>(10)));
-            Assert.IsTrue(ReferenceEquals(Some<int>(1), Some<int>(1)));
+            Assert.IsTrue(ReferenceEquals(Option.Create<int>(1), Option.Create<int>(1)));
         }
 
         /// <summary>
@@ -457,9 +457,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthHashCons()
         {
-            var e1 = Language.Length("abc");
-            var e2 = Language.Length("abc");
-            var e3 = Language.Length("ab");
+            var e1 = Zen.Length("abc");
+            var e2 = Zen.Length("abc");
+            var e3 = Zen.Length("ab");
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
         }
@@ -470,10 +470,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfHashCons()
         {
-            var e1 = Language.IndexOf("abc", "a", new BigInteger(0));
-            var e2 = Language.IndexOf("abc", "a", new BigInteger(0));
-            var e3 = Language.IndexOf("abc", "a", new BigInteger(1));
-            var e4 = Language.IndexOf("abc", "b", new BigInteger(0));
+            var e1 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e2 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e3 = Zen.IndexOf("abc", "a", new BigInteger(1));
+            var e4 = Zen.IndexOf("abc", "b", new BigInteger(0));
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
             Assert.IsFalse(ReferenceEquals(e1, e4));

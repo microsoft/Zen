@@ -11,7 +11,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Test unrolling expressions.
@@ -47,8 +47,8 @@ namespace ZenLib.Tests
             var string1 = Arbitrary<string>();
             var string2 = Arbitrary<string>();
             var string3 = Arbitrary<string>();
-            var list1 = Arbitrary<IList<byte>>();
-            var list2 = Arbitrary<IList<byte>>();
+            var list1 = Arbitrary<Seq<byte>>();
+            var list2 = Arbitrary<Seq<byte>>();
             var h1 = Arbitrary<IpHeader>();
             var h2 = Arbitrary<IpHeader>();
             var opt = Arbitrary<Option<int>>();

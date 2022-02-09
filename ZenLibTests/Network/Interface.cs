@@ -6,7 +6,7 @@ namespace ZenLib.Tests.Network
 {
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// A device interface object.
@@ -42,7 +42,7 @@ namespace ZenLib.Tests.Network
                     oheader.GetSrcPort(),
                     oheader.GetProtocol());
 
-                packet = Packet.Create(oheader, Some(uheader));
+                packet = Packet.Create(oheader, Option.Create(uheader));
             }
 
             return packet;
@@ -52,7 +52,7 @@ namespace ZenLib.Tests.Network
         {
             if (this.GreTunnel.HasValue)
             {
-                return Packet.Create(packet.GetOverlayHeader(), Null<IpHeader>());
+                return Packet.Create(packet.GetOverlayHeader(), Option.Null<IpHeader>());
             }
 
             return packet;

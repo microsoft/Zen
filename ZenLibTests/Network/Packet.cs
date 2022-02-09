@@ -6,7 +6,7 @@ namespace ZenLib.Tests.Network
 {
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Packet struct that contains IP headers.
@@ -34,7 +34,7 @@ namespace ZenLib.Tests.Network
             Zen<IpHeader> overlayHeader,
             Zen<Option<IpHeader>> underlayHeader)
         {
-            return Language.Create<Packet>(
+            return Zen.Create<Packet>(
                 ("OverlayHeader", overlayHeader),
                 ("UnderlayHeader", underlayHeader));
         }

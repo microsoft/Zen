@@ -56,7 +56,7 @@ namespace ZenLib.Tests.Network
             Zen<ushort> srcPort,
             Zen<byte> protocol)
         {
-            return Language.Create<IpHeader>(
+            return Zen.Create<IpHeader>(
                 ("DstIp", dstIp),
                 ("SrcIp", srcIp),
                 ("DstPort", dstPort),

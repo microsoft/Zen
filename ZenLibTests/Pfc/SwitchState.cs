@@ -57,7 +57,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// The packet outcomes for bursts.
         /// </summary>
-        public IList<Pair<ushort, Pair<byte, bool>>> Packets { get; set; }
+        public Seq<Pair<ushort, Pair<byte, bool>>> Packets { get; set; }
     }
 
     /// <summary>
@@ -106,9 +106,9 @@ namespace ZenLib.Tests
             return wd.GetField<SwitchState, ushort>("StormEndedTime2");
         }
 
-        internal static Zen<IList<Pair<ushort, Pair<byte, bool>>>> GetPackets(this Zen<SwitchState> wd)
+        internal static Zen<Seq<Pair<ushort, Pair<byte, bool>>>> GetPackets(this Zen<SwitchState> wd)
         {
-            return wd.GetField<SwitchState, IList<Pair<ushort, Pair<byte, bool>>>>("Packets");
+            return wd.GetField<SwitchState, Seq<Pair<ushort, Pair<byte, bool>>>>("Packets");
         }
 
         internal static Zen<SwitchState> SetWatchdogDropPackets1(this Zen<SwitchState> wd, Zen<bool> b)
@@ -151,7 +151,7 @@ namespace ZenLib.Tests
             return wd.WithField("StormEndedTime2", t);
         }
 
-        internal static Zen<SwitchState> SetPackets(this Zen<SwitchState> wd, Zen<IList<Pair<ushort, Pair<byte, bool>>>> p)
+        internal static Zen<SwitchState> SetPackets(this Zen<SwitchState> wd, Zen<Seq<Pair<ushort, Pair<byte, bool>>>> p)
         {
             return wd.WithField("Packets", p);
         }

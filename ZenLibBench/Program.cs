@@ -27,13 +27,13 @@ namespace ZenLibBench
             {
                 var f = new Func<Zen<TestObject>, Zen<Option<TestObject>>>(p =>
                 {
-                    return Language.If(
+                    return Zen.If(
                         p.GetField<TestObject, uint>("DstIp") == 1,
-                        Language.Some(p.WithField<TestObject, uint>("DstIp", 2)),
-                        Language.If(
+                        Option.Create(p.WithField<TestObject, uint>("DstIp", 2)),
+                        Zen.If(
                             p.GetField<TestObject, uint>("DstIp") == 3,
-                            Language.Some(p.WithField<TestObject, uint>("DstIp", 4)),
-                            Language.Some(p)
+                            Option.Create(p.WithField<TestObject, uint>("DstIp", 4)),
+                            Option.Create(p)
                             ));
                 });
 
@@ -50,8 +50,8 @@ namespace ZenLibBench
 
                 var largeSet = new ZenFunction<TestObject, bool>(p =>
                 {
-                    var constraints = randoms.Select(x => Language.And(p.GetField<TestObject, uint>("DstIp") == x.Item1, p.GetField<TestObject, uint>("SrcIp") == x.Item2));
-                    return Language.Or(constraints.ToArray());
+                    var constraints = randoms.Select(x => Zen.And(p.GetField<TestObject, uint>("DstIp") == x.Item1, p.GetField<TestObject, uint>("SrcIp") == x.Item2));
+                    return Zen.Or(constraints.ToArray());
                 }).StateSet();
 
                 var t = zf2.Transformer();
@@ -65,7 +65,7 @@ namespace ZenLibBench
         {
             Benchmark(nameof(BenchmarkAllocation), 20000, () =>
             {
-                var zf = new ZenFunction<uint, bool>(x => Language.And(x <= 90, x >= 30));
+                var zf = new ZenFunction<uint, bool>(x => Zen.And(x <= 90, x >= 30));
                 zf.StateSet();
                 zf.Transformer();
             });
@@ -79,7 +79,7 @@ namespace ZenLibBench
                 b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
                 b.NumLines = 10000;
                 b.CreateAcl();
-                b.Acl.ProcessProvenance(Language.Arbitrary<ZenLib.Tests.Network.IpHeader>());
+                b.Acl.ProcessProvenance(Zen.Arbitrary<ZenLib.Tests.Network.IpHeader>());
             });
         }
 

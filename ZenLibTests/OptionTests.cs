@@ -8,8 +8,8 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for the Zen option type.
@@ -120,7 +120,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToList1()
         {
-            CheckAgreement<Option<int>>(o => o.ToList().IsEmpty());
+            CheckAgreement<Option<int>>(o => o.ToSequence().IsEmpty());
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToList2()
         {
-            CheckValid<Option<int>>(o => Implies(o.HasValue(), o.ToList().Length() == 1));
+            CheckValid<Option<int>>(o => Implies(o.HasValue(), o.ToSequence().Length() == 1));
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<IpHeader>(() =>
             {
-                var x = Null<IpHeader>();
+                var x = Option.Null<IpHeader>();
                 return x.Value();
             });
 

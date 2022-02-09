@@ -60,7 +60,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator ==(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Eq(expr1, expr2);
+            return Zen.Eq(expr1, expr2);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator !=(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Not(Language.Eq(expr1, expr2));
+            return Zen.Not(Zen.Eq(expr1, expr2));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator <=(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Leq(expr1, expr2);
+            return Zen.Leq(expr1, expr2);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator <(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Lt(expr1, expr2);
+            return Zen.Lt(expr1, expr2);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator >(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Gt(expr1, expr2);
+            return Zen.Gt(expr1, expr2);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<bool> operator >=(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Geq(expr1, expr2);
+            return Zen.Geq(expr1, expr2);
         }
 
         /// <summary>
@@ -130,10 +130,10 @@ namespace ZenLib
 
             if (type == ReflectionUtilities.StringType)
             {
-                return Language.Concat(expr1 as Zen<string>, expr2 as Zen<string>) as Zen<T>;
+                return Zen.Concat(expr1 as Zen<string>, expr2 as Zen<string>) as Zen<T>;
             }
 
-            return Language.Plus(expr1, expr2);
+            return Zen.Plus(expr1, expr2);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator -(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Minus(expr1, expr2);
+            return Zen.Minus(expr1, expr2);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator *(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.Multiply(expr1, expr2);
+            return Zen.Multiply(expr1, expr2);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator &(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.BitwiseAnd(expr1, expr2);
+            return Zen.BitwiseAnd(expr1, expr2);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator |(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.BitwiseOr(expr1, expr2);
+            return Zen.BitwiseOr(expr1, expr2);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator ^(Zen<T> expr1, Zen<T> expr2)
         {
-            return Language.BitwiseXor(expr1, expr2);
+            return Zen.BitwiseXor(expr1, expr2);
         }
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace ZenLib
         /// <returns>Zen expression.</returns>
         public static Zen<T> operator ~(Zen<T> expr)
         {
-            return Language.BitwiseNot(expr);
+            return Zen.BitwiseNot(expr);
         }
 
         /// <summary>

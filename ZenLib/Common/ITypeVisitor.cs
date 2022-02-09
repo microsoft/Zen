@@ -10,8 +10,7 @@ namespace ZenLib
     /// <summary>
     /// Visitor class for building objects from a type.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal interface ITypeVisitor<T>
+    internal interface ITypeVisitor<T, TParam>
     {
         /// <summary>
         /// Visit the boolean type.
@@ -83,12 +82,12 @@ namespace ZenLib
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitList(Func<Type, T> recurse, Type listType, Type innerType);
+        T VisitList(Func<Type, TParam, T> recurse, Type listType, Type innerType, TParam parameter);
 
         /// <summary>
         /// Visit a class/struct type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitObject(Func<Type, T> recurse, Type objectType, SortedDictionary<string, Type> fields);
+        T VisitObject(Func<Type, TParam, T> recurse, Type objectType, SortedDictionary<string, Type> fields, TParam parameter);
     }
 }

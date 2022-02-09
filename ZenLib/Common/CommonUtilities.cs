@@ -219,12 +219,12 @@ namespace ZenLib
         /// Creates an arbitrary value if the input is null.
         /// </summary>
         /// <param name="input">The input.</param>
-        /// <param name="listSize">The list size.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller lists.</param>
+        /// <param name="depth">The input depth.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes.</param>
         /// <returns>An arbitrary Zen value.</returns>
-        public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int listSize, bool checkSmallerLists)
+        public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int depth, bool exhaustiveDepth)
         {
-            return (input is null) ? Language.Arbitrary<T>(listSize, checkSmallerLists) : input;
+            return (input is null) ? Zen.Arbitrary<T>(depth, exhaustiveDepth) : input;
         }
 
         /// <summary>

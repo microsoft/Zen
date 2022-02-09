@@ -9,8 +9,8 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
-    using static ZenLib.Language;
     using static ZenLib.Tests.TestHelper;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// Tests for Zen working with classes.
@@ -37,7 +37,7 @@ namespace ZenLib.Tests
                 header,
                 ruleMatch: (l, pkt, i) => MatchNatLine(l, pkt),
                 ruleAction: (l, pkt, i) => ApplyNatLine(l, pkt),
-                ruleReturn: (l, pkt, i) => Some(pkt),
+                ruleReturn: (l, pkt, i) => Option.Create(pkt),
                 nat.Rules);
         }
 

@@ -8,7 +8,7 @@ namespace ZenLib.Tests.Network
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using ZenLib;
-    using static ZenLib.Language;
+    using static ZenLib.Zen;
 
     /// <summary>
     /// An access control list object.
@@ -45,12 +45,12 @@ namespace ZenLib.Tests.Network
         /// <returns>Whether permitted.</returns>
         public Zen<ZenLib.Pair<bool, ushort>> ProcessProvenance(Zen<IpHeader> hdr)
         {
-            var acc = Pair<bool, ushort>(false, (ushort)(this.Lines.Length + 1));
+            var acc = Pair.Create<bool, ushort>(false, (ushort)(this.Lines.Length + 1));
 
             for (int i = this.Lines.Length - 1; i >= 0; i--)
             {
                 var line = this.Lines[i];
-                acc = If(line.Matches(hdr), Pair<bool, ushort>(line.Permitted, (ushort)(i + 1)), acc);
+                acc = If(line.Matches(hdr), Pair.Create<bool, ushort>(line.Permitted, (ushort)(i + 1)), acc);
             }
 
             return acc;
@@ -66,13 +66,13 @@ namespace ZenLib.Tests.Network
         {
             if (i == this.Lines.Length)
             {
-                return Pair<bool, ushort>(false, (ushort)(i + 1));
+                return Pair.Create<bool, ushort>(false, (ushort)(i + 1));
             }
 
             var line = this.Lines[i];
             return If(
                 line.Matches(hdr),
-                Pair<bool, ushort>(line.Permitted, (ushort)(i + 1)),
+                Pair.Create<bool, ushort>(line.Permitted, (ushort)(i + 1)),
                 ProcessProvenance(hdr, i + 1));
         }
 
