@@ -234,7 +234,7 @@ The test generation approach uses [symbolic execution](https://en.wikipedia.org/
 
 # Supported data types
 
-Zen currently supports a subset of .NET types, summarized below.
+Zen currently supports a subset of .NET types and also introduces some of its own data types summarized below.
 
 | Type   | Description          | Supported by Z3 backend | Supported by BDD backend | Supported by `StateSetTransformers`
 | ------ | -------------------- | ----------------------- | ------------------------ | ------------|
