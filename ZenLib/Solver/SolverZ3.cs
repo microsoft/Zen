@@ -6,14 +6,13 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
 
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>
     {
         private Context context;
 
