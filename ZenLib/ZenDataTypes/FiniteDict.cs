@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -12,7 +11,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a simple list-backed dictionary.
     /// </summary>
-    public class Dict<TKey, TValue>
+    public class FiniteDict<TKey, TValue>
     {
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
@@ -88,22 +87,22 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for dictionary Zen objects.
     /// </summary>
-    public static class Dict
+    public static class FiniteDict
     {
         /// <summary>
         /// The Zen value for an empty Dictionary.
         /// </summary>
         /// <returns>Zen value.</returns>
-        public static Zen<Dict<TKey, TValue>> Create<TKey, TValue>()
+        public static Zen<FiniteDict<TKey, TValue>> Empty<TKey, TValue>()
         {
-            return Create<Dict<TKey, TValue>>(("Values", Seq.Empty<Pair<TKey, TValue>>()));
+            return Create<FiniteDict<TKey, TValue>>(("Values", Seq.Empty<Pair<TKey, TValue>>()));
         }
     }
 
     /// <summary>
     /// Extension methods for Zen dictionary objects.
     /// </summary>
-    public static class DictExtensions
+    public static class FiniteDictExtensions
     {
         /// <summary>
         /// Add a value to a Zen map.
@@ -112,14 +111,14 @@ namespace ZenLib
         /// <param name="keyExpr">Zen key expression.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Dict<TKey, TValue>> Add<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        public static Zen<FiniteDict<TKey, TValue>> Add<TKey, TValue>(this Zen<FiniteDict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
-            return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
+            var l = mapExpr.GetField<FiniteDict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
+            return Create<FiniteDict<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
         }
 
         /// <summary>
@@ -128,12 +127,12 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<FiniteDict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
+            var l = mapExpr.GetField<FiniteDict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
             return l.SeqGet(keyExpr);
         }
 
@@ -143,7 +142,7 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<FiniteDict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);

@@ -11,7 +11,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a simple unordered multi-set.
     /// </summary>
-    public class Bag<T>
+    public class FiniteBag<T>
     {
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
@@ -43,15 +43,15 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for Bag Zen objects.
     /// </summary>
-    public static class Bag
+    public static class FiniteBag
     {
         /// <summary>
         /// Convert a collection of items to a Bag.
         /// </summary>
         /// <param name="values">The items to add to the bag.</param>
-        public static Bag<T> FromArray<T>(params T[] values)
+        public static FiniteBag<T> FromArray<T>(params T[] values)
         {
-            return new Bag<T> { Values = new Seq<Option<T>> { Values = values.Select(Option.Some).ToList() } };
+            return new FiniteBag<T> { Values = new Seq<Option<T>> { Values = values.Select(Option.Some).ToList() } };
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="seqExpr">The sequence expr.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Bag<T>> Create<T>(Zen<Seq<Option<T>>> seqExpr)
+        internal static Zen<FiniteBag<T>> Create<T>(Zen<Seq<Option<T>>> seqExpr)
         {
-            return Zen.Create<Bag<T>>(("Values", seqExpr));
+            return Zen.Create<FiniteBag<T>>(("Values", seqExpr));
         }
 
         /// <summary>
@@ -69,30 +69,30 @@ namespace ZenLib
         /// </summary>
         /// <param name="elements">Zen elements.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Bag<T>> Create<T>(params Zen<T>[] elements)
+        public static Zen<FiniteBag<T>> Create<T>(params Zen<T>[] elements)
         {
             CommonUtilities.ValidateNotNull(elements);
 
             var asOptions = elements.Select(Option.Create);
-            return Bag.Create(Seq.Create(asOptions));
+            return FiniteBag.Create(Seq.Create(asOptions));
         }
     }
 
     /// <summary>
     /// Extension methods for Zen bag objects.
     /// </summary>
-    public static class BagExtensions
+    public static class FiniteBagExtensions
     {
         /// <summary>
         /// Gets the underlying sequence for a bag.
         /// </summary>
         /// <param name="bagExpr">The bag expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Seq<Option<T>>> Values<T>(this Zen<Bag<T>> bagExpr)
+        internal static Zen<Seq<Option<T>>> Values<T>(this Zen<FiniteBag<T>> bagExpr)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
 
-            return bagExpr.GetField<Bag<T>, Seq<Option<T>>>("Values");
+            return bagExpr.GetField<FiniteBag<T>, Seq<Option<T>>>("Values");
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace ZenLib
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <param name="value">The value to check for containment.</param>
         /// <returns>Zen value indicating the containment.</returns>
-        public static Zen<bool> Contains<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
+        public static Zen<bool> Contains<T>(this Zen<FiniteBag<T>> bagExpr, Zen<T> value)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
@@ -115,12 +115,12 @@ namespace ZenLib
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <param name="value">The value to add to the bag.</param>
         /// <returns>The new bag from adding the value.</returns>
-        public static Zen<Bag<T>> Add<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
+        public static Zen<FiniteBag<T>> Add<T>(this Zen<FiniteBag<T>> bagExpr, Zen<T> value)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
-            return Bag.Create(bagExpr.Values().AddFront(Option.Create(value)));
+            return FiniteBag.Create(bagExpr.Values().AddFront(Option.Create(value)));
         }
 
         /// <summary>
@@ -130,12 +130,12 @@ namespace ZenLib
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <param name="value">The value to add to the bag.</param>
         /// <returns>The new bag from adding the value.</returns>
-        public static Zen<Bag<T>> AddIfSpace<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
+        public static Zen<FiniteBag<T>> AddIfSpace<T>(this Zen<FiniteBag<T>> bagExpr, Zen<T> value)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
-            return Bag.Create(AddIfSpace(bagExpr.Values(), value));
+            return FiniteBag.Create(AddIfSpace(bagExpr.Values(), value));
         }
 
         /// <summary>
@@ -160,12 +160,12 @@ namespace ZenLib
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <param name="value">The value to add to the bag.</param>
         /// <returns>The new bag from adding the value..</returns>
-        public static Zen<Bag<T>> Remove<T>(this Zen<Bag<T>> bagExpr, Zen<T> value)
+        public static Zen<FiniteBag<T>> Remove<T>(this Zen<FiniteBag<T>> bagExpr, Zen<T> value)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
-            return Bag.Create(bagExpr.Values().Select(o => If(And(o.HasValue(), o.Value() == value), Option.Null<T>(), o)));
+            return FiniteBag.Create(bagExpr.Values().Select(o => If(And(o.HasValue(), o.Value() == value), Option.Null<T>(), o)));
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="bagExpr">Zen bag expression.</param>
         /// <returns>The new bag from adding the value..</returns>
-        public static Zen<ushort> Size<T>(this Zen<Bag<T>> bagExpr)
+        public static Zen<ushort> Size<T>(this Zen<FiniteBag<T>> bagExpr)
         {
             CommonUtilities.ValidateNotNull(bagExpr);
 

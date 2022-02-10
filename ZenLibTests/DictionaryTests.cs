@@ -23,7 +23,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAddThenGetIsEqual()
         {
-            CheckValid<Dict<int, int>>(d => d.Add(1, 1).Get(1).Value() == 1);
+            CheckValid<FiniteDict<int, int>>(d => d.Add(1, 1).Get(1).Value() == 1);
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluation()
         {
-            var f = new ZenFunction<Dict<int, int>, Dict<int, int>>(d => d.Add(1, 1).Add(2, 2));
-            var result = f.Evaluate(new Dict<int, int>());
+            var f = new ZenFunction<FiniteDict<int, int>, FiniteDict<int, int>>(d => d.Add(1, 1).Add(2, 2));
+            var result = f.Evaluate(new FiniteDict<int, int>());
             Assert.AreEqual(result.Get(1), 1);
             Assert.AreEqual(result.Get(2), 2);
         }
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            RandomBytes(x => CheckAgreement<Dict<int, int>>(d => Not(Dict.Create<int, int>().Get(x).HasValue())));
+            RandomBytes(x => CheckAgreement<FiniteDict<int, int>>(d => Not(FiniteDict.Empty<int, int>().Get(x).HasValue())));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateOutput()
         {
-            var f = new ZenFunction<int, int, Dict<int, int>>((x, y) => Dict.Create<int, int>().Add(x, y));
+            var f = new ZenFunction<int, int, FiniteDict<int, int>>((x, y) => FiniteDict.Empty<int, int>().Add(x, y));
             var d = f.Evaluate(1, 2);
             // Assert.AreEqual(1, d.Count);
             Assert.AreEqual(2, d.Get(1));
@@ -69,15 +69,15 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateInput()
         {
-            CheckAgreement<Dict<int, int>>(d => d.ContainsKey(1));
+            CheckAgreement<FiniteDict<int, int>>(d => d.ContainsKey(1));
 
-            var f = new ZenFunction<Dict<int, int>, bool>(d => d.ContainsKey(1));
+            var f = new ZenFunction<FiniteDict<int, int>, bool>(d => d.ContainsKey(1));
 
-            var d1 = new Dict<int, int>();
+            var d1 = new FiniteDict<int, int>();
             d1.Add(1, 2);
             Assert.AreEqual(true, f.Evaluate(d1));
 
-            var d2 = new Dict<int, int>();
+            var d2 = new FiniteDict<int, int>();
             d2.Add(2, 1);
             Assert.AreEqual(false, f.Evaluate(d2));
         }
@@ -88,7 +88,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryStrings()
         {
-            var f = new ZenFunction<Dict<string, string>, bool>(d => true);
+            var f = new ZenFunction<FiniteDict<string, string>, bool>(d => true);
             var sat = f.Find((d, allowed) =>
             {
                 return And(
@@ -109,7 +109,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryGet()
         {
-            var d = new Dict<int, int>();
+            var d = new FiniteDict<int, int>();
             d.Add(1, 2);
             d.Add(2, 3);
             d.Add(1, 4);
@@ -126,7 +126,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(System.IndexOutOfRangeException))]
         public void TestDictionaryGetException()
         {
-            var d = new Dict<int, int>();
+            var d = new FiniteDict<int, int>();
             d.Add(1, 2);
             d.Add(2, 3);
             d.Get(3);
@@ -138,7 +138,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryToString()
         {
-            var d = new Dict<int, int>();
+            var d = new FiniteDict<int, int>();
             d.Add(1, 2);
             d.Add(2, 3);
 

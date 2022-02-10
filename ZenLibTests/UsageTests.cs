@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException1()
         {
-            DictExtensions.Add(null, Constant(1), Constant(1));
+            FiniteDictExtensions.Add(null, Constant(1), Constant(1));
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException2()
         {
-            DictExtensions.Add(Dict.Create<int, int>(), null, 1);
+            FiniteDictExtensions.Add(FiniteDict.Empty<int, int>(), null, 1);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException3()
         {
-            DictExtensions.Add(Dict.Create<int, int>(), 1, null);
+            FiniteDictExtensions.Add(FiniteDict.Empty<int, int>(), 1, null);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException1()
         {
-            DictExtensions.ContainsKey<int, int>(null, 0);
+            FiniteDictExtensions.ContainsKey<int, int>(null, 0);
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException2()
         {
-            DictExtensions.ContainsKey(Dict.Create<int, int>(), null);
+            FiniteDictExtensions.ContainsKey(FiniteDict.Empty<int, int>(), null);
         }
 
         /// <summary>
@@ -476,7 +476,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException1()
         {
-            DictExtensions.Get<int, int>(null, null);
+            FiniteDictExtensions.Get<int, int>(null, null);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException2()
         {
-            DictExtensions.Get(Dict.Create<int, int>(), null);
+            FiniteDictExtensions.Get(FiniteDict.Empty<int, int>(), null);
         }
 
         /// <summary>

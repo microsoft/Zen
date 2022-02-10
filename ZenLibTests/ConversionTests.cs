@@ -41,9 +41,9 @@ namespace ZenLib.Tests
 
             CheckAgreement<IDictionary<int, int>>(x =>
             {
-                var d = new Dict<int, int>();
+                var d = new FiniteDict<int, int>();
                 d.Add(1, 2);
-                Zen<Dict<int, int>> y = d;
+                Zen<FiniteDict<int, int>> y = d;
                 return y.ContainsKey(4);
             });
         }
@@ -150,7 +150,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConvertNullDictionaryValue()
         {
-            Dict<int, Object1> o = new Dict<int, Object1>();
+            FiniteDict<int, Object1> o = new FiniteDict<int, Object1>();
             o.Add(1, null);
             var _ = Constant(o);
         }

@@ -125,9 +125,9 @@ namespace ZenLib.Tests
             var zf = new ZenConstraint<IDictionary<int, int>>(d => DictGet(d, 10) == Option.Some(11));
             var result = zf.Find();
 
-            Console.WriteLine(result.HasValue);
-            Console.WriteLine(result.Value.Count);
-            Console.WriteLine(result.Value[10]);
+            Assert.IsTrue(result.HasValue);
+            Assert.AreEqual(1, result.Value.Count);
+            Assert.AreEqual(11, result.Value[10]);
         }
 
         /// <summary>
