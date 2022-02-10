@@ -151,12 +151,12 @@ namespace ZenLib.ModelChecking
             foreach (var kv in this.ArbitraryMapping)
             {
                 var type = kv.Key.GetType().GetGenericArgumentsCached()[0];
-                var value = this.Solver.Get(model, kv.Value);
-                assignment[kv.Key] = CommonUtilities.ConvertSymbolicResultToCSharp(type, value);
+                var value = this.Solver.Get(model, kv.Value, type);
+                assignment[kv.Key] = value;
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            return CommonUtilities.ConvertSymbolicResultToCSharp<T>(this.ZenExpression.Accept(new ExpressionEvaluator(false), interpreterEnv));
+            return (T)this.ZenExpression.Accept(new ExpressionEvaluator(false), interpreterEnv);
         }
 
         /// <summary>

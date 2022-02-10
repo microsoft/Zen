@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
@@ -476,32 +477,37 @@ namespace ZenLib.Solver
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
-        public object Get(Assignment<T> m, Variable<T> v)
+        public object Get(Assignment<T> m, Variable<T> v, Type type)
         {
             if (v is VarBool<T> v1)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
                 return m.Get(v1);
             }
             else if (v is VarInt8<T> v8)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(byte), "Internal type mismatch");
                 return m.Get(v8);
             }
             else if (v is VarInt16<T> v16)
             {
-                return m.Get(v16);
+                CommonUtilities.ValidateIsTrue(type == typeof(short) || type == typeof(ushort), "Internal type mismatch");
+                return type == typeof(short) ? m.Get(v16) : (object)(ushort)m.Get(v16);
             }
             else if (v is VarInt32<T> v32)
             {
-                return m.Get(v32);
+                CommonUtilities.ValidateIsTrue(type == typeof(int) || type == typeof(uint), "Internal type mismatch");
+                return type == typeof(int) ? m.Get(v32) : (object)(uint)m.Get(v32);
             }
             else if (v is VarInt64<T> v64)
             {
-                return m.Get(v64);
+                CommonUtilities.ValidateIsTrue(type == typeof(long) || type == typeof(ulong), "Internal type mismatch");
+                return type == typeof(long) ? m.Get(v64) : (object)(ulong)m.Get(v64);
             }
             else
             {
-                // fixed width integer.
-                // bits are stored in little endian, need to reverse
+                // fixed width integer. bits are stored in little endian, need to reverse
+                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsFixedIntegerType(type), "Internal type mismatch");
                 var bytes = m.Get((VarInt<T>)v);
                 var remainder = v.NumBits % 8;
 
@@ -510,7 +516,7 @@ namespace ZenLib.Solver
                     bytes[bytes.Length - 1] >>= (8 - remainder);
                 }
 
-                return bytes;
+                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
             }
         }
 

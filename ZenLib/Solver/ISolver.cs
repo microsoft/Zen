@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using System.Numerics;
 
     /// <summary>
@@ -433,7 +434,8 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="m">The model.</param>
         /// <param name="v">The variable.</param>
+        /// <param name="type">The C# type to coerce the result to.</param>
         /// <returns>The value.</returns>
-        object Get(TModel m, TVariable v);
+        object Get(TModel m, TVariable v, Type type);
     }
 }

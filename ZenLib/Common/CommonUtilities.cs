@@ -252,50 +252,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Converts a solver result back to a C# result.
-        /// </summary>
-        /// <param name="value">The solver result.</param>
-        /// <returns>The C# value.</returns>
-        public static T ConvertSymbolicResultToCSharp<T>(object value)
-        {
-            return (T)ConvertSymbolicResultToCSharp(typeof(T), value);
-        }
-
-        /// <summary>
-        /// Converts a solver result back to a C# result.
-        /// </summary>
-        /// <param name="type">The type of the result.</param>
-        /// <param name="value">The solver result.</param>
-        /// <returns>The C# value.</returns>
-        public static object ConvertSymbolicResultToCSharp(Type type, object value)
-        {
-            var objType = value.GetType();
-
-            if (type.IsAssignableFrom(objType))
-            {
-                return value;
-            }
-            else if (type == typeof(ushort) && objType == typeof(short))
-            {
-                return (ushort)(short)value;
-            }
-            else if (type == typeof(uint) && objType == typeof(int))
-            {
-                return (uint)(int)value;
-            }
-            else if (type == typeof(ulong) && objType == typeof(long))
-            {
-                return (ulong)(long)value;
-            }
-            else if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { value });
-            }
-
-            throw new ZenException($"Internal error: invalid conversion of type {type} to {objType}");
-        }
-
-        /// <summary>
         /// Convert a C# string to a Z3 string.
         /// </summary>
         /// <param name="s">The C# string.</param>

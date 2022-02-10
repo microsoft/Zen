@@ -352,52 +352,47 @@ namespace ZenLib.Solver
             return this.context.MkIndexOf(x, y, z);
         }
 
-        public object Get(Model m, Expr v)
+        public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
 
             if (e.Sort == this.BoolSort)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
                 return bool.Parse(e.ToString());
             }
             else if (e.Sort == this.ByteSort)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(byte), "Internal type mismatch");
                 return byte.Parse(e.ToString());
             }
             else if (e.Sort == this.ShortSort)
             {
-                if (short.TryParse(e.ToString(), out short x))
-                {
-                    return x;
-                }
-
-                return (short)ushort.Parse(e.ToString());
+                CommonUtilities.ValidateIsTrue(type == typeof(short) || type == typeof(ushort), "Internal type mismatch");
+                var result = ushort.Parse(e.ToString());
+                return type == typeof(ushort) ? result : (object)(short)result;
             }
             else if (e.Sort == this.IntSort)
             {
-                if (int.TryParse(e.ToString(), out int x))
-                {
-                    return x;
-                }
-
-                return (int)uint.Parse(e.ToString());
+                CommonUtilities.ValidateIsTrue(type == typeof(int) || type == typeof(uint), "Internal type mismatch");
+                var result = uint.Parse(e.ToString());
+                return type == typeof(uint) ? result : (object)(int)result;
             }
             else if (e.Sort == this.BigIntSort)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(BigInteger), "Internal type mismatch");
                 return BigInteger.Parse(e.ToString());
             }
             else if (e.Sort == this.StringSort)
             {
+                CommonUtilities.ValidateIsTrue(type == typeof(string), "Internal type mismatch");
                 return CommonUtilities.ConvertZ3StringToCSharp(e.ToString());
             }
             else if (e.Sort == this.LongSort)
             {
-                if (long.TryParse(e.ToString(), out long xl))
-                {
-                    return xl;
-                }
-
-                return (long)ulong.Parse(e.ToString());
+                CommonUtilities.ValidateIsTrue(type == typeof(long) || type == typeof(ulong), "Internal type mismatch");
+                var result = ulong.Parse(e.ToString());
+                return type == typeof(ulong) ? result : (object)(long)result;
             }
             else
             {
@@ -406,7 +401,7 @@ namespace ZenLib.Solver
                 RemoveTrailingZeroes(ref bytes);
 
                 Array.Reverse(bytes);
-                return bytes;
+                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
             }
         }
 

@@ -61,9 +61,8 @@ namespace ZenLib.ModelChecking
                 var expr = kv.Key;
                 var variable = kv.Value;
                 var type = expr.GetType().GetGenericArgumentsCached()[0];
-                var obj = this.solver.Get(model, variable);
-                var result = CommonUtilities.ConvertSymbolicResultToCSharp(type, obj);
-                arbitraryAssignment.Add(expr, result);
+                var obj = this.solver.Get(model, variable, type);
+                arbitraryAssignment.Add(expr, obj);
             }
 
             return arbitraryAssignment;
