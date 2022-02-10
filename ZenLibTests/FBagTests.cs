@@ -1,4 +1,4 @@
-﻿// <copyright file="BagTests.cs" company="Microsoft">
+﻿// <copyright file="FBagTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -17,7 +17,7 @@ namespace ZenLib.Tests
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class BagTests
+    public class FBagTests
     {
         /// <summary>
         /// Test that converting a bag to and from an array works.
@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         public void TestBagToArray()
         {
             var a1 = new int[] { 1, 2, 3, 4 };
-            var b = FiniteBag.FromArray(a1);
+            var b = FBag.FromArray(a1);
             var a2 = b.ToArray();
             Assert.AreEqual(a1.Length, a2.Length);
 
@@ -42,12 +42,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagSizingAnnotation()
         {
-            var zf = new ZenFunction<FiniteBag<byte>, bool>(l => l.Size() == 5);
+            var zf = new ZenFunction<FBag<byte>, bool>(l => l.Size() == 5);
             var example1 = zf.Find((l, b) => b, depth: 5);
             Assert.IsTrue(example1.HasValue);
             Assert.AreEqual(5, example1.Value.Values.Values.Count);
 
-            zf = new ZenFunction<FiniteBag<byte>, bool>(l => l.Size() == 3);
+            zf = new ZenFunction<FBag<byte>, bool>(l => l.Size() == 3);
             var example2 = zf.Find((l, b) => b, depth: 5);
             Assert.IsTrue(example2.HasValue);
             Assert.AreEqual(5, example1.Value.Values.Values.Count);
@@ -63,7 +63,7 @@ namespace ZenLib.Tests
             // var zf1 = new ZenFunction<Seq<byte>, Seq<byte>>(l => l.Where(x => x != 100));
             // var example1 = zf1.Find((l, b) => b.Length() == 4, depth: 15);
 
-            var zf2 = new ZenFunction<FiniteBag<byte>, FiniteBag<byte>>(l => l.Remove(100));
+            var zf2 = new ZenFunction<FBag<byte>, FBag<byte>>(l => l.Remove(100));
             var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 100);
         }
 
@@ -73,7 +73,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddIfSpaceIsScalable()
         {
-            var zf2 = new ZenFunction<FiniteBag<byte>, FiniteBag<byte>>(l => l.AddIfSpace(100));
+            var zf2 = new ZenFunction<FBag<byte>, FBag<byte>>(l => l.AddIfSpace(100));
             var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 100);
         }
 
@@ -83,9 +83,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagCreate()
         {
-            var b1 = Symbolic<FiniteBag<int>>(depth: 5);
-            var b2 = FiniteBag.Create<int>(1, 2, 3);
-            var b3 = FiniteBag.Create<int>(1, 2, 3, 4, 5);
+            var b1 = Symbolic<FBag<int>>(depth: 5);
+            var b2 = FBag.Create<int>(1, 2, 3);
+            var b3 = FBag.Create<int>(1, 2, 3, 4, 5);
             Assert.IsFalse((b1 == b2).Solve().IsSatisfiable());
             Assert.IsTrue((b1 == b3).Solve().IsSatisfiable());
         }
@@ -96,7 +96,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddExample()
         {
-            var zf = new ZenFunction<FiniteBag<byte>, FiniteBag<byte>>(l => l.Add(7));
+            var zf = new ZenFunction<FBag<byte>, FBag<byte>>(l => l.Add(7));
             var example = zf.Find((l, b) => l.Size() == 3, depth: 5);
             Assert.IsTrue(example.HasValue);
 
@@ -111,8 +111,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddIfSpace()
         {
-            var b1 = Symbolic<FiniteBag<int>>();
-            var b2 = Symbolic<FiniteBag<int>>();
+            var b1 = Symbolic<FBag<int>>();
+            var b2 = Symbolic<FBag<int>>();
             var b3 = b1.AddIfSpace(5);
 
             var sol = (b2 == b3).Solve();
@@ -128,7 +128,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagRemoveExample()
         {
-            var zf = new ZenFunction<FiniteBag<byte>, FiniteBag<byte>>(l => l.Remove(7));
+            var zf = new ZenFunction<FBag<byte>, FBag<byte>>(l => l.Remove(7));
             var example = zf.Find((l, b) => l.Contains(7), depth: 5);
             Assert.IsTrue(example.HasValue);
 
@@ -143,7 +143,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagContainsExample()
         {
-            var zf = new ZenFunction<FiniteBag<byte>, bool>(l => And(l.Contains(7), l.Contains(4)));
+            var zf = new ZenFunction<FBag<byte>, bool>(l => And(l.Contains(7), l.Contains(4)));
             var example = zf.Find((l, b) => b, depth: 5);
             Assert.IsTrue(example.HasValue);
 
@@ -157,7 +157,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddContains()
         {
-            RandomBytes(x => CheckValid<FiniteBag<byte>>(l => l.Add(x).Contains(x)));
+            RandomBytes(x => CheckValid<FBag<byte>>(l => l.Add(x).Contains(x)));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddIfSpaceContains1()
         {
-            RandomBytes(x => CheckValid<FiniteBag<byte>>(l => Implies(l.Size() == 0, l.AddIfSpace(x).Contains(x))));
+            RandomBytes(x => CheckValid<FBag<byte>>(l => Implies(l.Size() == 0, l.AddIfSpace(x).Contains(x))));
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagAddIfSpaceNotContains1()
         {
-            RandomBytes(x => CheckValid<FiniteBag<byte>>(l => Implies(l.Size() >= 5, l.AddIfSpace(x) == l)));
+            RandomBytes(x => CheckValid<FBag<byte>>(l => Implies(l.Size() >= 5, l.AddIfSpace(x) == l)));
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestBagRemoveContains()
         {
-            RandomBytes(x => CheckValid<FiniteBag<byte>>(l => Not(l.Remove(x).Contains(x))));
+            RandomBytes(x => CheckValid<FBag<byte>>(l => Not(l.Remove(x).Contains(x))));
         }
     }
 }

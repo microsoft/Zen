@@ -133,6 +133,44 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Gets a value from a dictionary if the key exists.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key to lookup.</param>
+        /// <returns></returns>
+        public static Option<TValue> DictionaryGet<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (dictionary.TryGetValue(key, out var value))
+            {
+                return Option.Some(value);
+            }
+
+            return Option.None<TValue>();
+        }
+
+        /// <summary>
+        /// Checks if two dictionaries are equal.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dictionary1">The first dictionary.</param>
+        /// <param name="dictionary2">The second dictionary.</param>
+        /// <returns></returns>
+        public static bool DictionaryEquals<TKey, TValue>(IDictionary<TKey, TValue> dictionary1, IDictionary<TKey, TValue> dictionary2)
+        {
+            if (dictionary1.Count != dictionary2.Count)
+            {
+                return false;
+            }
+
+            var pairs1 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary1);
+            var pairs2 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary2);
+            return pairs1.SetEquals(pairs2);
+        }
+
+        /// <summary>
         /// Validate that an argument is true.
         /// </summary>
         /// <param name="obj">The argument.</param>

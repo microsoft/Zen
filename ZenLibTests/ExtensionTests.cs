@@ -185,7 +185,7 @@ namespace ZenLib.Tests
             var i = Arbitrary<int>();
             var s = Arbitrary<string>();
             var o = Arbitrary<Option<ulong>>();
-            var l = Arbitrary<Seq<int>>(depth: 10, exhaustiveDepth: false);
+            var l = Arbitrary<FSeq<int>>(depth: 10, exhaustiveDepth: false);
 
             // build constraints on these variables
             var c1 = Or(b, i <= 10);
@@ -240,12 +240,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEvaluateList()
         {
-            var a = Arbitrary<Seq<int>>();
+            var a = Arbitrary<FSeq<int>>();
             var expr = a.Sort();
 
             var assignment = new Dictionary<object, object>
             {
-                { a, new Seq<int> { Values = new List<int> { 3, 2, 1 } } },
+                { a, new FSeq<int> { Values = new List<int> { 3, 2, 1 } } },
             };
 
             var l = expr.Evaluate(assignment);
@@ -330,7 +330,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestEvaluateWrongTypes3()
         {
-            var a = Arbitrary<Seq<int>>();
+            var a = Arbitrary<FSeq<int>>();
             var expr = a.Sort();
 
             var assignment = new Dictionary<object, object>

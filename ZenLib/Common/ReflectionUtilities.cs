@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -25,7 +26,7 @@ namespace ZenLib
         /// <summary>
         /// The type of finite string values.
         /// </summary>
-        public readonly static Type FiniteStringType = typeof(FiniteString);
+        public readonly static Type FiniteStringType = typeof(FString);
 
         /// <summary>
         /// The type of bool values.
@@ -86,6 +87,11 @@ namespace ZenLib
         /// Type of an List.
         /// </summary>
         public readonly static Type ListType = typeof(List<>);
+
+        /// <summary>
+        /// Type of an List.
+        /// </summary>
+        public readonly static Type ImmutableDictType = typeof(ImmutableDictionary<,>);
 
         /// <summary>
         /// Type of a fixed size integer.
@@ -603,6 +609,15 @@ namespace ZenLib
                 return string.Empty;
             if (IsFixedIntegerType(type))
                 return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
+
+            if (IsIDictType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                var f = ImmutableDictType.MakeGenericType(keyType, valueType).GetFieldCached("Empty");
+                return f.GetValue(null);
+            }
 
             if (IsIListType(type))
             {

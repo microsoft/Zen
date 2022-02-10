@@ -25,12 +25,12 @@ namespace ZenLib.Tests.Network
         /// <summary>
         /// The list of communities.
         /// </summary>
-        public Seq<uint> Communities { get; set; }
+        public FSeq<uint> Communities { get; set; }
 
         /// <summary>
         /// The AS path.
         /// </summary>
-        public Seq<uint> AsPath { get; set; }
+        public FSeq<uint> AsPath { get; set; }
 
         /// <summary>
         /// Convert a route to a string.
@@ -172,7 +172,7 @@ namespace ZenLib.Tests.Network
             var prefix = route.GetField<Route, Prefix>("Prefix");
             var dstIp = prefix.GetField<Prefix, uint>("Address");
             var prefixLen = prefix.GetField<Prefix, byte>("Length");
-            var communities = route.GetField<Route, Seq<uint>>("Communities");
+            var communities = route.GetField<Route, FSeq<uint>>("Communities");
 
             var (addr, lenLow, lenHi) = this.PrefixGuard;
             var mask = (uint)(0xFFFFFF << (32 - lenLow));
@@ -193,8 +193,8 @@ namespace ZenLib.Tests.Network
         /// <returns>A new modified route.</returns>
         public Zen<Route> ApplyAction(Zen<Route> route)
         {
-            var communities = route.GetField<Route, Seq<uint>>("Communities");
-            var aspath = route.GetField<Route, Seq<uint>>("AsPath");
+            var communities = route.GetField<Route, FSeq<uint>>("Communities");
+            var aspath = route.GetField<Route, FSeq<uint>>("AsPath");
 
             foreach (var c in this.CommunityDeletes)
             {

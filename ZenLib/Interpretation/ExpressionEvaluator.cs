@@ -531,7 +531,7 @@ namespace ZenLib.Interpretation
 
             var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
             var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
-            var result = e1.ContainsKey(e2) ? Option.Some(e1[e2]) : Option.None<TValue>();
+            var result = CommonUtilities.DictionaryGet(e1, e2);
             this.cache[expression] = result;
             return result;
         }
@@ -545,18 +545,7 @@ namespace ZenLib.Interpretation
 
             var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr1.Accept(this, parameter));
             var e2 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr2.Accept(this, parameter));
-
-            bool result;
-            if (e1.Count != e2.Count)
-            {
-                result = false;
-            }
-            else
-            {
-                var pairs1 = new HashSet<KeyValuePair<TKey, TValue>>(e1);
-                var pairs2 = new HashSet<KeyValuePair<TKey, TValue>>(e2);
-                result = pairs1.SetEquals(pairs2);
-            }
+            var result = CommonUtilities.DictionaryEquals(e1, e2);
 
             this.cache[expression] = result;
             return result;

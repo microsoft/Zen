@@ -576,22 +576,73 @@ namespace ZenLib.Compilation
 
         public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            throw new NotImplementedException();
+            return LookupOrCompute(expression, () =>
+            {
+                var fieldInfo = typeof(ImmutableDictionary<TKey, TValue>).GetFieldCached("Empty");
+                return Expression.Field(null, fieldInfo);
+            });
         }
 
         public Expression VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            throw new NotImplementedException();
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("SetItem");
+                var dict = expression.DictExpr.Accept(this, parameter);
+
+                var toImmutableDictMethod = typeof(CommonUtilities)
+                    .GetMethodCached("ToImmutableDictionary")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
+
+                var key = expression.KeyExpr.Accept(this, parameter);
+                var value = expression.ValueExpr.Accept(this, parameter);
+                return Expression.Call(immutableDictExpr, method, key, value);
+            });
         }
 
         public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            throw new NotImplementedException();
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(CommonUtilities)
+                    .GetMethodCached("DictionaryGet")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var dict = expression.DictExpr.Accept(this, parameter);
+
+                var toImmutableDictMethod = typeof(CommonUtilities)
+                    .GetMethodCached("ToImmutableDictionary")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
+
+                var key = expression.KeyExpr.Accept(this, parameter);
+                return Expression.Call(null, method, immutableDictExpr, key);
+            });
         }
 
         public Expression VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            throw new NotImplementedException();
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(CommonUtilities)
+                    .GetMethodCached("DictionaryEquals")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var dict1 = expression.DictExpr1.Accept(this, parameter);
+                var dict2 = expression.DictExpr2.Accept(this, parameter);
+
+                var toImmutableDictMethod = typeof(CommonUtilities)
+                    .GetMethodCached("ToImmutableDictionary")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
+                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+
+                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+            });
         }
 
         /// <summary>

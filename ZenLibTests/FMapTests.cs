@@ -1,4 +1,4 @@
-﻿// <copyright file="DictionaryTests.cs" company="Microsoft">
+﻿// <copyright file="FMapTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -15,7 +15,7 @@ namespace ZenLib.Tests
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class DictionaryTests
+    public class FMapTests
     {
         /// <summary>
         /// Test that adding and then getting an element returns that element.
@@ -23,7 +23,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAddThenGetIsEqual()
         {
-            CheckValid<FiniteDict<int, int>>(d => d.Add(1, 1).Get(1).Value() == 1);
+            CheckValid<FMap<int, int>>(d => d.Set(1, 1).Get(1).Value() == 1);
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluation()
         {
-            var f = new ZenFunction<FiniteDict<int, int>, FiniteDict<int, int>>(d => d.Add(1, 1).Add(2, 2));
-            var result = f.Evaluate(new FiniteDict<int, int>());
+            var f = new ZenFunction<FMap<int, int>, FMap<int, int>>(d => d.Set(1, 1).Set(2, 2));
+            var result = f.Evaluate(new FMap<int, int>());
             Assert.AreEqual(result.Get(1), 1);
             Assert.AreEqual(result.Get(2), 2);
         }
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            RandomBytes(x => CheckAgreement<FiniteDict<int, int>>(d => Not(FiniteDict.Empty<int, int>().Get(x).HasValue())));
+            RandomBytes(x => CheckAgreement<FMap<int, int>>(d => Not(FMap.Empty<int, int>().Get(x).HasValue())));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateOutput()
         {
-            var f = new ZenFunction<int, int, FiniteDict<int, int>>((x, y) => FiniteDict.Empty<int, int>().Add(x, y));
+            var f = new ZenFunction<int, int, FMap<int, int>>((x, y) => FMap.Empty<int, int>().Set(x, y));
             var d = f.Evaluate(1, 2);
             // Assert.AreEqual(1, d.Count);
             Assert.AreEqual(2, d.Get(1));
@@ -69,16 +69,16 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEvaluateInput()
         {
-            CheckAgreement<FiniteDict<int, int>>(d => d.ContainsKey(1));
+            CheckAgreement<FMap<int, int>>(d => d.ContainsKey(1));
 
-            var f = new ZenFunction<FiniteDict<int, int>, bool>(d => d.ContainsKey(1));
+            var f = new ZenFunction<FMap<int, int>, bool>(d => d.ContainsKey(1));
 
-            var d1 = new FiniteDict<int, int>();
-            d1.Add(1, 2);
+            var d1 = new FMap<int, int>();
+            d1.Set(1, 2);
             Assert.AreEqual(true, f.Evaluate(d1));
 
-            var d2 = new FiniteDict<int, int>();
-            d2.Add(2, 1);
+            var d2 = new FMap<int, int>();
+            d2.Set(2, 1);
             Assert.AreEqual(false, f.Evaluate(d2));
         }
 
@@ -88,7 +88,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryStrings()
         {
-            var f = new ZenFunction<FiniteDict<string, string>, bool>(d => true);
+            var f = new ZenFunction<FMap<string, string>, bool>(d => true);
             var sat = f.Find((d, allowed) =>
             {
                 return And(
@@ -109,10 +109,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryGet()
         {
-            var d = new FiniteDict<int, int>();
-            d.Add(1, 2);
-            d.Add(2, 3);
-            d.Add(1, 4);
+            var d = new FMap<int, int>();
+            d.Set(1, 2);
+            d.Set(2, 3);
+            d.Set(1, 4);
 
             Assert.IsTrue(d.ContainsKey(1));
             Assert.IsTrue(d.ContainsKey(2));
@@ -126,9 +126,9 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(System.IndexOutOfRangeException))]
         public void TestDictionaryGetException()
         {
-            var d = new FiniteDict<int, int>();
-            d.Add(1, 2);
-            d.Add(2, 3);
+            var d = new FMap<int, int>();
+            d.Set(1, 2);
+            d.Set(2, 3);
             d.Get(3);
         }
 
@@ -138,9 +138,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryToString()
         {
-            var d = new FiniteDict<int, int>();
-            d.Add(1, 2);
-            d.Add(2, 3);
+            var d = new FMap<int, int>();
+            d.Set(1, 2);
+            d.Set(2, 3);
 
             Assert.AreEqual("{2 => 3, 1 => 2}", d.ToString());
         }

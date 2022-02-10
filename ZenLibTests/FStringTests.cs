@@ -1,4 +1,4 @@
-﻿// <copyright file="FiniteStringTests.cs" company="Microsoft">
+﻿// <copyright file="FStringTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -16,7 +16,7 @@ namespace ZenLib.Tests
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class FiniteStringTests
+    public class FStringTests
     {
         /// <summary>
         /// Test FiniteString equality and hashing.
@@ -30,8 +30,8 @@ namespace ZenLib.Tests
         [DataRow("endline\r\n", "endline\r\n", true)]
         public void TestEqualityAndHashing(string s1, string s2, bool equal)
         {
-            FiniteString fs1 = s1;
-            FiniteString fs2 = s2;
+            FString fs1 = s1;
+            FString fs2 = s2;
             Assert.IsFalse(fs1.Equals(new object()));
             Assert.IsFalse(fs2.Equals(new object()));
             Assert.AreEqual(equal, fs1.Equals(fs2));
@@ -54,7 +54,7 @@ namespace ZenLib.Tests
         [DataRow("endline\r\n")]
         public void TestConversions(string s)
         {
-            FiniteString fs = s;
+            FString fs = s;
             Assert.AreEqual(fs.ToString(), s);
         }
 
@@ -73,8 +73,8 @@ namespace ZenLib.Tests
         [DataRow("endline\r\n")]
         public void TestConstants(string s)
         {
-            var fs = FiniteString.Create(s);
-            var f = new ZenFunction<FiniteString>(() => fs);
+            var fs = FString.Create(s);
+            var f = new ZenFunction<FString>(() => fs);
             Assert.IsTrue(f.Assert(x => x == fs));
         }
 
@@ -84,8 +84,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEmptyString()
         {
-            CheckValid<FiniteString>(fs => (fs.Length() == 0) == (fs == new FiniteString("")));
-            CheckValid<FiniteString>(fs => (fs == new FiniteString("")) == fs.IsEmpty());
+            CheckValid<FString>(fs => (fs.Length() == 0) == (fs == new FString("")));
+            CheckValid<FString>(fs => (fs == new FString("")) == fs.IsEmpty());
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace ZenLib.Tests
         [DataRow("", 0)]
         public void TestLength(string s, int expected)
         {
-            var f = new ZenFunction<FiniteString, ushort>(fs => fs.Length());
+            var f = new ZenFunction<FString, ushort>(fs => fs.Length());
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, (int)actual);
         }
@@ -110,7 +110,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthRandom()
         {
-            var f = new ZenFunction<FiniteString, ushort>(fs => fs.Length());
+            var f = new ZenFunction<FString, ushort>(fs => fs.Length());
             RandomStrings(s =>
             {
                 var ex = f.Find((fs, l) => l == (ushort)s.Length).Value.ToString();
@@ -129,7 +129,7 @@ namespace ZenLib.Tests
         [DataRow("hello", "b", false)]
         public void TestContains(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<FiniteString, bool>(fs => fs.Contains(new FiniteString(sub)));
+            var f = new ZenFunction<FString, bool>(fs => fs.Contains(new FString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -142,7 +142,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, bool>(fs => fs.Contains(new FiniteString(s)));
+                var f = new ZenFunction<FString, bool>(fs => fs.Contains(new FString(s)));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(ex.Contains(s));
             });
@@ -160,7 +160,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestPrefixOf(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<FiniteString, bool>(fs => fs.StartsWith(new FiniteString(sub)));
+            var f = new ZenFunction<FString, bool>(fs => fs.StartsWith(new FString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -173,7 +173,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString.Create(s).StartsWith(fs));
+                var f = new ZenFunction<FString, bool>(fs => FString.Create(s).StartsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.StartsWith(ex));
             });
@@ -189,7 +189,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestSuffixOf(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<FiniteString, bool>(fs => fs.EndsWith(new FiniteString(sub)));
+            var f = new ZenFunction<FString, bool>(fs => fs.EndsWith(new FString(sub)));
             var actual = f.Evaluate(s);
             Assert.AreEqual(expected, actual);
         }
@@ -202,7 +202,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, bool>(fs => FiniteString.Create(s).EndsWith(fs));
+                var f = new ZenFunction<FString, bool>(fs => FString.Create(s).EndsWith(fs));
                 var ex = f.Find((fs, b) => b).Value.ToString();
                 Assert.IsTrue(s.EndsWith(ex));
             });
@@ -218,7 +218,7 @@ namespace ZenLib.Tests
         [DataRow("abc", 3, "")]
         public void TestAt(string s, int idx, string expected)
         {
-            var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.At((ushort)idx));
+            var f = new ZenFunction<FString, FString>(fs => fs.At((ushort)idx));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -231,7 +231,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.At(2));
+                var f = new ZenFunction<FString, FString>(fs => fs.At(2));
                 var fs = f.Evaluate(s);
                 var expected = s.Length >= 3 ? s[2].ToString() : string.Empty;
                 Assert.AreEqual(expected, fs.ToString());
@@ -250,7 +250,7 @@ namespace ZenLib.Tests
         [DataRow("abcde", "ab", 3, -1)]
         public void TestIndexOf(string s, string sub, int offset, int expected)
         {
-            var f = new ZenFunction<FiniteString, Option<ushort>>(fs => fs.IndexOf(new FiniteString(sub), (ushort)offset));
+            var f = new ZenFunction<FString, Option<ushort>>(fs => fs.IndexOf(new FString(sub), (ushort)offset));
             var idx = f.Evaluate(s);
             var actual = idx.HasValue ? (int)idx.Value : -1;
             Assert.AreEqual(expected, actual);
@@ -264,7 +264,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(s =>
             {
-                var f = new ZenFunction<FiniteString, Option<ushort>>(fs => fs.IndexOf(new FiniteString(s)));
+                var f = new ZenFunction<FString, Option<ushort>>(fs => fs.IndexOf(new FString(s)));
                 var ex = f.Find((fs, i) => i.HasValue()).Value.ToString();
                 var idx = f.Evaluate(ex);
                 Assert.IsTrue(ex.Contains(s));
@@ -285,7 +285,7 @@ namespace ZenLib.Tests
         [DataRow("abcdefg", 0, 100, "abcdefg")]
         public void TestSubstring(string s, int offset, int len, string expected)
         {
-            var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.SubString((ushort)offset, (ushort)len));
+            var f = new ZenFunction<FString, FString>(fs => fs.SubString((ushort)offset, (ushort)len));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -301,7 +301,7 @@ namespace ZenLib.Tests
         [DataRow("AaBb", 'A', 'a', "aaBb")]
         public void TestReplaceAll(string s, char c1, char c2, string expected)
         {
-            var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.ReplaceAll(c1, c2));
+            var f = new ZenFunction<FString, FString>(fs => fs.ReplaceAll(c1, c2));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -317,7 +317,7 @@ namespace ZenLib.Tests
         [DataRow("", 'b', "")]
         public void TestRemoveAll(string s, char c, string expected)
         {
-            var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.RemoveAll(c));
+            var f = new ZenFunction<FString, FString>(fs => fs.RemoveAll(c));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -332,7 +332,7 @@ namespace ZenLib.Tests
         [DataRow("quick", " brown", "quick brown")]
         public void TestConcat(string s1, string s2, string expected)
         {
-            var f = new ZenFunction<FiniteString, FiniteString>(fs => fs.Concat(new FiniteString(s2)));
+            var f = new ZenFunction<FString, FString>(fs => fs.Concat(new FString(s2)));
             var actual = f.Evaluate(s1).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -343,7 +343,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPrefixImpliesContains()
         {
-            var f = new ZenFunction<FiniteString, FiniteString, bool>(
+            var f = new ZenFunction<FString, FString, bool>(
                 (fs1, fs2) => Implies(fs2.StartsWith(fs1), fs2.Contains(fs1)));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
@@ -356,7 +356,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSuffixImpliesContains()
         {
-            var f = new ZenFunction<FiniteString, FiniteString, bool>(
+            var f = new ZenFunction<FString, FString, bool>(
                 (fs1, fs2) => Implies(fs2.EndsWith(fs1), fs2.Contains(fs1)));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
@@ -369,8 +369,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtWithinBounds()
         {
-            var f = new ZenFunction<FiniteString, ushort, bool>(
-                (fs, i) => Implies(i < fs.Length(), fs.At(i) != new FiniteString("")));
+            var f = new ZenFunction<FString, ushort, bool>(
+                (fs, i) => Implies(i < fs.Length(), fs.At(i) != new FString("")));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);
@@ -382,7 +382,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfImpliesContains()
         {
-            var f = new ZenFunction<FiniteString, FiniteString, bool>(
+            var f = new ZenFunction<FString, FString, bool>(
                 (fs1, fs2) => Implies(fs1.Contains(fs2), fs1.IndexOf(fs2).HasValue()));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
@@ -395,7 +395,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatContains()
         {
-            var f = new ZenFunction<FiniteString, FiniteString, FiniteString, bool>(
+            var f = new ZenFunction<FString, FString, FString, bool>(
                 (fs1, fs2, fs3) => Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3)));
 
             var ex = f.Find((fs1, fs2, fs3, b) => Not(b), depth: 4, exhaustiveDepth: true);
