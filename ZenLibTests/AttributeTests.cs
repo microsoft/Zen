@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Zen;
 
@@ -18,6 +19,74 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class AttributeTests
     {
+        /// <summary>
+        /// Test that attributes work correctly for depth.
+        /// </summary>
+        [TestMethod]
+        public void TestZ3()
+        {
+            var ctx = new Context();
+            var solver = ctx.MkSolver();
+
+            var c1 = ctx.MkConstructor("None", "none");
+            var c2 = ctx.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { ctx.IntSort });
+            var optionSort = ctx.MkDatatypeSort("Option", new Constructor[] { c1, c2 });
+            var none = ctx.MkApp(c1.ConstructorDecl);
+
+            var arraySort = ctx.MkArraySort(ctx.IntSort, optionSort);
+
+            var a = ctx.MkArrayConst("a", ctx.IntSort, optionSort);
+            var b = ctx.MkArrayConst("b", ctx.IntSort, optionSort);
+            var some = ctx.MkApp(c2.ConstructorDecl, ctx.MkInt(9));
+
+            // this is the magic
+            solver.Assert(ctx.MkEq(ctx.MkTermArray(a), none));
+            solver.Assert(ctx.MkEq(ctx.MkTermArray(b), none));
+
+            Console.WriteLine(ctx.MkEq(ctx.MkSelect(a, ctx.MkInt(10)), some));
+
+            solver.Assert(ctx.MkEq(ctx.MkSelect(b, ctx.MkInt(11)), some));
+            solver.Assert(ctx.MkEq(ctx.MkStore(a, ctx.MkInt(10), some), b));
+
+            Console.WriteLine(solver.Check());
+
+            Console.WriteLine(solver.Model.Evaluate(b, true));
+
+            var expr = solver.Model.Evaluate(b, true);
+
+            Console.WriteLine(expr.IsStore);
+
+            var store = expr.Args[0].Args[0].Args[0].Sort;
+
+            Console.WriteLine(store);
+        }
+
+        /// <summary>
+        /// Test that dictionary evaluation works.
+        /// </summary>
+        [TestMethod]
+        public void TestDictEvaluation()
+        {
+            var zf1 = new ZenFunction<IDictionary<int, int>, IDictionary<int, int>>(d => ZenDictSetExpr<int, int>.Create(d, 10, 20));
+            var result1 = zf1.Evaluate(new Dictionary<int, int> { { 5, 5 } });
+            Assert.AreEqual(2, result1.Count);
+            Assert.AreEqual(5, result1[5]);
+            Assert.AreEqual(20, result1[10]);
+
+            var zf2 = new ZenFunction<IDictionary<int, int>, bool>(d => ZenDictGetExpr<int, int>.Create(d, 10) == Option.Some(11));
+            var result2 = zf2.Evaluate(new Dictionary<int, int> { { 5, 5 } });
+            var result3 = zf2.Evaluate(new Dictionary<int, int> { { 10, 10 } });
+            var result4 = zf2.Evaluate(new Dictionary<int, int> { { 5, 5 }, { 10, 11 } });
+            Assert.IsFalse(result2);
+            Assert.IsFalse(result3);
+            Assert.IsTrue(result4);
+
+            var zf3 = new ZenFunction<IDictionary<int, int>>(() => ZenDictEmptyExpr<int, int>.Instance);
+            var result5 = zf3.Evaluate();
+            Assert.AreEqual(0, result5.Count);
+            // var result = zf.Find((d1, d2) => ZenDictGetExpr<int, int>.Create(d2, 11) == 12);
+        }
+
         /// <summary>
         /// Test that attributes work correctly for depth.
         /// </summary>

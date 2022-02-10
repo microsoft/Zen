@@ -107,8 +107,6 @@ namespace ZenLib
         /// <summary>
         /// Convert to an immutable list if necessary.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
         /// <returns></returns>
         public static ImmutableList<T> ToImmutableList<T>(object obj)
         {
@@ -118,6 +116,20 @@ namespace ZenLib
             }
 
             return ImmutableList.CreateRange((IList<T>)obj);
+        }
+
+        /// <summary>
+        /// Convert to an immutable dictionary if necessary.
+        /// </summary>
+        /// <returns></returns>
+        public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(object obj)
+        {
+            if (obj is ImmutableDictionary<TKey, TValue>)
+            {
+                return (ImmutableDictionary<TKey, TValue>)obj;
+            }
+
+            return ImmutableDictionary.CreateRange((IDictionary<TKey, TValue>)obj);
         }
 
         /// <summary>

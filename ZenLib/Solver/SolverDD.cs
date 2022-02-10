@@ -482,39 +482,36 @@ namespace ZenLib.Solver
             {
                 return m.Get(v1);
             }
-
-            if (v is VarInt8<T> v8)
+            else if (v is VarInt8<T> v8)
             {
                 return m.Get(v8);
             }
-
-            if (v is VarInt16<T> v16)
+            else if (v is VarInt16<T> v16)
             {
                 return m.Get(v16);
             }
-
-            if (v is VarInt32<T> v32)
+            else if (v is VarInt32<T> v32)
             {
                 return m.Get(v32);
             }
-
-            if (v is VarInt64<T> v64)
+            else if (v is VarInt64<T> v64)
             {
                 return m.Get(v64);
             }
-
-            // fixed width integer.
-            // bits are stored in little endian, need to reverse
-
-            var bytes = m.Get((VarInt<T>)v);
-            var remainder = v.NumBits % 8;
-
-            if (remainder != 0)
+            else
             {
-                bytes[bytes.Length - 1] >>= (8 - remainder);
-            }
+                // fixed width integer.
+                // bits are stored in little endian, need to reverse
+                var bytes = m.Get((VarInt<T>)v);
+                var remainder = v.NumBits % 8;
 
-            return bytes;
+                if (remainder != 0)
+                {
+                    bytes[bytes.Length - 1] >>= (8 - remainder);
+                }
+
+                return bytes;
+            }
         }
 
         public DD Ite(DD g, DD t, DD f)

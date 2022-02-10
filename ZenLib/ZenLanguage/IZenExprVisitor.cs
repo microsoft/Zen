@@ -124,12 +124,20 @@ namespace ZenLib
         TReturn VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit an EmptyListExpr.
+        /// Visit a ListEmptyExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a DictEmptyExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListAddFrontExpr.
@@ -138,6 +146,22 @@ namespace ZenLib
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a DictSetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a DictGetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListCaseExpr.

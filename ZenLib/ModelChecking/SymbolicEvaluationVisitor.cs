@@ -750,6 +750,21 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString> parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         [ExcludeFromCodeCoverage]
         private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(
             TBool guard,

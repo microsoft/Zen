@@ -5,6 +5,7 @@
 namespace ZenLib.Solver
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
@@ -34,6 +35,8 @@ namespace ZenLib.Solver
 
         private Sort StringSort;
 
+        private Dictionary<Type, Sort> typeToSort;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
@@ -50,6 +53,18 @@ namespace ZenLib.Solver
             this.LongSort = this.context.MkBitVecSort(64);
             this.BigIntSort = this.context.MkIntSort();
             this.StringSort = this.context.StringSort;
+
+            this.typeToSort = new Dictionary<Type, Sort>();
+            this.typeToSort[typeof(bool)] = this.BoolSort;
+            this.typeToSort[typeof(byte)] = this.ByteSort;
+            this.typeToSort[typeof(short)] = this.ShortSort;
+            this.typeToSort[typeof(ushort)] = this.ShortSort;
+            this.typeToSort[typeof(int)] = this.IntSort;
+            this.typeToSort[typeof(uint)] = this.IntSort;
+            this.typeToSort[typeof(long)] = this.LongSort;
+            this.typeToSort[typeof(ulong)] = this.LongSort;
+            this.typeToSort[typeof(BigInteger)] = this.BigIntSort;
+            this.typeToSort[typeof(string)] = this.StringSort;
         }
 
         private Symbol FreshSymbol()
@@ -345,13 +360,11 @@ namespace ZenLib.Solver
             {
                 return bool.Parse(e.ToString());
             }
-
-            if (e.Sort == this.ByteSort)
+            else if (e.Sort == this.ByteSort)
             {
                 return byte.Parse(e.ToString());
             }
-
-            if (e.Sort == this.ShortSort)
+            else if (e.Sort == this.ShortSort)
             {
                 if (short.TryParse(e.ToString(), out short x))
                 {
@@ -360,8 +373,7 @@ namespace ZenLib.Solver
 
                 return (short)ushort.Parse(e.ToString());
             }
-
-            if (e.Sort == this.IntSort)
+            else if (e.Sort == this.IntSort)
             {
                 if (int.TryParse(e.ToString(), out int x))
                 {
@@ -370,18 +382,15 @@ namespace ZenLib.Solver
 
                 return (int)uint.Parse(e.ToString());
             }
-
-            if (e.Sort == this.BigIntSort)
+            else if (e.Sort == this.BigIntSort)
             {
                 return BigInteger.Parse(e.ToString());
             }
-
-            if (e.Sort == this.StringSort)
+            else if (e.Sort == this.StringSort)
             {
                 return CommonUtilities.ConvertZ3StringToCSharp(e.ToString());
             }
-
-            if (e.Sort == this.LongSort)
+            else if (e.Sort == this.LongSort)
             {
                 if (long.TryParse(e.ToString(), out long xl))
                 {
@@ -390,13 +399,15 @@ namespace ZenLib.Solver
 
                 return (long)ulong.Parse(e.ToString());
             }
+            else
+            {
+                // must be a fixed width integer
+                var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
+                RemoveTrailingZeroes(ref bytes);
 
-            // must be a fixed width integer
-            var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
-            RemoveTrailingZeroes(ref bytes);
-
-            Array.Reverse(bytes);
-            return bytes;
+                Array.Reverse(bytes);
+                return bytes;
+            }
         }
 
         public Model Satisfiable(BoolExpr x)

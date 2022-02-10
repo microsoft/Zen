@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenListEmptyExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenDictEmptyExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,28 +8,28 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing an empty list expression.
+    /// Class representing an empty dictionary expression.
     /// </summary>
-    internal sealed class ZenListEmptyExpr<T> : Zen<IList<T>>
+    internal sealed class ZenDictEmptyExpr<TKey, TValue> : Zen<IDictionary<TKey, TValue>>
     {
         /// <summary>
-        /// The empty list instance.
+        /// The empty dictionary instance.
         /// </summary>
-        public static ZenListEmptyExpr<T> Instance = new ZenListEmptyExpr<T>();
+        public static ZenDictEmptyExpr<TKey, TValue> Instance = new ZenDictEmptyExpr<TKey, TValue>();
 
         /// <summary>
         /// Unroll the expression.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
-        public override Zen<IList<T>> Unroll()
+        public override Zen<IDictionary<TKey, TValue>> Unroll()
         {
             return this;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenListEmptyExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenDictEmptyExpr{TKey, TValue}"/> class.
         /// </summary>
-        private ZenListEmptyExpr()
+        private ZenDictEmptyExpr()
         {
         }
 
@@ -40,7 +40,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"[]";
+            return "{}";
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenListEmptyExpr(this, parameter);
+            return visitor.VisitZenDictEmptyExpr(this, parameter);
         }
     }
 }

@@ -515,5 +515,39 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return ImmutableDictionary<TKey, TValue>.Empty;
+        }
+
+        public object VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
+            var e3 = (TValue)expression.ValueExpr.Accept(this, parameter);
+            var result = e1.SetItem(e2, e3);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
+            var result = e1.ContainsKey(e2) ? Option.Some(e1[e2]) : Option.None<TValue>();
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }

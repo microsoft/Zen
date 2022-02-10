@@ -574,6 +574,21 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Expression VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Create an object given the fields.
         /// </summary>
