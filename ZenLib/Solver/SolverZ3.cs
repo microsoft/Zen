@@ -497,9 +497,9 @@ namespace ZenLib.Solver
                 var dict = ConvertExprToObject(arrayExpr, type);
                 var key = ConvertExprToObject(keyExpr, keyType);
                 var value = ConvertExprToObject(valueExpr, valueType);
-
                 var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
-                return m.Invoke(dict, new object[] { key, value });
+                m.Invoke(dict, new object[] { key, value });
+                return dict;
             }
             else if (e.IsApp && e.Args.Length == 0)
             {
@@ -512,7 +512,6 @@ namespace ZenLib.Solver
             }
             else
             {
-                Console.WriteLine(e);
                 // must be a fixed width integer
                 var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
                 RemoveTrailingZeroes(ref bytes);
