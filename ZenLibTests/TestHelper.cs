@@ -174,7 +174,6 @@ namespace ZenLib.Tests
                 // prove that it is valid
                 var f = new ZenFunction<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
-                Console.WriteLine(result);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation

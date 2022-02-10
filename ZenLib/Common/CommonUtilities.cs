@@ -208,6 +208,18 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Validate that a type is a valid map key or value type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static void ValidateIsMapElementType(Type type)
+        {
+            if (!ReflectionUtilities.IsIntegerType(type) && type != ReflectionUtilities.StringType && type != ReflectionUtilities.BoolType)
+            {
+                throw new ZenException($"Invalid map element type {type}. Map elements must be primitive types");
+            }
+        }
+
+        /// <summary>
         /// Validate that a string literal is well-formed.
         /// </summary>
         /// <param name="s">The string.</param>
