@@ -18,101 +18,204 @@ namespace ZenLib.Tests
     public class FMapTests
     {
         /// <summary>
-        /// Test that adding and then getting an element returns that element.
+        /// Test that map evaluation works.
         /// </summary>
         [TestMethod]
-        public void TestAddThenGetIsEqual()
+        public void TestMapEvaluation1()
         {
-            CheckValid<FMap<int, int>>(d => d.Set(1, 1).Get(1).Value() == 1);
+            var zf1 = new ZenFunction<FMap<int, int>, FMap<int, int>>(d => d.Set(10, 20));
+            var zf2 = new ZenFunction<FMap<int, int>, bool>(d => d.Get(10) == Option.Some(11));
+            var zf3 = new ZenFunction<FMap<int, int>>(() => FMap.Empty<int, int>());
+
+            var result1 = zf1.Evaluate(new FMap<int, int>().Set(5, 5));
+            Assert.AreEqual(2, result1.Count());
+            Assert.AreEqual(5, result1.Get(5).Value);
+            Assert.AreEqual(20, result1.Get(10).Value);
+
+            zf1.Compile();
+            result1 = zf1.Evaluate(new FMap<int, int>().Set(5, 5));
+            Assert.AreEqual(2, result1.Count());
+            Assert.AreEqual(5, result1.Get(5).Value);
+            Assert.AreEqual(20, result1.Get(10).Value);
+
+            var result2 = zf2.Evaluate(new FMap<int, int>().Set(5, 5));
+            var result3 = zf2.Evaluate(new FMap<int, int>().Set(10, 10));
+            var result4 = zf2.Evaluate(new FMap<int, int>().Set(5, 5).Set(10, 11));
+            Assert.IsFalse(result2);
+            Assert.IsFalse(result3);
+            Assert.IsTrue(result4);
+
+            zf2.Compile();
+            result2 = zf2.Evaluate(new FMap<int, int>().Set(5, 5));
+            result3 = zf2.Evaluate(new FMap<int, int>().Set(10, 10));
+            result4 = zf2.Evaluate(new FMap<int, int>().Set(5, 5).Set(10, 11));
+            Assert.IsFalse(result2);
+            Assert.IsFalse(result3);
+            Assert.IsTrue(result4);
+
+            var result5 = zf3.Evaluate();
+            Assert.AreEqual(0, result5.Count());
+
+            zf3.Compile();
+            result5 = zf3.Evaluate();
+            Assert.AreEqual(0, result5.Count());
         }
 
         /// <summary>
         /// Check that adding to a dictionary evaluates correctly.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluation()
+        public void TestMapEvaluation2()
         {
             var f = new ZenFunction<FMap<int, int>, FMap<int, int>>(d => d.Set(1, 1).Set(2, 2));
+
             var result = f.Evaluate(new FMap<int, int>());
-            Assert.AreEqual(result.Get(1), 1);
-            Assert.AreEqual(result.Get(2), 2);
+            Assert.AreEqual(1, result.Get(1).Value);
+            Assert.AreEqual(2, result.Get(2).Value);
+
+            f.Compile();
+            result = f.Evaluate(new FMap<int, int>());
+            Assert.AreEqual(1, result.Get(1).Value);
+            Assert.AreEqual(2, result.Get(2).Value);
         }
 
         /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
+        /// Test that map symbolic evaluation with equality and empty map.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEmpty()
+        public void TestMapEqualsEmpty()
         {
-            RandomBytes(x => CheckAgreement<FMap<int, int>>(d => Not(FMap.Empty<int, int>().Get(x).IsSome())));
+            var zf = new ZenConstraint<FMap<int, int>>(d => d == FMap.Empty<int, int>());
+            var result = zf.Find();
+
+            Assert.AreEqual(0, result.Value.Count());
         }
 
         /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
+        /// Test map symbolic evaluation with set.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluateOutput()
+        public void TestMapSet()
+        {
+            var zf = new ZenFunction<FMap<int, int>, FMap<int, int>>(d => d.Set(10, 20));
+            var result = zf.Find((d1, d2) => d2 == FMap.Empty<int, int>());
+
+            Assert.IsFalse(result.HasValue);
+        }
+
+        /// <summary>
+        /// Test map symbolic evaluation with get.
+        /// </summary>
+        [TestMethod]
+        public void TestMapGet1()
+        {
+            var zf = new ZenConstraint<FMap<int, int>>(d => d.Get(10) == Option.Some(11));
+            var result = zf.Find();
+
+            Assert.IsTrue(result.HasValue);
+            Assert.AreEqual(1, result.Value.Count());
+            Assert.AreEqual(11, result.Value.Get(10).Value);
+        }
+
+        /// <summary>
+        /// Test map symbolic evaluation with get.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEquals()
+        {
+            CheckAgreement<FMap<ushort, long>>(d => d.Set(1, 2).Set(3, 4) == FMap.Empty<ushort, long>().Set(1, 2), runBdds: false);
+            CheckAgreement<FMap<ushort, long>>(d => d.Set(1, 2).Set(3, 4) == FMap.Empty<ushort, long>().Set(1, 2).Set(3, 4), runBdds: false);
+
+            var zf1 = new ZenConstraint<FMap<int, int>>(d => d.Set(1, 2).Set(3, 4) == FMap.Empty<int, int>().Set(1, 2));
+            var zf2 = new ZenConstraint<FMap<int, int>>(d => d.Set(1, 2).Set(3, 4) == FMap.Empty<int, int>().Set(1, 2).Set(3, 4));
+
+            Assert.IsFalse(zf1.Evaluate(new FMap<int, int>()));
+            Assert.IsTrue(zf2.Evaluate(new FMap<int, int>()));
+
+            zf1.Compile();
+            zf2.Compile();
+            Assert.IsFalse(zf1.Evaluate(new FMap<int, int>()));
+            Assert.IsTrue(zf2.Evaluate(new FMap<int, int>()));
+        }
+
+        /// <summary>
+        /// Test that If works with maps.
+        /// </summary>
+        [TestMethod]
+        public void TestMapIte()
+        {
+            CheckValid<FMap<long, long>, bool>((d, b) =>
+                Implies(d == FMap.Empty<long, long>(),
+                        If(b, d.Set(1, 1), d.Set(2, 2)).Get(3).IsNone()), runBdds: false);
+        }
+
+        /// <summary>
+        /// Test that adding and then getting an element returns that element.
+        /// </summary>
+        [TestMethod]
+        public void TestAddThenGetIsEqual()
+        {
+            CheckValid<FMap<int, int>>(d => d.Set(1, 1).Get(1).Value() == 1, runBdds: false);
+        }
+
+        /// <summary>
+        /// Test that the empty map does not return anything for get.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEmpty()
+        {
+            RandomBytes(x => CheckAgreement<FMap<int, int>>(d => Not(Map.Empty<int, int>().Get(x).IsSome()), runBdds: false));
+        }
+
+        /// <summary>
+        /// Test that map get and set return the right values.
+        /// </summary>
+        [TestMethod]
+        public void TestMapGetAndSet()
+        {
+            CheckAgreement<FMap<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(5).IsSome(), runBdds: false);
+            RandomBytes(x => CheckAgreement<FMap<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(x).IsSome(), runBdds: false));
+        }
+
+        /// <summary>
+        /// Test that the empty map does not return anything for get.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEvaluateOutput()
         {
             var f = new ZenFunction<int, int, FMap<int, int>>((x, y) => FMap.Empty<int, int>().Set(x, y));
             var d = f.Evaluate(1, 2);
-            // Assert.AreEqual(1, d.Count);
-            Assert.AreEqual(2, d.Get(1));
+            Assert.AreEqual(2, d.Get(1).Value);
 
             f.Compile();
             d = f.Evaluate(1, 2);
-            Assert.AreEqual(2, d.Get(1));
+            Assert.AreEqual(2, d.Get(1).Value);
         }
 
         /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
+        /// Test that the empty map does not return anything for get.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluateInput()
+        public void TestMapEvaluateInput()
         {
-            CheckAgreement<FMap<int, int>>(d => d.ContainsKey(1));
+            CheckAgreement<FMap<int, int>>(d => d.ContainsKey(1), runBdds: false);
 
             var f = new ZenFunction<FMap<int, int>, bool>(d => d.ContainsKey(1));
 
-            var d1 = new FMap<int, int>();
-            d1.Set(1, 2);
+            var d1 = new FMap<int, int>().Set(1, 2);
             Assert.AreEqual(true, f.Evaluate(d1));
 
-            var d2 = new FMap<int, int>();
-            d2.Set(2, 1);
+            var d2 = new FMap<int, int>().Set(2, 1);
             Assert.AreEqual(false, f.Evaluate(d2));
         }
 
         /// <summary>
-        /// Test that the dictionary works with strings.
+        /// Test that the map get operation works.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryStrings()
+        public void TestMapContainsKey()
         {
-            var f = new ZenFunction<FMap<string, string>, bool>(d => true);
-            var sat = f.Find((d, allowed) =>
-            {
-                return And(
-                    d.Get("k1").Value() == "v1",
-                    d.Get("k2").Value() == "v2",
-                    d.Get("k3").Value() == "v3");
-            });
-
-            Assert.IsTrue(sat.HasValue);
-            Assert.AreEqual("v1", sat.Value.Get("k1"));
-            Assert.AreEqual("v2", sat.Value.Get("k2"));
-            Assert.AreEqual("v3", sat.Value.Get("k3"));
-        }
-
-        /// <summary>
-        /// Test that the dictionary get operation works.
-        /// </summary>
-        [TestMethod]
-        public void TestDictionaryGet()
-        {
-            var d = new FMap<int, int>();
-            d.Set(1, 2);
-            d.Set(2, 3);
-            d.Set(1, 4);
+            var d = new FMap<int, int>().Set(1, 2).Set(2, 3).Set(1, 4);
 
             Assert.IsTrue(d.ContainsKey(1));
             Assert.IsTrue(d.ContainsKey(2));
@@ -120,28 +223,46 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the dictionary get operation works.
+        /// Test that the map works with strings.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(System.IndexOutOfRangeException))]
-        public void TestDictionaryGetException()
+        public void TestMapStrings()
         {
-            var d = new FMap<int, int>();
-            d.Set(1, 2);
-            d.Set(2, 3);
-            d.Get(3);
+            var f = new ZenFunction<FMap<string, string>, bool>(d => true);
+            var sat = f.Find((d, allowed) =>
+            {
+                var v1 = d.Get("k1");
+                var v2 = d.Get("k2");
+                var v3 = d.Get("k3");
+                return And(
+                    v1 == Option.Some("v1"),
+                    v2 == Option.Some("v2"),
+                    v3 == Option.Some("v3"));
+            });
+
+            Assert.IsTrue(sat.HasValue);
+            Assert.AreEqual("v1", sat.Value.Get("k1").Value);
+            Assert.AreEqual("v2", sat.Value.Get("k2").Value);
+            Assert.AreEqual("v3", sat.Value.Get("k3").Value);
         }
 
         /// <summary>
-        /// Test that the dictionary tostring operation works.
+        /// Test that the map get operation works.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryToString()
+        public void TestMapGetMissing()
         {
-            var d = new FMap<int, int>();
-            d.Set(1, 2);
-            d.Set(2, 3);
+            var d = new FMap<int, int>().Set(1, 2).Set(2, 3);
+            Assert.IsFalse(d.Get(3).HasValue);
+        }
 
+        /// <summary>
+        /// Test that the map tostring operation works.
+        /// </summary>
+        [TestMethod]
+        public void TestMapToString()
+        {
+            var d = new FMap<int, int>().Set(1, 2).Set(2, 3);
             Assert.AreEqual("{2 => 3, 1 => 2}", d.ToString());
         }
     }

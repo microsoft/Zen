@@ -4,7 +4,6 @@
 
 namespace ZenLib.Tests
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -22,7 +21,7 @@ namespace ZenLib.Tests
         /// Test that map evaluation works.
         /// </summary>
         [TestMethod]
-        public void TestMapEvaluation()
+        public void TestMapEvaluation1()
         {
             var zf1 = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(10, 20));
             var zf2 = new ZenFunction<Map<int, int>, bool>(d => d.Get(10) == Option.Some(11));
@@ -63,6 +62,24 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Check that adding to a dictionary evaluates correctly.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEvaluation2()
+        {
+            var f = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(1, 1).Set(2, 2));
+
+            var result = f.Evaluate(new Map<int, int>());
+            Assert.AreEqual(1, result.Get(1).Value);
+            Assert.AreEqual(2, result.Get(2).Value);
+
+            f.Compile();
+            result = f.Evaluate(new Map<int, int>());
+            Assert.AreEqual(1, result.Get(1).Value);
+            Assert.AreEqual(2, result.Get(2).Value);
+        }
+
+        /// <summary>
         /// Test that map symbolic evaluation with equality and empty map.
         /// </summary>
         [TestMethod]
@@ -90,7 +107,7 @@ namespace ZenLib.Tests
         /// Test map symbolic evaluation with get.
         /// </summary>
         [TestMethod]
-        public void TestMapGet()
+        public void TestMapGet1()
         {
             var zf = new ZenConstraint<Map<int, int>>(d => d.Get(10) == Option.Some(11));
             var result = zf.Find();
@@ -101,7 +118,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test dictionary symbolic evaluation with get.
+        /// Test map symbolic evaluation with get.
         /// </summary>
         [TestMethod]
         public void TestMapEquals()
@@ -142,47 +159,29 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Check that adding to a dictionary evaluates correctly.
+        /// Test that the empty map does not return anything for get.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluation()
-        {
-            var f = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(1, 1).Set(2, 2));
-
-            var result = f.Evaluate(new Map<int, int>());
-            Assert.AreEqual(1, result.Get(1).Value);
-            Assert.AreEqual(2, result.Get(2).Value);
-
-            f.Compile();
-            result = f.Evaluate(new Map<int, int>());
-            Assert.AreEqual(1, result.Get(1).Value);
-            Assert.AreEqual(2, result.Get(2).Value);
-        }
-
-        /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
-        /// </summary>
-        [TestMethod]
-        public void TestDictionaryEmpty()
+        public void TestMapEmpty()
         {
             RandomBytes(x => CheckAgreement<Map<int, int>>(d => Not(Map.Empty<int, int>().Get(x).IsSome()), runBdds: false));
         }
 
         /// <summary>
-        /// Test that dictionary get and set return the right values.
+        /// Test that map get and set return the right values.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryGetAndSet()
+        public void TestMapGetAndSet()
         {
             CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(5).IsSome(), runBdds: false);
             RandomBytes(x => CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(x).IsSome(), runBdds: false));
         }
 
         /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
+        /// Test that the empty map does not return anything for get.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluateOutput()
+        public void TestMapEvaluateOutput()
         {
             var f = new ZenFunction<int, int, Map<int, int>>((x, y) => Map.Empty<int, int>().Set(x, y));
             var d = f.Evaluate(1, 2);
@@ -194,10 +193,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the empty dictionary does not return anything for get.
+        /// Test that the empty map does not return anything for get.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryEvaluateInput()
+        public void TestMapEvaluateInput()
         {
             CheckAgreement<Map<int, int>>(d => d.ContainsKey(1), runBdds: false);
 
@@ -211,10 +210,23 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the dictionary works with strings.
+        /// Test that the map get operation works.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryStrings()
+        public void TestMapContainsKey()
+        {
+            var d = new Map<int, int>().Set(1, 2).Set(2, 3).Set(1, 4);
+
+            Assert.IsTrue(d.ContainsKey(1));
+            Assert.IsTrue(d.ContainsKey(2));
+            Assert.IsFalse(d.ContainsKey(3));
+        }
+
+        /// <summary>
+        /// Test that the map works with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestMapStrings()
         {
             var f = new ZenFunction<Map<string, string>, bool>(d => true);
             var sat = f.Find((d, allowed) =>
@@ -235,35 +247,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the dictionary get operation works.
+        /// Test that the map get operation works.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryGet()
+        public void TestMapGetMissing()
         {
-            var d = new Map<int, int>().Set(1, 2).Set(2, 3).Set(1, 4);
-
-            Assert.IsTrue(d.ContainsKey(1));
-            Assert.IsTrue(d.ContainsKey(2));
-            Assert.IsFalse(d.ContainsKey(3));
-        }
-
-        /// <summary>
-        /// Test that the dictionary get operation works.
-        /// </summary>
-        [TestMethod]
-        public void TestDictionaryGetMissing()
-        {
-            var d = new Map<int, int>();
-            d.Set(1, 2);
-            d.Set(2, 3);
+            var d = new Map<int, int>().Set(1, 2).Set(2, 3);
             Assert.IsFalse(d.Get(3).HasValue);
         }
 
         /// <summary>
-        /// Test that the dictionary tostring operation works.
+        /// Test that the map tostring operation works.
         /// </summary>
         [TestMethod]
-        public void TestDictionaryToString()
+        public void TestMapToString()
         {
             var d = new Map<int, int>().Set(1, 2).Set(2, 3);
             Assert.AreEqual("{1 => 2, 2 => 3}", d.ToString());

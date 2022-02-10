@@ -19,13 +19,32 @@ namespace ZenLib
         public FSeq<Pair<TKey, TValue>> Values { get; set; } = new FSeq<Pair<TKey, TValue>>();
 
         /// <summary>
-        /// Add a key and value to the Dict.
+        /// Creates a new instance of the <see cref="FMap{TKey, TValue}"/> class.
+        /// </summary>
+        public FMap()
+        {
+            this.Values = new FSeq<Pair<TKey, TValue>>();
+        }
+
+        private FMap(FSeq<Pair<TKey, TValue>> sequence)
+        {
+            this.Values = sequence;
+        }
+
+        /// <summary>
+        /// The number of elements in the map.
+        /// </summary>
+        public int Count() { return this.Values.Values.Count; }
+
+        /// <summary>
+        /// Add a key and value to the finite map.
         /// </summary>
         /// <param name="key">The key to add.</param>
         /// <param name="value">The value to add.</param>
-        public void Set(TKey key, TValue value)
+        public FMap<TKey, TValue> Set(TKey key, TValue value)
         {
-            this.Values.Values.Insert(0, (key, value));
+            var newValues = this.Values.AddFront((key, value));
+            return new FMap<TKey, TValue>(newValues);
         }
 
         /// <summary>
@@ -43,16 +62,16 @@ namespace ZenLib
         /// </summary>
         /// <param name="key">The specified key.</param>
         /// <returns></returns>
-        public TValue Get(TKey key)
+        public Option<TValue> Get(TKey key)
         {
             var idx = IndexOf(key);
 
             if (idx < 0)
             {
-                throw new System.IndexOutOfRangeException($"Missing key: {key} from Dict.");
+                return Option.None<TValue>();
             }
 
-            return this.Values.Values[idx].Item2;
+            return Option.Some(this.Values.Values[idx].Item2);
         }
 
         /// <summary>

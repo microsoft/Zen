@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -18,7 +19,30 @@ namespace ZenLib
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
         /// </summary>
-        public IList<T> Values { get; set; } = new List<T>();
+        public IList<T> Values { get; set; } = ImmutableList<T>.Empty;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="FSeq{T}"/> class.
+        /// </summary>
+        public FSeq()
+        {
+            this.Values = ImmutableList<T>.Empty;
+        }
+
+        private FSeq(ImmutableList<T> list)
+        {
+            this.Values = list;
+        }
+
+        /// <summary>
+        /// Add an element to the front of the list.
+        /// </summary>
+        /// <param name="value">The value to add.</param>
+        public FSeq<T> AddFront(T value)
+        {
+            var l = (ImmutableList<T>)this.Values;
+            return new FSeq<T>(l.Insert(0, value));
+        }
 
         /// <summary>
         /// Convert the sequence to a string.
