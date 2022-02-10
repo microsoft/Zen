@@ -30,7 +30,9 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="other">The other list.</param>
         /// <returns>A new symbolic list.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
             var o = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var result = Merge(guard, this.GuardedListGroup, o.GuardedListGroup);

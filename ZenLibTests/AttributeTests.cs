@@ -67,13 +67,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictEvaluation()
         {
-            var zf1 = new ZenFunction<IDictionary<int, int>, IDictionary<int, int>>(d => ZenDictSetExpr<int, int>.Create(d, 10, 20));
+            var zf1 = new ZenFunction<IDictionary<int, int>, IDictionary<int, int>>(d => DictSet(d, 10, 20));
             var result1 = zf1.Evaluate(new Dictionary<int, int> { { 5, 5 } });
             Assert.AreEqual(2, result1.Count);
             Assert.AreEqual(5, result1[5]);
             Assert.AreEqual(20, result1[10]);
 
-            var zf2 = new ZenFunction<IDictionary<int, int>, bool>(d => ZenDictGetExpr<int, int>.Create(d, 10) == Option.Some(11));
+            var zf2 = new ZenFunction<IDictionary<int, int>, bool>(d => DictGet(d, 10) == Option.Some(11));
             var result2 = zf2.Evaluate(new Dictionary<int, int> { { 5, 5 } });
             var result3 = zf2.Evaluate(new Dictionary<int, int> { { 10, 10 } });
             var result4 = zf2.Evaluate(new Dictionary<int, int> { { 5, 5 }, { 10, 11 } });
@@ -81,10 +81,25 @@ namespace ZenLib.Tests
             Assert.IsFalse(result3);
             Assert.IsTrue(result4);
 
-            var zf3 = new ZenFunction<IDictionary<int, int>>(() => ZenDictEmptyExpr<int, int>.Instance);
+            var zf3 = new ZenFunction<IDictionary<int, int>>(() => EmptyDict<int, int>());
             var result5 = zf3.Evaluate();
             Assert.AreEqual(0, result5.Count);
-            // var result = zf.Find((d1, d2) => ZenDictGetExpr<int, int>.Create(d2, 11) == 12);
+        }
+
+        /// <summary>
+        /// Test that dictionary symbolic evaluation works.
+        /// </summary>
+        [TestMethod]
+        public void TestDictFind()
+        {
+            var zf = new ZenConstraint<IDictionary<int, int>>(d => d == EmptyDict<int, int>());
+            var result = zf.Find();
+
+            Console.WriteLine(result.Value.Count);
+            foreach (var kv in result.Value)
+            {
+                Console.WriteLine($"{kv.Key} -> {kv.Value}");
+            }
         }
 
         /// <summary>

@@ -78,6 +78,11 @@ namespace ZenLib
         public readonly static Type IListType = typeof(IList<>);
 
         /// <summary>
+        /// Type of an IList.
+        /// </summary>
+        public readonly static Type IDictType = typeof(IDictionary<,>);
+
+        /// <summary>
         /// Type of an List.
         /// </summary>
         public readonly static Type ListType = typeof(List<>);
@@ -292,6 +297,18 @@ namespace ZenLib
         public static bool IsListType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ListType;
+        }
+
+        /// <summary>
+        /// Check if a type is a Dictionary type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsIDictType(Type type)
+        {
+            return type.IsInterface &&
+                   type.IsGenericType &&
+                   type.GetGenericTypeDefinitionCached() == IDictType;
         }
 
         /// <summary>
@@ -644,6 +661,14 @@ namespace ZenLib
                 return visitor.VisitString();
             if (IsFixedIntegerType(type))
                 return visitor.VisitFixedInteger(type);
+
+            if (IsIDictType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                return visitor.VisitDictionary((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, keyType, valueType, parameter);
+            }
 
             if (IsIListType(type))
             {

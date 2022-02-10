@@ -19,7 +19,9 @@ namespace ZenLib.ModelChecking
 
         public TInt Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
             var o = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);

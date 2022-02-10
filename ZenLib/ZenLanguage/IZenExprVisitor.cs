@@ -164,6 +164,14 @@ namespace ZenLib
         TReturn VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a DictEqualityExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -201,7 +209,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, TParam parameter);
+        TReturn VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit an ArgumentExpr.

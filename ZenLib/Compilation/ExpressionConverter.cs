@@ -287,7 +287,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -585,6 +585,11 @@ namespace ZenLib.Compilation
         }
 
         public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Expression VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             throw new NotImplementedException();
         }

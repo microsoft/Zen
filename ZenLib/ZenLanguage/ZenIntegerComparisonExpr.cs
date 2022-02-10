@@ -11,7 +11,7 @@ namespace ZenLib
     /// <summary>
     /// Class representing a comparison expression.
     /// </summary>
-    internal sealed class ZenComparisonExpr<T> : Zen<bool>
+    internal sealed class ZenIntegerComparisonExpr<T> : Zen<bool>
     {
         /// <summary>
         /// Static creation function for hash consing.
@@ -94,7 +94,7 @@ namespace ZenLib
                 return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)comparisonType](x.Value, y.Value));
             }
 
-            return new ZenComparisonExpr<T>(e1, e2, comparisonType);
+            return new ZenIntegerComparisonExpr<T>(e1, e2, comparisonType);
         }
 
         /// <summary>
@@ -120,12 +120,12 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenComparisonExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenIntegerComparisonExpr{T}"/> class.
         /// </summary>
         /// <param name="expr1">The first expression.</param>
         /// <param name="expr2">The second expression.</param>
         /// <param name="comparisonType">The comparison type.</param>
-        private ZenComparisonExpr(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
+        private ZenIntegerComparisonExpr(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;

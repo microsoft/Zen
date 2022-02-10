@@ -36,6 +36,8 @@ namespace ZenLib.Solver
 
         private Dictionary<Type, Sort> typeToSort;
 
+        private Dictionary<Sort, DatatypeSort> optionSorts;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
@@ -53,6 +55,7 @@ namespace ZenLib.Solver
             this.BigIntSort = this.context.MkIntSort();
             this.StringSort = this.context.StringSort;
 
+            this.optionSorts = new Dictionary<Sort, DatatypeSort>();
             this.typeToSort = new Dictionary<Type, Sort>();
             this.typeToSort[typeof(bool)] = this.BoolSort;
             this.typeToSort[typeof(byte)] = this.ByteSort;
@@ -186,6 +189,27 @@ namespace ZenLib.Solver
             return (v, (SeqExpr)v);
         }
 
+        public (Expr, ArrayExpr) CreateDictVar(object e)
+        {
+            var dictType = e.GetType().GetGenericArgumentsCached()[0];
+            var typeArguments = dictType.GetGenericArgumentsCached();
+            var keyType = typeArguments[0];
+            var valueType = typeArguments[1];
+
+            var keySort = this.typeToSort[keyType];
+            var valueSort = this.typeToSort[valueType];
+            var optionSort = this.GetOrCreateOptionSort(valueSort);
+            var none = this.context.MkApp(optionSort.Constructors[0]);
+
+            // create the new array variable
+            var v = this.context.MkArrayConst(FreshSymbol(), keySort, optionSort);
+
+            // need to ensure we constrain the array default to be none
+            this.solver.Assert(this.context.MkEq(this.context.MkTermArray(v), none));
+
+            return (v, v);
+        }
+
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
         {
             return this.context.MkEq(x, y);
@@ -197,6 +221,11 @@ namespace ZenLib.Solver
         }
 
         public BoolExpr Eq(SeqExpr x, SeqExpr y)
+        {
+            return this.context.MkEq(x, y);
+        }
+
+        public BoolExpr Eq(ArrayExpr x, ArrayExpr y)
         {
             return this.context.MkEq(x, y);
         }
@@ -234,6 +263,11 @@ namespace ZenLib.Solver
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
             return (SeqExpr)this.context.MkITE(g, t, f);
+        }
+
+        public ArrayExpr Ite(BoolExpr g, ArrayExpr t, ArrayExpr f)
+        {
+            return (ArrayExpr)this.context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -351,6 +385,29 @@ namespace ZenLib.Solver
             return this.context.MkIndexOf(x, y, z);
         }
 
+        public ArrayExpr EmptyDict(Type keyType, Type valueType)
+        {
+            var keySort = this.typeToSort[keyType];
+            var valueSort = this.typeToSort[valueType];
+            var optionSort = GetOrCreateOptionSort(valueSort);
+            var none = this.context.MkApp(optionSort.Constructors[0]);
+            return this.context.MkConstArray(keySort, none);
+        }
+
+        private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
+        {
+            if (this.optionSorts.TryGetValue(valueSort, out var optionSort))
+            {
+                return optionSort;
+            }
+
+            var c1 = this.context.MkConstructor("None", "none");
+            var c2 = this.context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
+            var optSort = this.context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
+            this.optionSorts[valueSort] = optSort;
+            return optSort;
+        }
+
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
@@ -393,8 +450,18 @@ namespace ZenLib.Solver
                 var result = ulong.Parse(e.ToString());
                 return type == typeof(ulong) ? result : (object)(long)result;
             }
+            else if (e.IsConstantArray)
+            {
+                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsIDictType(type), "Internal type mismatch");
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                var c = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
+            }
             else
             {
+                Console.WriteLine(e);
                 // must be a fixed width integer
                 var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
                 RemoveTrailingZeroes(ref bytes);

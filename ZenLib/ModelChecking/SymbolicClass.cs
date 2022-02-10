@@ -30,7 +30,9 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="other">The other integer.</param>
         /// <returns>A new symbolic integer.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
             var o = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var newValue = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;

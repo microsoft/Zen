@@ -67,6 +67,7 @@ namespace ZenLib.ModelChecking
             }
 
             var type = typeof(T1);
+            Console.WriteLine("type: " + type);
 
             if (type == ReflectionUtilities.BoolType)
             {
@@ -141,6 +142,19 @@ namespace ZenLib.ModelChecking
                 var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            if (ReflectionUtilities.IsIDictType(type))
+            {
+                Console.WriteLine("is dictionary");
+                var (variable, expr) = this.Solver.CreateDictVar(expression);
+                this.Variables.Add(variable);
+                var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                this.ArbitraryVariables[expression] = variable;
+
+                Console.WriteLine($"Done");
                 this.Cache[expression] = result;
                 return result;
             }
@@ -427,7 +441,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenComparisonExpr<T1>(ZenComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -752,7 +766,16 @@ namespace ZenLib.ModelChecking
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var emptyDict = this.Solver.EmptyDict(typeof(TKey), typeof(TValue));
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, emptyDict);
+
+            this.Cache[expression] = result;
+            return result;
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
@@ -763,6 +786,21 @@ namespace ZenLib.ModelChecking
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
             throw new NotImplementedException();
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr1.Accept(this, parameter);
+            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr2.Accept(this, parameter);
+            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(e1.Value, e2.Value));
+
+            this.Cache[expression] = result;
+            return result;
         }
 
         [ExcludeFromCodeCoverage]

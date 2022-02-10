@@ -1,4 +1,4 @@
-// <copyright file="SymbolicString.cs" company="Microsoft">
+﻿// <copyright file="SymbolicDict.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,24 +8,24 @@ namespace ZenLib.ModelChecking
     using ZenLib.Solver;
 
     /// <summary>
-    /// Representation of a symbolic string value.
+    /// Representation of a symbolic dictionary value.
     /// </summary>
-    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
+    internal class SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, TString value) : base(solver)
+        public SymbolicDict(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, TArray value) : base(solver)
         {
             this.Value = value;
         }
 
-        public TString Value { get; }
+        public TArray Value { get; }
 
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
-            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
+            var o = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
+            return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symstring>";
+            return "<symdict>";
         }
     }
 }

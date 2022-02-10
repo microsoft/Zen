@@ -315,7 +315,7 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public DD Eq(Unit x, Unit y)
         {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+            throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
         }
 
         public DD LessThanOrEqual(BitVector<T> x, BitVector<T> y)
@@ -466,6 +466,7 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(dds);
         }
 
+        [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateStringVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
@@ -475,6 +476,12 @@ namespace ZenLib.Solver
         public Unit CreateStringConst(string s)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateDictVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support dictionary operations. Use Z3 backend.");
         }
 
         public object Get(Assignment<T> m, Variable<T> v, Type type)
@@ -553,7 +560,7 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public Unit Ite(DD g, Unit t, Unit f)
         {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+            throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
         }
 
         public DD Not(DD x)
@@ -611,6 +618,12 @@ namespace ZenLib.Solver
         public DD GreaterThanOrEqual(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit EmptyDict(Type keyType, Type valueType)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }
     }
 }

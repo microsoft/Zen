@@ -132,6 +132,13 @@ namespace ZenLib.Solver
         TString CreateStringConst(string s);
 
         /// <summary>
+        /// Create a new dictionary expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TArray) CreateDictVar(object e);
+
+        /// <summary>
         /// The 'And' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -316,6 +323,14 @@ namespace ZenLib.Solver
         TInteger IndexOf(TString x, TString y, TInteger z);
 
         /// <summary>
+        /// The empty dictionary.
+        /// </summary>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        TArray EmptyDict(Type keyType, Type valueType);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -338,6 +353,14 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool Eq(TString x, TString y);
+
+        /// <summary>
+        /// The 'Equal' of two arrays.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TArray x, TArray y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -422,6 +445,15 @@ namespace ZenLib.Solver
         /// <param name="f">The false expression.</param>
         /// <returns></returns>
         TString Ite(TBool g, TString t, TString f);
+
+        /// <summary>
+        /// The 'Ite' of a guard and two arrays.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TArray Ite(TBool g, TArray t, TArray f);
 
         /// <summary>
         /// Check whether a boolean expression is satisfiable.
