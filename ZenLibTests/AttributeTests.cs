@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
     using ZenLib;
@@ -87,19 +88,44 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that dictionary symbolic evaluation works.
+        /// Test that dictionary symbolic evaluation with equality and empty dictionary.
         /// </summary>
         [TestMethod]
-        public void TestDictFind()
+        public void TestDictEqualsEmpty()
         {
             var zf = new ZenConstraint<IDictionary<int, int>>(d => d == EmptyDict<int, int>());
             var result = zf.Find();
 
+            Assert.AreEqual(0, result.Value.Count);
             Console.WriteLine(result.Value.Count);
             foreach (var kv in result.Value)
             {
                 Console.WriteLine($"{kv.Key} -> {kv.Value}");
             }
+        }
+
+        /// <summary>
+        /// Test dictionary symbolic evaluation with set.
+        /// </summary>
+        [TestMethod]
+        public void TestDictSet()
+        {
+            var zf = new ZenFunction<IDictionary<int, int>, IDictionary<int, int>>(d => DictSet(d, 10, 20));
+            var result = zf.Find((d1, d2) => d2 == EmptyDict<int, int>());
+
+            Assert.IsFalse(result.HasValue);
+        }
+
+        /// <summary>
+        /// Test dictionary symbolic evaluation with get.
+        /// </summary>
+        [TestMethod]
+        public void TestDictGet()
+        {
+            var zf = new ZenConstraint<IDictionary<int, int>>(d => DictGet(d, 10) == Option.Some(11));
+            var result = zf.Find();
+
+            Console.WriteLine(result.Value.Count);
         }
 
         /// <summary>

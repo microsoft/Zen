@@ -621,7 +621,19 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit EmptyDict(Type keyType, Type valueType)
+        public Unit DictEmpty(Type keyType, Type valueType)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit DictSet(Unit arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (DD, object) DictGet(Unit arrayExpr, object keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }

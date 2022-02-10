@@ -385,13 +385,35 @@ namespace ZenLib.Solver
             return this.context.MkIndexOf(x, y, z);
         }
 
-        public ArrayExpr EmptyDict(Type keyType, Type valueType)
+        public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
             var keySort = this.typeToSort[keyType];
             var valueSort = this.typeToSort[valueType];
             var optionSort = GetOrCreateOptionSort(valueSort);
             var none = this.context.MkApp(optionSort.Constructors[0]);
             return this.context.MkConstArray(keySort, none);
+        }
+
+        public ArrayExpr DictSet(ArrayExpr arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType)
+        {
+            var key = (Expr)keyExpr;
+            var value = (Expr)valueExpr;
+            var valueSort = this.typeToSort[valueType];
+            var optionSort = GetOrCreateOptionSort(valueSort);
+            var some = this.context.MkApp(optionSort.Constructors[1], value);
+            return this.context.MkStore(arrayExpr, key, some);
+        }
+
+        public (BoolExpr, object) DictGet(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        {
+            var key = (Expr)keyExpr;
+            var valueSort = this.typeToSort[valueType];
+            var optionSort = GetOrCreateOptionSort(valueSort);
+            var optionResult = this.context.MkSelect(arrayExpr, key);
+            var none = this.context.MkApp(optionSort.Constructors[0]);
+            var someAccessor = optionSort.Accessors[1][0];
+            var hasValue = this.context.MkNot(this.context.MkEq(optionResult, none));
+            return (hasValue, this.context.MkApp(someAccessor, optionResult));
         }
 
         private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
@@ -411,7 +433,12 @@ namespace ZenLib.Solver
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
+            Console.WriteLine(e);
+            return ConvertExprToObject(e, type);
+        }
 
+        private object ConvertExprToObject(Expr e, Type type)
+        {
             if (e.Sort == this.BoolSort)
             {
                 CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
@@ -458,6 +485,30 @@ namespace ZenLib.Solver
                 var valueType = typeParameters[1];
                 var c = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
                 return c.Invoke(CommonUtilities.EmptyArray);
+            }
+            else if (e.IsStore)
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                var arrayExpr = e.Args[0];
+                var keyExpr = e.Args[1];
+                var valueExpr = e.Args[2];
+                var dict = ConvertExprToObject(arrayExpr, type);
+                var key = ConvertExprToObject(keyExpr, keyType);
+                var value = ConvertExprToObject(valueExpr, valueType);
+
+                var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
+                return m.Invoke(dict, new object[] { key, value });
+            }
+            else if (e.IsApp && e.Args.Length == 0)
+            {
+                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
+            }
+            else if (e.IsApp && e.Args.Length == 1)
+            {
+                // strip the option
+                return ConvertExprToObject(e.Args[0], type);
             }
             else
             {

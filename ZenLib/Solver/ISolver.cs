@@ -328,7 +328,28 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray EmptyDict(Type keyType, Type valueType);
+        TArray DictEmpty(Type keyType, Type valueType);
+
+        /// <summary>
+        /// The result of setting a key to a value for an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        TArray DictSet(TArray arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType);
+
+        /// <summary>
+        /// The result of getting a value for a key from an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        (TBool, object) DictGet(TArray arrayExpr, object keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The 'Equal' of two integers.

@@ -67,7 +67,6 @@ namespace ZenLib.ModelChecking
             }
 
             var type = typeof(T1);
-            Console.WriteLine("type: " + type);
 
             if (type == ReflectionUtilities.BoolType)
             {
@@ -148,13 +147,11 @@ namespace ZenLib.ModelChecking
 
             if (ReflectionUtilities.IsIDictType(type))
             {
-                Console.WriteLine("is dictionary");
                 var (variable, expr) = this.Solver.CreateDictVar(expression);
                 this.Variables.Add(variable);
                 var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
-                Console.WriteLine($"Done");
                 this.Cache[expression] = result;
                 return result;
             }
@@ -771,7 +768,7 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var emptyDict = this.Solver.EmptyDict(typeof(TKey), typeof(TValue));
+            var emptyDict = this.Solver.DictEmpty(typeof(TKey), typeof(TValue));
             var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, emptyDict);
 
             this.Cache[expression] = result;
@@ -780,12 +777,80 @@ namespace ZenLib.ModelChecking
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
+            var e2 = expression.KeyExpr.Accept(this, parameter);
+            var e3 = expression.ValueExpr.Accept(this, parameter);
+            var e = this.Solver.DictSet(e1.Value, e2.GetExpr(), e3.GetExpr(), typeof(TKey), typeof(TValue));
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
+
+            this.Cache[expression] = result;
+            return result;
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            // Console.WriteLine($"executing dict get expr");
+            // Console.WriteLine(expression);
+
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
+            var e2 = expression.KeyExpr.Accept(this, parameter);
+            var (flag, e) = this.Solver.DictGet(e1.Value, e2.GetExpr(), typeof(TKey), typeof(TValue));
+
+            // Console.WriteLine($"flag: {flag}");
+            // Console.WriteLine($"e: {e}");
+
+            var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, flag);
+            var optionValue = GetValueFromType(e, typeof(TValue));
+
+            var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
+                .Add("HasValue", hasValue).Add("Value", optionValue);
+
+            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, fields);
+
+            this.Cache[expression] = result;
+            return result;
+        }
+
+        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> GetValueFromType(object e, Type type)
+        {
+            if (type == ReflectionUtilities.BoolType)
+            {
+                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBool)e);
+            }
+
+            if (ReflectionUtilities.IsUnsignedIntegerType(type) ||
+                ReflectionUtilities.IsSignedIntegerType(type) ||
+                ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBitvec)e);
+            }
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TInt)e);
+            }
+
+            if (type == ReflectionUtilities.StringType)
+            {
+                return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TString)e);
+            }
+
+            if (ReflectionUtilities.IsIDictType(type))
+            {
+                return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TArray)e);
+            }
+
+            throw new ZenException($"Unsupported type {type} as value in dictionary.");
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)

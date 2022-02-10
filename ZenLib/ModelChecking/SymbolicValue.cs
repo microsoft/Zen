@@ -18,6 +18,11 @@ namespace ZenLib.ModelChecking
             this.Solver = solver;
         }
 
+        internal virtual object GetExpr()
+        {
+            throw new ZenException("Invalid call to GetExpr()");
+        }
+
         internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other);
