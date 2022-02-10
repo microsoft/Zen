@@ -99,7 +99,7 @@ namespace ZenLib.Generation
             return list;
         }
 
-        public object VisitDictionary(Func<Type, DepthConfiguration, object> recurse, Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);

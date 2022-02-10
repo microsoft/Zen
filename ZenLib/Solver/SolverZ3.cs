@@ -433,7 +433,7 @@ namespace ZenLib.Solver
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
-            Console.WriteLine(e);
+            // Console.WriteLine(e);
             return ConvertExprToObject(e, type);
         }
 

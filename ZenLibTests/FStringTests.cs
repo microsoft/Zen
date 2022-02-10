@@ -265,7 +265,7 @@ namespace ZenLib.Tests
             RandomStrings(s =>
             {
                 var f = new ZenFunction<FString, Option<ushort>>(fs => fs.IndexOf(new FString(s)));
-                var ex = f.Find((fs, i) => i.HasValue()).Value.ToString();
+                var ex = f.Find((fs, i) => i.IsSome()).Value.ToString();
                 var idx = f.Evaluate(ex);
                 Assert.IsTrue(ex.Contains(s));
                 Assert.AreEqual(idx.Value, ex.IndexOf(s));
@@ -383,7 +383,7 @@ namespace ZenLib.Tests
         public void TestIndexOfImpliesContains()
         {
             var f = new ZenFunction<FString, FString, bool>(
-                (fs1, fs2) => Implies(fs1.Contains(fs2), fs1.IndexOf(fs2).HasValue()));
+                (fs1, fs2) => Implies(fs1.Contains(fs2), fs1.IndexOf(fs2).IsSome()));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);

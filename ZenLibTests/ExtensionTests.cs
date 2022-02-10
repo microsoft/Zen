@@ -121,7 +121,7 @@ namespace ZenLib.Tests
         {
             var a = Arbitrary<Option<int>>();
             var b = Arbitrary<Option<int>>();
-            var expr = And(Not(a.HasValue()), b == Option.Some(1));
+            var expr = And(Not(a.IsSome()), b == Option.Some(1));
             var solution = expr.Solve();
 
             Assert.IsTrue(!solution.Get(a).HasValue);
@@ -190,7 +190,7 @@ namespace ZenLib.Tests
             // build constraints on these variables
             var c1 = Or(b, i <= 10);
             var c2 = Or(Not(b), o == Option.Some(1UL));
-            var c3 = Or(s.Contains("hello"), Not(o.HasValue()));
+            var c3 = Or(s.Contains("hello"), Not(o.IsSome()));
             var c4 = l.Where(x => x <= i).Length() == 5;
             var c5 = l.All(x => And(x >= 0, x <= 100));
             var expr = And(c1, c2, c3, c4, c5);

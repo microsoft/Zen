@@ -108,7 +108,7 @@ namespace ZenLib.Tests
             }
 
             var newLp = StepOnce(initial);
-            return If(newLp.HasValue(), StepMany(newLp.Value(), k - 1), initial);
+            return If(newLp.IsSome(), StepMany(newLp.Value(), k - 1), initial);
         }
     }
 }

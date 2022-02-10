@@ -44,7 +44,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            RandomBytes(x => CheckAgreement<FMap<int, int>>(d => Not(FMap.Empty<int, int>().Get(x).HasValue())));
+            RandomBytes(x => CheckAgreement<FMap<int, int>>(d => Not(FMap.Empty<int, int>().Get(x).IsSome())));
         }
 
         /// <summary>

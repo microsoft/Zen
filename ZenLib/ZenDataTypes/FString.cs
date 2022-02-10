@@ -302,7 +302,7 @@ namespace ZenLib
         {
             var trimmed = s.GetCharacters().Drop(offset);
             var idx = IndexOf(trimmed, sub.GetCharacters(), 0);
-            return If(idx.HasValue(), Option.Create(idx.Value() + offset), idx);
+            return If(idx.IsSome(), Option.Create(idx.Value() + offset), idx);
         }
 
         /// <summary>

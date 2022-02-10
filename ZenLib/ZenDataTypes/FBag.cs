@@ -106,7 +106,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
-            return bagExpr.Values().Any(o => And(o.HasValue(), o.Value() == value));
+            return bagExpr.Values().Any(o => And(o.IsSome(), o.Value() == value));
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(value);
 
             return seqExpr.Case(seqExpr, (hd, tl) =>
-                If(hd.HasValue(), AddIfSpace(tl, value).AddFront(hd), tl.AddFront(Option.Create(value))));
+                If(hd.IsSome(), AddIfSpace(tl, value).AddFront(hd), tl.AddFront(Option.Create(value))));
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(bagExpr);
             CommonUtilities.ValidateNotNull(value);
 
-            return FBag.Create(bagExpr.Values().Select(o => If(And(o.HasValue(), o.Value() == value), Option.Null<T>(), o)));
+            return FBag.Create(bagExpr.Values().Select(o => If(And(o.IsSome(), o.Value() == value), Option.Null<T>(), o)));
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace ZenLib
         /// <returns>The new bag from adding the value..</returns>
         private static Zen<ushort> Size<T>(Zen<FSeq<Option<T>>> seqExpr)
         {
-            return seqExpr.Case(0, (hd, tl) => If<ushort>(hd.HasValue(), 1, 0) + Size(tl));
+            return seqExpr.Case(0, (hd, tl) => If<ushort>(hd.IsSome(), 1, 0) + Size(tl));
         }
     }
 }

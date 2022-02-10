@@ -147,7 +147,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return mapExpr.Get(keyExpr).HasValue();
+            return mapExpr.Get(keyExpr).IsSome();
         }
 
         /// <summary>

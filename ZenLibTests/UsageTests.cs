@@ -536,7 +536,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestHasValueException()
         {
-            OptionExtensions.HasValue<int>(null);
+            OptionExtensions.IsSome<int>(null);
         }
 
         /// <summary>

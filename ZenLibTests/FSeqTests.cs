@@ -116,7 +116,7 @@ namespace ZenLib.Tests
         public void TestSeqContainsFind()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).HasValue())));
+                Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).IsSome())));
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ZenLib.Tests
         public void TestSeqIndexOf()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x).HasValue())));
+                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x).IsSome())));
         }
 
         /// <summary>
@@ -136,10 +136,10 @@ namespace ZenLib.Tests
         public void TestSeqAt()
         {
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() >= 2, l.At(1).HasValue()));
+                Implies(l.Length() >= 2, l.At(1).IsSome()));
 
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() == 0, Not(l.At(0).HasValue())));
+                Implies(l.Length() == 0, Not(l.At(0).IsSome())));
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace ZenLib.Tests
             {
                 var dropped = l.DropWhile(b => b > 0);
                 var first = dropped.At(0);
-                return Implies(first.HasValue(), first.Value() == 0);
+                return Implies(first.IsSome(), first.Value() == 0);
             });
         }
 
@@ -307,7 +307,7 @@ namespace ZenLib.Tests
             {
                 var dropped = l.TakeWhile(b => b > 0);
                 var first = dropped.At(0);
-                return Implies(first.HasValue(), first.Value() > 0);
+                return Implies(first.IsSome(), first.Value() > 0);
             });
         }
 

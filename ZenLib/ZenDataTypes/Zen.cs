@@ -128,7 +128,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(none);
             CommonUtilities.ValidateNotNull(some);
 
-            return If(expr.HasValue(), some(expr.Value()), none());
+            return If(expr.IsSome(), some(expr.Value()), none());
         }
 
         /// <summary>

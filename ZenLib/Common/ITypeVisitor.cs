@@ -79,16 +79,16 @@ namespace ZenLib
         T VisitString();
 
         /// <summary>
+        /// Visit the dictionary type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitDictionary(Type dictionaryType, Type keyType, Type valueType);
+
+        /// <summary>
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>
         T VisitList(Func<Type, TParam, T> recurse, Type listType, Type innerType, TParam parameter);
-
-        /// <summary>
-        /// Visit the dictionary type.
-        /// </summary>
-        /// <returns>A value.</returns>
-        T VisitDictionary(Func<Type, TParam, T> recurse, Type dictionaryType, Type keyType, Type valueType, TParam parameter);
 
         /// <summary>
         /// Visit a class/struct type.

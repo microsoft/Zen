@@ -457,7 +457,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenFunction<Option<ulong>>(() => Option.Null<ulong>()).Assert(v => v.Value() == 0));
             Assert.IsTrue(new ZenFunction<Option<BigInteger>>(() => Option.Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
             Assert.IsTrue(new ZenFunction<Option<FSeq<bool>>>(() => Option.Null<FSeq<bool>>()).Assert(v => v.Value().IsEmpty()));
-            Assert.IsTrue(new ZenFunction<Option<FMap<bool, bool>>>(() => Option.Null<FMap<bool, bool>>()).Assert(v => v.Value().Get(true).HasValue() == false));
+            Assert.IsTrue(new ZenFunction<Option<FMap<bool, bool>>>(() => Option.Null<FMap<bool, bool>>()).Assert(v => v.Value().Get(true).IsSome() == false));
         }
 
         /// <summary>

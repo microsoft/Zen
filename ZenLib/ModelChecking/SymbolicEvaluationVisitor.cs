@@ -799,15 +799,9 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            // Console.WriteLine($"executing dict get expr");
-            // Console.WriteLine(expression);
-
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
             var (flag, e) = this.Solver.DictGet(e1.Value, e2.GetExpr(), typeof(TKey), typeof(TValue));
-
-            // Console.WriteLine($"flag: {flag}");
-            // Console.WriteLine($"e: {e}");
 
             var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, flag);
             var optionValue = GetValueFromType(e, typeof(TValue));

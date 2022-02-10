@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -18,18 +19,26 @@ namespace ZenLib.Tests
     public class MapTests
     {
         /// <summary>
-        /// Test that dictionary evaluation works.
+        /// Test that map evaluation works.
         /// </summary>
         [TestMethod]
-        public void TestDictEvaluation()
+        public void TestMapEvaluation()
         {
             var zf1 = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(10, 20));
+            var zf2 = new ZenFunction<Map<int, int>, bool>(d => d.Get(10) == Option.Some(11));
+            var zf3 = new ZenFunction<Map<int, int>>(() => Map.Empty<int, int>());
+
             var result1 = zf1.Evaluate(new Map<int, int>().Set(5, 5));
             Assert.AreEqual(2, result1.Count());
             Assert.AreEqual(5, result1.Get(5).Value);
             Assert.AreEqual(20, result1.Get(10).Value);
 
-            var zf2 = new ZenFunction<Map<int, int>, bool>(d => d.Get(10) == Option.Some(11));
+            zf1.Compile();
+            result1 = zf1.Evaluate(new Map<int, int>().Set(5, 5));
+            Assert.AreEqual(2, result1.Count());
+            Assert.AreEqual(5, result1.Get(5).Value);
+            Assert.AreEqual(20, result1.Get(10).Value);
+
             var result2 = zf2.Evaluate(new Map<int, int>().Set(5, 5));
             var result3 = zf2.Evaluate(new Map<int, int>().Set(10, 10));
             var result4 = zf2.Evaluate(new Map<int, int>().Set(5, 5).Set(10, 11));
@@ -37,8 +46,19 @@ namespace ZenLib.Tests
             Assert.IsFalse(result3);
             Assert.IsTrue(result4);
 
-            var zf3 = new ZenFunction<Map<int, int>>(() => Map.Empty<int, int>());
+            zf2.Compile();
+            result2 = zf2.Evaluate(new Map<int, int>().Set(5, 5));
+            result3 = zf2.Evaluate(new Map<int, int>().Set(10, 10));
+            result4 = zf2.Evaluate(new Map<int, int>().Set(5, 5).Set(10, 11));
+            Assert.IsFalse(result2);
+            Assert.IsFalse(result3);
+            Assert.IsTrue(result4);
+
             var result5 = zf3.Evaluate();
+            Assert.AreEqual(0, result5.Count());
+
+            zf3.Compile();
+            result5 = zf3.Evaluate();
             Assert.AreEqual(0, result5.Count());
         }
 
@@ -55,10 +75,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test dictionary symbolic evaluation with set.
+        /// Test map symbolic evaluation with set.
         /// </summary>
         [TestMethod]
-        public void TestDictSet()
+        public void TestMapSet()
         {
             var zf = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(10, 20));
             var result = zf.Find((d1, d2) => d2 == Map.Empty<int, int>());
@@ -67,10 +87,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test dictionary symbolic evaluation with get.
+        /// Test map symbolic evaluation with get.
         /// </summary>
         [TestMethod]
-        public void TestDictGet()
+        public void TestMapGet()
         {
             var zf = new ZenConstraint<Map<int, int>>(d => d.Get(10) == Option.Some(11));
             var result = zf.Find();
@@ -78,6 +98,38 @@ namespace ZenLib.Tests
             Assert.IsTrue(result.HasValue);
             Assert.AreEqual(1, result.Value.Count());
             Assert.AreEqual(11, result.Value.Get(10).Value);
+        }
+
+        /// <summary>
+        /// Test dictionary symbolic evaluation with get.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEquals()
+        {
+            CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4) == Map.Empty<ushort, long>().Set(1, 2), runBdds: false);
+            CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4) == Map.Empty<ushort, long>().Set(1, 2).Set(3, 4), runBdds: false);
+
+            var zf1 = new ZenConstraint<Map<int, int>>(d => d.Set(1, 2).Set(3, 4) == Map.Empty<int, int>().Set(1, 2));
+            var zf2 = new ZenConstraint<Map<int, int>>(d => d.Set(1, 2).Set(3, 4) == Map.Empty<int, int>().Set(1, 2).Set(3, 4));
+
+            Assert.IsFalse(zf1.Evaluate(new Map<int, int>()));
+            Assert.IsTrue(zf2.Evaluate(new Map<int, int>()));
+
+            zf1.Compile();
+            zf2.Compile();
+            Assert.IsFalse(zf1.Evaluate(new Map<int, int>()));
+            Assert.IsTrue(zf2.Evaluate(new Map<int, int>()));
+        }
+
+        /// <summary>
+        /// Test that If works with maps.
+        /// </summary>
+        [TestMethod]
+        public void TestMapIte()
+        {
+            CheckValid<Map<long, long>, bool>((d, b) =>
+                Implies(d == Map.Empty<long, long>(),
+                        If(b, d.Set(1, 1), d.Set(2, 2)).Get(3).IsNone()), runBdds: false);
         }
 
         /// <summary>
@@ -96,7 +148,13 @@ namespace ZenLib.Tests
         public void TestDictionaryEvaluation()
         {
             var f = new ZenFunction<Map<int, int>, Map<int, int>>(d => d.Set(1, 1).Set(2, 2));
+
             var result = f.Evaluate(new Map<int, int>());
+            Assert.AreEqual(1, result.Get(1).Value);
+            Assert.AreEqual(2, result.Get(2).Value);
+
+            f.Compile();
+            result = f.Evaluate(new Map<int, int>());
             Assert.AreEqual(1, result.Get(1).Value);
             Assert.AreEqual(2, result.Get(2).Value);
         }
@@ -107,7 +165,17 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestDictionaryEmpty()
         {
-            RandomBytes(x => CheckAgreement<Map<int, int>>(d => Not(Map.Empty<int, int>().Get(x).HasValue()), runBdds: false));
+            RandomBytes(x => CheckAgreement<Map<int, int>>(d => Not(Map.Empty<int, int>().Get(x).IsSome()), runBdds: false));
+        }
+
+        /// <summary>
+        /// Test that dictionary get and set return the right values.
+        /// </summary>
+        [TestMethod]
+        public void TestDictionaryGetAndSet()
+        {
+            CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(5).IsSome(), runBdds: false);
+            RandomBytes(x => CheckAgreement<Map<ushort, long>>(d => d.Set(1, 2).Set(3, 4).Get(x).IsSome(), runBdds: false));
         }
 
         /// <summary>
