@@ -834,17 +834,8 @@ namespace ZenLib.ModelChecking
                 return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TInt)e);
             }
 
-            if (type == ReflectionUtilities.StringType)
-            {
-                return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TString)e);
-            }
-
-            if (ReflectionUtilities.IsIDictType(type))
-            {
-                return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TArray)e);
-            }
-
-            throw new ZenException($"Unsupported type {type} as value in dictionary.");
+            CommonUtilities.ValidateIsTrue(type == ReflectionUtilities.StringType, "unexpected type");
+            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TString)e);
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)

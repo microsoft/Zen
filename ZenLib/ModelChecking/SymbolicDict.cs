@@ -19,11 +19,6 @@ namespace ZenLib.ModelChecking
 
         public TArray Value { get; }
 
-        internal override object GetExpr()
-        {
-            return this.Value;
-        }
-
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
