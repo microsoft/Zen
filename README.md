@@ -25,7 +25,7 @@ var b = Zen.Symbolic<bool>();
 var i = Zen.Symbolic<int>();
 var s = Zen.Symbolic<string>();
 var o = Zen.Symbolic<Option<ulong>>();
-var l = Zen.Symbolic<Seq<int>>(depth: 10, exhaustiveDepth: false);
+var l = Zen.Symbolic<FSeq<int>>(depth: 10, exhaustiveDepth: false);
 
 // build constraints on these variables
 var c1 = Zen.Or(b, i <= 10);
@@ -140,18 +140,18 @@ var inputs = function.FindAll((x, y, result) => Zen.And(x <= 0, result == 11)).T
 
 Each input in `inputs` will be unique so there will be no duplicates.
 
-Zen also supports richer data types such as sequences. For example, we can write an implementation for the insertion sort algorithm using recursion:
+Zen also supports richer data types such as sequences (`FSeq`). For example, we can write an implementation for the insertion sort algorithm using recursion:
 
 ```csharp
-Zen<Seq<T>> Sort<T>(Zen<Seq<T>> expr)
+Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
 {
-    return expr.Case(empty: Seq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
+    return expr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
 }
 
-Zen<Seq<T>> Insert<T>(Zen<T> elt, Zen<Seq<T>> list)
+Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
 {
     return list.Case(
-        empty: Seq.Create(elt),
+        empty: FSeq.Create(elt),
         cons: (hd, tl) => Zen.If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
 }
 ```
@@ -159,7 +159,7 @@ Zen<Seq<T>> Insert<T>(Zen<T> elt, Zen<Seq<T>> list)
 We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
 
 ```csharp
-var f = new ZenFunction<Seq<byte>, IList<Seq>>(l => Sort(l));
+var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
 var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
 // input = None
 ```
@@ -207,7 +207,7 @@ Internally, transformers leverage [binary decision diagrams](https://github.com/
 As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
 ```csharp
-var f = new ZenFunction<Seq<byte>, Seq<byte>>(l => Sort(l));
+var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
 
 foreach (var seq in f.GenerateInputs(depth: 3))
 {
@@ -250,12 +250,13 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `UInt1`, `UInt2`, ..., `UIntN` | N-bit unsigned value| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: |
 | `string`     | arbitrary length string | :heavy_check_mark:           | :x:                 | :x:  |
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
-| `FiniteString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
-| `Seq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
-| `Bag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
-| `Dict<T1, T2>` | finite size dictionary of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` must be primitive types (bool, integers, string, BigInteger, etc.) | :heavy_check_mark: | :x: | :x:  |
+| `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
+| `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
 | `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
 
 
@@ -267,7 +268,7 @@ Zen supports the following primitive types: `bool, byte, short, ushort, int, uin
 
 Zen supports the `string` type for reasoning about unbounded strings. However, string theories are generally incomplete in SMT solvers so there may be problems that they can not solve. 
 
-For this reason, Zen also includes a library-defined `FiniteString` type for reasoning about strings with bounded size. The is done by treating a string as a list of characters `Seq<ushort>`. You can see the implementation of this class [here](https://github.com/microsoft/Zen/blob/master/ZenLib/DataTypes/FiniteString.cs).
+For this reason, Zen also includes a library-defined `FString` type for reasoning about strings with bounded size. The is done by treating a string as a list of characters `FSeq<ushort>`. You can see the implementation of this class [here](https://github.com/microsoft/Zen/blob/master/ZenLib/DataTypes/FiniteString.cs).
 
 ### Integer types
 
@@ -296,11 +297,22 @@ public class UInt65 : IntN<UInt65, Unsigned>
 }
 ```
 
-### Sequences, Bags, Dictionaries, Options, Tuples
+### , Options, Tuples
 
-Zen supports values with type `Seq<T>` for reasoning about variable length sequences of values. It also provides several library types based on `Seq<T>` to model other useful data structures. For example, it provides a `Dict<T1, T2>` type to emulate finite dictionaries, `Bag<T>` to represent unordered multi-sets, and pair types, e.g., `Pair<T1, T2>` as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
+Zen offers `Pair<T1, T2, ...>`, types as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 
-Note: When the order of elements is not important, it is usually preferred to use `Bag<T>` if possible compared to `Seq<T>` as it will frequently scale better.
+### Finite Sequences, Bags, Maps
+
+Zen supports a number of high-level data types that are finite (bounded) in size (the default size is 5 but can be changed). These include:
+
+- `FSeq<T>` for reasoning about variable length sequences of values where the order is important. For instance, the sorting example earlier.
+- `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is usually preferred to use `FBag<T>` if possible compared to `FSeq<T>` as it will frequently scale better.
+- `FMap<T1, T2>` type to emulate finite maps from keys to values.
+
+### Unbounded Maps
+
+Zen also supports a `Map<T1, T2>` data type that does not restrict the size of the map a priori. However, this type only works with the Z3 backend and requires that `T1` and `T2` be primitive types (bool, integers, string, BigInteger).
+
 
 ### Custom classes and structs
 
@@ -347,7 +359,7 @@ public class Point
 
 # Solver backends
 
-Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `Seq<T>`, `Bag<T>`, and `Dict<T1, T2>` can not be used with transformers.
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
 
 # Example: Network access control lists
 
