@@ -404,6 +404,15 @@ namespace ZenLib.Solver
             return this.context.MkStore(arrayExpr, key, some);
         }
 
+        public ArrayExpr DictDelete(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        {
+            var key = (Expr)keyExpr;
+            var valueSort = this.typeToSort[valueType];
+            var optionSort = GetOrCreateOptionSort(valueSort);
+            var none = this.context.MkApp(optionSort.Constructors[0]);
+            return this.context.MkStore(arrayExpr, key, none);
+        }
+
         public (BoolExpr, object) DictGet(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
         {
             var key = (Expr)keyExpr;

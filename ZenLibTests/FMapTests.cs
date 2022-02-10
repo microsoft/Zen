@@ -18,6 +18,56 @@ namespace ZenLib.Tests
     public class FMapTests
     {
         /// <summary>
+        /// Test map symbolic evaluation with delete.
+        /// </summary>
+        [TestMethod]
+        public void TestMapDelete()
+        {
+            var zf = new ZenFunction<FMap<int, int>, FMap<int, int>>(d => d.Delete(10).Set(10, 1));
+
+            var d = zf.Evaluate(new FMap<int, int>().Set(10, 100));
+            Assert.AreEqual(1, d.Count());
+            Assert.AreEqual(1, d.Get(10).Value);
+
+            d = zf.Evaluate(new FMap<int, int>());
+            Assert.AreEqual(1, d.Count());
+            Assert.AreEqual(1, d.Get(10).Value);
+
+            zf.Compile();
+            d = zf.Evaluate(new FMap<int, int>().Set(10, 100));
+            Assert.AreEqual(1, d.Count());
+            Assert.AreEqual(1, d.Get(10).Value);
+
+            d = zf.Evaluate(new FMap<int, int>());
+            Assert.AreEqual(1, d.Count());
+            Assert.AreEqual(1, d.Get(10).Value);
+        }
+
+        /// <summary>
+        /// Test map symbolic evaluation with delete.
+        /// </summary>
+        [TestMethod]
+        public void TestMapDeleteImplementation()
+        {
+            Assert.AreEqual(0, new FMap<int, int>().Delete(10).Count());
+            Assert.AreEqual(1, new FMap<int, int>().Set(1, 10).Delete(10).Count());
+            Assert.AreEqual(0, new FMap<int, int>().Set(1, 10).Delete(1).Count());
+            Assert.AreEqual(1, new FMap<int, int>().Set(1, 10).Set(10, 10).Delete(1).Count());
+        }
+
+        /// <summary>
+        /// Test that some basic map equations hold.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEquations()
+        {
+            CheckValid<FMap<byte, byte>, byte, byte>((d, k, v) => d.Set(k, v).Delete(k) == d.Delete(k), runBdds: false);
+            // CheckValid<FMap<byte, byte>, byte, byte>((d, k, v) => d.Delete(k).Set(k, v) == d.Set(k, v), runBdds: false);
+            // CheckValid<FMap<byte, byte>, byte, byte>((d, k, v) => Implies(d.Get(k) == Option.Create(v), d.Set(k, v) == d), runBdds: false);
+            CheckValid<FMap<byte, byte>, byte, byte>((d, k, v) => Implies(d.Get(k).IsNone(), d.Delete(k) == d), runBdds: false);
+        }
+
+        /// <summary>
         /// Test that map evaluation works.
         /// </summary>
         [TestMethod]

@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -45,6 +46,17 @@ namespace ZenLib
         {
             var newValues = this.Values.AddFront((key, value));
             return new FMap<TKey, TValue>(newValues);
+        }
+
+        /// <summary>
+        /// Delete a key from the Map.
+        /// </summary>
+        /// <param name="key">The key to add.</param>
+        public FMap<TKey, TValue> Delete(TKey key)
+        {
+            var newList = ImmutableList<Pair<TKey, TValue>>.Empty.AddRange(this.Values.Values.Where(x => !x.Item1.Equals(key)));
+            var newSeq = new FSeq<Pair<TKey, TValue>>(newList);
+            return new FMap<TKey, TValue>(newSeq);
         }
 
         /// <summary>
@@ -138,6 +150,21 @@ namespace ZenLib
 
             var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
             return Create<FMap<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
+        }
+
+        /// <summary>
+        /// Delete a key from a Zen map.
+        /// </summary>
+        /// <param name="mapExpr">Zen map expression.</param>
+        /// <param name="keyExpr">Zen key expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FMap<TKey, TValue>> Delete<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        {
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
+
+            var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
+            return Create<FMap<TKey, TValue>>(("Values", l.Where(x => x.Item1() != keyExpr)));
         }
 
         /// <summary>

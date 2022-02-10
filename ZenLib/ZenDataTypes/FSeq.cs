@@ -29,7 +29,7 @@ namespace ZenLib
             this.Values = ImmutableList<T>.Empty;
         }
 
-        private FSeq(ImmutableList<T> list)
+        internal FSeq(ImmutableList<T> list)
         {
             this.Values = list;
         }

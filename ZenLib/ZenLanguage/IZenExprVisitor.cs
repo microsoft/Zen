@@ -156,6 +156,14 @@ namespace ZenLib
         TReturn VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a DictDeleteExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a DictGetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

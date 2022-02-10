@@ -602,6 +602,24 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("Remove");
+                var dict = expression.DictExpr.Accept(this, parameter);
+
+                var toImmutableDictMethod = typeof(CommonUtilities)
+                    .GetMethodCached("ToImmutableDictionary")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+
+                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
+
+                var key = expression.KeyExpr.Accept(this, parameter);
+                return Expression.Call(immutableDictExpr, method, key);
+            });
+        }
+
         public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>

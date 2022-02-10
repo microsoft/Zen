@@ -50,6 +50,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Delete a key from the Map.
+        /// </summary>
+        /// <param name="key">The key to add.</param>
+        public Map<TKey, TValue> Delete(TKey key)
+        {
+            var d = (ImmutableDictionary<TKey, TValue>)this.Values;
+            return new Map<TKey, TValue>(d.Remove(key));
+        }
+
+        /// <summary>
         /// Check if the Map contains the key.
         /// </summary>
         /// <param name="key">The given key.</param>
@@ -124,6 +134,20 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(valueExpr);
 
             return Create<Map<TKey, TValue>>(("Values", DictSet(mapExpr.Values(), keyExpr, valueExpr)));
+        }
+
+        /// <summary>
+        /// Delete a key from a Zen map.
+        /// </summary>
+        /// <param name="mapExpr">Zen map expression.</param>
+        /// <param name="keyExpr">Zen key expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Map<TKey, TValue>> Delete<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        {
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
+
+            return Create<Map<TKey, TValue>>(("Values", DictDelete(mapExpr.Values(), keyExpr)));
         }
 
         /// <summary>
