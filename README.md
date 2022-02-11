@@ -253,6 +253,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` must be primitive types (bool, integers, string, BigInteger, etc.) | :heavy_check_mark: | :x: | :x:  |
+| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictiosn as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
@@ -297,7 +298,7 @@ public class UInt65 : IntN<UInt65, Unsigned>
 }
 ```
 
-### , Options, Tuples
+### Options, Tuples
 
 Zen offers `Pair<T1, T2, ...>`, types as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 
@@ -309,9 +310,9 @@ Zen supports a number of high-level data types that are finite (bounded) in size
 - `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is usually preferred to use `FBag<T>` if possible compared to `FSeq<T>` as it will frequently scale better.
 - `FMap<T1, T2>` type to emulate finite maps from keys to values.
 
-### Unbounded Maps
+### Unbounded Sets and Maps
 
-Zen also supports a `Map<T1, T2>` data type that does not restrict the size of the map a priori. However, this type only works with the Z3 backend and requires that `T1` and `T2` be primitive types (bool, integers, string, BigInteger).
+Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` be primitive types (bool, integers, string, BigInteger).
 
 
 ### Custom classes and structs
