@@ -243,7 +243,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException()
         {
-            _ = Seq.Empty<int>() + Seq.Empty<int>();
+            _ = FSeq.Empty<int>() + FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSubtractException()
         {
-            _ = Seq.Empty<int>() - Seq.Empty<int>();
+            _ = FSeq.Empty<int>() - FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException()
         {
-            _ = Seq.Empty<int>() * Seq.Empty<int>();
+            _ = FSeq.Empty<int>() * FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGeqException()
         {
-            _ = Seq.Empty<int>() >= Seq.Empty<int>();
+            _ = FSeq.Empty<int>() >= FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLeqException()
         {
-            _ = Seq.Empty<int>() <= Seq.Empty<int>();
+            _ = FSeq.Empty<int>() <= FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGtException()
         {
-            _ = Seq.Empty<int>() > Seq.Empty<int>();
+            _ = FSeq.Empty<int>() > FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -303,7 +303,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLtException()
         {
-            _ = Seq.Empty<int>() < Seq.Empty<int>();
+            _ = FSeq.Empty<int>() < FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseOrException()
         {
-            _ = Seq.Empty<int>() | Seq.Empty<int>();
+            _ = FSeq.Empty<int>() | FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -323,7 +323,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseAndException()
         {
-            _ = Seq.Empty<int>() & Seq.Empty<int>();
+            _ = FSeq.Empty<int>() & FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseNotException()
         {
-            _ = ~Seq.Empty<int>();
+            _ = ~FSeq.Empty<int>();
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestBitwiseXorException()
         {
-            _ = Seq.Empty<int>() ^ Seq.Empty<int>();
+            _ = FSeq.Empty<int>() ^ FSeq.Empty<int>();
         }
     }
 }

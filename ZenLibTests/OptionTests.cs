@@ -42,7 +42,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionFind()
         {
-            var zf = new ZenFunction<Option<int>, bool>(o => o.HasValue());
+            var zf = new ZenFunction<Option<int>, bool>(o => o.IsSome());
             var example = zf.Find((i, o) => o);
             Assert.IsTrue(example.HasValue);
             Assert.AreEqual(Option.Some(0), example.Value);
@@ -54,7 +54,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionNone()
         {
-            CheckAgreement<Option<int>>(o => o.HasValue());
+            CheckAgreement<Option<int>>(o => o.IsSome());
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionSomeInt()
         {
-            RandomBytes(x => CheckAgreement<Option<int>>(o => And(o.HasValue(), o.Value() == Constant<int>(x))));
+            RandomBytes(x => CheckAgreement<Option<int>>(o => And(o.IsSome(), o.Value() == Constant<int>(x))));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace ZenLib.Tests
                 {
                     var item1 = o.Value().Item1() == x;
                     var item2 = o.Value().Item2() == x;
-                    return And(o.HasValue(), Or(item1, item2));
+                    return And(o.IsSome(), Or(item1, item2));
                 });
             });
         }
@@ -90,7 +90,7 @@ namespace ZenLib.Tests
         public void TestOptionSelect()
         {
             CheckValid<Option<int>>(o =>
-                Implies(o.HasValue(), o.Select(v => v + Constant<int>(1)).Value() == o.Value() + Constant<int>(1)));
+                Implies(o.IsSome(), o.Select(v => v + Constant<int>(1)).Value() == o.Value() + Constant<int>(1)));
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace ZenLib.Tests
         public void TestOptionWhere()
         {
             CheckValid<Option<int>>(o =>
-                Implies(And(o.HasValue(), o.Value() <= Constant<int>(4)), Not(o.Where(v => v > Constant<int>(4)).HasValue())));
+                Implies(And(o.IsSome(), o.Value() <= Constant<int>(4)), Not(o.Where(v => v > Constant<int>(4)).IsSome())));
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace ZenLib.Tests
         public void TestOptionMatch()
         {
             CheckValid<Option<int>>(o =>
-                Implies(And(o.HasValue(), o.Value() <= Constant<int>(4)),
+                Implies(And(o.IsSome(), o.Value() <= Constant<int>(4)),
                     o.Case(none: () => False(), some: v => v <= Constant<int>(4))));
         }
 
@@ -129,7 +129,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToList2()
         {
-            CheckValid<Option<int>>(o => Implies(o.HasValue(), o.ToSequence().Length() == 1));
+            CheckValid<Option<int>>(o => Implies(o.IsSome(), o.ToSequence().Length() == 1));
         }
 
         /// <summary>

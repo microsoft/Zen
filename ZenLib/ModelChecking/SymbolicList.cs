@@ -7,15 +7,14 @@ namespace ZenLib.ModelChecking
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
-    using System.Transactions;
     using ZenLib.Solver;
 
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>
-    internal class SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal class SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public SymbolicList(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString> value) : base(solver)
+        public SymbolicList(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> value) : base(solver)
         {
             this.GuardedListGroup = value;
         }
@@ -23,7 +22,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the guarded lists representing the symbolic list.
         /// </summary>
-        public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString> GuardedListGroup { get; }
+        public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> GuardedListGroup { get; }
 
         /// <summary>
         /// Merge two symbolic lists together under a guard.
@@ -31,11 +30,13 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="other">The other list.</param>
         /// <returns>A new symbolic list.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other)
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
-            var o = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
+            var o = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var result = Merge(guard, this.GuardedListGroup, o.GuardedListGroup);
-            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, result);
+            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, result);
         }
 
         /// <summary>
@@ -45,10 +46,10 @@ namespace ZenLib.ModelChecking
         /// <param name="lists1">The first lists.</param>
         /// <param name="lists2">The second lists.</param>
         /// <returns>A new guarded group of lists.</returns>
-        private GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(
+        private GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString> lists1,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString> lists2)
+            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> lists1,
+            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> lists2)
         {
             var result = CommonUtilities.Merge(lists1.Mapping, lists2.Mapping, (len, list1, list2) =>
             {
@@ -74,7 +75,7 @@ namespace ZenLib.ModelChecking
                 return Option.Some(merged);
             });
 
-            return new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString>(result);
+            return new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(result);
         }
 
         /// <summary>
@@ -83,10 +84,10 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="list">The list.</param>
         /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString> MapGuard(TBool guard, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString> list)
+        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> MapGuard(TBool guard, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> list)
         {
             var newGuard = this.Solver.And(guard, list.Guard);
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString>(newGuard, list.Values);
+            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(newGuard, list.Values);
         }
 
         /// <summary>
@@ -96,13 +97,13 @@ namespace ZenLib.ModelChecking
         /// <param name="list1">The first list.</param>
         /// <param name="list2">The second list.</param>
         /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(
+        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString> list1,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString> list2)
+            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> list1,
+            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> list2)
         {
             var newGuard = this.Solver.Ite(guard, list1.Guard, list2.Guard);
-            var newValues = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>>.Empty;
+            var newValues = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
             for (int i = 0; i < list1.Values.Count; i++)
             {
                 var v1 = list1.Values[i];
@@ -110,7 +111,7 @@ namespace ZenLib.ModelChecking
                 newValues = newValues.Add(v1.Merge(guard, v2));
             }
 
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString>(newGuard, newValues);
+            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(newGuard, newValues);
         }
 
         /// <summary>
@@ -127,14 +128,14 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Represents a guarded group of lists, distinguishing by length.
     /// </summary>
-    internal class GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal class GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public GuardedListGroup(ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString>> mapping)
+        public GuardedListGroup(ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> mapping)
         {
             this.Mapping = mapping;
         }
 
-        public ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString>> Mapping { get; }
+        public ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Mapping { get; }
 
         /// <summary>
         /// Convert the object to a string.
@@ -158,9 +159,9 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// A single list with a fixed length guarded by a predicate.
     /// </summary>
-    internal class GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal class GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public GuardedList(TBool guard, ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> values)
+        public GuardedList(TBool guard, ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> values)
         {
             this.Guard = guard;
             this.Values = values;
@@ -168,7 +169,7 @@ namespace ZenLib.ModelChecking
 
         public TBool Guard { get; }
 
-        public ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>> Values { get; }
+        public ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Values { get; }
 
         /// <summary>
         /// Convert the object to a string.

@@ -85,15 +85,26 @@ namespace ZenLib.Tests
             return p.Simplify ? expr.Simplify() : expr;
         }
 
-        private static TestParameter[] GetBoundedParameters(int bddListSize)
+        private static TestParameter[] GetBoundedParameters(int bddListSize, bool runBdds)
         {
-            return new TestParameter[]
+            if (runBdds)
             {
-                new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
-                new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = false, ListSize = 1 },
-                new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
-            };
+                return new TestParameter[]
+                {
+                    new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
+                    new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = false, ListSize = 1 },
+                    new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
+                    new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                };
+            }
+            else
+            {
+                return new TestParameter[]
+                {
+                    new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
+                    new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                };
+            }
         }
 
         private static TestParameter[] GetUnboundedParameters()
@@ -105,9 +116,9 @@ namespace ZenLib.Tests
             };
         }
 
-        private static TestParameter[] SetParameters(int bddListSize, params Type[] types)
+        private static TestParameter[] SetParameters(int bddListSize, bool runBdds, params Type[] types)
         {
-            var ps = GetBoundedParameters(bddListSize);
+            var ps = GetBoundedParameters(bddListSize, runBdds);
 
             foreach (var type in types)
             {
@@ -123,11 +134,11 @@ namespace ZenLib.Tests
         /// <summary>
         /// Check a predicate is valid.
         /// </summary>
-        /// <typeparam name="T1">First input type..</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckValid<T1>(Func<Zen<T1>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckValid<T1>(Func<Zen<T1>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(4, typeof(T1));
+            var selectedParams = SetParameters(4, runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
@@ -152,10 +163,11 @@ namespace ZenLib.Tests
         /// <typeparam name="T1">First input type..</typeparam>
         /// <typeparam name="T2">Second input type.</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, bool runBdds = true)
         {
             // If testing on strings, only use Z3 backend (DD does not support strings)
-            var selectedParams = SetParameters(defaultBddListSize, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
@@ -181,9 +193,10 @@ namespace ZenLib.Tests
         /// <typeparam name="T2">Second input type.</typeparam>
         /// <typeparam name="T3">Third input type.</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckValid<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckValid<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, typeof(T1), typeof(T2), typeof(T3));
+            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2), typeof(T3));
 
             foreach (var p in selectedParams)
             {
@@ -210,9 +223,10 @@ namespace ZenLib.Tests
         /// <typeparam name="T3">Third input type.</typeparam>
         /// <typeparam name="T4">Fourth input input.</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckValid<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckValid<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
 
             foreach (var p in selectedParams)
             {
@@ -236,9 +250,10 @@ namespace ZenLib.Tests
         /// </summary>
         /// <typeparam name="T1">First input type.</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckNotValid<T1>(Func<Zen<T1>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckNotValid<T1>(Func<Zen<T1>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, typeof(T1));
+            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
@@ -260,9 +275,10 @@ namespace ZenLib.Tests
         /// <typeparam name="T1">First input type.</typeparam>
         /// <typeparam name="T2">Second input type.</typeparam>
         /// <param name="function">The predicate.</param>
-        public static void CheckNotValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckNotValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
@@ -281,9 +297,10 @@ namespace ZenLib.Tests
         /// Check that the backends agree on the result.
         /// </summary>
         /// <param name="function">The function.</param>
-        public static void CheckAgreement(Func<Zen<bool>> function)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckAgreement(Func<Zen<bool>> function, bool runBdds = true)
         {
-            foreach (var p in GetBoundedParameters(defaultBddListSize))
+            foreach (var p in GetBoundedParameters(defaultBddListSize, runBdds))
             {
                 var f = new ZenFunction<bool>(function);
                 var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
@@ -299,9 +316,10 @@ namespace ZenLib.Tests
         /// </summary>
         /// <param name="function">The function.</param>
         /// <param name="bddListSize">The list size for bdds.</param>
-        public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function, int bddListSize = 4)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function, int bddListSize = 4, bool runBdds = true)
         {
-            var selectedParams = SetParameters(bddListSize, typeof(T1));
+            var selectedParams = SetParameters(bddListSize, runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
@@ -324,9 +342,10 @@ namespace ZenLib.Tests
         /// <typeparam name="T2">Second input type.</typeparam>
         /// <param name="function">The function.</param>
         /// <param name="bddListSize">The maximum .</param>
-        public static void CheckAgreement<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, int bddListSize = 4)
+        /// <param name="runBdds">Whether to run the bdd backend.</param>
+        public static void CheckAgreement<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, int bddListSize = 4, bool runBdds = true)
         {
-            var selectedParams = SetParameters(bddListSize, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(bddListSize, runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
@@ -393,7 +412,7 @@ namespace ZenLib.Tests
 
             var applyRest = ApplyOrderedRules(modifiedInput, deflt, ruleMatch, ruleAction, ruleReturn, rules, i + 1);
 
-            return If(And(match, ret.HasValue()), ret.Value(), applyRest);
+            return If(And(match, ret.IsSome()), ret.Value(), applyRest);
         }
 
         /// <summary>

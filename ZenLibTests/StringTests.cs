@@ -507,7 +507,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConcatException()
         {
-            _ = Seq.Empty<string>() + Seq.Empty<string>();
+            _ = FSeq.Empty<string>() + FSeq.Empty<string>();
         }
 
         /// <summary>

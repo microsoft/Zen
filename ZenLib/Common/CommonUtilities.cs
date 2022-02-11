@@ -107,8 +107,6 @@ namespace ZenLib
         /// <summary>
         /// Convert to an immutable list if necessary.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
         /// <returns></returns>
         public static ImmutableList<T> ToImmutableList<T>(object obj)
         {
@@ -118,6 +116,58 @@ namespace ZenLib
             }
 
             return ImmutableList.CreateRange((IList<T>)obj);
+        }
+
+        /// <summary>
+        /// Convert to an immutable dictionary if necessary.
+        /// </summary>
+        /// <returns></returns>
+        public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(object obj)
+        {
+            if (obj is ImmutableDictionary<TKey, TValue>)
+            {
+                return (ImmutableDictionary<TKey, TValue>)obj;
+            }
+
+            return ImmutableDictionary.CreateRange((IDictionary<TKey, TValue>)obj);
+        }
+
+        /// <summary>
+        /// Gets a value from a dictionary if the key exists.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key to lookup.</param>
+        /// <returns></returns>
+        public static Option<TValue> DictionaryGet<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (dictionary.TryGetValue(key, out var value))
+            {
+                return Option.Some(value);
+            }
+
+            return Option.None<TValue>();
+        }
+
+        /// <summary>
+        /// Checks if two dictionaries are equal.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dictionary1">The first dictionary.</param>
+        /// <param name="dictionary2">The second dictionary.</param>
+        /// <returns></returns>
+        public static bool DictionaryEquals<TKey, TValue>(IDictionary<TKey, TValue> dictionary1, IDictionary<TKey, TValue> dictionary2)
+        {
+            if (dictionary1.Count != dictionary2.Count)
+            {
+                return false;
+            }
+
+            var pairs1 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary1);
+            var pairs2 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary2);
+            return pairs1.SetEquals(pairs2);
         }
 
         /// <summary>
@@ -154,6 +204,18 @@ namespace ZenLib
             if (!ReflectionUtilities.IsIntegerType(type))
             {
                 throw new ZenException($"Invalid non-integer type {type} used as integer.");
+            }
+        }
+
+        /// <summary>
+        /// Validate that a type is a valid map key or value type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static void ValidateIsMapElementType(Type type)
+        {
+            if (!ReflectionUtilities.IsIntegerType(type) && type != ReflectionUtilities.StringType && type != ReflectionUtilities.BoolType)
+            {
+                throw new ZenException($"Invalid map element type {type}. Map elements must be primitive types");
             }
         }
 
@@ -237,50 +299,6 @@ namespace ZenLib
             var c = type.GetConstructor(constructorTypes);
             var integer = (dynamic)c.Invoke(constructorArgs);
             return integer.Size;
-        }
-
-        /// <summary>
-        /// Converts a solver result back to a C# result.
-        /// </summary>
-        /// <param name="value">The solver result.</param>
-        /// <returns>The C# value.</returns>
-        public static T ConvertSymbolicResultToCSharp<T>(object value)
-        {
-            return (T)ConvertSymbolicResultToCSharp(typeof(T), value);
-        }
-
-        /// <summary>
-        /// Converts a solver result back to a C# result.
-        /// </summary>
-        /// <param name="type">The type of the result.</param>
-        /// <param name="value">The solver result.</param>
-        /// <returns>The C# value.</returns>
-        public static object ConvertSymbolicResultToCSharp(Type type, object value)
-        {
-            var objType = value.GetType();
-
-            if (type.IsAssignableFrom(objType))
-            {
-                return value;
-            }
-            else if (type == typeof(ushort) && objType == typeof(short))
-            {
-                return (ushort)(short)value;
-            }
-            else if (type == typeof(uint) && objType == typeof(int))
-            {
-                return (uint)(int)value;
-            }
-            else if (type == typeof(ulong) && objType == typeof(long))
-            {
-                return (ulong)(long)value;
-            }
-            else if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { value });
-            }
-
-            throw new ZenException($"Internal error: invalid conversion of type {type} to {objType}");
         }
 
         /// <summary>

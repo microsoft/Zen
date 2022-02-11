@@ -18,15 +18,16 @@ namespace ZenLib.ModelChecking
     /// <typeparam name="TBitvec">The bitvector expression type.</typeparam>
     /// <typeparam name="TInt">The integer expression type.</typeparam>
     /// <typeparam name="TString">The string expression type.</typeparam>
-    internal class ModelChecker<TModel, TVar, TBool, TBitvec, TInt, TString> : IModelChecker
+    /// <typeparam name="TArray">The array expression type.</typeparam>
+    internal class ModelChecker<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : IModelChecker
     {
-        private ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver;
+        private ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver;
 
         /// <summary>
         /// Create an in instance of the class.
         /// </summary>
         /// <param name="solver">The solver.</param>
-        public ModelChecker(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver)
+        public ModelChecker(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver)
         {
             this.solver = solver;
         }
@@ -42,10 +43,10 @@ namespace ZenLib.ModelChecking
         /// </returns>
         public Dictionary<object, object> ModelCheck(Zen<bool> expression, Dictionary<long, object> arguments)
         {
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString>(solver);
-            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString>(arguments);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(solver);
+            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(arguments);
             var symbolicResult =
-                (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)expression.Accept(symbolicEvaluator, env);
+                (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Accept(symbolicEvaluator, env);
 
             var model = solver.Satisfiable(symbolicResult.Value);
 
@@ -61,9 +62,8 @@ namespace ZenLib.ModelChecking
                 var expr = kv.Key;
                 var variable = kv.Value;
                 var type = expr.GetType().GetGenericArgumentsCached()[0];
-                var obj = this.solver.Get(model, variable);
-                var result = CommonUtilities.ConvertSymbolicResultToCSharp(type, obj);
-                arbitraryAssignment.Add(expr, result);
+                var obj = this.solver.Get(model, variable, type);
+                arbitraryAssignment.Add(expr, obj);
             }
 
             return arbitraryAssignment;

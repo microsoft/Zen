@@ -974,7 +974,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPacketEncapsulation()
         {
-            var encap = new ZenFunction<Seq<IpHeader>, Seq<IpHeader>>(headers =>
+            var encap = new ZenFunction<FSeq<IpHeader>, FSeq<IpHeader>>(headers =>
             {
                 var currentHeader = headers.At(0);
                 var newHeader = currentHeader.Value().WithField("DstIp", Ip.Create(5));

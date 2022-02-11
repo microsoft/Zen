@@ -21,6 +21,11 @@ namespace ZenLib.Generation
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// Method for the creating an empty Zen list.
+        /// </summary>
+        private static MethodInfo emptyDictMethod = typeof(Zen).GetMethod("EmptyDict", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
         /// Name of the function used to create an object via reflection.
         /// </summary>
         private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");
@@ -43,6 +48,12 @@ namespace ZenLib.Generation
         public object VisitList(Func<Type, Unit, object> recurse, Type listType, Type innerType, Unit u)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
+            return method.Invoke(null, CommonUtilities.EmptyArray);
+        }
+
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+        {
+            var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 

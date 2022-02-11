@@ -1,32 +1,62 @@
-﻿// <copyright file="Dict.cs" company="Microsoft">
+﻿// <copyright file="FMap.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
 
     /// <summary>
-    /// A class representing a simple list-backed dictionary.
+    /// A class representing a simple finite list-backed map.
     /// </summary>
-    public class Dict<TKey, TValue>
+    public class FMap<TKey, TValue>
     {
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
         /// </summary>
-        public Seq<Pair<TKey, TValue>> Values { get; set; } = new Seq<Pair<TKey, TValue>>();
+        public FSeq<Pair<TKey, TValue>> Values { get; set; } = new FSeq<Pair<TKey, TValue>>();
 
         /// <summary>
-        /// Add a key and value to the Dict.
+        /// Creates a new instance of the <see cref="FMap{TKey, TValue}"/> class.
+        /// </summary>
+        public FMap()
+        {
+            this.Values = new FSeq<Pair<TKey, TValue>>();
+        }
+
+        private FMap(FSeq<Pair<TKey, TValue>> sequence)
+        {
+            this.Values = sequence;
+        }
+
+        /// <summary>
+        /// The number of elements in the map.
+        /// </summary>
+        public int Count() { return this.Values.Values.Count; }
+
+        /// <summary>
+        /// Add a key and value to the finite map.
         /// </summary>
         /// <param name="key">The key to add.</param>
         /// <param name="value">The value to add.</param>
-        public void Add(TKey key, TValue value)
+        public FMap<TKey, TValue> Set(TKey key, TValue value)
         {
-            this.Values.Values.Insert(0, (key, value));
+            var newValues = this.Values.AddFront((key, value));
+            return new FMap<TKey, TValue>(newValues);
+        }
+
+        /// <summary>
+        /// Delete a key from the Map.
+        /// </summary>
+        /// <param name="key">The key to add.</param>
+        public FMap<TKey, TValue> Delete(TKey key)
+        {
+            var newList = ImmutableList<Pair<TKey, TValue>>.Empty.AddRange(this.Values.Values.Where(x => !x.Item1.Equals(key)));
+            var newSeq = new FSeq<Pair<TKey, TValue>>(newList);
+            return new FMap<TKey, TValue>(newSeq);
         }
 
         /// <summary>
@@ -44,16 +74,16 @@ namespace ZenLib
         /// </summary>
         /// <param name="key">The specified key.</param>
         /// <returns></returns>
-        public TValue Get(TKey key)
+        public Option<TValue> Get(TKey key)
         {
             var idx = IndexOf(key);
 
             if (idx < 0)
             {
-                throw new System.IndexOutOfRangeException($"Missing key: {key} from Dict.");
+                return Option.None<TValue>();
             }
 
-            return this.Values.Values[idx].Item2;
+            return Option.Some(this.Values.Values[idx].Item2);
         }
 
         /// <summary>
@@ -88,22 +118,22 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for dictionary Zen objects.
     /// </summary>
-    public static class Dict
+    public static class FMap
     {
         /// <summary>
         /// The Zen value for an empty Dictionary.
         /// </summary>
         /// <returns>Zen value.</returns>
-        public static Zen<Dict<TKey, TValue>> Create<TKey, TValue>()
+        public static Zen<FMap<TKey, TValue>> Empty<TKey, TValue>()
         {
-            return Create<Dict<TKey, TValue>>(("Values", Seq.Empty<Pair<TKey, TValue>>()));
+            return Create<FMap<TKey, TValue>>(("Values", FSeq.Empty<Pair<TKey, TValue>>()));
         }
     }
 
     /// <summary>
     /// Extension methods for Zen dictionary objects.
     /// </summary>
-    public static class DictExtensions
+    public static class FMapExtensions
     {
         /// <summary>
         /// Add a value to a Zen map.
@@ -112,14 +142,29 @@ namespace ZenLib
         /// <param name="keyExpr">Zen key expression.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Dict<TKey, TValue>> Add<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        public static Zen<FMap<TKey, TValue>> Set<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
-            return Create<Dict<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
+            var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
+            return Create<FMap<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
+        }
+
+        /// <summary>
+        /// Delete a key from a Zen map.
+        /// </summary>
+        /// <param name="mapExpr">Zen map expression.</param>
+        /// <param name="keyExpr">Zen key expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FMap<TKey, TValue>> Delete<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        {
+            CommonUtilities.ValidateNotNull(mapExpr);
+            CommonUtilities.ValidateNotNull(keyExpr);
+
+            var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
+            return Create<FMap<TKey, TValue>>(("Values", l.Where(x => x.Item1() != keyExpr)));
         }
 
         /// <summary>
@@ -128,12 +173,12 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            var l = mapExpr.GetField<Dict<TKey, TValue>, Seq<Pair<TKey, TValue>>>("Values");
+            var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
             return l.SeqGet(keyExpr);
         }
 
@@ -143,12 +188,12 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="keyExpr">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<Dict<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return mapExpr.Get(keyExpr).HasValue();
+            return mapExpr.Get(keyExpr).IsSome();
         }
 
         /// <summary>
@@ -157,7 +202,7 @@ namespace ZenLib
         /// <param name="expr">Zen list expression.</param>
         /// <param name="key">The key.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<Option<TValue>> SeqGet<TKey, TValue>(this Zen<Seq<Pair<TKey, TValue>>> expr, Zen<TKey> key)
+        private static Zen<Option<TValue>> SeqGet<TKey, TValue>(this Zen<FSeq<Pair<TKey, TValue>>> expr, Zen<TKey> key)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(key);

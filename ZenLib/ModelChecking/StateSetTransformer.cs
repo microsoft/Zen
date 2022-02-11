@@ -91,10 +91,10 @@ namespace ZenLib.ModelChecking
 
             DD set = setTransformer;
             var expr = invariant(this.zenInput, this.zenOutput);
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(this.solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(arguments);
             var symbolicResult =
-                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
+                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
             var ddOutput = symbolicResult.Value;
             set = this.solver.And(set, ddOutput);
             var dd = solver.Manager.Exists(set, this.outputVariables);
@@ -112,10 +112,10 @@ namespace ZenLib.ModelChecking
 
             DD set = setTransformer;
             var expr = invariant(this.zenInput, this.zenOutput);
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(this.solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>(arguments);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(this.solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(arguments);
             var symbolicResult =
-                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
+                (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>)expr.Accept(symbolicEvaluator, env);
             var ddInput = symbolicResult.Value;
             set = this.solver.And(set, ddInput);
             var dd = solver.Manager.Exists(set, inputVariables);

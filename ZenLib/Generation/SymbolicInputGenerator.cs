@@ -22,6 +22,11 @@ namespace ZenLib.Generation
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// The method for creating the empty list at runtime.
+        /// </summary>
+        private static MethodInfo arbitraryDictMethod = typeof(Zen).GetMethod("ArbitraryDict", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
         private static MethodInfo ifConditionMethod = typeof(Zen).GetMethod("If");
@@ -92,6 +97,14 @@ namespace ZenLib.Generation
             }
 
             return list;
+        }
+
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+        {
+            var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
+            var e = method.Invoke(null, CommonUtilities.EmptyArray);
+            this.ArbitraryExpressions.Add(e);
+            return e;
         }
 
         public static object ApplyToList(Func<Type, DepthConfiguration, object> recurse, Type innerType, DepthConfiguration config, int size)

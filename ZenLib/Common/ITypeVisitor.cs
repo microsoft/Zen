@@ -79,6 +79,12 @@ namespace ZenLib
         T VisitString();
 
         /// <summary>
+        /// Visit the dictionary type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitDictionary(Type dictionaryType, Type keyType, Type valueType);
+
+        /// <summary>
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>

@@ -169,7 +169,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(function);
 
-            return If(expr.HasValue(), Option.Create(function(expr.Value())), Option.Null<T2>());
+            return If(expr.IsSome(), Option.Create(function(expr.Value())), Option.Null<T2>());
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(function);
 
-            return If(And(expr.HasValue(), function(expr.Value())), expr, Option.Null<T>());
+            return If(And(expr.IsSome(), function(expr.Value())), expr, Option.Null<T>());
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(deflt);
 
-            return If(expr.HasValue(), expr.Value(), deflt);
+            return If(expr.IsSome(), expr.Value(), deflt);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> HasValue<T>(this Zen<Option<T>> expr)
+        public static Zen<bool> IsSome<T>(this Zen<Option<T>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
@@ -217,12 +217,24 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Seq<T>> ToSequence<T>(this Zen<Option<T>> expr)
+        public static Zen<bool> IsNone<T>(this Zen<Option<T>> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
 
-            var l = Seq.Empty<T>();
-            return If(expr.HasValue(), l.AddFront(expr.Value()), l);
+            return Not(expr.IsSome());
+        }
+
+        /// <summary>
+        /// The Zen expression for whether an option has a value.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> ToSequence<T>(this Zen<Option<T>> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            var l = FSeq.Empty<T>();
+            return If(expr.IsSome(), l.AddFront(expr.Value()), l);
         }
     }
 }

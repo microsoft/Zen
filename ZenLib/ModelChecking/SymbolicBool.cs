@@ -10,20 +10,27 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>
-    internal class SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal class SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public SymbolicBool(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver, TBool value) : base(solver)
+        public SymbolicBool(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, TBool value) : base(solver)
         {
             this.Value = value;
         }
 
         public TBool Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(TBool guard, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other)
+        internal override object GetExpr()
         {
-            var o = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>)other;
+            return this.Value;
+        }
+
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+        {
+            var o = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString>(this.Solver, value);
+            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
         }
 
         /// <summary>

@@ -37,6 +37,11 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Zen).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// Dict equality method for reflection.
+        /// </summary>
+        private static MethodInfo eqDictsMethod = typeof(Zen).GetMethod("EqDicts", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
         /// Lift a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
@@ -123,7 +128,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(none);
             CommonUtilities.ValidateNotNull(some);
 
-            return If(expr.HasValue(), some(expr.Value()), none());
+            return If(expr.IsSome(), some(expr.Value()), none());
         }
 
         /// <summary>
@@ -295,13 +300,29 @@ namespace ZenLib
                 (hd1, tl1) => ZenListCaseExpr<T, bool>.Create(expr2, False(), (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
         }
 
+        private static Zen<bool> EqDicts<TKey, TValue>(Zen<IDictionary<TKey, TValue>> expr1, Zen<IDictionary<TKey, TValue>> expr2)
+        {
+            return ZenDictEqualityExpr<TKey, TValue>.Create(expr1, expr2);
+        }
+
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
         {
             var type = typeof(T);
 
-            if (type == ReflectionUtilities.BoolType || type == ReflectionUtilities.StringType || ReflectionUtilities.IsIntegerType(type))
+            if (type == ReflectionUtilities.BoolType ||
+                type == ReflectionUtilities.StringType ||
+                ReflectionUtilities.IsIntegerType(type))
             {
-                return ZenComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
+                return ZenIntegerComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
+            }
+
+            if (ReflectionUtilities.IsIDictType(type))
+            {
+                var typeArgs = type.GetGenericArgumentsCached();
+                var keyType = typeArgs[0];
+                var valueType = typeArgs[1];
+                var method = eqDictsMethod.MakeGenericMethod(keyType, valueType);
+                return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
             }
 
             if (ReflectionUtilities.IsIListType(type))
@@ -345,7 +366,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
+            return ZenIntegerComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
         }
 
         /// <summary>
@@ -387,7 +408,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
+            return ZenIntegerComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
         }
 
         /// <summary>
@@ -957,6 +978,58 @@ namespace ZenLib
         internal static Zen<IList<T>> EmptyList<T>()
         {
             return ZenListEmptyExpr<T>.Instance;
+        }
+
+        /// <summary>
+        /// The Zen value for an empty dictionary.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> EmptyDict<TKey, TValue>()
+        {
+            return ZenDictEmptyExpr<TKey, TValue>.Instance;
+        }
+
+        /// <summary>
+        /// The Zen value for an empty List.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> ArbitraryDict<TKey, TValue>()
+        {
+            return new ZenArbitraryExpr<IDictionary<TKey, TValue>>();
+        }
+
+        /// <summary>
+        /// Update a dictionary with a new value for a given key.
+        /// </summary>
+        /// <param name="dictExpr">The dictionary expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> DictSet<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        {
+            return ZenDictSetExpr<TKey, TValue>.Create(dictExpr, keyExpr, valueExpr);
+        }
+
+        /// <summary>
+        /// Update a dictionary by removing a given key.
+        /// </summary>
+        /// <param name="dictExpr">The dictionary expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> DictDelete<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        {
+            return ZenDictDeleteExpr<TKey, TValue>.Create(dictExpr, keyExpr);
+        }
+
+        /// <summary>
+        /// Get a value from a dictionary.
+        /// </summary>
+        /// <param name="dictExpr">The dictionary expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<Option<TValue>> DictGet<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        {
+            return ZenDictGetExpr<TKey, TValue>.Create(dictExpr, keyExpr);
         }
 
         /// <summary>

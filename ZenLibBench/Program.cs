@@ -37,7 +37,7 @@ namespace ZenLibBench
                             ));
                 });
 
-                var zf1 = new ZenFunction<TestObject, bool>(p => f(p).HasValue());
+                var zf1 = new ZenFunction<TestObject, bool>(p => f(p).IsSome());
                 var zf2 = new ZenFunction<TestObject, TestObject>(p => f(p).Value().Unroll());
                 var full = new ZenFunction<TestObject, bool>(x => true).StateSet();
 

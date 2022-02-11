@@ -36,14 +36,14 @@ namespace ZenLib.Tests
             CheckAgreement<(int, int)>(x => x == (1, 2));
             CheckAgreement<IList<int>>(x => x == new List<int>() { 1, 2, 3 });
             CheckAgreement<IList<IList<int>>>(x => x == new List<IList<int>>() { new List<int>() { 1 } });
-            CheckAgreement<FiniteString>(x => x == new FiniteString("hello"));
+            CheckAgreement<FString>(x => x == new FString("hello"));
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
 
             CheckAgreement<IDictionary<int, int>>(x =>
             {
-                var d = new Dict<int, int>();
-                d.Add(1, 2);
-                Zen<Dict<int, int>> y = d;
+                var d = new FMap<int, int>();
+                d.Set(1, 2);
+                Zen<FMap<int, int>> y = d;
                 return y.ContainsKey(4);
             });
         }
@@ -65,7 +65,7 @@ namespace ZenLib.Tests
             CheckEqual(Option.None<int>());
             CheckEqual(Option.Some(8));
             CheckEqual(new Pair<int, int> { Item1 = 9, Item2 = 10 });
-            CheckEqual(new FiniteString("hello"));
+            CheckEqual(new FString("hello"));
             CheckEqualLists(new List<int>() { 1, 2, 3 });
         }
 
@@ -150,8 +150,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConvertNullDictionaryValue()
         {
-            Dict<int, Object1> o = new Dict<int, Object1>();
-            o.Add(1, null);
+            FMap<int, Object1> o = new FMap<int, Object1>();
+            o.Set(1, null);
             var _ = Constant(o);
         }
 

@@ -47,8 +47,8 @@ namespace ZenLib.Tests
             var string1 = Arbitrary<string>();
             var string2 = Arbitrary<string>();
             var string3 = Arbitrary<string>();
-            var list1 = Arbitrary<Seq<byte>>();
-            var list2 = Arbitrary<Seq<byte>>();
+            var list1 = Arbitrary<FSeq<byte>>();
+            var list2 = Arbitrary<FSeq<byte>>();
             var h1 = Arbitrary<IpHeader>();
             var h2 = Arbitrary<IpHeader>();
             var opt = Arbitrary<Option<int>>();
@@ -88,7 +88,7 @@ namespace ZenLib.Tests
             CheckEqual(string1.Length(), string1.Length());
             CheckEqual(string1.ReplaceFirst(string2, string3), string1.ReplaceFirst(string2, string3));
             CheckEqual(string1.Substring(bigint1, bigint2), string1.Substring(bigint1, bigint2));
-            CheckEqual(opt.HasValue(), opt.HasValue());
+            CheckEqual(opt.IsSome(), opt.IsSome());
             CheckEqual(arg, arg);
             CheckEqual(If(a, x, y), If(a, x, y));
             CheckEqual(header, header);

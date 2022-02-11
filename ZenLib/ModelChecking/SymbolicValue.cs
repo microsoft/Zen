@@ -4,22 +4,29 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
 
     /// <summary>
     /// Representation of a symbolic value.
     /// </summary>
-    internal abstract class SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString>
+    internal abstract class SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> Solver;
+        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Solver;
 
-        public SymbolicValue(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString> solver)
+        public SymbolicValue(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver)
         {
             this.Solver = solver;
         }
 
-        internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> Merge(
+        [ExcludeFromCodeCoverage]
+        internal virtual object GetExpr()
+        {
+            throw new ZenException("Unreachable call to GetExpr()");
+        }
+
+        internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString> other);
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other);
     }
 }

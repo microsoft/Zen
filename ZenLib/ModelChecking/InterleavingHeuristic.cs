@@ -186,6 +186,36 @@ namespace ZenLib.ModelChecking
             throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
         public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
@@ -305,7 +335,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public InterleavingResult VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {

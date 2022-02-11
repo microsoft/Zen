@@ -4,7 +4,6 @@
 
 namespace ZenLib.Interpretation
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -52,19 +51,6 @@ namespace ZenLib.Interpretation
                 return ReflectionUtilities.GetDefaultValue<T>();
             if (!parameter.ArbitraryAssignment.TryGetValue(expression, out var value))
                 return ReflectionUtilities.GetDefaultValue<T>();
-
-            // the library doesn't distinguish between signed and unsigned,
-            // so we must perform this conversion manually.
-            var type = typeof(T);
-            if (type != value.GetType())
-            {
-                if (type == ReflectionUtilities.UshortType)
-                    return (ushort)(short)value;
-                if (type == ReflectionUtilities.UintType)
-                    return (uint)(int)value;
-                if (type == ReflectionUtilities.UlongType)
-                    return (ulong)(long)value;
-            }
             return value;
         }
 
@@ -283,7 +269,7 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenComparisonExpr<T>(ZenComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
             {
@@ -512,6 +498,68 @@ namespace ZenLib.Interpretation
             var e1 = (T1)expression.Expr.Accept(this, parameter);
             var e2 = (T2)expression.FieldValue.Accept(this, parameter);
             var result = ReflectionUtilities.WithField<T1>(e1, expression.FieldName, e2);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return ImmutableDictionary<TKey, TValue>.Empty;
+        }
+
+        public object VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
+            var e3 = (TValue)expression.ValueExpr.Accept(this, parameter);
+            var result = e1.SetItem(e2, e3);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
+            var result = e1.Remove(e2);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
+            var result = CommonUtilities.DictionaryGet(e1, e2);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr1.Accept(this, parameter));
+            var e2 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr2.Accept(this, parameter));
+            var result = CommonUtilities.DictionaryEquals(e1, e2);
             this.cache[expression] = result;
             return result;
         }

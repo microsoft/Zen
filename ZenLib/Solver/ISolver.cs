@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using System.Numerics;
 
     /// <summary>
@@ -15,7 +16,8 @@ namespace ZenLib.Solver
     /// <typeparam name="TBitvec">The finite integer type.</typeparam>
     /// <typeparam name="TInteger">The integer type.</typeparam>
     /// <typeparam name="TString">The string type.</typeparam>
-    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString>
+    /// <typeparam name="TArray">The array type.</typeparam>
+    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray>
     {
         /// <summary>
         /// The false expression.
@@ -128,6 +130,13 @@ namespace ZenLib.Solver
         /// </summary>
         /// <returns></returns>
         TString CreateStringConst(string s);
+
+        /// <summary>
+        /// Create a new dictionary expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TArray) CreateDictVar(object e);
 
         /// <summary>
         /// The 'And' of two expressions.
@@ -314,6 +323,45 @@ namespace ZenLib.Solver
         TInteger IndexOf(TString x, TString y, TInteger z);
 
         /// <summary>
+        /// The empty dictionary.
+        /// </summary>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        TArray DictEmpty(Type keyType, Type valueType);
+
+        /// <summary>
+        /// The result of setting a key to a value for an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        TArray DictSet(TArray arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType);
+
+        /// <summary>
+        /// The result of setting a key to a value for an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        TArray DictDelete(TArray arrayExpr, object keyExpr, Type keyType, Type valueType);
+
+        /// <summary>
+        /// The result of getting a value for a key from an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
+        (TBool, object) DictGet(TArray arrayExpr, object keyExpr, Type keyType, Type valueType);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -336,6 +384,14 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool Eq(TString x, TString y);
+
+        /// <summary>
+        /// The 'Equal' of two arrays.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TArray x, TArray y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -422,6 +478,15 @@ namespace ZenLib.Solver
         TString Ite(TBool g, TString t, TString f);
 
         /// <summary>
+        /// The 'Ite' of a guard and two arrays.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TArray Ite(TBool g, TArray t, TArray f);
+
+        /// <summary>
         /// Check whether a boolean expression is satisfiable.
         /// </summary>
         /// <param name="x">The expression.</param>
@@ -433,7 +498,8 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="m">The model.</param>
         /// <param name="v">The variable.</param>
+        /// <param name="type">The C# type to coerce the result to.</param>
         /// <returns>The value.</returns>
-        object Get(TModel m, TVariable v);
+        object Get(TModel m, TVariable v, Type type);
     }
 }

@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -25,7 +26,7 @@ namespace ZenLib
         /// <summary>
         /// The type of finite string values.
         /// </summary>
-        public readonly static Type FiniteStringType = typeof(FiniteString);
+        public readonly static Type FiniteStringType = typeof(FString);
 
         /// <summary>
         /// The type of bool values.
@@ -78,9 +79,19 @@ namespace ZenLib
         public readonly static Type IListType = typeof(IList<>);
 
         /// <summary>
+        /// Type of an IList.
+        /// </summary>
+        public readonly static Type IDictType = typeof(IDictionary<,>);
+
+        /// <summary>
         /// Type of an List.
         /// </summary>
         public readonly static Type ListType = typeof(List<>);
+
+        /// <summary>
+        /// Type of an List.
+        /// </summary>
+        public readonly static Type ImmutableDictType = typeof(ImmutableDictionary<,>);
 
         /// <summary>
         /// Type of a fixed size integer.
@@ -292,6 +303,18 @@ namespace ZenLib
         public static bool IsListType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ListType;
+        }
+
+        /// <summary>
+        /// Check if a type is a Dictionary type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsIDictType(Type type)
+        {
+            return type.IsInterface &&
+                   type.IsGenericType &&
+                   type.GetGenericTypeDefinitionCached() == IDictType;
         }
 
         /// <summary>
@@ -587,6 +610,15 @@ namespace ZenLib
             if (IsFixedIntegerType(type))
                 return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
 
+            if (IsIDictType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                var f = ImmutableDictType.MakeGenericType(keyType, valueType).GetFieldCached("Empty");
+                return f.GetValue(null);
+            }
+
             if (IsIListType(type))
             {
                 var innerType = type.GetGenericArgumentsCached()[0];
@@ -644,6 +676,14 @@ namespace ZenLib
                 return visitor.VisitString();
             if (IsFixedIntegerType(type))
                 return visitor.VisitFixedInteger(type);
+
+            if (IsIDictType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                return visitor.VisitDictionary(type, keyType, valueType);
+            }
 
             if (IsIListType(type))
             {
