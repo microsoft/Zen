@@ -6,6 +6,8 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
 
@@ -34,9 +36,9 @@ namespace ZenLib.Solver
 
         private Sort StringSort;
 
-        private Dictionary<Type, Sort> typeToSort;
-
         private Dictionary<Sort, DatatypeSort> optionSorts;
+
+        private TypeToSortConverter typeToSortConverter;
 
         public SolverZ3()
         {
@@ -54,19 +56,8 @@ namespace ZenLib.Solver
             this.LongSort = this.context.MkBitVecSort(64);
             this.BigIntSort = this.context.MkIntSort();
             this.StringSort = this.context.StringSort;
-
+            this.typeToSortConverter = new TypeToSortConverter(this);
             this.optionSorts = new Dictionary<Sort, DatatypeSort>();
-            this.typeToSort = new Dictionary<Type, Sort>();
-            this.typeToSort[typeof(bool)] = this.BoolSort;
-            this.typeToSort[typeof(byte)] = this.ByteSort;
-            this.typeToSort[typeof(short)] = this.ShortSort;
-            this.typeToSort[typeof(ushort)] = this.ShortSort;
-            this.typeToSort[typeof(int)] = this.IntSort;
-            this.typeToSort[typeof(uint)] = this.IntSort;
-            this.typeToSort[typeof(long)] = this.LongSort;
-            this.typeToSort[typeof(ulong)] = this.LongSort;
-            this.typeToSort[typeof(BigInteger)] = this.BigIntSort;
-            this.typeToSort[typeof(string)] = this.StringSort;
         }
 
         private Symbol FreshSymbol()
@@ -550,20 +541,131 @@ namespace ZenLib.Solver
 
         private Sort GetSortForType(Type type)
         {
-            if (this.typeToSort.TryGetValue(type, out var sort))
+            return ReflectionUtilities.ApplyTypeVisitor(this.typeToSortConverter, type, new Unit());
+        }
+
+        /// <summary>
+        /// Convert a C# type into a Z3 sort.
+        /// </summary>
+        internal class TypeToSortConverter : ITypeVisitor<Sort, Unit>
+        {
+            private SolverZ3 solver;
+
+            private Dictionary<Type, Sort> typeToSort;
+
+            public TypeToSortConverter(SolverZ3 solver)
             {
-                return sort;
+                this.solver = solver;
+                this.typeToSort = new Dictionary<Type, Sort>();
+                this.typeToSort = new Dictionary<Type, Sort>();
+                this.typeToSort[typeof(bool)] = this.solver.BoolSort;
+                this.typeToSort[typeof(byte)] = this.solver.ByteSort;
+                this.typeToSort[typeof(short)] = this.solver.ShortSort;
+                this.typeToSort[typeof(ushort)] = this.solver.ShortSort;
+                this.typeToSort[typeof(int)] = this.solver.IntSort;
+                this.typeToSort[typeof(uint)] = this.solver.IntSort;
+                this.typeToSort[typeof(long)] = this.solver.LongSort;
+                this.typeToSort[typeof(ulong)] = this.solver.LongSort;
+                this.typeToSort[typeof(BigInteger)] = this.solver.BigIntSort;
+                this.typeToSort[typeof(string)] = this.solver.StringSort;
             }
 
-            if (ReflectionUtilities.IsFixedIntegerType(type))
+            public Sort VisitBigInteger()
             {
-                int size = ((dynamic)Activator.CreateInstance(type, 0L)).Size;
-                var bitvecSort = this.context.MkBitVecSort((uint)size);
-                this.typeToSort[type] = bitvecSort;
+                return this.solver.BigIntSort;
+            }
+
+            public Sort VisitBool()
+            {
+                return this.solver.BoolSort;
+            }
+
+            public Sort VisitByte()
+            {
+                return this.solver.ByteSort;
+            }
+
+            [ExcludeFromCodeCoverage]
+            public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+            {
+                throw new ZenException("Can not use map type in another map.");
+            }
+
+            public Sort VisitFixedInteger(Type intType)
+            {
+                if (this.typeToSort.TryGetValue(intType, out var sort))
+                {
+                    return sort;
+                }
+
+                int size = ((dynamic)Activator.CreateInstance(intType, 0L)).Size;
+                var bitvecSort = this.solver.context.MkBitVecSort((uint)size);
+                this.typeToSort[intType] = bitvecSort;
                 return bitvecSort;
             }
 
-            throw new ZenException("Unexpected error encountered.");
+            public Sort VisitInt()
+            {
+                return this.solver.IntSort;
+            }
+
+            [ExcludeFromCodeCoverage]
+            public Sort VisitList(Func<Type, Unit, Sort> recurse, Type listType, Type innerType, Unit parameter)
+            {
+                throw new ZenException("Can not use finite sequence type in another map.");
+            }
+
+            public Sort VisitLong()
+            {
+                return this.solver.LongSort;
+            }
+
+            public Sort VisitObject(Func<Type, Unit, Sort> recurse, Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
+            {
+                if (this.typeToSort.TryGetValue(objectType, out var sort))
+                {
+                    return sort;
+                }
+
+                var fields = objectFields.ToArray();
+                var fieldNames = new string[fields.Length];
+                var fieldSorts = new Sort[fields.Length];
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    fieldNames[i] = fields[i].Key;
+                    fieldSorts[i] = recurse((Type)fields[i].Value, new Unit());
+                }
+
+                var objectConstructor = this.solver.context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
+                var objectSort = this.solver.context.MkDatatypeSort("", new Constructor[] { objectConstructor });
+                this.typeToSort[objectType] = objectSort;
+                return objectSort;
+            }
+
+            public Sort VisitShort()
+            {
+                return this.solver.ShortSort;
+            }
+
+            public Sort VisitString()
+            {
+                return this.solver.StringSort;
+            }
+
+            public Sort VisitUint()
+            {
+                return this.solver.IntSort;
+            }
+
+            public Sort VisitUlong()
+            {
+                return this.solver.LongSort;
+            }
+
+            public Sort VisitUshort()
+            {
+                return this.solver.ShortSort;
+            }
         }
     }
 }
