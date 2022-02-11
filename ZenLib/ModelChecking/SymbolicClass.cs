@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
@@ -14,10 +15,19 @@ namespace ZenLib.ModelChecking
     /// </summary>
     internal class SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public SymbolicClass(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> value) : base(solver)
+        public SymbolicClass(
+            Type objectType,
+            ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver,
+            ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> value) : base(solver)
         {
+            this.ObjectType = objectType;
             this.Fields = value;
         }
+
+        /// <summary>
+        /// Gets the type of the object it represents.
+        /// </summary>
+        public Type ObjectType;
 
         /// <summary>
         /// Gets the underlying decision diagram bitvector representation.
@@ -43,7 +53,7 @@ namespace ZenLib.ModelChecking
                 newValue = newValue.Add(kv.Key, value1.Merge(guard, value2));
             }
 
-            return new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, newValue);
+            return new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.ObjectType, this.Solver, newValue);
         }
 
         /// <summary>

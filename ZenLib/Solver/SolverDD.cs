@@ -9,6 +9,7 @@ namespace ZenLib.Solver
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using DecisionDiagrams;
+    using ZenLib.ModelChecking;
 
     /// <summary>
     /// Implementation of a solver using decision diagrams.
@@ -627,19 +628,19 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit DictSet(Unit arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType)
+        public Unit DictSet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> keyExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> valueExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public (DD, object) DictGet(Unit arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit DictDelete(Unit arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }

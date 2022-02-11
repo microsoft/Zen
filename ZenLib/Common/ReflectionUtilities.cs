@@ -697,19 +697,30 @@ namespace ZenLib
             }
 
             // some class or struct
-            var dict = new SortedDictionary<string, Type>();
+            var dict = GetAllFieldsAndProperties(type);
+            return visitor.VisitObject((t, p) => ApplyTypeVisitor(visitor, t, p), type, dict, parameter);
+        }
+
+        /// <summary>
+        /// Gets all fields and their types for a given class/struct type.
+        /// </summary>
+        /// <param name="type">The class or struct type.</param>
+        /// <returns>A sorted dictionary of field names to types.</returns>
+        public static SortedDictionary<string, Type> GetAllFieldsAndProperties(Type type)
+        {
+            var fieldTypes = new SortedDictionary<string, Type>();
 
             foreach (var field in GetAllFields(type))
             {
-                dict[field.Name] = field.FieldType;
+                fieldTypes[field.Name] = field.FieldType;
             }
 
             foreach (var property in GetAllProperties(type))
             {
-                dict[property.Name] = property.PropertyType;
+                fieldTypes[property.Name] = property.PropertyType;
             }
 
-            return visitor.VisitObject((t, p) => ApplyTypeVisitor(visitor, t, p), type, dict, parameter);
+            return fieldTypes;
         }
 
         /// <summary>

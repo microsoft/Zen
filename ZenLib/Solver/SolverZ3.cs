@@ -10,6 +10,7 @@ namespace ZenLib.Solver
     using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
+    using ZenLib.ModelChecking;
 
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
@@ -385,28 +386,41 @@ namespace ZenLib.Solver
             return this.context.MkConstArray(keySort, none);
         }
 
-        public ArrayExpr DictSet(ArrayExpr arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType)
+        public ArrayExpr DictSet(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
-            var value = (Expr)valueExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
+            var value = ConvertSymbolicValueToExpr(valueExpr, valueType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var some = this.context.MkApp(optionSort.Constructors[1], value);
             return this.context.MkStore(arrayExpr, key, some);
         }
 
-        public ArrayExpr DictDelete(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public ArrayExpr DictDelete(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var none = this.context.MkApp(optionSort.Constructors[0]);
             return this.context.MkStore(arrayExpr, key, none);
         }
 
-        public (BoolExpr, object) DictGet(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public (BoolExpr, object) DictGet(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var optionResult = this.context.MkSelect(arrayExpr, key);
@@ -435,6 +449,54 @@ namespace ZenLib.Solver
             var e = m.Evaluate(v, true);
             // Console.WriteLine(e);
             return ConvertExprToObject(e, type);
+        }
+
+        private Expr ConvertSymbolicValueToExpr(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
+        {
+            if (value is SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sb)
+            {
+                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
+                return sb.Value;
+            }
+            else if (value is SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbv)
+            {
+                CommonUtilities.ValidateIsTrue(
+                    ReflectionUtilities.IsUnsignedIntegerType(type) ||
+                    ReflectionUtilities.IsSignedIntegerType(type) ||
+                    ReflectionUtilities.IsFixedIntegerType(type), "Internal type mismatch");
+
+                return sbv.Value;
+            }
+            else if (value is SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbi)
+            {
+                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsBigIntegerType(type), "Internal type mismatch");
+                return sbi.Value;
+            }
+            else if (value is SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbs)
+            {
+                CommonUtilities.ValidateIsTrue(type == typeof(string), "Internal type mismatch");
+                return sbs.Value;
+            }
+            else if (value is SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbc)
+            {
+                var fieldTypes = ReflectionUtilities.GetAllFieldsAndProperties(sbc.ObjectType);
+                var fields = sbc.Fields.ToArray();
+                var fieldNames = new string[fields.Length];
+                var fieldExprs = new Expr[fields.Length];
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    fieldNames[i] = fields[i].Key;
+                    fieldExprs[i] = ConvertSymbolicValueToExpr(fields[i].Value, fieldTypes[fieldNames[i]]);
+                }
+
+                var dataTypeSort = (DatatypeSort)GetSortForType(type);
+                var objectConstructor = dataTypeSort.Constructors[0];
+                return this.context.MkApp(objectConstructor, fieldExprs);
+            }
+            else
+            {
+                throw new ZenException($"Type {type} used in an unsupported context.");
+            }
         }
 
         private object ConvertExprToObject(Expr e, Type type)

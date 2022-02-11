@@ -6,6 +6,7 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Numerics;
+    using ZenLib.ModelChecking;
 
     /// <summary>
     /// Solver interface for a model checker backend.
@@ -334,32 +335,32 @@ namespace ZenLib.Solver
         /// The result of setting a key to a value for an array.
         /// </summary>
         /// <param name="arrayExpr">The array expression.</param>
-        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyExpr">The key value.</param>
         /// <param name="valueExpr">The value expression.</param>
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictSet(TArray arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType);
+        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> valueExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of setting a key to a value for an array.
         /// </summary>
         /// <param name="arrayExpr">The array expression.</param>
-        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyExpr">The key value.</param>
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictDelete(TArray arrayExpr, object keyExpr, Type keyType, Type valueType);
+        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of getting a value for a key from an array.
         /// </summary>
         /// <param name="arrayExpr">The array expression.</param>
-        /// <param name="keyExpr">The key expression.</param>
+        /// <param name="keyExpr">The key value.</param>
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        (TBool, object) DictGet(TArray arrayExpr, object keyExpr, Type keyType, Type valueType);
+        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The 'Equal' of two integers.
