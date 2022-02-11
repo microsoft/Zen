@@ -196,8 +196,8 @@ namespace ZenLib.Solver
             var keyType = typeArguments[0];
             var valueType = typeArguments[1];
 
-            var keySort = this.typeToSort[keyType];
-            var valueSort = this.typeToSort[valueType];
+            var keySort = GetSortForType(keyType);
+            var valueSort = GetSortForType(valueType);
             var optionSort = this.GetOrCreateOptionSort(valueSort);
             var none = this.context.MkApp(optionSort.Constructors[0]);
 
@@ -387,8 +387,8 @@ namespace ZenLib.Solver
 
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
-            var keySort = this.typeToSort[keyType];
-            var valueSort = this.typeToSort[valueType];
+            var keySort = GetSortForType(keyType);
+            var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var none = this.context.MkApp(optionSort.Constructors[0]);
             return this.context.MkConstArray(keySort, none);
@@ -398,7 +398,7 @@ namespace ZenLib.Solver
         {
             var key = (Expr)keyExpr;
             var value = (Expr)valueExpr;
-            var valueSort = this.typeToSort[valueType];
+            var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var some = this.context.MkApp(optionSort.Constructors[1], value);
             return this.context.MkStore(arrayExpr, key, some);
@@ -407,7 +407,7 @@ namespace ZenLib.Solver
         public ArrayExpr DictDelete(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
         {
             var key = (Expr)keyExpr;
-            var valueSort = this.typeToSort[valueType];
+            var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var none = this.context.MkApp(optionSort.Constructors[0]);
             return this.context.MkStore(arrayExpr, key, none);
@@ -416,7 +416,7 @@ namespace ZenLib.Solver
         public (BoolExpr, object) DictGet(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
         {
             var key = (Expr)keyExpr;
-            var valueSort = this.typeToSort[valueType];
+            var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
             var optionResult = this.context.MkSelect(arrayExpr, key);
             var none = this.context.MkApp(optionSort.Constructors[0]);
@@ -542,10 +542,28 @@ namespace ZenLib.Solver
             return this.solver.Model;
         }
 
-        public static void RemoveTrailingZeroes(ref byte[] array)
+        private static void RemoveTrailingZeroes(ref byte[] array)
         {
             int lastIndex = Array.FindLastIndex(array, b => b != 0);
             Array.Resize(ref array, lastIndex + 1);
+        }
+
+        private Sort GetSortForType(Type type)
+        {
+            if (this.typeToSort.TryGetValue(type, out var sort))
+            {
+                return sort;
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                int size = ((dynamic)Activator.CreateInstance(type, 0L)).Size;
+                var bitvecSort = this.context.MkBitVecSort((uint)size);
+                this.typeToSort[type] = bitvecSort;
+                return bitvecSort;
+            }
+
+            throw new ZenException("Unexpected error encountered.");
         }
     }
 }
