@@ -478,8 +478,7 @@ namespace ZenLib.Solver
             }
             else if (value is SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbc)
             {
-                Console.WriteLine($"It is a symbolic class.");
-                var fieldTypes = ReflectionUtilities.GetAllFieldsAndProperties(sbc.ObjectType);
+                var fieldTypes = ReflectionUtilities.GetAllFieldAndPropertyTypes(sbc.ObjectType);
                 var fields = sbc.Fields.ToArray();
                 var fieldNames = new string[fields.Length];
                 var fieldExprs = new Expr[fields.Length];
@@ -487,12 +486,10 @@ namespace ZenLib.Solver
                 {
                     fieldNames[i] = fields[i].Key;
                     fieldExprs[i] = ConvertSymbolicValueToExpr(fields[i].Value, fieldTypes[fieldNames[i]]);
-                    Console.WriteLine($"{fieldNames[i]} -> {fieldExprs[i]}");
                 }
 
                 var dataTypeSort = (DatatypeSort)GetSortForType(type);
                 var objectConstructor = dataTypeSort.Constructors[0];
-                Console.WriteLine("am done");
                 return this.Context.MkApp(objectConstructor, fieldExprs);
             }
             else
@@ -525,7 +522,7 @@ namespace ZenLib.Solver
             else
             {
                 var dataTypeSort = (DatatypeSort)GetSortForType(type);
-                var fields = ReflectionUtilities.GetAllFieldsAndProperties(type).ToArray();
+                var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
                 var result = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
                 for (int i = 0; i < fields.Length; i++)
                 {
@@ -607,7 +604,7 @@ namespace ZenLib.Solver
             {
                 if (this.typeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
                 {
-                    var fields = ReflectionUtilities.GetAllFieldsAndProperties(type).ToArray();
+                    var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
                     var fieldNames = new string[fields.Length];
                     var fieldValues = new object[fields.Length];
                     for (int i = 0; i < fields.Length; i++)

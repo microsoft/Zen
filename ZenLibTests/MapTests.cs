@@ -331,7 +331,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the map works with pairs.
+        /// Test that the map works with nested objects.
         /// </summary>
         [TestMethod]
         public void TestMapNestedObjects()
@@ -341,6 +341,26 @@ namespace ZenLib.Tests
             Assert.AreEqual(2, sat.Value.Get(1).Value.Item1);
             Assert.AreEqual(3, sat.Value.Get(1).Value.Item2.Item1);
             Assert.AreEqual(4, sat.Value.Get(1).Value.Item2.Item2);
+        }
+
+        /// <summary>
+        /// Test that the map works with objects with updates.
+        /// </summary>
+        [TestMethod]
+        public void TestMapUpdatedObjects()
+        {
+            var f = new ZenFunction<Map<Pair<int, int>, int>, Map<Pair<int, int>, int>>(d =>
+            {
+                return d.Set(Pair.Create<int, int>(1, 2).WithField<Pair<int, int>, int>("Item1", 3), 1);
+            });
+
+            var key1 = new Pair<int, int> { Item1 = 1, Item2 = 2 };
+            var key2 = new Pair<int, int> { Item1 = 3, Item2 = 2 };
+            var sat = f.Find((d1, d2) => And(d1.Get(key1) == Option.None<int>(), d2.Get(key2) == Option.Some(1)));
+
+            Assert.IsTrue(sat.HasValue);
+            Assert.IsFalse(sat.Value.Get(key1).HasValue);
+            Assert.IsTrue(f.Evaluate(sat.Value).Get(key2).HasValue);
         }
 
         /// <summary>
