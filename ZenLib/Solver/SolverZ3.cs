@@ -6,7 +6,6 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
@@ -37,11 +36,13 @@ namespace ZenLib.Solver
 
         internal Sort StringSort;
 
-        private Dictionary<Sort, DatatypeSort> optionSorts;
+        internal Dictionary<Sort, DatatypeSort> OptionSorts;
 
-        private Z3TypeToSortConverter typeToSortConverter;
+        internal Z3TypeToSortConverter TypeToSortConverter;
 
-        private Z3ExprToSymbolicValueConverter exprToSymbolicValueConverter;
+        internal Z3ExprToSymbolicValueConverter ExprToSymbolicValueConverter;
+
+        internal Z3SymbolicValueToExprConverter SymbolicValueToExprConverter;
 
         public SolverZ3()
         {
@@ -59,9 +60,10 @@ namespace ZenLib.Solver
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
-            this.typeToSortConverter = new Z3TypeToSortConverter(this);
-            this.exprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
-            this.optionSorts = new Dictionary<Sort, DatatypeSort>();
+            this.TypeToSortConverter = new Z3TypeToSortConverter(this);
+            this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
+            this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
+            this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 
         private Symbol FreshSymbol()
@@ -435,12 +437,12 @@ namespace ZenLib.Solver
 
         public Sort GetSortForType(Type type)
         {
-            return ReflectionUtilities.ApplyTypeVisitor(this.typeToSortConverter, type, new Unit());
+            return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());
         }
 
         private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
         {
-            if (this.optionSorts.TryGetValue(valueSort, out var optionSort))
+            if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))
             {
                 return optionSort;
             }
@@ -448,70 +450,39 @@ namespace ZenLib.Solver
             var c1 = this.Context.MkConstructor("None", "none");
             var c2 = this.Context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
             var optSort = this.Context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
-            this.optionSorts[valueSort] = optSort;
+            this.OptionSorts[valueSort] = optSort;
             return optSort;
         }
 
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
-            return ConvertExprToObject(e, type);
+            return convertExprToObject(e, type);
         }
 
         private Expr ConvertSymbolicValueToExpr(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
         {
-            if (value is SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sb)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
-                return sb.Value;
-            }
-            else if (value is SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbv)
-            {
-                CommonUtilities.ValidateIsTrue(
-                    ReflectionUtilities.IsUnsignedIntegerType(type) ||
-                    ReflectionUtilities.IsSignedIntegerType(type) ||
-                    ReflectionUtilities.IsFixedIntegerType(type), "Internal type mismatch");
-
-                return sbv.Value;
-            }
-            else if (value is SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbi)
-            {
-                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsBigIntegerType(type), "Internal type mismatch");
-                return sbi.Value;
-            }
-            else if (value is SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbs)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(string), "Internal type mismatch");
-                return sbs.Value;
-            }
-            else if (value is SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbc)
-            {
-                var fieldTypes = ReflectionUtilities.GetAllFieldAndPropertyTypes(sbc.ObjectType);
-                var fields = sbc.Fields.ToArray();
-                var fieldNames = new string[fields.Length];
-                var fieldExprs = new Expr[fields.Length];
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    fieldNames[i] = fields[i].Key;
-                    fieldExprs[i] = ConvertSymbolicValueToExpr(fields[i].Value, fieldTypes[fieldNames[i]]);
-                }
-
-                var dataTypeSort = (DatatypeSort)GetSortForType(type);
-                var objectConstructor = dataTypeSort.Constructors[0];
-                return this.Context.MkApp(objectConstructor, fieldExprs);
-            }
-            else
-            {
-                throw new ZenException($"Type {type} used in an unsupported context.");
-            }
+            return value.Accept(this.SymbolicValueToExprConverter, type);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
         {
-            return ReflectionUtilities.ApplyTypeVisitor(this.exprToSymbolicValueConverter, type, (Expr)e);
+            return ReflectionUtilities.ApplyTypeVisitor(this.ExprToSymbolicValueConverter, type, (Expr)e);
         }
 
-        private object ConvertExprToObject(Expr e, Type type)
+        public Model Satisfiable(BoolExpr x)
+        {
+            this.Solver.Assert(x);
+            var status = this.Solver.Check();
+            if (status == Status.UNSATISFIABLE)
+            {
+                return null;
+            }
+
+            return this.Solver.Model;
+        }
+
+        private object convertExprToObject(Expr e, Type type)
         {
             if (e.Sort == this.BoolSort)
             {
@@ -568,16 +539,16 @@ namespace ZenLib.Solver
                 var arrayExpr = e.Args[0];
                 var keyExpr = e.Args[1];
                 var valueExpr = e.Args[2];
-                var dict = ConvertExprToObject(arrayExpr, type);
-                var key = ConvertExprToObject(keyExpr, keyType);
-                var value = ConvertExprToObject(valueExpr, valueType);
+                var dict = convertExprToObject(arrayExpr, type);
+                var key = convertExprToObject(keyExpr, keyType);
+                var value = convertExprToObject(valueExpr, valueType);
                 var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
                 m.Invoke(dict, new object[] { key, value });
                 return dict;
             }
             else if (e.IsApp)
             {
-                if (this.typeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
+                if (this.TypeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
                 {
                     var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
                     var fieldNames = new string[fields.Length];
@@ -585,7 +556,7 @@ namespace ZenLib.Solver
                     for (int i = 0; i < fields.Length; i++)
                     {
                         fieldNames[i] = fields[i].Key;
-                        fieldValues[i] = ConvertExprToObject(e.Args[i], fields[i].Value);
+                        fieldValues[i] = convertExprToObject(e.Args[i], fields[i].Value);
                     }
 
                     return ReflectionUtilities.CreateInstance(type, fieldNames, fieldValues);
@@ -596,35 +567,18 @@ namespace ZenLib.Solver
                 }
                 else
                 {
-                    return ConvertExprToObject(e.Args[0], type);
+                    return convertExprToObject(e.Args[0], type);
                 }
             }
             else
             {
                 // must be a fixed width integer
                 var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
-                RemoveTrailingZeroes(ref bytes);
+                int lastIndex = Array.FindLastIndex(bytes, b => b != 0);
+                Array.Resize(ref bytes, lastIndex + 1);
                 Array.Reverse(bytes);
                 return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
             }
-        }
-
-        public Model Satisfiable(BoolExpr x)
-        {
-            this.Solver.Assert(x);
-            var status = this.Solver.Check();
-            if (status == Status.UNSATISFIABLE)
-            {
-                return null;
-            }
-
-            return this.Solver.Model;
-        }
-
-        private static void RemoveTrailingZeroes(ref byte[] array)
-        {
-            int lastIndex = Array.FindLastIndex(array, b => b != 0);
-            Array.Resize(ref array, lastIndex + 1);
         }
     }
 }

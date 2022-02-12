@@ -28,6 +28,13 @@ namespace ZenLib.ModelChecking
             return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
         }
 
+        internal override TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            TParam parameter)
+        {
+            return visitor.VisitSymbolicString(this, parameter);
+        }
+
         /// <summary>
         /// Convert the object to a string.
         /// </summary>

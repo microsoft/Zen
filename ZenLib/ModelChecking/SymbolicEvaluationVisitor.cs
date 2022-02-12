@@ -397,7 +397,7 @@ namespace ZenLib.ModelChecking
                     fields = fields.Add(field, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter })); // fieldValue.Accept(this, parameter));
                 }
 
-                var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(TObject), this.Solver, fields);
+                var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(TObject), this.Solver, fields);
 
                 this.Cache[expression] = result;
                 return result;
@@ -415,7 +415,7 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var v = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var v = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
             var result = v.Fields[expression.FieldName];
 
             this.Cache[expression] = result;
@@ -753,9 +753,9 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var o = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
             var f = expression.FieldValue.Accept(this, parameter);
-            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
 
             this.Cache[expression] = result;
             return result;
@@ -825,7 +825,7 @@ namespace ZenLib.ModelChecking
             var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
                 .Add("HasValue", hasValue).Add("Value", optionValue);
 
-            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
 
             this.Cache[expression] = result;
             return result;

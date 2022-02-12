@@ -1,4 +1,4 @@
-﻿// <copyright file="SymbolicClass.cs" company="Microsoft">
+﻿// <copyright file="SymbolicObject.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -13,9 +13,9 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>
-    internal class SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
+    internal class SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
     {
-        public SymbolicClass(
+        public SymbolicObject(
             Type objectType,
             ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver,
             ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> value) : base(solver)
@@ -34,6 +34,13 @@ namespace ZenLib.ModelChecking
         /// </summary>
         public ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Fields { get; set; }
 
+        internal override TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            TParam parameter)
+        {
+            return visitor.VisitSymbolicObject(this, parameter);
+        }
+
         /// <summary>
         /// Merge two symbolic integers together under a guard.
         /// </summary>
@@ -44,7 +51,7 @@ namespace ZenLib.ModelChecking
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
-            var o = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
+            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var newValue = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
             foreach (var kv in this.Fields)
             {
@@ -53,7 +60,7 @@ namespace ZenLib.ModelChecking
                 newValue = newValue.Add(kv.Key, value1.Merge(guard, value2));
             }
 
-            return new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.ObjectType, this.Solver, newValue);
+            return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.ObjectType, this.Solver, newValue);
         }
 
         /// <summary>

@@ -9,7 +9,6 @@ namespace ZenLib.Solver
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
 
@@ -81,7 +80,7 @@ namespace ZenLib.Solver
                 result = result.Add(fieldName, fieldSymbolicValue);
             }
 
-            return new SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this.solver, result);
+            return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this.solver, result);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitShort(Expr parameter)
