@@ -6,152 +6,149 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
+    using ZenLib.ModelChecking;
 
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
     internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>
     {
-        private Context context;
+        internal Context Context;
 
-        private Solver solver;
+        internal Solver Solver;
 
         private int nextIndex;
 
-        private Sort BoolSort;
+        internal Sort BoolSort;
 
-        private Sort ByteSort;
+        internal Sort ByteSort;
 
-        private Sort ShortSort;
+        internal Sort ShortSort;
 
-        private Sort IntSort;
+        internal Sort IntSort;
 
-        private Sort LongSort;
+        internal Sort LongSort;
 
-        private Sort BigIntSort;
+        internal Sort BigIntSort;
 
-        private Sort StringSort;
+        internal Sort StringSort;
 
-        private Dictionary<Type, Sort> typeToSort;
+        internal Dictionary<Sort, DatatypeSort> OptionSorts;
 
-        private Dictionary<Sort, DatatypeSort> optionSorts;
+        internal Z3TypeToSortConverter TypeToSortConverter;
+
+        internal Z3ExprToSymbolicValueConverter ExprToSymbolicValueConverter;
+
+        internal Z3SymbolicValueToExprConverter SymbolicValueToExprConverter;
 
         public SolverZ3()
         {
             this.nextIndex = 0;
-            this.context = new Context();
-            var t1 = this.context.MkTactic("simplify");
-            var t2 = this.context.MkTactic("solve-eqs");
-            var t3 = this.context.MkTactic("smt");
-            var tactic = this.context.AndThen(t1, t2, t3);
-            this.solver = this.context.MkSolver(tactic);
-            this.BoolSort = this.context.MkBoolSort();
-            this.ByteSort = this.context.MkBitVecSort(8);
-            this.ShortSort = this.context.MkBitVecSort(16);
-            this.IntSort = this.context.MkBitVecSort(32);
-            this.LongSort = this.context.MkBitVecSort(64);
-            this.BigIntSort = this.context.MkIntSort();
-            this.StringSort = this.context.StringSort;
-
-            this.optionSorts = new Dictionary<Sort, DatatypeSort>();
-            this.typeToSort = new Dictionary<Type, Sort>();
-            this.typeToSort[typeof(bool)] = this.BoolSort;
-            this.typeToSort[typeof(byte)] = this.ByteSort;
-            this.typeToSort[typeof(short)] = this.ShortSort;
-            this.typeToSort[typeof(ushort)] = this.ShortSort;
-            this.typeToSort[typeof(int)] = this.IntSort;
-            this.typeToSort[typeof(uint)] = this.IntSort;
-            this.typeToSort[typeof(long)] = this.LongSort;
-            this.typeToSort[typeof(ulong)] = this.LongSort;
-            this.typeToSort[typeof(BigInteger)] = this.BigIntSort;
-            this.typeToSort[typeof(string)] = this.StringSort;
+            this.Context = new Context();
+            var t1 = this.Context.MkTactic("simplify");
+            var t2 = this.Context.MkTactic("solve-eqs");
+            var t3 = this.Context.MkTactic("smt");
+            var tactic = this.Context.AndThen(t1, t2, t3);
+            this.Solver = this.Context.MkSolver(tactic);
+            this.BoolSort = this.Context.MkBoolSort();
+            this.ByteSort = this.Context.MkBitVecSort(8);
+            this.ShortSort = this.Context.MkBitVecSort(16);
+            this.IntSort = this.Context.MkBitVecSort(32);
+            this.LongSort = this.Context.MkBitVecSort(64);
+            this.BigIntSort = this.Context.MkIntSort();
+            this.StringSort = this.Context.StringSort;
+            this.TypeToSortConverter = new Z3TypeToSortConverter(this);
+            this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
+            this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
+            this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 
         private Symbol FreshSymbol()
         {
-            return this.context.MkSymbol(nextIndex++);
+            return this.Context.MkSymbol(nextIndex++);
         }
 
         public BoolExpr And(BoolExpr x, BoolExpr y)
         {
-            return this.context.MkAnd(x, y);
+            return this.Context.MkAnd(x, y);
         }
 
         public BitVecExpr BitwiseAnd(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVAND(x, y);
+            return this.Context.MkBVAND(x, y);
         }
 
         public BitVecExpr BitwiseNot(BitVecExpr x)
         {
-            return this.context.MkBVNot(x);
+            return this.Context.MkBVNot(x);
         }
 
         public BitVecExpr BitwiseOr(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVOR(x, y);
+            return this.Context.MkBVOR(x, y);
         }
 
         public BitVecExpr BitwiseXor(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVXOR(x, y);
+            return this.Context.MkBVXOR(x, y);
         }
 
         public (Expr, BoolExpr) CreateBoolVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.BoolSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.BoolSort);
             return (v, (BoolExpr)v);
         }
 
         public BitVecExpr CreateByteConst(byte b)
         {
-            return this.context.MkBV(b, 8);
+            return this.Context.MkBV(b, 8);
         }
 
         public (Expr, BitVecExpr) CreateByteVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.ByteSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.ByteSort);
             return (v, (BitVecExpr)v);
         }
 
         public BitVecExpr CreateShortConst(short s)
         {
-            return this.context.MkBV(s, 16);
+            return this.Context.MkBV(s, 16);
         }
 
         public (Expr, BitVecExpr) CreateShortVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.ShortSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.ShortSort);
             return (v, (BitVecExpr)v);
         }
 
         public BitVecExpr CreateIntConst(int i)
         {
-            return this.context.MkBV(i, 32);
+            return this.Context.MkBV(i, 32);
         }
 
         public (Expr, BitVecExpr) CreateIntVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.IntSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.IntSort);
             return (v, (BitVecExpr)v);
         }
 
         public BitVecExpr CreateLongConst(long l)
         {
-            return this.context.MkBV(l, 64);
+            return this.Context.MkBV(l, 64);
         }
 
         public (Expr, BitVecExpr) CreateLongVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.LongSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.LongSort);
             return (v, (BitVecExpr)v);
         }
 
         public (Expr, BitVecExpr) CreateBitvecVar(object e, uint size)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.context.MkBitVecSort(size));
+            var v = this.Context.MkConst(FreshSymbol(), this.Context.MkBitVecSort(size));
             return (v, (BitVecExpr)v);
         }
 
@@ -164,28 +161,28 @@ namespace ZenLib.Solver
                 littleEndian[i] = bits[bits.Length - 1 - i];
             }
 
-            return this.context.MkBV(littleEndian);
+            return this.Context.MkBV(littleEndian);
         }
 
         public IntExpr CreateBigIntegerConst(BigInteger bi)
         {
-            return this.context.MkInt(bi.ToString());
+            return this.Context.MkInt(bi.ToString());
         }
 
         public (Expr, IntExpr) CreateBigIntegerVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.BigIntSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.BigIntSort);
             return (v, (IntExpr)v);
         }
 
         public SeqExpr CreateStringConst(string s)
         {
-            return this.context.MkString(s);
+            return this.Context.MkString(s);
         }
 
         public (Expr, SeqExpr) CreateStringVar(object e)
         {
-            var v = this.context.MkConst(FreshSymbol(), this.StringSort);
+            var v = this.Context.MkConst(FreshSymbol(), this.StringSort);
             return (v, (SeqExpr)v);
         }
 
@@ -199,190 +196,190 @@ namespace ZenLib.Solver
             var keySort = GetSortForType(keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = this.GetOrCreateOptionSort(valueSort);
-            var none = this.context.MkApp(optionSort.Constructors[0]);
+            var none = this.Context.MkApp(optionSort.Constructors[0]);
 
             // create the new array variable
-            var v = this.context.MkArrayConst(FreshSymbol(), keySort, optionSort);
+            var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
 
             // need to ensure we constrain the array default to be none
-            this.solver.Assert(this.context.MkEq(this.context.MkTermArray(v), none));
+            this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
 
             return (v, v);
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkEq(x, y);
+            return this.Context.MkEq(x, y);
         }
 
         public BoolExpr Eq(IntExpr x, IntExpr y)
         {
-            return this.context.MkEq(x, y);
+            return this.Context.MkEq(x, y);
         }
 
         public BoolExpr Eq(SeqExpr x, SeqExpr y)
         {
-            return this.context.MkEq(x, y);
+            return this.Context.MkEq(x, y);
         }
 
         public BoolExpr Eq(ArrayExpr x, ArrayExpr y)
         {
-            return this.context.MkEq(x, y);
+            return this.Context.MkEq(x, y);
         }
 
         public BoolExpr False()
         {
-            return this.context.MkFalse();
+            return this.Context.MkFalse();
         }
 
         public BoolExpr True()
         {
-            return this.context.MkTrue();
+            return this.Context.MkTrue();
         }
 
         public BoolExpr Iff(BoolExpr x, BoolExpr y)
         {
-            return this.context.MkIff(x, y);
+            return this.Context.MkIff(x, y);
         }
 
         public BoolExpr Ite(BoolExpr g, BoolExpr t, BoolExpr f)
         {
-            return (BoolExpr)this.context.MkITE(g, t, f);
+            return (BoolExpr)this.Context.MkITE(g, t, f);
         }
 
         public BitVecExpr Ite(BoolExpr g, BitVecExpr t, BitVecExpr f)
         {
-            return (BitVecExpr)this.context.MkITE(g, t, f);
+            return (BitVecExpr)this.Context.MkITE(g, t, f);
         }
 
         public IntExpr Ite(BoolExpr g, IntExpr t, IntExpr f)
         {
-            return (IntExpr)this.context.MkITE(g, t, f);
+            return (IntExpr)this.Context.MkITE(g, t, f);
         }
 
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
-            return (SeqExpr)this.context.MkITE(g, t, f);
+            return (SeqExpr)this.Context.MkITE(g, t, f);
         }
 
         public ArrayExpr Ite(BoolExpr g, ArrayExpr t, ArrayExpr f)
         {
-            return (ArrayExpr)this.context.MkITE(g, t, f);
+            return (ArrayExpr)this.Context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVULE(x, y);
+            return this.Context.MkBVULE(x, y);
         }
 
         public BoolExpr LessThanOrEqual(IntExpr x, IntExpr y)
         {
-            return this.context.MkLe(x, y);
+            return this.Context.MkLe(x, y);
         }
 
         public BoolExpr LessThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVSLE(x, y);
+            return this.Context.MkBVSLE(x, y);
         }
 
         public BoolExpr GreaterThanOrEqual(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVUGE(x, y);
+            return this.Context.MkBVUGE(x, y);
         }
 
         public BoolExpr GreaterThanOrEqual(IntExpr x, IntExpr y)
         {
-            return this.context.MkGe(x, y);
+            return this.Context.MkGe(x, y);
         }
 
         public BoolExpr GreaterThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVSGE(x, y);
+            return this.Context.MkBVSGE(x, y);
         }
 
         public BoolExpr Not(BoolExpr x)
         {
-            return this.context.MkNot(x);
+            return this.Context.MkNot(x);
         }
 
         public BoolExpr Or(BoolExpr x, BoolExpr y)
         {
-            return this.context.MkOr(x, y);
+            return this.Context.MkOr(x, y);
         }
 
         public BitVecExpr Add(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVAdd(x, y);
+            return this.Context.MkBVAdd(x, y);
         }
 
         public IntExpr Add(IntExpr x, IntExpr y)
         {
-            return (IntExpr)this.context.MkAdd(x, y);
+            return (IntExpr)this.Context.MkAdd(x, y);
         }
 
         public BitVecExpr Subtract(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVSub(x, y);
+            return this.Context.MkBVSub(x, y);
         }
 
         public IntExpr Subtract(IntExpr x, IntExpr y)
         {
-            return (IntExpr)this.context.MkSub(x, y);
+            return (IntExpr)this.Context.MkSub(x, y);
         }
 
         public BitVecExpr Multiply(BitVecExpr x, BitVecExpr y)
         {
-            return this.context.MkBVMul(x, y);
+            return this.Context.MkBVMul(x, y);
         }
 
         public IntExpr Multiply(IntExpr x, IntExpr y)
         {
-            return (IntExpr)this.context.MkMul(x, y);
+            return (IntExpr)this.Context.MkMul(x, y);
         }
 
         public SeqExpr Concat(SeqExpr x, SeqExpr y)
         {
-            return this.context.MkConcat(x, y);
+            return this.Context.MkConcat(x, y);
         }
 
         public BoolExpr PrefixOf(SeqExpr x, SeqExpr y)
         {
-            return this.context.MkPrefixOf(y, x);
+            return this.Context.MkPrefixOf(y, x);
         }
 
         public BoolExpr SuffixOf(SeqExpr x, SeqExpr y)
         {
-            return this.context.MkSuffixOf(y, x);
+            return this.Context.MkSuffixOf(y, x);
         }
 
         public BoolExpr Contains(SeqExpr x, SeqExpr y)
         {
-            return this.context.MkContains(x, y);
+            return this.Context.MkContains(x, y);
         }
 
         public SeqExpr ReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
         {
-            return this.context.MkReplace(x, y, z);
+            return this.Context.MkReplace(x, y, z);
         }
 
         public SeqExpr Substring(SeqExpr x, IntExpr y, IntExpr z)
         {
-            return this.context.MkExtract(x, y, z);
+            return this.Context.MkExtract(x, y, z);
         }
 
         public SeqExpr At(SeqExpr x, IntExpr y)
         {
-            return this.context.MkAt(x, y);
+            return this.Context.MkAt(x, y);
         }
 
         public IntExpr Length(SeqExpr x)
         {
-            return this.context.MkLength(x);
+            return this.Context.MkLength(x);
         }
 
         public IntExpr IndexOf(SeqExpr x, SeqExpr y, IntExpr z)
         {
-            return this.context.MkIndexOf(x, y, z);
+            return this.Context.MkIndexOf(x, y, z);
         }
 
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
@@ -390,63 +387,102 @@ namespace ZenLib.Solver
             var keySort = GetSortForType(keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.context.MkApp(optionSort.Constructors[0]);
-            return this.context.MkConstArray(keySort, none);
+            var none = this.Context.MkApp(optionSort.Constructors[0]);
+            return this.Context.MkConstArray(keySort, none);
         }
 
-        public ArrayExpr DictSet(ArrayExpr arrayExpr, object keyExpr, object valueExpr, Type keyType, Type valueType)
+        public ArrayExpr DictSet(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
-            var value = (Expr)valueExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
+            var value = ConvertSymbolicValueToExpr(valueExpr, valueType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var some = this.context.MkApp(optionSort.Constructors[1], value);
-            return this.context.MkStore(arrayExpr, key, some);
+            var some = this.Context.MkApp(optionSort.Constructors[1], value);
+            return this.Context.MkStore(arrayExpr, key, some);
         }
 
-        public ArrayExpr DictDelete(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public ArrayExpr DictDelete(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.context.MkApp(optionSort.Constructors[0]);
-            return this.context.MkStore(arrayExpr, key, none);
+            var none = this.Context.MkApp(optionSort.Constructors[0]);
+            return this.Context.MkStore(arrayExpr, key, none);
         }
 
-        public (BoolExpr, object) DictGet(ArrayExpr arrayExpr, object keyExpr, Type keyType, Type valueType)
+        public (BoolExpr, object) DictGet(
+            ArrayExpr arrayExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            Type keyType,
+            Type valueType)
         {
-            var key = (Expr)keyExpr;
+            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var optionResult = this.context.MkSelect(arrayExpr, key);
-            var none = this.context.MkApp(optionSort.Constructors[0]);
+            var optionResult = this.Context.MkSelect(arrayExpr, key);
+            var none = this.Context.MkApp(optionSort.Constructors[0]);
             var someAccessor = optionSort.Accessors[1][0];
-            var hasValue = this.context.MkNot(this.context.MkEq(optionResult, none));
-            return (hasValue, this.context.MkApp(someAccessor, optionResult));
+            var hasValue = this.Context.MkNot(this.Context.MkEq(optionResult, none));
+            return (hasValue, this.Context.MkApp(someAccessor, optionResult));
+        }
+
+        public Sort GetSortForType(Type type)
+        {
+            return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());
         }
 
         private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
         {
-            if (this.optionSorts.TryGetValue(valueSort, out var optionSort))
+            if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))
             {
                 return optionSort;
             }
 
-            var c1 = this.context.MkConstructor("None", "none");
-            var c2 = this.context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
-            var optSort = this.context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
-            this.optionSorts[valueSort] = optSort;
+            var c1 = this.Context.MkConstructor("None", "none");
+            var c2 = this.Context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
+            var optSort = this.Context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
+            this.OptionSorts[valueSort] = optSort;
             return optSort;
         }
 
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
-            // Console.WriteLine(e);
-            return ConvertExprToObject(e, type);
+            return convertExprToObject(e, type);
         }
 
-        private object ConvertExprToObject(Expr e, Type type)
+        private Expr ConvertSymbolicValueToExpr(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
+        {
+            return value.Accept(this.SymbolicValueToExprConverter, type);
+        }
+
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
+        {
+            return ReflectionUtilities.ApplyTypeVisitor(this.ExprToSymbolicValueConverter, type, (Expr)e);
+        }
+
+        public Model Satisfiable(BoolExpr x)
+        {
+            this.Solver.Assert(x);
+            var status = this.Solver.Check();
+            if (status == Status.UNSATISFIABLE)
+            {
+                return null;
+            }
+
+            return this.Solver.Model;
+        }
+
+        private object convertExprToObject(Expr e, Type type)
         {
             if (e.Sort == this.BoolSort)
             {
@@ -503,67 +539,46 @@ namespace ZenLib.Solver
                 var arrayExpr = e.Args[0];
                 var keyExpr = e.Args[1];
                 var valueExpr = e.Args[2];
-                var dict = ConvertExprToObject(arrayExpr, type);
-                var key = ConvertExprToObject(keyExpr, keyType);
-                var value = ConvertExprToObject(valueExpr, valueType);
+                var dict = convertExprToObject(arrayExpr, type);
+                var key = convertExprToObject(keyExpr, keyType);
+                var value = convertExprToObject(valueExpr, valueType);
                 var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
                 m.Invoke(dict, new object[] { key, value });
                 return dict;
             }
-            else if (e.IsApp && e.Args.Length == 0)
+            else if (e.IsApp)
             {
-                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
-            }
-            else if (e.IsApp && e.Args.Length == 1)
-            {
-                // strip the option
-                return ConvertExprToObject(e.Args[0], type);
+                if (this.TypeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
+                {
+                    var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
+                    var fieldNames = new string[fields.Length];
+                    var fieldValues = new object[fields.Length];
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        fieldNames[i] = fields[i].Key;
+                        fieldValues[i] = convertExprToObject(e.Args[i], fields[i].Value);
+                    }
+
+                    return ReflectionUtilities.CreateInstance(type, fieldNames, fieldValues);
+                }
+                else if (e.Args.Length == 0)
+                {
+                    return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
+                }
+                else
+                {
+                    return convertExprToObject(e.Args[0], type);
+                }
             }
             else
             {
                 // must be a fixed width integer
                 var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
-                RemoveTrailingZeroes(ref bytes);
-
+                int lastIndex = Array.FindLastIndex(bytes, b => b != 0);
+                Array.Resize(ref bytes, lastIndex + 1);
                 Array.Reverse(bytes);
                 return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
             }
-        }
-
-        public Model Satisfiable(BoolExpr x)
-        {
-            this.solver.Assert(x);
-            var status = this.solver.Check();
-            if (status == Status.UNSATISFIABLE)
-            {
-                return null;
-            }
-
-            return this.solver.Model;
-        }
-
-        private static void RemoveTrailingZeroes(ref byte[] array)
-        {
-            int lastIndex = Array.FindLastIndex(array, b => b != 0);
-            Array.Resize(ref array, lastIndex + 1);
-        }
-
-        private Sort GetSortForType(Type type)
-        {
-            if (this.typeToSort.TryGetValue(type, out var sort))
-            {
-                return sort;
-            }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                int size = ((dynamic)Activator.CreateInstance(type, 0L)).Size;
-                var bitvecSort = this.context.MkBitVecSort((uint)size);
-                this.typeToSort[type] = bitvecSort;
-                return bitvecSort;
-            }
-
-            throw new ZenException("Unexpected error encountered.");
         }
     }
 }

@@ -17,7 +17,7 @@ To import the Zen library, add the following lines to your source file:
 using ZenLib;
 ```
 
-The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can take on any value. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., bool, int, string, IList) and then encodes constraints over those variables.
+The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can take on any value. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., `bool`, `int`, `string`, `FSeq`) and then encodes constraints over those variables.
 
 ```csharp
 // create symbolic variables of different types
@@ -252,7 +252,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
-| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` must be primitive types (bool, integers, string, BigInteger, etc.) | :heavy_check_mark: | :x: | :x:  |
+| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use sequences or maps themselves | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictiosn as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
@@ -312,7 +312,7 @@ Zen supports a number of high-level data types that are finite (bounded) in size
 
 ### Unbounded Sets and Maps
 
-Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` be primitive types (bool, integers, string, BigInteger).
+Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain sequences or other maps/sets. For instance primitive types (bool, integers, string, BigInteger) as well as classes/structs are allowed.
 
 
 ### Custom classes and structs

@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
 
     /// <summary>
@@ -19,14 +18,12 @@ namespace ZenLib.ModelChecking
             this.Solver = solver;
         }
 
-        [ExcludeFromCodeCoverage]
-        internal virtual object GetExpr()
-        {
-            throw new ZenException("Unreachable call to GetExpr()");
-        }
-
         internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other);
+
+        internal abstract TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            TParam parameter);
     }
 }

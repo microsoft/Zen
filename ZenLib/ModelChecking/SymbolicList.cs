@@ -24,6 +24,13 @@ namespace ZenLib.ModelChecking
         /// </summary>
         public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> GuardedListGroup { get; }
 
+        internal override TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            TParam parameter)
+        {
+            return visitor.VisitSymbolicList(this, parameter);
+        }
+
         /// <summary>
         /// Merge two symbolic lists together under a guard.
         /// </summary>

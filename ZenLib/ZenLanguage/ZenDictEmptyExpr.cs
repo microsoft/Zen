@@ -31,8 +31,6 @@ namespace ZenLib
         /// </summary>
         private ZenDictEmptyExpr()
         {
-            CommonUtilities.ValidateIsMapElementType(typeof(TKey));
-            CommonUtilities.ValidateIsMapElementType(typeof(TValue));
         }
 
         /// <summary>

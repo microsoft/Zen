@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -318,6 +319,74 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the map works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestMapPairs()
+        {
+            var f = new ZenFunction<Map<int, Pair<int, bool>>, bool>(d => d.Get(1) == Option.Create(Pair.Create<int, bool>(2, true)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Item1);
+            Assert.AreEqual(true, sat.Value.Get(1).Value.Item2);
+        }
+
+        /// <summary>
+        /// Test that the map works with nested objects.
+        /// </summary>
+        [TestMethod]
+        public void TestMapNestedObjects()
+        {
+            var f = new ZenFunction<Map<int, Pair<int, Pair<int, int>>>, bool>(d => d.Get(1) == Option.Create(Pair.Create<int, Pair<int, int>>(2, Pair.Create<int, int>(3, 4))));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Item1);
+            Assert.AreEqual(3, sat.Value.Get(1).Value.Item2.Item1);
+            Assert.AreEqual(4, sat.Value.Get(1).Value.Item2.Item2);
+        }
+
+        /// <summary>
+        /// Test that the map works with objects with updates.
+        /// </summary>
+        [TestMethod]
+        public void TestMapUpdatedObjects()
+        {
+            var f = new ZenFunction<Map<Pair<int, int>, int>, Map<Pair<int, int>, int>>(d =>
+            {
+                return d.Set(Pair.Create<int, int>(1, 2).WithField<Pair<int, int>, int>("Item1", 3), 1);
+            });
+
+            var key1 = new Pair<int, int> { Item1 = 1, Item2 = 2 };
+            var key2 = new Pair<int, int> { Item1 = 3, Item2 = 2 };
+            var sat = f.Find((d1, d2) => And(d1.Get(key1) == Option.None<int>(), d2.Get(key2) == Option.Some(1)));
+
+            Assert.IsTrue(sat.HasValue);
+            Assert.IsFalse(sat.Value.Get(key1).HasValue);
+            Assert.IsTrue(f.Evaluate(sat.Value).Get(key2).HasValue);
+        }
+
+        /// <summary>
+        /// Test that the map works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestMapOptions()
+        {
+            var f = new ZenFunction<Map<int, Option<int>>, bool>(d => d.Get(1) == Option.Create(Option.Create<int>(2)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Value);
+        }
+
+        /// <summary>
+        /// Test that the map works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestMapUnit()
+        {
+            var f = new ZenFunction<Map<int, Unit>, bool>(d => d.Get(1) == Option.Create<Unit>(new Unit()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.IsFalse(sat.Value.Get(0).HasValue);
+            Assert.IsTrue(sat.Value.Get(1).HasValue);
+        }
+
+        /// <summary>
         /// Test that all primitive types work with maps.
         /// </summary>
         [TestMethod]
@@ -336,7 +405,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that non-primitive types do not work with maps.
+        /// Test that map types do not work with maps.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
@@ -346,23 +415,13 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that non-primitive types do not work with maps.
+        /// Test that sequence types do not work with maps.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
         public void TestMapNonPrimitiveTypesException2()
         {
-            new ZenConstraint<Map<uint, Option<int>>>(m => m.Get(10).IsSome()).Find();
-        }
-
-        /// <summary>
-        /// Test that non-primitive types do not work with maps.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestMapNonPrimitiveTypesException3()
-        {
-            new ZenConstraint<Map<Pair<int, int>, bool>>(m => m.Get(Pair.Create<int, int>(1, 2)).IsSome()).Find();
+            new ZenConstraint<Map<uint, FSeq<uint>>>(m => m.Get(10).IsSome()).Find();
         }
     }
 }

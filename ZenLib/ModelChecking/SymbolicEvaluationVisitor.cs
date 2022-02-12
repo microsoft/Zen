@@ -384,7 +384,7 @@ namespace ZenLib.ModelChecking
 
             try
             {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
+                var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
@@ -397,7 +397,7 @@ namespace ZenLib.ModelChecking
                     fields = fields.Add(field, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter })); // fieldValue.Accept(this, parameter));
                 }
 
-                var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, fields);
+                var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(TObject), this.Solver, fields);
 
                 this.Cache[expression] = result;
                 return result;
@@ -415,7 +415,7 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var v = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var v = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
             var result = v.Fields[expression.FieldName];
 
             this.Cache[expression] = result;
@@ -753,9 +753,9 @@ namespace ZenLib.ModelChecking
                 return value;
             }
 
-            var o = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
             var f = expression.FieldValue.Accept(this, parameter);
-            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, o.Fields.SetItem(expression.FieldName, f));
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
 
             this.Cache[expression] = result;
             return result;
@@ -785,7 +785,7 @@ namespace ZenLib.ModelChecking
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
             var e3 = expression.ValueExpr.Accept(this, parameter);
-            var e = this.Solver.DictSet(e1.Value, e2.GetExpr(), e3.GetExpr(), typeof(TKey), typeof(TValue));
+            var e = this.Solver.DictSet(e1.Value, e2, e3, typeof(TKey), typeof(TValue));
             var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
 
             this.Cache[expression] = result;
@@ -801,7 +801,7 @@ namespace ZenLib.ModelChecking
 
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
-            var e = this.Solver.DictDelete(e1.Value, e2.GetExpr(), typeof(TKey), typeof(TValue));
+            var e = this.Solver.DictDelete(e1.Value, e2, typeof(TKey), typeof(TValue));
             var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
 
             this.Cache[expression] = result;
@@ -817,41 +817,18 @@ namespace ZenLib.ModelChecking
 
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
-            var (flag, e) = this.Solver.DictGet(e1.Value, e2.GetExpr(), typeof(TKey), typeof(TValue));
+            var (flag, e) = this.Solver.DictGet(e1.Value, e2, typeof(TKey), typeof(TValue));
 
             var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, flag);
-            var optionValue = GetValueFromType(e, typeof(TValue));
+            var optionValue = this.Solver.ConvertExprToSymbolicValue(e, typeof(TValue));
 
-            var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
+            var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
                 .Add("HasValue", hasValue).Add("Value", optionValue);
 
-            var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, fields);
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
 
             this.Cache[expression] = result;
             return result;
-        }
-
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> GetValueFromType(object e, Type type)
-        {
-            if (type == ReflectionUtilities.BoolType)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBool)e);
-            }
-
-            if (ReflectionUtilities.IsUnsignedIntegerType(type) ||
-                ReflectionUtilities.IsSignedIntegerType(type) ||
-                ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBitvec)e);
-            }
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TInt)e);
-            }
-
-            CommonUtilities.ValidateIsTrue(type == ReflectionUtilities.StringType, "unexpected type");
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TString)e);
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)

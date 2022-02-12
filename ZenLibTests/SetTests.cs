@@ -61,7 +61,7 @@ namespace ZenLib.Tests
             CheckValid<Set<byte>, byte>((d, e) => d.Add(e).Delete(e) == d.Delete(e), runBdds: false);
             CheckValid<Set<byte>, byte>((d, e) => d.Delete(e).Add(e) == d.Add(e), runBdds: false);
             // TODO: add this back when switching to unit type for map values!
-            // CheckValid<Set<byte>, byte>((d, e) => Implies(d.Contains(e), d.Add(e) == d), runBdds: false);
+            CheckValid<Set<byte>, byte>((d, e) => Implies(d.Contains(e), d.Add(e) == d), runBdds: false);
             CheckValid<Set<byte>, byte>((d, e) => Implies(Not(d.Contains(e)), d.Delete(e) == d), runBdds: false);
         }
 
@@ -269,6 +269,50 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the set works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestSetPairs()
+        {
+            var f = new ZenFunction<Set<Pair<int, bool>>, bool>(d => d.Contains(Pair.Create<int, bool>(1, true)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{(1, True)}", sat.Value.ToString());
+        }
+
+        /// <summary>
+        /// Test that the set works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestSetNestedObjects()
+        {
+            var f = new ZenFunction<Set<Pair<int, Pair<int, int>>>, bool>(d => d.Contains(Pair.Create<int, Pair<int, int>>(2, Pair.Create<int, int>(3, 4))));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(1, sat.Value.Count());
+        }
+
+        /// <summary>
+        /// Test that the set works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestSetOptions()
+        {
+            var f = new ZenFunction<Set<Option<int>>, bool>(d => d.Contains(Option.Null<int>()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{None}", sat.Value.ToString());
+        }
+
+        /// <summary>
+        /// Test that the set works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestSetUnit()
+        {
+            var f = new ZenFunction<Set<Unit>, bool>(d => d.Contains(new Unit()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{ZenLib.Unit}", sat.Value.ToString());
+        }
+
+        /// <summary>
         /// Test that all primitive types work with sets.
         /// </summary>
         [TestMethod]
@@ -294,26 +338,6 @@ namespace ZenLib.Tests
         public void TestSetNonPrimitiveTypesException1()
         {
             new ZenConstraint<Set<Set<uint>>>(m => m.Contains(Set.Empty<uint>())).Find();
-        }
-
-        /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException2()
-        {
-            new ZenConstraint<Set<Option<int>>>(m => m.Contains(Option.Some(10))).Find();
-        }
-
-        /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException3()
-        {
-            new ZenConstraint<Set<Pair<int, int>>>(m => m.Contains(Pair.Create<int, int>(1, 2))).Find();
         }
 
         /// <summary>

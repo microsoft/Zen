@@ -46,28 +46,28 @@ namespace ZenLib.Generation
         /// </summary>
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
 
-        public object VisitBool()
+        public object VisitBool(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<bool>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitByte()
+        public object VisitByte(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<byte>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitInt()
+        public object VisitInt(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<int>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitBigInteger()
+        public object VisitBigInteger(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<BigInteger>();
             this.ArbitraryExpressions.Add(e);
@@ -99,7 +99,7 @@ namespace ZenLib.Generation
             return list;
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
@@ -124,7 +124,7 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { finalArgs });
         }
 
-        public object VisitLong()
+        public object VisitLong(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<long>();
             this.ArbitraryExpressions.Add(e);
@@ -176,35 +176,35 @@ namespace ZenLib.Generation
             return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
         }
 
-        public object VisitShort()
+        public object VisitShort(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<short>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUint()
+        public object VisitUint(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<uint>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUlong()
+        public object VisitUlong(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<ulong>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUshort()
+        public object VisitUshort(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<ushort>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitFixedInteger(Type intType)
+        public object VisitFixedInteger(Type intType, DepthConfiguration parameter)
         {
             var c = typeof(ZenArbitraryExpr<>).MakeGenericType(intType).GetConstructor(new Type[] { });
             var e = c.Invoke(CommonUtilities.EmptyArray);
@@ -212,7 +212,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitString()
+        public object VisitString(DepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<string>();
             this.ArbitraryExpressions.Add(e);

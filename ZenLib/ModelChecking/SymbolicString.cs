@@ -19,11 +19,6 @@ namespace ZenLib.ModelChecking
 
         public TString Value { get; }
 
-        internal override object GetExpr()
-        {
-            return this.Value;
-        }
-
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
@@ -31,6 +26,13 @@ namespace ZenLib.ModelChecking
             var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
             return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
+        }
+
+        internal override TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            TParam parameter)
+        {
+            return visitor.VisitSymbolicString(this, parameter);
         }
 
         /// <summary>

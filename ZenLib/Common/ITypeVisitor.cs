@@ -16,73 +16,73 @@ namespace ZenLib
         /// Visit the boolean type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitBool();
+        T VisitBool(TParam parameter);
 
         /// <summary>
         /// Visit the byte type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitByte();
+        T VisitByte(TParam parameter);
 
         /// <summary>
         /// Visit the short type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitShort();
+        T VisitShort(TParam parameter);
 
         /// <summary>
         /// Visit the ushort type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitUshort();
+        T VisitUshort(TParam parameter);
 
         /// <summary>
         /// Visit the int type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitInt();
+        T VisitInt(TParam parameter);
 
         /// <summary>
         /// Visit the uint type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitUint();
+        T VisitUint(TParam parameter);
 
         /// <summary>
         /// Visit the long type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitLong();
+        T VisitLong(TParam parameter);
 
         /// <summary>
         /// Visit the ulong type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitUlong();
+        T VisitUlong(TParam parameter);
 
         /// <summary>
         /// Visit the BigInteger type.
         /// </summary>
         /// <returns></returns>
-        T VisitBigInteger();
+        T VisitBigInteger(TParam parameter);
 
         /// <summary>
         /// Visit a fixed width integer type.
         /// </summary>
         /// <returns></returns>
-        T VisitFixedInteger(Type intType);
+        T VisitFixedInteger(Type intType, TParam parameter);
 
         /// <summary>
         /// Visit the string type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitString();
+        T VisitString(TParam parameter);
 
         /// <summary>
         /// Visit the dictionary type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitDictionary(Type dictionaryType, Type keyType, Type valueType);
+        T VisitDictionary(Type dictionaryType, Type keyType, Type valueType, TParam parameter);
 
         /// <summary>
         /// Visit the list type.
