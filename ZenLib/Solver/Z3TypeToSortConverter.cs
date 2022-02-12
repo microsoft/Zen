@@ -39,28 +39,28 @@ namespace ZenLib.Solver
             this.typeToSort[typeof(string)] = this.solver.StringSort;
         }
 
-        public Sort VisitBigInteger()
+        public Sort VisitBigInteger(Unit parameter)
         {
             return this.solver.BigIntSort;
         }
 
-        public Sort VisitBool()
+        public Sort VisitBool(Unit parameter)
         {
             return this.solver.BoolSort;
         }
 
-        public Sort VisitByte()
+        public Sort VisitByte(Unit parameter)
         {
             return this.solver.ByteSort;
         }
 
         [ExcludeFromCodeCoverage]
-        public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+        public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             throw new ZenException("Can not use map type in another map.");
         }
 
-        public Sort VisitFixedInteger(Type intType)
+        public Sort VisitFixedInteger(Type intType, Unit parameter)
         {
             if (this.typeToSort.TryGetValue(intType, out var sort))
             {
@@ -73,7 +73,7 @@ namespace ZenLib.Solver
             return bitvecSort;
         }
 
-        public Sort VisitInt()
+        public Sort VisitInt(Unit parameter)
         {
             return this.solver.IntSort;
         }
@@ -84,7 +84,7 @@ namespace ZenLib.Solver
             throw new ZenException("Can not use finite sequence type in another map.");
         }
 
-        public Sort VisitLong()
+        public Sort VisitLong(Unit parameter)
         {
             return this.solver.LongSort;
         }
@@ -112,27 +112,27 @@ namespace ZenLib.Solver
             return objectSort;
         }
 
-        public Sort VisitShort()
+        public Sort VisitShort(Unit parameter)
         {
             return this.solver.ShortSort;
         }
 
-        public Sort VisitString()
+        public Sort VisitString(Unit parameter)
         {
             return this.solver.StringSort;
         }
 
-        public Sort VisitUint()
+        public Sort VisitUint(Unit parameter)
         {
             return this.solver.IntSort;
         }
 
-        public Sort VisitUlong()
+        public Sort VisitUlong(Unit parameter)
         {
             return this.solver.LongSort;
         }
 
-        public Sort VisitUshort()
+        public Sort VisitUshort(Unit parameter)
         {
             return this.solver.ShortSort;
         }

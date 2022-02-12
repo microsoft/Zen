@@ -654,34 +654,34 @@ namespace ZenLib
         internal static T ApplyTypeVisitor<T, TParam>(ITypeVisitor<T, TParam> visitor, Type type, TParam parameter)
         {
             if (type == BoolType)
-                return visitor.VisitBool();
+                return visitor.VisitBool(parameter);
             if (type == ByteType)
-                return visitor.VisitByte();
+                return visitor.VisitByte(parameter);
             if (type == ShortType)
-                return visitor.VisitShort();
+                return visitor.VisitShort(parameter);
             if (type == UshortType)
-                return visitor.VisitUshort();
+                return visitor.VisitUshort(parameter);
             if (type == IntType)
-                return visitor.VisitInt();
+                return visitor.VisitInt(parameter);
             if (type == UintType)
-                return visitor.VisitUint();
+                return visitor.VisitUint(parameter);
             if (type == LongType)
-                return visitor.VisitLong();
+                return visitor.VisitLong(parameter);
             if (type == UlongType)
-                return visitor.VisitUlong();
+                return visitor.VisitUlong(parameter);
             if (type == BigIntType)
-                return visitor.VisitBigInteger();
+                return visitor.VisitBigInteger(parameter);
             if (type == StringType)
-                return visitor.VisitString();
+                return visitor.VisitString(parameter);
             if (IsFixedIntegerType(type))
-                return visitor.VisitFixedInteger(type);
+                return visitor.VisitFixedInteger(type, parameter);
 
             if (IsIDictType(type))
             {
                 var typeParameters = type.GetGenericArgumentsCached();
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
-                return visitor.VisitDictionary(type, keyType, valueType);
+                return visitor.VisitDictionary(type, keyType, valueType, parameter);
             }
 
             if (IsIListType(type))

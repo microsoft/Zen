@@ -30,17 +30,17 @@ namespace ZenLib.Generation
         /// </summary>
         private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");
 
-        public object VisitBool()
+        public object VisitBool(Unit parameter)
         {
             return ZenConstantExpr<bool>.Create(false);
         }
 
-        public object VisitByte()
+        public object VisitByte(Unit parameter)
         {
             return ZenConstantExpr<byte>.Create(0);
         }
 
-        public object VisitInt()
+        public object VisitInt(Unit parameter)
         {
             return ZenConstantExpr<int>.Create(0);
         }
@@ -51,25 +51,25 @@ namespace ZenLib.Generation
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
-        public object VisitLong()
+        public object VisitLong(Unit parameter)
         {
             return ZenConstantExpr<long>.Create(0);
         }
 
-        public object VisitFixedInteger(Type intType)
+        public object VisitFixedInteger(Type intType, Unit parameter)
         {
             var c = intType.GetConstructor(new Type[] { typeof(long) });
             dynamic value = c.Invoke(new object[] { 0L });
             return Zen.Constant(value);
         }
 
-        public object VisitBigInteger()
+        public object VisitBigInteger(Unit parameter)
         {
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
@@ -89,28 +89,28 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { args });
         }
 
-        public object VisitShort()
+        public object VisitShort(Unit parameter)
         {
             return ZenConstantExpr<short>.Create(0);
         }
 
-        public object VisitUint()
+        public object VisitUint(Unit parameter)
         {
             return ZenConstantExpr<uint>.Create(0);
         }
 
-        public object VisitUlong()
+        public object VisitUlong(Unit parameter)
         {
             return ZenConstantExpr<ulong>.Create(0);
         }
 
-        public object VisitUshort()
+        public object VisitUshort(Unit parameter)
         {
             return ZenConstantExpr<ushort>.Create(0);
         }
 
         // FIXME: default value for a c# string is null, not empty. How to represent null strings?
-        public object VisitString()
+        public object VisitString(Unit parameter)
         {
             return ZenConstantExpr<string>.Create("");
         }

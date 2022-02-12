@@ -41,6 +41,8 @@ namespace ZenLib.Solver
 
         private Z3TypeToSortConverter typeToSortConverter;
 
+        private Z3ExprToSymbolicValueConverter exprToSymbolicValueConverter;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
@@ -58,6 +60,7 @@ namespace ZenLib.Solver
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
             this.typeToSortConverter = new Z3TypeToSortConverter(this);
+            this.exprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.optionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 
@@ -430,6 +433,11 @@ namespace ZenLib.Solver
             return (hasValue, this.Context.MkApp(someAccessor, optionResult));
         }
 
+        public Sort GetSortForType(Type type)
+        {
+            return ReflectionUtilities.ApplyTypeVisitor(this.typeToSortConverter, type, new Unit());
+        }
+
         private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
         {
             if (this.optionSorts.TryGetValue(valueSort, out var optionSort))
@@ -500,40 +508,7 @@ namespace ZenLib.Solver
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
         {
-            if (type == ReflectionUtilities.BoolType)
-            {
-                return new SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (BoolExpr)e);
-            }
-            else if (ReflectionUtilities.IsUnsignedIntegerType(type) ||
-                ReflectionUtilities.IsSignedIntegerType(type) ||
-                ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                return new SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (BitVecExpr)e);
-            }
-            else if (type == ReflectionUtilities.BigIntType)
-            {
-                return new SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (IntExpr)e);
-            }
-            else if (type == ReflectionUtilities.StringType)
-            {
-                CommonUtilities.ValidateIsTrue(type == ReflectionUtilities.StringType, "unexpected type");
-                return new SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (SeqExpr)e);
-            }
-            else
-            {
-                var dataTypeSort = (DatatypeSort)GetSortForType(type);
-                var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
-                var result = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    var fieldName = fields[i].Key;
-                    var fieldAccessor = dataTypeSort.Accessors[0][i];
-                    var fieldSymbolicValue = ConvertExprToSymbolicValue(this.Context.MkApp(fieldAccessor, (Expr)e), fields[i].Value);
-                    result = result.Add(fieldName, fieldSymbolicValue);
-                }
-
-                return new SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(type, this, result);
-            }
+            return ReflectionUtilities.ApplyTypeVisitor(this.exprToSymbolicValueConverter, type, (Expr)e);
         }
 
         private object ConvertExprToObject(Expr e, Type type)
@@ -650,11 +625,6 @@ namespace ZenLib.Solver
         {
             int lastIndex = Array.FindLastIndex(array, b => b != 0);
             Array.Resize(ref array, lastIndex + 1);
-        }
-
-        private Sort GetSortForType(Type type)
-        {
-            return ReflectionUtilities.ApplyTypeVisitor(this.typeToSortConverter, type, new Unit());
         }
     }
 }
