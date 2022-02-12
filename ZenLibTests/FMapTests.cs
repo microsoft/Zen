@@ -347,7 +347,6 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<FMap<int, Unit>, bool>(d => d.Get(1) == Option.Create<Unit>(new Unit()));
             var sat = f.Find((d, allowed) => allowed);
-            Assert.IsFalse(sat.Value.Get(0).HasValue);
             Assert.IsTrue(sat.Value.Get(1).HasValue);
         }
     }
