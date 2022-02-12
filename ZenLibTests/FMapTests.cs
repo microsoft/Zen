@@ -329,6 +329,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the map works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestMapNestedObjects()
+        {
+            var f = new ZenFunction<FMap<int, Pair<int, Pair<int, int>>>, bool>(d => d.Get(1) == Option.Create(Pair.Create<int, Pair<int, int>>(2, Pair.Create<int, int>(3, 4))));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Item1);
+            Assert.AreEqual(3, sat.Value.Get(1).Value.Item2.Item1);
+            Assert.AreEqual(4, sat.Value.Get(1).Value.Item2.Item2);
+        }
+
+        /// <summary>
         /// Test that the map works with options.
         /// </summary>
         [TestMethod]

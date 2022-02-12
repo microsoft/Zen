@@ -280,6 +280,17 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the set works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestSetNestedObjects()
+        {
+            var f = new ZenFunction<Set<Pair<int, Pair<int, int>>>, bool>(d => d.Contains(Pair.Create<int, Pair<int, int>>(2, Pair.Create<int, int>(3, 4))));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(1, sat.Value.Count());
+        }
+
+        /// <summary>
         /// Test that the set works with options.
         /// </summary>
         [TestMethod]
