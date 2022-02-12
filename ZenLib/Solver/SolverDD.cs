@@ -644,5 +644,11 @@ namespace ZenLib.Solver
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
     }
 }

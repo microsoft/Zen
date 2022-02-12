@@ -44,8 +44,6 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(dictExpr1);
             CommonUtilities.ValidateNotNull(dictExpr2);
-            CommonUtilities.ValidateIsMapElementType(typeof(TKey));
-            CommonUtilities.ValidateIsMapElementType(typeof(TValue));
 
             var k = (dictExpr1.Id, dictExpr2.Id);
             hashConsTable.GetOrAdd(k, (dictExpr1, dictExpr2), createFunc, out var v);

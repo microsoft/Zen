@@ -18,7 +18,7 @@ namespace ZenLib.ModelChecking
         public SymbolicClass(
             Type objectType,
             ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver,
-            ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> value) : base(solver)
+            ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> value) : base(solver)
         {
             this.ObjectType = objectType;
             this.Fields = value;
@@ -32,7 +32,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the underlying decision diagram bitvector representation.
         /// </summary>
-        public ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Fields { get; set; }
+        public ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Fields { get; set; }
 
         /// <summary>
         /// Merge two symbolic integers together under a guard.
@@ -45,7 +45,7 @@ namespace ZenLib.ModelChecking
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
         {
             var o = (SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
-            var newValue = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
+            var newValue = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
             foreach (var kv in this.Fields)
             {
                 var value1 = kv.Value;

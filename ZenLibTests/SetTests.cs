@@ -269,6 +269,39 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the set works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestSetPairs()
+        {
+            var f = new ZenFunction<Set<Pair<int, bool>>, bool>(d => d.Contains(Pair.Create<int, bool>(1, true)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{(1, True)}", sat.Value.ToString());
+        }
+
+        /// <summary>
+        /// Test that the set works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestSetOptions()
+        {
+            var f = new ZenFunction<Set<Option<int>>, bool>(d => d.Contains(Option.Null<int>()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{None}", sat.Value.ToString());
+        }
+
+        /// <summary>
+        /// Test that the set works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestSetUnit()
+        {
+            var f = new ZenFunction<Set<Unit>, bool>(d => d.Contains(new Unit()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual("{ZenLib.Unit}", sat.Value.ToString());
+        }
+
+        /// <summary>
         /// Test that all primitive types work with sets.
         /// </summary>
         [TestMethod]
@@ -294,26 +327,6 @@ namespace ZenLib.Tests
         public void TestSetNonPrimitiveTypesException1()
         {
             new ZenConstraint<Set<Set<uint>>>(m => m.Contains(Set.Empty<uint>())).Find();
-        }
-
-        /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException2()
-        {
-            new ZenConstraint<Set<Option<int>>>(m => m.Contains(Option.Some(10))).Find();
-        }
-
-        /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException3()
-        {
-            new ZenConstraint<Set<Pair<int, int>>>(m => m.Contains(Pair.Create<int, int>(1, 2))).Find();
         }
 
         /// <summary>

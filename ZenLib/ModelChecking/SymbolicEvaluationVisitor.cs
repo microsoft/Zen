@@ -384,7 +384,7 @@ namespace ZenLib.ModelChecking
 
             try
             {
-                var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
+                var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
@@ -820,38 +820,15 @@ namespace ZenLib.ModelChecking
             var (flag, e) = this.Solver.DictGet(e1.Value, e2, typeof(TKey), typeof(TValue));
 
             var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, flag);
-            var optionValue = GetValueFromType(e, typeof(TValue));
+            var optionValue = this.Solver.ConvertExprToSymbolicValue(e, typeof(TValue));
 
-            var fields = ImmutableDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
+            var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
                 .Add("HasValue", hasValue).Add("Value", optionValue);
 
             var result = new SymbolicClass<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
 
             this.Cache[expression] = result;
             return result;
-        }
-
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> GetValueFromType(object e, Type type)
-        {
-            if (type == ReflectionUtilities.BoolType)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBool)e);
-            }
-
-            if (ReflectionUtilities.IsUnsignedIntegerType(type) ||
-                ReflectionUtilities.IsSignedIntegerType(type) ||
-                ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TBitvec)e);
-            }
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TInt)e);
-            }
-
-            CommonUtilities.ValidateIsTrue(type == ReflectionUtilities.StringType, "unexpected type");
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, (TString)e);
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)

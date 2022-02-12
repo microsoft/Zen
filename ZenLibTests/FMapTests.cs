@@ -315,5 +315,40 @@ namespace ZenLib.Tests
             var d = new FMap<int, int>().Set(1, 2).Set(2, 3);
             Assert.AreEqual("{2 => 3, 1 => 2}", d.ToString());
         }
+
+        /// <summary>
+        /// Test that the map works with pairs.
+        /// </summary>
+        [TestMethod]
+        public void TestMapPairs()
+        {
+            var f = new ZenFunction<FMap<int, Pair<int, int>>, bool>(d => d.Get(1) == Option.Create(Pair.Create<int, int>(2, 3)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Item1);
+            Assert.AreEqual(3, sat.Value.Get(1).Value.Item2);
+        }
+
+        /// <summary>
+        /// Test that the map works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestMapOptions()
+        {
+            var f = new ZenFunction<FMap<int, Option<int>>, bool>(d => d.Get(1) == Option.Create(Option.Create<int>(2)));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.AreEqual(2, sat.Value.Get(1).Value.Value);
+        }
+
+        /// <summary>
+        /// Test that the map works with options.
+        /// </summary>
+        [TestMethod]
+        public void TestMapUnit()
+        {
+            var f = new ZenFunction<FMap<int, Unit>, bool>(d => d.Get(1) == Option.Create<Unit>(new Unit()));
+            var sat = f.Find((d, allowed) => allowed);
+            Assert.IsFalse(sat.Value.Get(0).HasValue);
+            Assert.IsTrue(sat.Value.Get(1).HasValue);
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
@@ -479,6 +480,7 @@ namespace ZenLib.Solver
             }
             else if (value is SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> sbc)
             {
+                Console.WriteLine($"It is a symbolic class.");
                 var fieldTypes = ReflectionUtilities.GetAllFieldsAndProperties(sbc.ObjectType);
                 var fields = sbc.Fields.ToArray();
                 var fieldNames = new string[fields.Length];
@@ -487,15 +489,55 @@ namespace ZenLib.Solver
                 {
                     fieldNames[i] = fields[i].Key;
                     fieldExprs[i] = ConvertSymbolicValueToExpr(fields[i].Value, fieldTypes[fieldNames[i]]);
+                    Console.WriteLine($"{fieldNames[i]} -> {fieldExprs[i]}");
                 }
 
                 var dataTypeSort = (DatatypeSort)GetSortForType(type);
                 var objectConstructor = dataTypeSort.Constructors[0];
+                Console.WriteLine("am done");
                 return this.context.MkApp(objectConstructor, fieldExprs);
             }
             else
             {
                 throw new ZenException($"Type {type} used in an unsupported context.");
+            }
+        }
+
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
+        {
+            if (type == ReflectionUtilities.BoolType)
+            {
+                return new SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (BoolExpr)e);
+            }
+            else if (ReflectionUtilities.IsUnsignedIntegerType(type) ||
+                ReflectionUtilities.IsSignedIntegerType(type) ||
+                ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                return new SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (BitVecExpr)e);
+            }
+            else if (type == ReflectionUtilities.BigIntType)
+            {
+                return new SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (IntExpr)e);
+            }
+            else if (type == ReflectionUtilities.StringType)
+            {
+                CommonUtilities.ValidateIsTrue(type == ReflectionUtilities.StringType, "unexpected type");
+                return new SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, (SeqExpr)e);
+            }
+            else
+            {
+                var dataTypeSort = (DatatypeSort)GetSortForType(type);
+                var fields = ReflectionUtilities.GetAllFieldsAndProperties(type).ToArray();
+                var result = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    var fieldName = fields[i].Key;
+                    var fieldAccessor = dataTypeSort.Accessors[0][i];
+                    var fieldSymbolicValue = ConvertExprToSymbolicValue(this.context.MkApp(fieldAccessor, (Expr)e), fields[i].Value);
+                    result = result.Add(fieldName, fieldSymbolicValue);
+                }
+
+                return new SymbolicClass<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(type, this, result);
             }
         }
 
@@ -563,21 +605,35 @@ namespace ZenLib.Solver
                 m.Invoke(dict, new object[] { key, value });
                 return dict;
             }
-            else if (e.IsApp && e.Args.Length == 0)
+            else if (e.IsApp)
             {
-                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
-            }
-            else if (e.IsApp && e.Args.Length == 1)
-            {
-                // strip the option
-                return ConvertExprToObject(e.Args[0], type);
+                if (this.typeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
+                {
+                    var fields = ReflectionUtilities.GetAllFieldsAndProperties(type).ToArray();
+                    var fieldNames = new string[fields.Length];
+                    var fieldValues = new object[fields.Length];
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        fieldNames[i] = fields[i].Key;
+                        fieldValues[i] = ConvertExprToObject(e.Args[i], fields[i].Value);
+                    }
+
+                    return ReflectionUtilities.CreateInstance(type, fieldNames, fieldValues);
+                }
+                else if (e.Args.Length == 0)
+                {
+                    return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
+                }
+                else
+                {
+                    return ConvertExprToObject(e.Args[0], type);
+                }
             }
             else
             {
                 // must be a fixed width integer
                 var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
                 RemoveTrailingZeroes(ref bytes);
-
                 Array.Reverse(bytes);
                 return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
             }
@@ -615,10 +671,12 @@ namespace ZenLib.Solver
 
             private Dictionary<Type, Sort> typeToSort;
 
+            public ISet<string> ObjectAppNames;
+
             public TypeToSortConverter(SolverZ3 solver)
             {
                 this.solver = solver;
-                this.typeToSort = new Dictionary<Type, Sort>();
+                this.ObjectAppNames = new HashSet<string>();
                 this.typeToSort = new Dictionary<Type, Sort>();
                 this.typeToSort[typeof(bool)] = this.solver.BoolSort;
                 this.typeToSort[typeof(byte)] = this.solver.ByteSort;
@@ -699,7 +757,8 @@ namespace ZenLib.Solver
                 }
 
                 var objectConstructor = this.solver.context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
-                var objectSort = this.solver.context.MkDatatypeSort("", new Constructor[] { objectConstructor });
+                var objectSort = this.solver.context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
+                this.ObjectAppNames.Add(objectType.ToString());
                 this.typeToSort[objectType] = objectSort;
                 return objectSort;
             }

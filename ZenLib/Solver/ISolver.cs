@@ -502,5 +502,13 @@ namespace ZenLib.Solver
         /// <param name="type">The C# type to coerce the result to.</param>
         /// <returns>The value.</returns>
         object Get(TModel m, TVariable v, Type type);
+
+        /// <summary>
+        /// Convert a value back into a symbolic value.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> ConvertExprToSymbolicValue(object e, Type type);
     }
 }
