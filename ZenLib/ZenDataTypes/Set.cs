@@ -16,17 +16,17 @@ namespace ZenLib
         /// <summary>
         /// Gets the underlying values of the backing map.
         /// </summary>
-        public Map<T, Unit> Values { get; set; }
+        public Map<T, SetUnit> Values { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="Set{TKey}"/> class.
         /// </summary>
         public Set()
         {
-            this.Values = new Map<T, Unit>();
+            this.Values = new Map<T, SetUnit>();
         }
 
-        private Set(Map<T, Unit> map)
+        private Set(Map<T, SetUnit> map)
         {
             this.Values = map;
         }
@@ -42,7 +42,7 @@ namespace ZenLib
         /// <param name="elt">The element to add.</param>
         public Set<T> Add(T elt)
         {
-            return new Set<T>(this.Values.Set(elt, new Unit()));
+            return new Set<T>(this.Values.Set(elt, new SetUnit()));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Empty<T>()
         {
-            return Create<Set<T>>(("Values", Map.Empty<T, Unit>()));
+            return Create<Set<T>>(("Values", Map.Empty<T, SetUnit>()));
         }
     }
 
@@ -100,9 +100,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="setExpr">The set expr.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<T, Unit>> Values<T>(this Zen<Set<T>> setExpr)
+        internal static Zen<Map<T, SetUnit>> Values<T>(this Zen<Set<T>> setExpr)
         {
-            return setExpr.GetField<Set<T>, Map<T, Unit>>("Values");
+            return setExpr.GetField<Set<T>, Map<T, SetUnit>>("Values");
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr);
             CommonUtilities.ValidateNotNull(elementExpr);
 
-            return Create<Set<T>>(("Values", setExpr.Values().Set(elementExpr, new Unit())));
+            return Create<Set<T>>(("Values", setExpr.Values().Set(elementExpr, new SetUnit())));
         }
 
         /// <summary>
@@ -145,5 +145,12 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(elementExpr);
             return setExpr.Values().ContainsKey(elementExpr);
         }
+    }
+
+    /// <summary>
+    /// Unit class that is hidden from the user to not interfere with maps that use Unit.
+    /// </summary>
+    public class SetUnit
+    {
     }
 }

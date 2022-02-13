@@ -17,6 +17,8 @@ namespace ZenLib.Solver
     {
         internal Context Context;
 
+        internal Params Params;
+
         internal Solver Solver;
 
         private int nextIndex;
@@ -49,11 +51,14 @@ namespace ZenLib.Solver
         {
             this.nextIndex = 0;
             this.Context = new Context();
+            this.Params = this.Context.MkParams();
+            this.Params.Add("compact", false);
             var t1 = this.Context.MkTactic("simplify");
             var t2 = this.Context.MkTactic("solve-eqs");
             var t3 = this.Context.MkTactic("smt");
             var tactic = this.Context.AndThen(t1, t2, t3);
             this.Solver = this.Context.MkSolver(tactic);
+            this.Solver.Parameters = this.Params;
             this.BoolSort = this.Context.MkBoolSort();
             this.ByteSort = this.Context.MkBitVecSort(8);
             this.ShortSort = this.Context.MkBitVecSort(16);
@@ -197,16 +202,21 @@ namespace ZenLib.Solver
 
             var keySort = GetSortForType(keyType);
             var valueSort = GetSortForType(valueType);
-            var optionSort = this.GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
 
-            // create the new array variable
-            var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
-
-            // need to ensure we constrain the array default to be none
-            this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
-
-            return (v, v);
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                var v = this.Context.MkArrayConst(FreshSymbol(), keySort, this.BoolSort);
+                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), this.Context.MkFalse()));
+                return (v, v);
+            }
+            else
+            {
+                var optionSort = this.GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
+                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
+                return (v, v);
+            }
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
@@ -387,10 +397,18 @@ namespace ZenLib.Solver
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
             var keySort = GetSortForType(keyType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            return this.Context.MkConstArray(keySort, none);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkConstArray(keySort, this.Context.MkFalse());
+            }
+            else
+            {
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                return this.Context.MkConstArray(keySort, none);
+            }
         }
 
         public ArrayExpr DictSet(
@@ -401,11 +419,19 @@ namespace ZenLib.Solver
             Type valueType)
         {
             var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
-            var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, valueType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var some = this.Context.MkApp(optionSort.Constructors[1], value);
-            return this.Context.MkStore(arrayExpr, key, some);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkStore(arrayExpr, key, this.Context.MkTrue());
+            }
+            else
+            {
+                var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, valueType);
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var some = this.Context.MkApp(optionSort.Constructors[1], value);
+                return this.Context.MkStore(arrayExpr, key, some);
+            }
         }
 
         public ArrayExpr DictDelete(
@@ -415,10 +441,18 @@ namespace ZenLib.Solver
             Type valueType)
         {
             var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            return this.Context.MkStore(arrayExpr, key, none);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkStore(arrayExpr, key, this.Context.MkFalse());
+            }
+            else
+            {
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                return this.Context.MkStore(arrayExpr, key, none);
+            }
         }
 
         public (BoolExpr, object) DictGet(
@@ -430,11 +464,20 @@ namespace ZenLib.Solver
             var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var optionResult = this.Context.MkSelect(arrayExpr, key);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            var someAccessor = optionSort.Accessors[1][0];
-            var hasValue = this.Context.MkNot(this.Context.MkEq(optionResult, none));
-            return (hasValue, this.Context.MkApp(someAccessor, optionResult));
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                var hasValue = (BoolExpr)this.Context.MkSelect(arrayExpr, key);
+                return (hasValue, this.Context.MkApp(optionSort.Constructors[0]));
+            }
+            else
+            {
+                var optionResult = this.Context.MkSelect(arrayExpr, key);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                var someAccessor = optionSort.Accessors[1][0];
+                var hasValue = this.Context.MkNot(this.Context.MkEq(optionResult, none));
+                return (hasValue, this.Context.MkApp(someAccessor, optionResult));
+            }
         }
 
         public Sort GetSortForType(Type type)

@@ -29,6 +29,11 @@ namespace ZenLib
         public readonly static Type FiniteStringType = typeof(FString);
 
         /// <summary>
+        /// The type of unit values.
+        /// </summary>
+        public readonly static Type SetUnitType = typeof(SetUnit);
+
+        /// <summary>
         /// The type of bool values.
         /// </summary>
         public readonly static Type BoolType = typeof(bool);
