@@ -5,7 +5,6 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -87,6 +86,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Check if this set is a subset of another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>True if this set is a subset of the other..</returns>
+        public bool IsSubsetOf(Set<T> other)
+        {
+            return this.Equals(this.Intersect(other));
+        }
+
+        /// <summary>
         /// Convert the set to a string.
         /// </summary>
         /// <returns></returns>
@@ -124,7 +133,13 @@ namespace ZenLib
         /// <returns>Hashcode for sets.</returns>
         public override int GetHashCode()
         {
-            return 1291433875 + EqualityComparer<Map<T, SetUnit>>.Default.GetHashCode(Values);
+            var hashCode = 1291433875;
+            foreach (var kv in this.Values.Values)
+            {
+                hashCode += kv.Key.GetHashCode();
+            }
+
+            return hashCode;
         }
 
         /// <summary>
@@ -250,10 +265,24 @@ namespace ZenLib
             var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values().Values(), setExpr2.Values().Values())));
             return Create<Set<T>>(("Values", map));
         }
+
+        /// <summary>
+        /// Check if one set is a subset of another.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> IsSubsetOf<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
+        {
+            CommonUtilities.ValidateNotNull(setExpr1);
+            CommonUtilities.ValidateNotNull(setExpr2);
+
+            return setExpr1 == setExpr1.Intersect(setExpr2);
+        }
     }
 
     /// <summary>
-    /// Unit class that is hidden from the user to not interfere with maps that use Unit.
+    /// Unit class that is used to model sets as maps.
     /// </summary>
     public class SetUnit
     {

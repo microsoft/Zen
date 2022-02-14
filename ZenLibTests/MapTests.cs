@@ -423,5 +423,25 @@ namespace ZenLib.Tests
         {
             new ZenConstraint<Map<uint, FSeq<uint>>>(m => m.Get(10).IsSome()).Find();
         }
+
+        /// <summary>
+        /// Test map equality and hashcode.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEqualsHashcode()
+        {
+            var s1 = new Map<int, int>().Set(1, 2).Set(3, 4);
+            var s2 = new Map<int, int>().Set(3, 4).Set(1, 2);
+            var s3 = new Map<int, int>().Set(1, 2);
+            var s4 = new Map<int, int>().Set(1, 2).Set(3, 5);
+            Assert.IsTrue(s1.Equals(s2));
+            Assert.IsTrue(s1.Equals((object)s2));
+            Assert.IsFalse(s1.Equals(10));
+            Assert.IsFalse(s1 == s3);
+            Assert.IsFalse(s1 == s4);
+            Assert.IsTrue(s1 != s3);
+            Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
+            Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
+        }
     }
 }

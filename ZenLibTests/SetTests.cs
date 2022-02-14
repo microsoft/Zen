@@ -431,6 +431,40 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test set evaluation with issubsetof.
+        /// </summary>
+        [TestMethod]
+        public void TestSetIsSubset()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, bool>((d1, d2) => d1.IsSubsetOf(d2));
+
+            // test interperter
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>().Add(10)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10).Add(11), new Set<int>().Add(11).Add(10).Add(4)));
+
+            // test compiler
+            zf.Compile();
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>().Add(10)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10).Add(11), new Set<int>().Add(11).Add(10).Add(4)));
+
+            // test data structure
+            Assert.IsFalse(new Set<int>().Add(10).IsSubsetOf(new Set<int>()));
+            Assert.IsTrue(new Set<int>().IsSubsetOf(new Set<int>()));
+            Assert.IsTrue(new Set<int>().IsSubsetOf(new Set<int>().Add(10)));
+            Assert.IsTrue(new Set<int>().Add(10).IsSubsetOf(new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(new Set<int>().Add(10).IsSubsetOf(new Set<int>().Add(11)));
+            Assert.IsTrue(new Set<int>().Add(10).Add(11).IsSubsetOf(new Set<int>().Add(11).Add(10).Add(4)));
+        }
+
+        /// <summary>
         /// Test set combine operations.
         /// </summary>
         [TestMethod]
@@ -519,6 +553,8 @@ namespace ZenLib.Tests
             Assert.IsFalse(s1 == s4);
             Assert.IsTrue(s1 != s3);
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
+            Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
+            Assert.AreEqual(0, new SetUnit().GetHashCode());
         }
     }
 }

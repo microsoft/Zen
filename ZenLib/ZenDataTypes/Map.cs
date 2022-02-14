@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -13,7 +14,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing an arbitrary sized map.
     /// </summary>
-    public class Map<TKey, TValue>
+    public class Map<TKey, TValue> : IEquatable<Map<TKey, TValue>>
     {
         /// <summary>
         /// Gets the underlying values of the map.
@@ -87,6 +88,66 @@ namespace ZenLib
         public override string ToString()
         {
             return "{" + string.Join(", ", this.Values.Select(kv => $"{kv.Key} => {kv.Value}")) + "}";
+        }
+
+        /// <summary>
+        /// Equality for maps.
+        /// </summary>
+        /// <param name="obj">The other map.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is Map<TKey, TValue> o && Equals(o);
+        }
+
+        /// <summary>
+        /// Equality for maps.
+        /// </summary>
+        /// <param name="other">The other map.</param>
+        /// <returns>True or false.</returns>
+        public bool Equals(Map<TKey, TValue> other)
+        {
+            var count = this.Count();
+            var otherCount = other.Count();
+            var both = this.Values.Intersect(other.Values);
+            return count == otherCount && both.Count() == count;
+        }
+
+        /// <summary>
+        /// Hashcode for maps.
+        /// </summary>
+        /// <returns>Hashcode for maps.</returns>
+        public override int GetHashCode()
+        {
+            var hashCode = 1291433875;
+            foreach (var kv in this.Values.Values)
+            {
+                hashCode += kv.GetHashCode();
+            }
+
+            return hashCode;
+        }
+
+        /// <summary>
+        /// Equality for maps.
+        /// </summary>
+        /// <param name="left">The left map.</param>
+        /// <param name="right">The right map.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator ==(Map<TKey, TValue> left, Map<TKey, TValue> right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Inequality for maps.
+        /// </summary>
+        /// <param name="left">The left map.</param>
+        /// <param name="right">The right map.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator !=(Map<TKey, TValue> left, Map<TKey, TValue> right)
+        {
+            return !(left == right);
         }
     }
 
