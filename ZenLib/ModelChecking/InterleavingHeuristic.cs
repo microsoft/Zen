@@ -216,6 +216,12 @@ namespace ZenLib.ModelChecking
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
         public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))

@@ -846,6 +846,36 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr1.Accept(this, parameter);
+            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr2.Accept(this, parameter);
+
+            TArray expr;
+            switch (expression.CombinationType)
+            {
+                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                    expr = this.Solver.DictUnion(e1.Value, e2.Value);
+                    break;
+                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                    expr = this.Solver.DictIntersect(e1.Value, e2.Value);
+                    break;
+                default:
+                    expr = this.Solver.DictDifference(e1.Value, e2.Value);
+                    break;
+            }
+
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+
+            this.Cache[expression] = result;
+            return result;
+        }
+
         [ExcludeFromCodeCoverage]
         private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
             TBool guard,

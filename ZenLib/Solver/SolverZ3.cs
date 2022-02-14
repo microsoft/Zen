@@ -480,6 +480,21 @@ namespace ZenLib.Solver
             }
         }
 
+        public ArrayExpr DictUnion(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return this.Context.MkSetUnion(arrayExpr1, arrayExpr2);
+        }
+
+        public ArrayExpr DictIntersect(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return this.Context.MkSetIntersection(arrayExpr1, arrayExpr2);
+        }
+
+        public ArrayExpr DictDifference(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return this.Context.MkSetDifference(arrayExpr1, arrayExpr2);
+        }
+
         public Sort GetSortForType(Type type)
         {
             return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());

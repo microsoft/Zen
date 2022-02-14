@@ -28,7 +28,7 @@ namespace ZenLib
             this.Values = ImmutableDictionary<TKey, TValue>.Empty;
         }
 
-        private Map(ImmutableDictionary<TKey, TValue> dictionary)
+        internal Map(ImmutableDictionary<TKey, TValue> dictionary)
         {
             this.Values = dictionary;
         }

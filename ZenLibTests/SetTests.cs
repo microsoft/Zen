@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -364,6 +365,124 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(1, result.Value.Count());
             Assert.IsTrue(result.Value.Contains(new Int10(-2)));
+        }
+
+        /// <summary>
+        /// Test set evaluation with union.
+        /// </summary>
+        [TestMethod]
+        public void TestSetUnion()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, Set<int>>((d1, d2) => d1.Union(d2));
+
+            // test interperter
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(2, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(3, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test compiler
+            zf.Compile();
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(2, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(3, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test data structure
+            Assert.AreEqual(1, new Set<int>().Add(10).Union(new Set<int>()).Count());
+            Assert.AreEqual(1, new Set<int>().Add(10).Union(new Set<int>().Add(10)).Count());
+            Assert.AreEqual(2, new Set<int>().Add(10).Union(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, new Set<int>().Union(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(3, new Set<int>().Add(1).Add(2).Union(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
+        /// Test set evaluation with intersect.
+        /// </summary>
+        [TestMethod]
+        public void TestSetIntersection()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, Set<int>>((d1, d2) => d1.Intersect(d2));
+
+            // test interperter
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test compiler
+            zf.Compile();
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test data structure
+            Assert.AreEqual(0, new Set<int>().Add(10).Intersect(new Set<int>()).Count());
+            Assert.AreEqual(1, new Set<int>().Add(10).Intersect(new Set<int>().Add(10)).Count());
+            Assert.AreEqual(0, new Set<int>().Add(10).Intersect(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, new Set<int>().Intersect(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(1).Add(2).Intersect(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
+        /// Test set evaluation with difference.
+        /// </summary>
+        [TestMethod]
+        public void TestSetDifference()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, Set<int>>((d1, d2) => d1.Difference(d2));
+
+            // test interperter
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test compiler
+            zf.Compile();
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test data structure
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>()).Count());
+            Assert.AreEqual(0, new Set<int>().Add(10).Difference(new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, new Set<int>().Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(1).Add(2).Difference(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
+        /// Test set evaluation with difference.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+            var s4 = Symbolic<Set<int>>();
+
+            var expr = And(s1.Contains(3), s1.Intersect(s2).Contains(5), s3.Add(4) == s2, s4 == s1.Difference(s2));
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+            var r4 = solution.Get(s4);
+
+            Assert.IsTrue(r1.Contains(3));
+            Assert.IsTrue(r1.Intersect(r2).Contains(5));
+            Assert.IsTrue(r3.Add(4) == r2);
+            Assert.IsTrue(r4 == r1.Difference(r2));
         }
     }
 }

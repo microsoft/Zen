@@ -9,6 +9,7 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Linq;
     using System.Numerics;
     using System.Text;
     using System.Threading;
@@ -168,6 +169,39 @@ namespace ZenLib
             var pairs1 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary1);
             var pairs2 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary2);
             return pairs1.SetEquals(pairs2);
+        }
+
+        /// <summary>
+        /// Unions two dictionaries.
+        /// </summary>
+        /// <param name="dict1">A dictionary.</param>
+        /// <param name="dict2">A dictionary.</param>
+        /// <returns>The union of the two dictionaries.</returns>
+        public static ImmutableDictionary<T, SetUnit> DictionaryUnion<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
+        {
+            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Union(dict2));
+        }
+
+        /// <summary>
+        /// Intersects two dictionaries.
+        /// </summary>
+        /// <param name="dict1">A dictionary.</param>
+        /// <param name="dict2">A dictionary.</param>
+        /// <returns>The intersection of the two dictionaries.</returns>
+        public static ImmutableDictionary<T, SetUnit> DictionaryIntersect<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
+        {
+            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Intersect(dict2));
+        }
+
+        /// <summary>
+        /// Difference of two dictionaries.
+        /// </summary>
+        /// <param name="dict1">A dictionary.</param>
+        /// <param name="dict2">A dictionary.</param>
+        /// <returns>The difference of the two dictionaries.</returns>
+        public static ImmutableDictionary<T, SetUnit> DictionaryDifference<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
+        {
+            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Except(dict2));
         }
 
         /// <summary>

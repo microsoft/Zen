@@ -6,9 +6,11 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
+    using System.Reflection;
     using Microsoft.Z3;
 
     /// <summary>
@@ -42,8 +44,8 @@ namespace ZenLib.Solver
         {
             if (parameter.IsConstantArray)
             {
-                var c = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
+                var m = typeof(ImmutableDictionary).GetMethod("Create", new Type[] { }).MakeGenericMethod(keyType, valueType);
+                return m.Invoke(null, CommonUtilities.EmptyArray);
             }
             else if (parameter.IsStore)
             {
@@ -53,9 +55,26 @@ namespace ZenLib.Solver
                 var dict = this.solver.ConvertExprToObject(arrayExpr, dictionaryType);
                 var key = this.solver.ConvertExprToObject(keyExpr, keyType);
                 var value = this.solver.ConvertExprToObject(valueExpr, valueType);
-                var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
-                m.Invoke(dict, new object[] { key, value });
-                return dict;
+
+                // for sets, don't add the key when the value is false.
+                if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
+                {
+                    return dict;
+                }
+                else
+                {
+                    var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
+                    return m.Invoke(dict, new object[] { key, value });
+                }
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
+            {
+                var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
+                var e1 = this.solver.ConvertExprToObject(parameter.Args[0], dictionaryType);
+                var e2 = this.solver.ConvertExprToObject(parameter.Args[1], dictionaryType);
+                var methodName = (lambda == "and") ? "DictionaryIntersect" : (lambda == "or") ? "DictionaryUnion" : "DictionaryDifference";
+                var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
+                return m.Invoke(null, new object[] { e1, e2 });
             }
             else
             {

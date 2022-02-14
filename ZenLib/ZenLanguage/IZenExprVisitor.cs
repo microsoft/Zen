@@ -180,6 +180,14 @@ namespace ZenLib
         TReturn VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a DictCombineExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

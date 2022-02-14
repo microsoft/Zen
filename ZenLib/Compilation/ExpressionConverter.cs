@@ -663,6 +663,38 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                MethodInfo method;
+                switch (expression.CombinationType)
+                {
+                    case ZenDictCombineExpr<TKey>.CombineType.Union:
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
+                        break;
+                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
+                        break;
+                    default:
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
+                        break;
+                }
+
+                var dict1 = expression.DictExpr1.Accept(this, parameter);
+                var dict2 = expression.DictExpr2.Accept(this, parameter);
+
+                var toImmutableDictMethod = typeof(CommonUtilities)
+                    .GetMethodCached("ToImmutableDictionary")
+                    .MakeGenericMethod(typeof(TKey), typeof(SetUnit));
+
+                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
+                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+
+                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+            });
+        }
+
         /// <summary>
         /// Create an object given the fields.
         /// </summary>

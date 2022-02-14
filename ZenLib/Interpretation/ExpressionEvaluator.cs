@@ -4,6 +4,7 @@
 
 namespace ZenLib.Interpretation
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -560,6 +561,34 @@ namespace ZenLib.Interpretation
             var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr1.Accept(this, parameter));
             var e2 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr2.Accept(this, parameter));
             var result = CommonUtilities.DictionaryEquals(e1, e2);
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = CommonUtilities.ToImmutableDictionary<TKey, SetUnit>(expression.DictExpr1.Accept(this, parameter));
+            var e2 = CommonUtilities.ToImmutableDictionary<TKey, SetUnit>(expression.DictExpr2.Accept(this, parameter));
+
+            object result;
+            switch (expression.CombinationType)
+            {
+                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                    result = CommonUtilities.DictionaryIntersect(e1, e2);
+                    break;
+                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                    result = CommonUtilities.DictionaryUnion(e1, e2);
+                    break;
+                default:
+                    result = CommonUtilities.DictionaryDifference(e1, e2);
+                    break;
+            }
+
             this.cache[expression] = result;
             return result;
         }
