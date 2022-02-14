@@ -26,7 +26,7 @@ namespace ZenLib
         /// <summary>
         /// The strings for different comparison operations.
         /// </summary>
-        private string[] opStrings = new string[] { ">=", "<=", "==" };
+        private string[] opStrings = new string[] { ">=", "<=" };
 
         /// <summary>
         /// The constant functions for comparison operations.
@@ -35,7 +35,6 @@ namespace ZenLib
         {
             (x, y) => x >= y ? 1L : 0L,
             (x, y) => x <= y ? 1L : 0L,
-            (x, y) => x == y ? 1L : 0L,
         };
 
         /// <summary>
@@ -45,7 +44,6 @@ namespace ZenLib
         {
             (x, y) => x >= y,
             (x, y) => x <= y,
-            (x, y) => x == y,
         };
 
         /// <summary>
@@ -55,7 +53,6 @@ namespace ZenLib
         {
             (x, y) => x >= y,
             (x, y) => x <= y,
-            (x, y) => x == y,
         };
 
         /// <summary>
@@ -88,7 +85,6 @@ namespace ZenLib
 
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
-
             if (x.HasValue && y.HasValue)
             {
                 return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)comparisonType](x.Value, y.Value));
@@ -108,11 +104,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
-
-            if (comparisonType != ComparisonType.Eq)
-            {
-                CommonUtilities.ValidateIsIntegerType(typeof(T));
-            }
+            CommonUtilities.ValidateIsIntegerType(typeof(T));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
             hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), createFunc, out var value);
@@ -175,6 +167,5 @@ namespace ZenLib
     {
         Geq,
         Leq,
-        Eq,
     }
 }

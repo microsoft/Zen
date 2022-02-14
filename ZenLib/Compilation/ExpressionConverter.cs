@@ -209,10 +209,13 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    default:
+                    case Op.Multiplication:
                         return Expression.Multiply(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
+
+                    default:
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -361,7 +364,7 @@ namespace ZenLib.Compilation
                             expression.Expr2.Accept(this, parameter));
 
                     default:
-                        throw new ZenException("Invalid case");
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -538,8 +541,10 @@ namespace ZenLib.Compilation
                         return Expression.Call(l, prefixOfMethod, new Expression[] { r });
                     case ContainmentType.SuffixOf:
                         return Expression.Call(l, suffixOfMethod, new Expression[] { r });
-                    default:
+                    case ContainmentType.Contains:
                         return Expression.Call(l, containsMethod, new Expression[] { r });
+                    default:
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -682,9 +687,11 @@ namespace ZenLib.Compilation
                     case ZenDictCombineExpr<TKey>.CombineType.Union:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                         break;
-                    default:
+                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
                         break;
+                    default:
+                        throw new ZenUnreachableException();
                 }
 
                 var dict1 = expression.DictExpr1.Accept(this, parameter);

@@ -223,10 +223,12 @@ namespace ZenLib.ModelChecking
                         var result2 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result2;
                         return result2;
-                    default:
+                    case Op.Multiplication:
                         var result3 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result3;
                         return result3;
+                    default:
+                        throw new ZenUnreachableException();
                 }
             }
             else
@@ -256,10 +258,12 @@ namespace ZenLib.ModelChecking
                         var result5 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result5;
                         return result5;
-                    default:
+                    case Op.Multiplication:
                         var result6 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result6;
                         return result6;
+                    default:
+                        throw new ZenUnreachableException();
                 }
             }
         }
@@ -678,10 +682,12 @@ namespace ZenLib.ModelChecking
                     var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r2;
                     return r2;
-                default:
+                case ContainmentType.Contains:
                     var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
                     this.Cache[expression] = r3;
                     return r3;
+                default:
+                    throw new ZenUnreachableException();
             }
         }
 
@@ -863,9 +869,11 @@ namespace ZenLib.ModelChecking
                 case ZenDictCombineExpr<TKey>.CombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                default:
+                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     expr = this.Solver.DictIntersect(e1.Value, e2.Value);
                     break;
+                default:
+                    throw new ZenUnreachableException();
             }
 
             var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);

@@ -141,7 +141,7 @@ namespace ZenLib.Interpretation
                         result = ((dynamic)e1).Subtract((dynamic)e2);
                     break;
 
-                default:
+                case Op.Multiplication:
                     if (type == ReflectionUtilities.ByteType)
                         result = (byte)((byte)e1 * (byte)e2);
                     else if (type == ReflectionUtilities.ShortType)
@@ -159,6 +159,9 @@ namespace ZenLib.Interpretation
                     else
                         result = (BigInteger)e1 * (BigInteger)e2;
                     break;
+
+                default:
+                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -356,7 +359,7 @@ namespace ZenLib.Interpretation
                     break;
 
                 default:
-                    throw new ZenException("Invalid case.");
+                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -436,9 +439,11 @@ namespace ZenLib.Interpretation
                 case ContainmentType.SuffixOf:
                     result = e1.EndsWith(e2);
                     break;
-                default:
+                case ContainmentType.Contains:
                     result = e1.Contains(e2);
                     break;
+                default:
+                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -595,9 +600,11 @@ namespace ZenLib.Interpretation
                 case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     result = CommonUtilities.DictionaryIntersect(e1, e2);
                     break;
-                default:
+                case ZenDictCombineExpr<TKey>.CombineType.Union:
                     result = CommonUtilities.DictionaryUnion(e1, e2);
                     break;
+                default:
+                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
