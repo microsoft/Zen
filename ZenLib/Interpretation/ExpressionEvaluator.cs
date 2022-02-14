@@ -269,6 +269,36 @@ namespace ZenLib.Interpretation
             }
         }
 
+        public object VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = expression.Expr1.Accept(this, parameter);
+            var e2 = expression.Expr2.Accept(this, parameter);
+
+            object result;
+            if (ReflectionUtilities.IsIDictType(typeof(T)))
+            {
+                var typeArgs = typeof(T).GetGenericArgumentsCached();
+                var keyType = typeArgs[0];
+                var valueType = typeArgs[1];
+                var method = typeof(CommonUtilities).GetMethodCached("ToImmutableDictionary").MakeGenericMethod(keyType, valueType);
+                dynamic d1 = method.Invoke(null, new object[] { e1 });
+                dynamic d2 = method.Invoke(null, new object[] { e2 });
+                result = CommonUtilities.DictionaryEquals(d1, d2);
+            }
+            else
+            {
+                result = ((T)e1).Equals((T)e2);
+            }
+
+            this.cache[expression] = result;
+            return result;
+        }
+
         public object VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
@@ -326,8 +356,7 @@ namespace ZenLib.Interpretation
                     break;
 
                 default:
-                    result = ((T)e1).Equals((T)e2);
-                    break;
+                    throw new ZenException("Invalid case.");
             }
 
             this.cache[expression] = result;
@@ -546,20 +575,6 @@ namespace ZenLib.Interpretation
             var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
             var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
             var result = CommonUtilities.DictionaryGet(e1, e2);
-            this.cache[expression] = result;
-            return result;
-        }
-
-        public object VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            if (this.cache.TryGetValue(expression, out var value))
-            {
-                return value;
-            }
-
-            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr1.Accept(this, parameter));
-            var e2 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr2.Accept(this, parameter));
-            var result = CommonUtilities.DictionaryEquals(e1, e2);
             this.cache[expression] = result;
             return result;
         }

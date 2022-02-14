@@ -438,6 +438,55 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = expression.Expr1.Accept(this, parameter);
+            var e2 = expression.Expr2.Accept(this, parameter);
+
+            if (e1 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b1 &&
+                e2 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b2)
+            {
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s1 &&
+                e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s2)
+            {
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi1 &&
+                e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi2)
+            {
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            if (e1 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> di1 &&
+                e2 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> di2)
+            {
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(di1.Value, di2.Value));
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            var i1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
+            var i2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+            var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
+            this.Cache[expression] = res;
+            return res;
+        }
+
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
@@ -448,66 +497,33 @@ namespace ZenLib.ModelChecking
             var e1 = expression.Expr1.Accept(this, parameter);
             var e2 = expression.Expr2.Accept(this, parameter);
 
-            switch (expression.ComparisonType)
+            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)
             {
-                case ComparisonType.Geq:
-                case ComparisonType.Leq:
-                    if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)
-                    {
-                        var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                        var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
-                        var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver,
-                            expression.ComparisonType == ComparisonType.Geq ?
-                                this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
-                                this.Solver.LessThanOrEqual(v1.Value, v2.Value));
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver,
+                    expression.ComparisonType == ComparisonType.Geq ?
+                        this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
+                        this.Solver.LessThanOrEqual(v1.Value, v2.Value));
 
-                        this.Cache[expression] = result;
-                        return result;
-                    }
-                    else
-                    {
-                        var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                        var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
-                        var r = ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
-                                (expression.ComparisonType == ComparisonType.Geq ?
-                                    this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
-                                    this.Solver.LessThanOrEqual(v1.Value, v2.Value)) :
-                                (expression.ComparisonType == ComparisonType.Geq ?
-                                    this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value) :
-                                    this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value));
-                        var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, r);
+                this.Cache[expression] = result;
+                return result;
+            }
+            else
+            {
+                var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
+                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+                var r = ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
+                        (expression.ComparisonType == ComparisonType.Geq ?
+                            this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
+                            this.Solver.LessThanOrEqual(v1.Value, v2.Value)) :
+                        (expression.ComparisonType == ComparisonType.Geq ?
+                            this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value) :
+                            this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value));
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, r);
 
-                        this.Cache[expression] = result;
-                        return result;
-                    }
-
-                default:
-                    if (e1 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b1 && e2 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b2)
-                    {
-                        var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
-                        this.Cache[expression] = result;
-                        return result;
-                    }
-
-                    if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s1 && e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s2)
-                    {
-                        var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
-                        this.Cache[expression] = result;
-                        return result;
-                    }
-
-                    if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi1 && e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi2)
-                    {
-                        var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
-                        this.Cache[expression] = result;
-                        return result;
-                    }
-
-                    var i1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                    var i2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
-                    var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
-                    this.Cache[expression] = res;
-                    return res;
+                this.Cache[expression] = result;
+                return result;
             }
         }
 
@@ -826,21 +842,6 @@ namespace ZenLib.ModelChecking
                 .Add("HasValue", hasValue).Add("Value", optionValue);
 
             var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
-
-            this.Cache[expression] = result;
-            return result;
-        }
-
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
-        {
-            if (this.Cache.TryGetValue(expression, out var value))
-            {
-                return value;
-            }
-
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr1.Accept(this, parameter);
-            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr2.Accept(this, parameter);
-            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(e1.Value, e2.Value));
 
             this.Cache[expression] = result;
             return result;

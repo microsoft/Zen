@@ -39,20 +39,8 @@ namespace ZenLib.Tests
             var s3 = o.GetField<ObjectAttribute, IList<int>>("Field3").ToString();
 
             Assert.AreEqual(11, s1.Split("::").Length);
-
-            for (int i = 1; i <= 5; i++)
-            {
-                Assert.IsTrue(s2.Contains($"== {i}"));
-            }
-            Assert.IsFalse(s2.Contains($"== 6"));
-
-            Console.WriteLine(s3);
-
-            for (int i = 1; i <= 3; i++)
-            {
-                Assert.IsTrue(s3.Contains($"== {i}"));
-            }
-            Assert.IsFalse(s3.Contains($"== 4"));
+            Assert.AreEqual(6, s2.Split("Eq").Length);
+            Assert.AreEqual(4, s3.Split("Eq").Length);
         }
 
         private struct ObjectAttribute

@@ -253,11 +253,6 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Zen).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Dict equality method for reflection.
-        /// </summary>
-        private static MethodInfo eqDictsMethod = typeof(Zen).GetMethod("EqDicts", BindingFlags.Static | BindingFlags.NonPublic);
-
-        /// <summary>
         /// Lift a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
@@ -516,29 +511,16 @@ namespace ZenLib
                 (hd1, tl1) => ZenListCaseExpr<T, bool>.Create(expr2, False(), (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
         }
 
-        private static Zen<bool> EqDicts<TKey, TValue>(Zen<IDictionary<TKey, TValue>> expr1, Zen<IDictionary<TKey, TValue>> expr2)
-        {
-            return ZenDictEqualityExpr<TKey, TValue>.Create(expr1, expr2);
-        }
-
         private static Zen<bool> EqHelper<T>(object expr1, object expr2)
         {
             var type = typeof(T);
 
             if (type == ReflectionUtilities.BoolType ||
                 type == ReflectionUtilities.StringType ||
-                ReflectionUtilities.IsIntegerType(type))
+                ReflectionUtilities.IsIntegerType(type) ||
+                ReflectionUtilities.IsIDictType(type))
             {
-                return ZenIntegerComparisonExpr<T>.Create((dynamic)expr1, (dynamic)expr2, ComparisonType.Eq);
-            }
-
-            if (ReflectionUtilities.IsIDictType(type))
-            {
-                var typeArgs = type.GetGenericArgumentsCached();
-                var keyType = typeArgs[0];
-                var valueType = typeArgs[1];
-                var method = eqDictsMethod.MakeGenericMethod(keyType, valueType);
-                return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
+                return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
             }
 
             if (ReflectionUtilities.IsIListType(type))

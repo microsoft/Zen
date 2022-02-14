@@ -287,6 +287,47 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                {
+                    return Expression.Call(
+                        expression.Expr1.Accept(this, parameter),
+                        typeof(T).GetMethod("Equals", new Type[] { typeof(object) }),
+                        expression.Expr2.Accept(this, parameter));
+                }
+
+                if (ReflectionUtilities.IsIDictType(typeof(T)))
+                {
+                    var typeArgs = typeof(T).GetGenericArgumentsCached();
+                    var keyType = typeArgs[0];
+                    var valueType = typeArgs[1];
+
+                    var method = typeof(CommonUtilities)
+                        .GetMethodCached("DictionaryEquals")
+                        .MakeGenericMethod(keyType, valueType);
+
+                    var dict1 = expression.Expr1.Accept(this, parameter);
+                    var dict2 = expression.Expr2.Accept(this, parameter);
+
+                    var toImmutableDictMethod = typeof(CommonUtilities)
+                        .GetMethodCached("ToImmutableDictionary")
+                        .MakeGenericMethod(keyType, valueType);
+
+                    var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
+                    var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+
+                    return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+                }
+
+                return Expression.Equal(
+                    expression.Expr1.Accept(this, parameter),
+                    expression.Expr2.Accept(this, parameter));
+            });
+        }
+
         public Expression VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -320,17 +361,7 @@ namespace ZenLib.Compilation
                             expression.Expr2.Accept(this, parameter));
 
                     default:
-                        if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                        {
-                            return Expression.Call(
-                                expression.Expr1.Accept(this, parameter),
-                                typeof(T).GetMethod("Equals", new Type[] { typeof(object) }),
-                                expression.Expr2.Accept(this, parameter));
-                        }
-
-                        return Expression.Equal(
-                            expression.Expr1.Accept(this, parameter),
-                            expression.Expr2.Accept(this, parameter));
+                        throw new ZenException("Invalid case");
                 }
             });
         }
@@ -638,28 +669,6 @@ namespace ZenLib.Compilation
 
                 var key = expression.KeyExpr.Accept(this, parameter);
                 return Expression.Call(null, method, immutableDictExpr, key);
-            });
-        }
-
-        public Expression VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var method = typeof(CommonUtilities)
-                    .GetMethodCached("DictionaryEquals")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var dict1 = expression.DictExpr1.Accept(this, parameter);
-                var dict2 = expression.DictExpr2.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
-
-                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
             });
         }
 
