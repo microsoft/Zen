@@ -459,7 +459,7 @@ namespace ZenLib.Tests
         /// Test set combine operations.
         /// </summary>
         [TestMethod]
-        public void TestSetCombinations3()
+        public void TestSetCombinations2()
         {
             var s1 = Symbolic<Set<int>>();
             var s2 = Symbolic<Set<int>>();
