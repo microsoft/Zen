@@ -18,6 +18,11 @@ namespace ZenLib.Solver
     {
         private SolverZ3 solver;
 
+        public Expr ConvertSymbolicValue(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
+        {
+            return value.Accept(this, type);
+        }
+
         public Z3SymbolicValueToExprConverter(SolverZ3 solver)
         {
             this.solver = solver;

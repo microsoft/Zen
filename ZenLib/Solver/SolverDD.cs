@@ -650,5 +650,17 @@ namespace ZenLib.Solver
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public Unit DictUnion(Unit arrayExpr1, Unit arrayExpr2)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit DictIntersect(Unit arrayExpr1, Unit arrayExpr2)
+        {
+            throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
     }
 }

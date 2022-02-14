@@ -92,6 +92,7 @@ namespace ZenLib.Tests
             CheckEqual(arg, arg);
             CheckEqual(If(a, x, y), If(a, x, y));
             CheckEqual(header, header);
+            CheckEqual(Set.Empty<UInt10>().Add(new UInt10(4)), Set.Empty<UInt10>().Add(new UInt10(4)));
             CheckEqual(header.WithField("DstIp", Ip.Create(99)), header.WithField("DstIp", Ip.Create(99)));
             CheckEqual(list1.AddFront(byte1), list1.AddFront(byte1));
 

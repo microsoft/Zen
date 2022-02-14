@@ -4,6 +4,8 @@
 
 namespace ZenLib
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -11,22 +13,22 @@ namespace ZenLib
     /// <summary>
     /// A class representing an arbitrary sized set.
     /// </summary>
-    public class Set<T>
+    public class Set<T> : IEquatable<Set<T>>
     {
         /// <summary>
         /// Gets the underlying values of the backing map.
         /// </summary>
-        public Map<T, Unit> Values { get; set; }
+        public Map<T, SetUnit> Values { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="Set{TKey}"/> class.
         /// </summary>
         public Set()
         {
-            this.Values = new Map<T, Unit>();
+            this.Values = new Map<T, SetUnit>();
         }
 
-        private Set(Map<T, Unit> map)
+        private Set(Map<T, SetUnit> map)
         {
             this.Values = map;
         }
@@ -42,7 +44,7 @@ namespace ZenLib
         /// <param name="elt">The element to add.</param>
         public Set<T> Add(T elt)
         {
-            return new Set<T>(this.Values.Set(elt, new Unit()));
+            return new Set<T>(this.Values.Set(elt, new SetUnit()));
         }
 
         /// <summary>
@@ -65,6 +67,26 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Union this set with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The union of the two sets.</returns>
+        public Set<T> Union(Set<T> other)
+        {
+            return new Set<T>(new Map<T, SetUnit>(CommonUtilities.DictionaryUnion(this.Values.Values, other.Values.Values)));
+        }
+
+        /// <summary>
+        /// Intersect this set with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The intersection of the two sets.</returns>
+        public Set<T> Intersect(Set<T> other)
+        {
+            return new Set<T>(new Map<T, SetUnit>(CommonUtilities.DictionaryIntersect(this.Values.Values, other.Values.Values)));
+        }
+
+        /// <summary>
         /// Convert the set to a string.
         /// </summary>
         /// <returns></returns>
@@ -72,6 +94,59 @@ namespace ZenLib
         public override string ToString()
         {
             return "{" + string.Join(", ", this.Values.Values.Select(kv => kv.Key)) + "}";
+        }
+
+        /// <summary>
+        /// Equality for sets.
+        /// </summary>
+        /// <param name="obj">The other set.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is Set<T> o && Equals(o);
+        }
+
+        /// <summary>
+        /// Equality for sets.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>True or false.</returns>
+        public bool Equals(Set<T> other)
+        {
+            var count = this.Count();
+            var otherCount = other.Count();
+            return count == otherCount && this.Intersect(other).Count() == count;
+        }
+
+        /// <summary>
+        /// Hashcode for sets.
+        /// </summary>
+        /// <returns>Hashcode for sets.</returns>
+        public override int GetHashCode()
+        {
+            return 1291433875 + EqualityComparer<Map<T, SetUnit>>.Default.GetHashCode(Values);
+        }
+
+        /// <summary>
+        /// Equality for sets.
+        /// </summary>
+        /// <param name="left">The left set.</param>
+        /// <param name="right">The right set.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator ==(Set<T> left, Set<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Inequality for sets.
+        /// </summary>
+        /// <param name="left">The left set.</param>
+        /// <param name="right">The right set.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator !=(Set<T> left, Set<T> right)
+        {
+            return !(left == right);
         }
     }
 
@@ -86,7 +161,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Empty<T>()
         {
-            return Create<Set<T>>(("Values", Map.Empty<T, Unit>()));
+            return Create<Set<T>>(("Values", Map.Empty<T, SetUnit>()));
         }
     }
 
@@ -100,9 +175,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="setExpr">The set expr.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<T, Unit>> Values<T>(this Zen<Set<T>> setExpr)
+        internal static Zen<Map<T, SetUnit>> Values<T>(this Zen<Set<T>> setExpr)
         {
-            return setExpr.GetField<Set<T>, Map<T, Unit>>("Values");
+            return setExpr.GetField<Set<T>, Map<T, SetUnit>>("Values");
         }
 
         /// <summary>
@@ -116,7 +191,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr);
             CommonUtilities.ValidateNotNull(elementExpr);
 
-            return Create<Set<T>>(("Values", setExpr.Values().Set(elementExpr, new Unit())));
+            return Create<Set<T>>(("Values", setExpr.Values().Set(elementExpr, new SetUnit())));
         }
 
         /// <summary>
@@ -144,6 +219,61 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr);
             CommonUtilities.ValidateNotNull(elementExpr);
             return setExpr.Values().ContainsKey(elementExpr);
+        }
+
+        /// <summary>
+        /// Union two sets together.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Set<T>> Union<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
+        {
+            CommonUtilities.ValidateNotNull(setExpr1);
+            CommonUtilities.ValidateNotNull(setExpr2);
+
+            var map = Create<Map<T, SetUnit>>(("Values", Zen.Union(setExpr1.Values().Values(), setExpr2.Values().Values())));
+            return Create<Set<T>>(("Values", map));
+        }
+
+        /// <summary>
+        /// Union two sets together.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Set<T>> Intersect<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
+        {
+            CommonUtilities.ValidateNotNull(setExpr1);
+            CommonUtilities.ValidateNotNull(setExpr2);
+
+            var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values().Values(), setExpr2.Values().Values())));
+            return Create<Set<T>>(("Values", map));
+        }
+    }
+
+    /// <summary>
+    /// Unit class that is hidden from the user to not interfere with maps that use Unit.
+    /// </summary>
+    public class SetUnit
+    {
+        /// <summary>
+        /// Equality between unit types.
+        /// </summary>
+        /// <param name="obj">The other unit object.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Hashcode for a unit type.
+        /// </summary>
+        /// <returns>The hash code.</returns>
+        public override int GetHashCode()
+        {
+            return 0;
         }
     }
 }

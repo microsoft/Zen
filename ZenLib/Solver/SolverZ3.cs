@@ -6,7 +6,6 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -17,6 +16,8 @@ namespace ZenLib.Solver
     internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>
     {
         internal Context Context;
+
+        internal Params Params;
 
         internal Solver Solver;
 
@@ -44,15 +45,20 @@ namespace ZenLib.Solver
 
         internal Z3SymbolicValueToExprConverter SymbolicValueToExprConverter;
 
+        internal Z3ExprToObjectConverter ExprToObjectConverter;
+
         public SolverZ3()
         {
             this.nextIndex = 0;
             this.Context = new Context();
+            this.Params = this.Context.MkParams();
+            this.Params.Add("compact", false);
             var t1 = this.Context.MkTactic("simplify");
             var t2 = this.Context.MkTactic("solve-eqs");
             var t3 = this.Context.MkTactic("smt");
             var tactic = this.Context.AndThen(t1, t2, t3);
             this.Solver = this.Context.MkSolver(tactic);
+            this.Solver.Parameters = this.Params;
             this.BoolSort = this.Context.MkBoolSort();
             this.ByteSort = this.Context.MkBitVecSort(8);
             this.ShortSort = this.Context.MkBitVecSort(16);
@@ -63,6 +69,7 @@ namespace ZenLib.Solver
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
+            this.ExprToObjectConverter = new Z3ExprToObjectConverter(this);
             this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 
@@ -195,16 +202,21 @@ namespace ZenLib.Solver
 
             var keySort = GetSortForType(keyType);
             var valueSort = GetSortForType(valueType);
-            var optionSort = this.GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
 
-            // create the new array variable
-            var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
-
-            // need to ensure we constrain the array default to be none
-            this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
-
-            return (v, v);
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                var v = this.Context.MkArrayConst(FreshSymbol(), keySort, this.BoolSort);
+                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), this.Context.MkFalse()));
+                return (v, v);
+            }
+            else
+            {
+                var optionSort = this.GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
+                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
+                return (v, v);
+            }
         }
 
         public BoolExpr Eq(BitVecExpr x, BitVecExpr y)
@@ -385,10 +397,18 @@ namespace ZenLib.Solver
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
             var keySort = GetSortForType(keyType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            return this.Context.MkConstArray(keySort, none);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkConstArray(keySort, this.Context.MkFalse());
+            }
+            else
+            {
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                return this.Context.MkConstArray(keySort, none);
+            }
         }
 
         public ArrayExpr DictSet(
@@ -398,12 +418,20 @@ namespace ZenLib.Solver
             Type keyType,
             Type valueType)
         {
-            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
-            var value = ConvertSymbolicValueToExpr(valueExpr, valueType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var some = this.Context.MkApp(optionSort.Constructors[1], value);
-            return this.Context.MkStore(arrayExpr, key, some);
+            var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkStore(arrayExpr, key, this.Context.MkTrue());
+            }
+            else
+            {
+                var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, valueType);
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var some = this.Context.MkApp(optionSort.Constructors[1], value);
+                return this.Context.MkStore(arrayExpr, key, some);
+            }
         }
 
         public ArrayExpr DictDelete(
@@ -412,11 +440,19 @@ namespace ZenLib.Solver
             Type keyType,
             Type valueType)
         {
-            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
-            var valueSort = GetSortForType(valueType);
-            var optionSort = GetOrCreateOptionSort(valueSort);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            return this.Context.MkStore(arrayExpr, key, none);
+            var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                return this.Context.MkStore(arrayExpr, key, this.Context.MkFalse());
+            }
+            else
+            {
+                var valueSort = GetSortForType(valueType);
+                var optionSort = GetOrCreateOptionSort(valueSort);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                return this.Context.MkStore(arrayExpr, key, none);
+            }
         }
 
         public (BoolExpr, object) DictGet(
@@ -425,14 +461,33 @@ namespace ZenLib.Solver
             Type keyType,
             Type valueType)
         {
-            var key = ConvertSymbolicValueToExpr(keyExpr, keyType);
+            var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
             var valueSort = GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
-            var optionResult = this.Context.MkSelect(arrayExpr, key);
-            var none = this.Context.MkApp(optionSort.Constructors[0]);
-            var someAccessor = optionSort.Accessors[1][0];
-            var hasValue = this.Context.MkNot(this.Context.MkEq(optionResult, none));
-            return (hasValue, this.Context.MkApp(someAccessor, optionResult));
+
+            if (valueType == ReflectionUtilities.SetUnitType)
+            {
+                var hasValue = (BoolExpr)this.Context.MkSelect(arrayExpr, key);
+                return (hasValue, this.Context.MkApp(optionSort.Constructors[0]));
+            }
+            else
+            {
+                var optionResult = this.Context.MkSelect(arrayExpr, key);
+                var none = this.Context.MkApp(optionSort.Constructors[0]);
+                var someAccessor = optionSort.Accessors[1][0];
+                var hasValue = this.Context.MkNot(this.Context.MkEq(optionResult, none));
+                return (hasValue, this.Context.MkApp(someAccessor, optionResult));
+            }
+        }
+
+        public ArrayExpr DictUnion(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return this.Context.MkSetUnion(arrayExpr1, arrayExpr2);
+        }
+
+        public ArrayExpr DictIntersect(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return this.Context.MkSetIntersection(arrayExpr1, arrayExpr2);
         }
 
         public Sort GetSortForType(Type type)
@@ -457,17 +512,12 @@ namespace ZenLib.Solver
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
-            return convertExprToObject(e, type);
-        }
-
-        private Expr ConvertSymbolicValueToExpr(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
-        {
-            return value.Accept(this.SymbolicValueToExprConverter, type);
+            return ConvertExprToObject(e, type);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
         {
-            return ReflectionUtilities.ApplyTypeVisitor(this.ExprToSymbolicValueConverter, type, (Expr)e);
+            return this.ExprToSymbolicValueConverter.ConvertExpr((Expr)e, type);
         }
 
         public Model Satisfiable(BoolExpr x)
@@ -482,103 +532,20 @@ namespace ZenLib.Solver
             return this.Solver.Model;
         }
 
-        private object convertExprToObject(Expr e, Type type)
+        public object ConvertExprToObject(Expr e, Type type)
         {
-            if (e.Sort == this.BoolSort)
+            // strip off the added option wrappers for dictionary values.
+            if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
-                return bool.Parse(e.ToString());
+                return ConvertExprToObject(e.Args[0], type);
             }
-            else if (e.Sort == this.ByteSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(byte), "Internal type mismatch");
-                return byte.Parse(e.ToString());
-            }
-            else if (e.Sort == this.ShortSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(short) || type == typeof(ushort), "Internal type mismatch");
-                var result = ushort.Parse(e.ToString());
-                return type == typeof(ushort) ? result : (object)(short)result;
-            }
-            else if (e.Sort == this.IntSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(int) || type == typeof(uint), "Internal type mismatch");
-                var result = uint.Parse(e.ToString());
-                return type == typeof(uint) ? result : (object)(int)result;
-            }
-            else if (e.Sort == this.BigIntSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(BigInteger), "Internal type mismatch");
-                return BigInteger.Parse(e.ToString());
-            }
-            else if (e.Sort == this.StringSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(string), "Internal type mismatch");
-                return CommonUtilities.ConvertZ3StringToCSharp(e.ToString());
-            }
-            else if (e.Sort == this.LongSort)
-            {
-                CommonUtilities.ValidateIsTrue(type == typeof(long) || type == typeof(ulong), "Internal type mismatch");
-                var result = ulong.Parse(e.ToString());
-                return type == typeof(ulong) ? result : (object)(long)result;
-            }
-            else if (e.IsConstantArray)
-            {
-                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsIDictType(type), "Internal type mismatch");
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                var c = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-            else if (e.IsStore)
-            {
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                var arrayExpr = e.Args[0];
-                var keyExpr = e.Args[1];
-                var valueExpr = e.Args[2];
-                var dict = convertExprToObject(arrayExpr, type);
-                var key = convertExprToObject(keyExpr, keyType);
-                var value = convertExprToObject(valueExpr, valueType);
-                var m = typeof(Dictionary<,>).MakeGenericType(keyType, valueType).GetMethod("Add", new Type[] { keyType, valueType });
-                m.Invoke(dict, new object[] { key, value });
-                return dict;
-            }
-            else if (e.IsApp)
-            {
-                if (this.TypeToSortConverter.ObjectAppNames.Contains(e.FuncDecl.Name.ToString()))
-                {
-                    var fields = ReflectionUtilities.GetAllFieldAndPropertyTypes(type).ToArray();
-                    var fieldNames = new string[fields.Length];
-                    var fieldValues = new object[fields.Length];
-                    for (int i = 0; i < fields.Length; i++)
-                    {
-                        fieldNames[i] = fields[i].Key;
-                        fieldValues[i] = convertExprToObject(e.Args[i], fields[i].Value);
-                    }
 
-                    return ReflectionUtilities.CreateInstance(type, fieldNames, fieldValues);
-                }
-                else if (e.Args.Length == 0)
-                {
-                    return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
-                }
-                else
-                {
-                    return convertExprToObject(e.Args[0], type);
-                }
-            }
-            else
+            if (e.IsApp && e.FuncDecl.Name.ToString() == "None")
             {
-                // must be a fixed width integer
-                var bytes = BigInteger.Parse(e.ToString()).ToByteArray();
-                int lastIndex = Array.FindLastIndex(bytes, b => b != 0);
-                Array.Resize(ref bytes, lastIndex + 1);
-                Array.Reverse(bytes);
-                return type.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
+                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
             }
+
+            return ReflectionUtilities.ApplyTypeVisitor(this.ExprToObjectConverter, type, e);
         }
     }
 }

@@ -25,6 +25,11 @@ namespace ZenLib.Solver
             this.solver = solver;
         }
 
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExpr(Expr e, Type type)
+        {
+            return ReflectionUtilities.ApplyTypeVisitor(this, type, e);
+        }
+
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitBigInteger(Expr parameter)
         {
             return new SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (IntExpr)parameter);

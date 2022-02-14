@@ -363,6 +363,22 @@ namespace ZenLib.Solver
         (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
+        /// The result of unioning two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
+        TArray DictUnion(TArray arrayExpr1, TArray arrayExpr2);
+
+        /// <summary>
+        /// The result of intersecting two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
+        TArray DictIntersect(TArray arrayExpr1, TArray arrayExpr2);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>
