@@ -194,17 +194,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Difference of two dictionaries.
-        /// </summary>
-        /// <param name="dict1">A dictionary.</param>
-        /// <param name="dict2">A dictionary.</param>
-        /// <returns>The difference of the two dictionaries.</returns>
-        public static ImmutableDictionary<T, SetUnit> DictionaryDifference<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
-        {
-            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Except(dict2));
-        }
-
-        /// <summary>
         /// Validate that an argument is true.
         /// </summary>
         /// <param name="obj">The argument.</param>

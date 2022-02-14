@@ -1012,17 +1012,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The intersection of two zen dictionaries.
-        /// </summary>
-        /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, SetUnit>> Difference<TKey>(
-            Zen<IDictionary<TKey, SetUnit>> d1,
-            Zen<IDictionary<TKey, SetUnit>> d2)
-        {
-            return ZenDictCombineExpr<TKey>.Create(d1, d2, ZenDictCombineExpr<TKey>.CombineType.Difference);
-        }
-
-        /// <summary>
         /// The Zen value for an empty List.
         /// </summary>
         /// <returns>Zen value.</returns>

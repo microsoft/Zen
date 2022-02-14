@@ -862,11 +862,8 @@ namespace ZenLib.ModelChecking
                 case ZenDictCombineExpr<TKey>.CombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
-                    expr = this.Solver.DictIntersect(e1.Value, e2.Value);
-                    break;
                 default:
-                    expr = this.Solver.DictDifference(e1.Value, e2.Value);
+                    expr = this.Solver.DictIntersect(e1.Value, e2.Value);
                     break;
             }
 

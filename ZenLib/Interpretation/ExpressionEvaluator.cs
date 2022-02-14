@@ -581,11 +581,8 @@ namespace ZenLib.Interpretation
                 case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     result = CommonUtilities.DictionaryIntersect(e1, e2);
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Union:
-                    result = CommonUtilities.DictionaryUnion(e1, e2);
-                    break;
                 default:
-                    result = CommonUtilities.DictionaryDifference(e1, e2);
+                    result = CommonUtilities.DictionaryUnion(e1, e2);
                     break;
             }
 

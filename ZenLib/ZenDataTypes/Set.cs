@@ -87,16 +87,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Difference of this set minus another.
-        /// </summary>
-        /// <param name="other">The other set.</param>
-        /// <returns>The set difference of the two sets.</returns>
-        public Set<T> Difference(Set<T> other)
-        {
-            return new Set<T>(new Map<T, SetUnit>(CommonUtilities.DictionaryDifference(this.Values.Values, other.Values.Values)));
-        }
-
-        /// <summary>
         /// Convert the set to a string.
         /// </summary>
         /// <returns></returns>
@@ -113,7 +103,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as Set<T>);
+            return obj is Set<T> o && Equals(o);
         }
 
         /// <summary>
@@ -258,21 +248,6 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr2);
 
             var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values().Values(), setExpr2.Values().Values())));
-            return Create<Set<T>>(("Values", map));
-        }
-
-        /// <summary>
-        /// Union two sets together.
-        /// </summary>
-        /// <param name="setExpr1">Zen set expression.</param>
-        /// <param name="setExpr2">Zen set expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Set<T>> Difference<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
-        {
-            CommonUtilities.ValidateNotNull(setExpr1);
-            CommonUtilities.ValidateNotNull(setExpr2);
-
-            var map = Create<Map<T, SetUnit>>(("Values", Zen.Difference(setExpr1.Values().Values(), setExpr2.Values().Values())));
             return Create<Set<T>>(("Values", map));
         }
     }

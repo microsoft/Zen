@@ -673,11 +673,8 @@ namespace ZenLib.Compilation
                     case ZenDictCombineExpr<TKey>.CombineType.Union:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                         break;
-                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
-                        method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
-                        break;
                     default:
-                        method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
                         break;
                 }
 

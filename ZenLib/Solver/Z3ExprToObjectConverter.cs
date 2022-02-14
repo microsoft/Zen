@@ -72,7 +72,7 @@ namespace ZenLib.Solver
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
                 var e1 = this.solver.ConvertExprToObject(parameter.Args[0], dictionaryType);
                 var e2 = this.solver.ConvertExprToObject(parameter.Args[1], dictionaryType);
-                var methodName = (lambda == "and") ? "DictionaryIntersect" : (lambda == "or") ? "DictionaryUnion" : "DictionaryDifference";
+                var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
