@@ -115,6 +115,12 @@ namespace ZenLib
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
+        /// The zen constant dict creation method.
+        /// </summary>
+        public static MethodInfo CreateZenDictConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenDictConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
         /// The zen constant option creation method.
         /// </summary>
         public static MethodInfo CreateZenOptionConstantMethod =
@@ -745,6 +751,23 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Create a constant Zen list value.
+        /// </summary>
+        /// <param name="value">The list value.</param>
+        /// <returns>The Zen value representing the list.</returns>
+        internal static Zen<IDictionary<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(IDictionary<TKey, TValue> value)
+        {
+            Zen<IDictionary<TKey, TValue>> dict = ZenDictEmptyExpr<TKey, TValue>.Instance;
+            foreach (var elt in value)
+            {
+                ReportIfNullConversionError(elt, "element", typeof(IDictionary<TKey, TValue>));
+                dict = ZenDictSetExpr<TKey, TValue>.Create(dict, elt.Key, elt.Value);
+            }
+
+            return dict;
+        }
+
+        /// <summary>
         /// Create a constant Zen option value.
         /// </summary>
         /// <param name="value">The option value.</param>
@@ -784,6 +807,13 @@ namespace ZenLib
                 {
                     var innerType = typeArgs[0];
                     return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+                }
+
+                if (type.IsGenericType && typeArgs.Length == 2 && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
+                {
+                    var keyType = typeArgs[0];
+                    var valueType = typeArgs[1];
+                    return CreateZenDictConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
                 }
 
                 // option type, we need this separate from classes/structs

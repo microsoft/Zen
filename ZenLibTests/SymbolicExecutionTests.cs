@@ -199,6 +199,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test symbolic execution for maps.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionWithMaps()
+        {
+            var f = new ZenFunction<Map<int, int>, bool, int>(
+                (m, b) => If(And(b, m.ContainsKey(1)), m.Get(1).Value(), 3));
+
+            var inputs = f.GenerateInputs().ToArray();
+
+            Assert.AreEqual(2, inputs.Length);
+            Assert.IsTrue(!inputs[0].Item1.ContainsKey(1) || !inputs[0].Item2);
+            Assert.IsTrue(inputs[1].Item1.ContainsKey(1) && inputs[1].Item2);
+        }
+
+        /// <summary>
         /// Test symbolic execution for string length.
         /// </summary>
         [TestMethod]
