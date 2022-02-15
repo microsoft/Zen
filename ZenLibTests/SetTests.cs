@@ -566,5 +566,37 @@ namespace ZenLib.Tests
             var result = new ZenConstraint<Set<Set<int>>>(d => d.Delete(Set.Empty<int>().Add(1)).Contains(Set.Empty<int>().Add(3))).Find();
             Assert.IsTrue(result.Value.Contains(new Set<int>().Add(3)));
         }
+
+        /// <summary>
+        /// Test that sets work with objects.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithObjects()
+        {
+            var result = new ZenConstraint<Set<ObjectWithSet>>(
+                d => d.Contains(new ObjectWithSet { Set = new Set<int>().Add(1) })).Find();
+            Assert.AreEqual(1, result.Value.Count());
+            Assert.AreEqual("{[Set={1}]}", result.Value.ToString());
+        }
+
+        /// <summary>
+        /// Object with a set field.
+        /// </summary>
+        public struct ObjectWithSet
+        {
+            /// <summary>
+            /// The set value.
+            /// </summary>
+            public Set<int> Set { get; set; }
+
+            /// <summary>
+            /// To string for object.
+            /// </summary>
+            /// <returns>A string.</returns>
+            public override string ToString()
+            {
+                return $"[Set={this.Set}]";
+            }
+        }
     }
 }
