@@ -37,7 +37,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The default value.</param>
         /// <returns>A value of the underlying type.</returns>
-        public T ValueOr(T other)
+        public T ValueOrDefault(T other)
         {
             if (this.HasValue)
             {
@@ -45,6 +45,58 @@ namespace ZenLib
             }
 
             return other;
+        }
+
+        /// <summary>
+        /// Map a function over an option.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        /// <returns>A new option with the function mapped over the value.</returns>
+        public Option<TResult> Select<TResult>(Func<T, TResult> function)
+        {
+            return this.HasValue ? Option.Some(function(this.Value)) : Option.None<TResult>();
+        }
+
+        /// <summary>
+        /// Filter an option with a predicate.
+        /// </summary>
+        /// <param name="function">The predicate function.</param>
+        /// <returns>A new option that is filtered to None if the predicate matches.</returns>
+        public Option<T> Where(Func<T, bool> function)
+        {
+            if (this.HasValue && !function(this.Value))
+            {
+                return Option.None<T>();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Determines if this option is none.
+        /// </summary>
+        /// <returns>True if the option has no value.</returns>
+        public bool IsNone()
+        {
+            return !this.HasValue;
+        }
+
+        /// <summary>
+        /// Determines if this option is some.
+        /// </summary>
+        /// <returns>True if the option has a value.</returns>
+        public bool IsSome()
+        {
+            return this.HasValue;
+        }
+
+        /// <summary>
+        /// Convert the option to a sequence with zero or one element.
+        /// </summary>
+        /// <returns>A sequence.</returns>
+        public FSeq<T> ToSequence()
+        {
+            return this.HasValue ? new FSeq<T>().AddFront(this.Value)  : new FSeq<T>();
         }
 
         /// <summary>
