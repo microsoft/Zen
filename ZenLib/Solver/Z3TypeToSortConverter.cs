@@ -54,10 +54,24 @@ namespace ZenLib.Solver
             return this.solver.ByteSort;
         }
 
-        [ExcludeFromCodeCoverage]
-        public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public Sort VisitDictionary(Func<Type, Unit, Sort> recurse, Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
-            throw new ZenException("Can not use map type in another map.");
+            if (this.typeToSort.TryGetValue(dictionaryType, out var sort))
+            {
+                return sort;
+            }
+
+            var keySort = this.solver.GetSortForType(keyType);
+            var valueSort = this.solver.GetSortForType(valueType);
+
+            if (valueType != ReflectionUtilities.SetUnitType)
+            {
+                valueSort = this.solver.GetOrCreateOptionSort(valueSort);
+            }
+
+            var dictionarySort = this.solver.Context.MkArraySort(keySort, valueSort);
+            this.typeToSort[dictionaryType] = dictionarySort;
+            return dictionarySort;
         }
 
         public Sort VisitFixedInteger(Type intType, Unit parameter)
@@ -102,7 +116,7 @@ namespace ZenLib.Solver
             for (int i = 0; i < fields.Length; i++)
             {
                 fieldNames[i] = fields[i].Key;
-                fieldSorts[i] = recurse((Type)fields[i].Value, new Unit());
+                fieldSorts[i] = this.solver.GetSortForType(fields[i].Value);
             }
 
             var objectConstructor = this.solver.Context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);

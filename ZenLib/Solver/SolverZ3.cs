@@ -490,25 +490,6 @@ namespace ZenLib.Solver
             return this.Context.MkSetIntersection(arrayExpr1, arrayExpr2);
         }
 
-        public Sort GetSortForType(Type type)
-        {
-            return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());
-        }
-
-        private DatatypeSort GetOrCreateOptionSort(Sort valueSort)
-        {
-            if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))
-            {
-                return optionSort;
-            }
-
-            var c1 = this.Context.MkConstructor("None", "none");
-            var c2 = this.Context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
-            var optSort = this.Context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
-            this.OptionSorts[valueSort] = optSort;
-            return optSort;
-        }
-
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
@@ -534,7 +515,6 @@ namespace ZenLib.Solver
 
         public object ConvertExprToObject(Expr e, Type type)
         {
-            // strip off the added option wrappers for dictionary values.
             if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
             {
                 return ConvertExprToObject(e.Args[0], type);
@@ -546,6 +526,30 @@ namespace ZenLib.Solver
             }
 
             return ReflectionUtilities.ApplyTypeVisitor(this.ExprToObjectConverter, type, e);
+        }
+
+        public Sort GetSortForType(Type type)
+        {
+            if (type == ReflectionUtilities.SetUnitType)
+            {
+                return this.BoolSort;
+            }
+
+            return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());
+        }
+
+        public DatatypeSort GetOrCreateOptionSort(Sort valueSort)
+        {
+            if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))
+            {
+                return optionSort;
+            }
+
+            var c1 = this.Context.MkConstructor("None", "none");
+            var c2 = this.Context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
+            var optSort = this.Context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
+            this.OptionSorts[valueSort] = optSort;
+            return optSort;
         }
     }
 }

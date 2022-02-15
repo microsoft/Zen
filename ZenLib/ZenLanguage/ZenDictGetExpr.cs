@@ -16,14 +16,14 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IDictionary<TKey, TValue>>, Zen<TKey>), ZenDictGetExpr<TKey, TValue>> createFunc = (v) =>
-            new ZenDictGetExpr<TKey, TValue>(v.Item1, v.Item2);
+        private static Func<(Zen<IDictionary<TKey, TValue>>, Zen<TKey>), Zen<Option<TValue>>> createFunc = (v) =>
+            Simplify(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenDictAddExpr.
         /// </summary>
-        private static HashConsTable<(long, long), ZenDictGetExpr<TKey, TValue>> hashConsTable =
-            new HashConsTable<(long, long), ZenDictGetExpr<TKey, TValue>>();
+        private static HashConsTable<(long, long), Zen<Option<TValue>>> hashConsTable =
+            new HashConsTable<(long, long), Zen<Option<TValue>>>();
 
         /// <summary>
         /// Unroll a ZenDictGetExpr.
@@ -35,12 +35,38 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Simplify and create a new ZenDictGetExpr.
+        /// </summary>
+        /// <param name="dict">The dictionary expr.</param>
+        /// <param name="key">The key expr.</param>
+        /// <returns>The new Zen expr.</returns>
+        private static Zen<Option<TValue>> Simplify(Zen<IDictionary<TKey, TValue>> dict, Zen<TKey> key)
+        {
+            if (dict is ZenDictEmptyExpr<TKey, TValue>)
+            {
+                return Option.Null<TValue>();
+            }
+
+            if (dict is ZenDictDeleteExpr<TKey, TValue> e1 && e1.KeyExpr.Equals(key))
+            {
+                return Option.Null<TValue>();
+            }
+
+            if (dict is ZenDictSetExpr<TKey, TValue> e2 && e2.KeyExpr.Equals(key))
+            {
+                return Option.Create(e2.ValueExpr);
+            }
+
+            return new ZenDictGetExpr<TKey, TValue>(dict, key);
+        }
+
+        /// <summary>
         /// Create a new ZenDictGetExpr.
         /// </summary>
         /// <param name="dictExpr">The dictionary expr.</param>
         /// <param name="key">The key expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenDictGetExpr<TKey, TValue> Create(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> key)
+        public static Zen<Option<TValue>> Create(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> key)
         {
             CommonUtilities.ValidateNotNull(dictExpr);
             CommonUtilities.ValidateNotNull(key);

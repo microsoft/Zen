@@ -209,10 +209,13 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    default:
+                    case Op.Multiplication:
                         return Expression.Multiply(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
+
+                    default:
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -287,6 +290,47 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                {
+                    return Expression.Call(
+                        expression.Expr1.Accept(this, parameter),
+                        typeof(T).GetMethod("Equals", new Type[] { typeof(object) }),
+                        expression.Expr2.Accept(this, parameter));
+                }
+
+                if (ReflectionUtilities.IsIDictType(typeof(T)))
+                {
+                    var typeArgs = typeof(T).GetGenericArgumentsCached();
+                    var keyType = typeArgs[0];
+                    var valueType = typeArgs[1];
+
+                    var method = typeof(CommonUtilities)
+                        .GetMethodCached("DictionaryEquals")
+                        .MakeGenericMethod(keyType, valueType);
+
+                    var dict1 = expression.Expr1.Accept(this, parameter);
+                    var dict2 = expression.Expr2.Accept(this, parameter);
+
+                    var toImmutableDictMethod = typeof(CommonUtilities)
+                        .GetMethodCached("ToImmutableDictionary")
+                        .MakeGenericMethod(keyType, valueType);
+
+                    var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
+                    var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+
+                    return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+                }
+
+                return Expression.Equal(
+                    expression.Expr1.Accept(this, parameter),
+                    expression.Expr2.Accept(this, parameter));
+            });
+        }
+
         public Expression VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -320,17 +364,7 @@ namespace ZenLib.Compilation
                             expression.Expr2.Accept(this, parameter));
 
                     default:
-                        if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                        {
-                            return Expression.Call(
-                                expression.Expr1.Accept(this, parameter),
-                                typeof(T).GetMethod("Equals", new Type[] { typeof(object) }),
-                                expression.Expr2.Accept(this, parameter));
-                        }
-
-                        return Expression.Equal(
-                            expression.Expr1.Accept(this, parameter),
-                            expression.Expr2.Accept(this, parameter));
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -507,8 +541,10 @@ namespace ZenLib.Compilation
                         return Expression.Call(l, prefixOfMethod, new Expression[] { r });
                     case ContainmentType.SuffixOf:
                         return Expression.Call(l, suffixOfMethod, new Expression[] { r });
-                    default:
+                    case ContainmentType.Contains:
                         return Expression.Call(l, containsMethod, new Expression[] { r });
+                    default:
+                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -641,28 +677,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var method = typeof(CommonUtilities)
-                    .GetMethodCached("DictionaryEquals")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var dict1 = expression.DictExpr1.Accept(this, parameter);
-                var dict2 = expression.DictExpr2.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
-
-                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
-            });
-        }
-
         public Expression VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -673,9 +687,11 @@ namespace ZenLib.Compilation
                     case ZenDictCombineExpr<TKey>.CombineType.Union:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                         break;
-                    default:
+                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
                         break;
+                    default:
+                        throw new ZenUnreachableException();
                 }
 
                 var dict1 = expression.DictExpr1.Accept(this, parameter);

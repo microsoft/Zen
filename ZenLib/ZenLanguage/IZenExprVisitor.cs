@@ -172,14 +172,6 @@ namespace ZenLib
         TReturn VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictEqualityExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenDictEqualityExpr<TKey, TValue>(ZenDictEqualityExpr<TKey, TValue> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a DictCombineExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -218,6 +210,14 @@ namespace ZenLib
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a EqualityExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a LeqExpr.

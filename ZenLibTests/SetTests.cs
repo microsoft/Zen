@@ -333,16 +333,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException1()
-        {
-            new ZenConstraint<Set<Set<uint>>>(m => m.Contains(Set.Empty<uint>())).Find();
-        }
-
-        /// <summary>
         /// Test that set works with fixed integers.
         /// </summary>
         [TestMethod]
@@ -428,6 +418,40 @@ namespace ZenLib.Tests
             Assert.AreEqual(0, new Set<int>().Add(10).Intersect(new Set<int>().Add(11)).Count());
             Assert.AreEqual(0, new Set<int>().Intersect(new Set<int>().Add(11)).Count());
             Assert.AreEqual(1, new Set<int>().Add(1).Add(2).Intersect(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
+        /// Test set evaluation with issubsetof.
+        /// </summary>
+        [TestMethod]
+        public void TestSetIsSubset()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, bool>((d1, d2) => d1.IsSubsetOf(d2));
+
+            // test interperter
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>().Add(10)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10).Add(11), new Set<int>().Add(11).Add(10).Add(4)));
+
+            // test compiler
+            zf.Compile();
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>()));
+            Assert.IsTrue(zf.Evaluate(new Set<int>(), new Set<int>().Add(10)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)));
+            Assert.IsTrue(zf.Evaluate(new Set<int>().Add(10).Add(11), new Set<int>().Add(11).Add(10).Add(4)));
+
+            // test data structure
+            Assert.IsFalse(new Set<int>().Add(10).IsSubsetOf(new Set<int>()));
+            Assert.IsTrue(new Set<int>().IsSubsetOf(new Set<int>()));
+            Assert.IsTrue(new Set<int>().IsSubsetOf(new Set<int>().Add(10)));
+            Assert.IsTrue(new Set<int>().Add(10).IsSubsetOf(new Set<int>().Add(10).Add(11)));
+            Assert.IsFalse(new Set<int>().Add(10).IsSubsetOf(new Set<int>().Add(11)));
+            Assert.IsTrue(new Set<int>().Add(10).Add(11).IsSubsetOf(new Set<int>().Add(11).Add(10).Add(4)));
         }
 
         /// <summary>
@@ -519,6 +543,60 @@ namespace ZenLib.Tests
             Assert.IsFalse(s1 == s4);
             Assert.IsTrue(s1 != s3);
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
+            Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
+            Assert.AreEqual(0, new SetUnit().GetHashCode());
+        }
+
+        /// <summary>
+        /// Test that set work with other sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithOtherSet1()
+        {
+            var result = new ZenConstraint<Set<Set<int>>>(d => d.Contains(Set.Empty<int>())).Find();
+            Assert.IsTrue(result.Value.Contains(new Set<int>()));
+        }
+
+        /// <summary>
+        /// Test that set work with other sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithOtherSet2()
+        {
+            var result = new ZenConstraint<Set<Set<int>>>(d => d.Delete(Set.Empty<int>().Add(1)).Contains(Set.Empty<int>().Add(3))).Find();
+            Assert.IsTrue(result.Value.Contains(new Set<int>().Add(3)));
+        }
+
+        /// <summary>
+        /// Test that sets work with objects.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithObjects()
+        {
+            var result = new ZenConstraint<Set<ObjectWithSet>>(
+                d => d.Contains(new ObjectWithSet { Set = new Set<int>().Add(1) })).Find();
+            Assert.AreEqual(1, result.Value.Count());
+            Assert.AreEqual("{[Set={1}]}", result.Value.ToString());
+        }
+
+        /// <summary>
+        /// Object with a set field.
+        /// </summary>
+        public struct ObjectWithSet
+        {
+            /// <summary>
+            /// The set value.
+            /// </summary>
+            public Set<int> Set { get; set; }
+
+            /// <summary>
+            /// To string for object.
+            /// </summary>
+            /// <returns>A string.</returns>
+            public override string ToString()
+            {
+                return $"[Set={this.Set}]";
+            }
         }
     }
 }
