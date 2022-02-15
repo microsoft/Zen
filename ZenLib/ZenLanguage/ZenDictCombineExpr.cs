@@ -16,14 +16,14 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IDictionary<TKey, SetUnit>>, Zen<IDictionary<TKey, SetUnit>>, CombineType), ZenDictCombineExpr<TKey>> createFunc = (v) =>
-            new ZenDictCombineExpr<TKey>(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<IDictionary<TKey, SetUnit>>, Zen<IDictionary<TKey, SetUnit>>, CombineType), Zen<IDictionary<TKey, SetUnit>>> createFunc = (v) =>
+            Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenDictUnionExpr.
         /// </summary>
-        private static HashConsTable<(long, long, int), ZenDictCombineExpr<TKey>> hashConsTable =
-            new HashConsTable<(long, long, int), ZenDictCombineExpr<TKey>>();
+        private static HashConsTable<(long, long, int), Zen<IDictionary<TKey, SetUnit>>> hashConsTable =
+            new HashConsTable<(long, long, int), Zen<IDictionary<TKey, SetUnit>>>();
 
         /// <summary>
         /// Unroll a ZenDictUnionExpr.
@@ -35,13 +35,42 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Simplify and create a new ZenDictCombineExpr.
+        /// </summary>
+        /// <param name="dict1">The dictionary expr.</param>
+        /// <param name="dict2">The dictionary expr.</param>
+        /// <param name="combinationType">The combination type.</param>
+        /// <returns>The new Zen expr.</returns>
+        private static Zen<IDictionary<TKey, SetUnit>> Simplify(
+            Zen<IDictionary<TKey, SetUnit>> dict1,
+            Zen<IDictionary<TKey, SetUnit>> dict2,
+            CombineType combinationType)
+        {
+            if (dict1 is ZenDictCombineExpr<TKey> e1 &&
+                e1.CombinationType == combinationType &&
+                (e1.DictExpr1.Equals(dict2) || e1.DictExpr2.Equals(dict2)))
+            {
+                return dict1;
+            }
+
+            if (dict2 is ZenDictCombineExpr<TKey> e2 &&
+                e2.CombinationType == combinationType &&
+                (e2.DictExpr1.Equals(dict1) || e2.DictExpr2.Equals(dict1)))
+            {
+                return dict2;
+            }
+
+            return new ZenDictCombineExpr<TKey>(dict1, dict2, combinationType);
+        }
+
+        /// <summary>
         /// Create a new ZenDictUnionExpr.
         /// </summary>
         /// <param name="dictExpr1">The first dictionary expr.</param>
         /// <param name="dictExpr2">The second dictionary expr.</param>
         /// <param name="combineType">The combination type.</param>
         /// <returns>The new expr.</returns>
-        public static ZenDictCombineExpr<TKey> Create(
+        public static Zen<IDictionary<TKey, SetUnit>> Create(
             Zen<IDictionary<TKey, SetUnit>> dictExpr1,
             Zen<IDictionary<TKey, SetUnit>> dictExpr2,
             CombineType combineType)
@@ -99,7 +128,7 @@ namespace ZenLib
                 case CombineType.Intersect:
                     return $"Intersect({this.DictExpr1}, {this.DictExpr2})";
                 default:
-                    return $"Difference({this.DictExpr1}, {this.DictExpr2})";
+                    throw new ZenUnreachableException();
             }
         }
 

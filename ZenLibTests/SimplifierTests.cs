@@ -515,6 +515,23 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that set simplification is working.
+        /// </summary>
+        [TestMethod]
+        public void TestSetSimplification()
+        {
+            var x = Set.Empty<int>().Add(10);
+            var y = Set.Empty<int>().Add(11);
+
+            Assert.AreEqual(x.Intersect(y).Intersect(y), x.Intersect(y));
+            Assert.AreEqual(x.Intersect(y).Intersect(x), x.Intersect(y));
+            Assert.AreEqual(x.Union(y).Union(y), x.Union(y));
+            Assert.AreEqual(x.Union(y).Union(x), x.Union(y));
+            Assert.AreNotEqual(x.Union(y).Intersect(y), x.Union(y));
+            Assert.AreNotEqual(x.Intersect(y).Union(x), x.Intersect(y));
+        }
+
+        /// <summary>
         /// Simplify get field.
         /// </summary>
         [TestMethod]
