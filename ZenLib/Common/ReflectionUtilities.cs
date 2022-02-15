@@ -692,7 +692,7 @@ namespace ZenLib
                 var typeParameters = type.GetGenericArgumentsCached();
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
-                return visitor.VisitDictionary(type, keyType, valueType, parameter);
+                return visitor.VisitDictionary((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, keyType, valueType, parameter);
             }
 
             if (IsIListType(type))

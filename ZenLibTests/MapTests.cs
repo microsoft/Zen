@@ -405,16 +405,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that map types do not work with maps.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestMapNonPrimitiveTypesException1()
-        {
-            new ZenConstraint<Map<uint, Map<uint, bool>>>(m => m.Get(10).IsSome()).Find();
-        }
-
-        /// <summary>
         /// Test that sequence types do not work with maps.
         /// </summary>
         [TestMethod]
@@ -442,6 +432,39 @@ namespace ZenLib.Tests
             Assert.IsTrue(s1 != s3);
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
             Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
+        }
+
+        /// <summary>
+        /// Test that maps work as values in other maps.
+        /// </summary>
+        [TestMethod]
+        public void TestMapWithMapValues1()
+        {
+            var f = new ZenFunction<Map<int, Map<int, int>>, bool>(d => And(d.Get(1).IsSome(), d.Get(1).Value().Get(2).IsSome()));
+            var sat = f.Find((d, allowed) => allowed);
+
+            Assert.IsTrue(sat.Value.ContainsKey(1));
+            Assert.IsTrue(sat.Value.Get(1).Value.ContainsKey(2));
+        }
+
+        /// <summary>
+        /// Test that map types do work with map values.
+        /// </summary>
+        [TestMethod]
+        public void TestMapWithMapValues2()
+        {
+            var sat = new ZenConstraint<Map<uint, Map<uint, bool>>>(m => m.Get(10).IsSome()).Find();
+            Assert.IsTrue(sat.Value.ContainsKey(10));
+        }
+
+        /// <summary>
+        /// Test that map types do work with map keys.
+        /// </summary>
+        [TestMethod]
+        public void TestMapWithMapKeys1()
+        {
+            var sat = new ZenConstraint<Map<Map<int, int>, int>>(m => m.Get(Map.Empty<int, int>()).IsSome()).Find();
+            Assert.IsTrue(sat.Value.ContainsKey(new Map<int, int>()));
         }
     }
 }

@@ -46,9 +46,9 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitDictionary(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
-            throw new ZenException("Invalid use of map or set in another map or set type");
+            return new SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (ArrayExpr)parameter);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitFixedInteger(Type intType, Expr parameter)
@@ -74,15 +74,19 @@ namespace ZenLib.Solver
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitObject(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
         {
-            var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(objectType);
-            var fieldsAndTypes = fields.ToArray();
             var result = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
-            for (int i = 0; i < fieldsAndTypes.Length; i++)
+
+            if (objectType != ReflectionUtilities.SetUnitType)
             {
-                var fieldName = fieldsAndTypes[i].Key;
-                var fieldAccessor = dataTypeSort.Accessors[0][i];
-                var fieldSymbolicValue = this.solver.ConvertExprToSymbolicValue(this.solver.Context.MkApp(fieldAccessor, parameter), fieldsAndTypes[i].Value);
-                result = result.Add(fieldName, fieldSymbolicValue);
+                var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(objectType);
+                var fieldsAndTypes = fields.ToArray();
+                for (int i = 0; i < fieldsAndTypes.Length; i++)
+                {
+                    var fieldName = fieldsAndTypes[i].Key;
+                    var fieldAccessor = dataTypeSort.Accessors[0][i];
+                    var fieldSymbolicValue = this.solver.ConvertExprToSymbolicValue(this.solver.Context.MkApp(fieldAccessor, parameter), fieldsAndTypes[i].Value);
+                    result = result.Add(fieldName, fieldSymbolicValue);
+                }
             }
 
             return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this.solver, result);

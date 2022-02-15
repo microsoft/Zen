@@ -40,12 +40,11 @@ namespace ZenLib.Solver
             return byte.Parse(parameter.ToString());
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public object VisitDictionary(Func<Type, Expr, object> recurse, Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
             {
-                var m = typeof(ImmutableDictionary).GetMethod("Create", new Type[] { }).MakeGenericMethod(keyType, valueType);
-                return m.Invoke(null, CommonUtilities.EmptyArray);
+                return CreateEmptyDictionary(keyType, valueType);
             }
             else if (parameter.IsStore)
             {
@@ -55,17 +54,7 @@ namespace ZenLib.Solver
                 var dict = this.solver.ConvertExprToObject(arrayExpr, dictionaryType);
                 var key = this.solver.ConvertExprToObject(keyExpr, keyType);
                 var value = this.solver.ConvertExprToObject(valueExpr, valueType);
-
-                // for sets, don't add the key when the value is false.
-                if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
-                {
-                    return dict;
-                }
-                else
-                {
-                    var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
-                    return m.Invoke(dict, new object[] { key, value });
-                }
+                return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
             {
@@ -76,9 +65,48 @@ namespace ZenLib.Solver
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "as-array")
+            {
+                var lambda = parameter.FuncDecl.Parameters[0].FuncDecl;
+                var interpretation = this.solver.Solver.Model.FuncInterp(lambda);
+                var elseCase = interpretation.Else.ToString();
+                CommonUtilities.ValidateIsTrue(elseCase == "false" || elseCase == "None", "Internal error.");
+
+                var dict = CreateEmptyDictionary(keyType, valueType);
+                for (int i = 0; i < interpretation.NumEntries; i++)
+                {
+                    var keyExpr = interpretation.Entries[i].Args[0];
+                    var valueExpr = interpretation.Entries[i].Value;
+                    var key = this.solver.ConvertExprToObject(keyExpr, keyType);
+                    var value = this.solver.ConvertExprToObject(valueExpr, valueType);
+                    dict = AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
+                }
+
+                return dict;
+            }
             else
             {
                 throw new ZenException("Internal error. Unexpected Z3 AST type.");
+            }
+        }
+
+        private object CreateEmptyDictionary(Type keyType, Type valueType)
+        {
+            var m = typeof(ImmutableDictionary).GetMethod("Create", new Type[] { }).MakeGenericMethod(keyType, valueType);
+            return m.Invoke(null, CommonUtilities.EmptyArray);
+        }
+
+        private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
+        {
+            // for sets, don't add the key when the value is false.
+            if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
+            {
+                return dict;
+            }
+            else
+            {
+                var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
+                return m.Invoke(dict, new object[] { key, value });
             }
         }
 

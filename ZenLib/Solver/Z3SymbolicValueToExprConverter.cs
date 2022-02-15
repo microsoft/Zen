@@ -38,10 +38,9 @@ namespace ZenLib.Solver
             return v.Value;
         }
 
-        [ExcludeFromCodeCoverage]
         public Expr VisitSymbolicDict(SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
         {
-            throw new ZenException("Invalid use of map or set in another map or set type.");
+            return v.Value;
         }
 
         public Expr VisitSymbolicInteger(SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
@@ -69,7 +68,8 @@ namespace ZenLib.Solver
 
             var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(parameter);
             var objectConstructor = dataTypeSort.Constructors[0];
-            return this.solver.Context.MkApp(objectConstructor, fieldExprs);
+            var ret = this.solver.Context.MkApp(objectConstructor, fieldExprs);
+            return ret;
         }
 
         public Expr VisitSymbolicString(SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)

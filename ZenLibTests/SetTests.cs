@@ -333,16 +333,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that non-primitive types do not work with sets.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSetNonPrimitiveTypesException1()
-        {
-            new ZenConstraint<Set<Set<uint>>>(m => m.Contains(Set.Empty<uint>())).Find();
-        }
-
-        /// <summary>
         /// Test that set works with fixed integers.
         /// </summary>
         [TestMethod]
@@ -555,6 +545,26 @@ namespace ZenLib.Tests
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
             Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
             Assert.AreEqual(0, new SetUnit().GetHashCode());
+        }
+
+        /// <summary>
+        /// Test that set work with other sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithOtherSet1()
+        {
+            var result = new ZenConstraint<Set<Set<int>>>(d => d.Contains(Set.Empty<int>())).Find();
+            Assert.IsTrue(result.Value.Contains(new Set<int>()));
+        }
+
+        /// <summary>
+        /// Test that set work with other sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithOtherSet2()
+        {
+            var result = new ZenConstraint<Set<Set<int>>>(d => d.Delete(Set.Empty<int>().Add(1)).Contains(Set.Empty<int>().Add(3))).Find();
+            Assert.IsTrue(result.Value.Contains(new Set<int>().Add(3)));
         }
     }
 }
