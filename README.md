@@ -3,7 +3,7 @@
 ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/rybecket/Zen/2)
 
 # Introduction 
-Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
+Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
 
 # Installation
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
@@ -252,8 +252,8 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
-| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use sequences or maps themselves | :heavy_check_mark: | :x: | :x:  |
-| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictiosn as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
+| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
+| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
