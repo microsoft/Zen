@@ -502,6 +502,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that map simplification is working.
+        /// </summary>
+        [TestMethod]
+        public void TestMapSimplification()
+        {
+            Assert.AreEqual(Map.Empty<int, int>().Get(10), Option.Null<int>());
+            Assert.AreEqual(Map.Empty<int, int>().Delete(10).Get(10), Option.Null<int>());
+            Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Get(10), Option.Create<int>(11));
+            Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Set(10, 12), Map.Empty<int, int>().Set(10, 12));
+            Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Delete(15).Set(15, 10), Map.Empty<int, int>().Set(10, 11).Set(15, 10));
+        }
+
+        /// <summary>
         /// Simplify get field.
         /// </summary>
         [TestMethod]
