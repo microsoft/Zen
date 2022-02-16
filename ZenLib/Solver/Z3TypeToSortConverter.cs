@@ -153,7 +153,16 @@ namespace ZenLib.Solver
 
         public Sort VisitSeq(Func<Type, Unit, Sort> recurse, Type sequenceType, Type innerType, Unit parameter)
         {
-            throw new NotImplementedException();
+            if (this.typeToSort.TryGetValue(sequenceType, out var sort))
+            {
+                return sort;
+            }
+
+            var valueSort = this.solver.GetSortForType(innerType);
+
+            var seqSort = this.solver.Context.MkSeqSort(valueSort);
+            this.typeToSort[sequenceType] = seqSort;
+            return seqSort;
         }
     }
 }

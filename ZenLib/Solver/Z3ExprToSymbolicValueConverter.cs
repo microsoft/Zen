@@ -94,7 +94,7 @@ namespace ZenLib.Solver
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitSeq(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type sequenceType, Type innerType, Expr parameter)
         {
-            throw new NotImplementedException();
+            return new SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (SeqExpr)parameter);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitShort(Expr parameter)

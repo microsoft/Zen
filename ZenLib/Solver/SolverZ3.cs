@@ -193,6 +193,16 @@ namespace ZenLib.Solver
             return (v, (SeqExpr)v);
         }
 
+        public (Expr, SeqExpr) CreateSeqVar(object e)
+        {
+            var seqType = e.GetType().GetGenericArgumentsCached()[0];
+            var innerType = seqType.GetGenericArgumentsCached()[0];
+            var innerSort = GetSortForType(innerType);
+            var seqSort = this.Context.MkSeqSort(innerSort);
+            var v = this.Context.MkConst(FreshSymbol(), seqSort);
+            return (v, (SeqExpr)v);
+        }
+
         public (Expr, ArrayExpr) CreateDictVar(object e)
         {
             var dictType = e.GetType().GetGenericArgumentsCached()[0];
@@ -434,6 +444,14 @@ namespace ZenLib.Solver
             }
         }
 
+        public SeqExpr SeqUnit(
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            Type type)
+        {
+            var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, type);
+            return this.Context.MkUnit(value);
+        }
+
         public ArrayExpr DictDelete(
             ArrayExpr arrayExpr,
             SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
@@ -488,6 +506,13 @@ namespace ZenLib.Solver
         public ArrayExpr DictIntersect(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
         {
             return this.Context.MkSetIntersection(arrayExpr1, arrayExpr2);
+        }
+
+        public SeqExpr SeqEmpty(Type type)
+        {
+            var sort = GetSortForType(type);
+            var seqSort = this.Context.MkSeqSort(sort);
+            return this.Context.MkEmptySeq(seqSort);
         }
 
         public object Get(Model m, Expr v, Type type)

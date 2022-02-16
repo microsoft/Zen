@@ -9,21 +9,21 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic value.
     /// </summary>
-    internal abstract class SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
+    internal abstract class SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
     {
-        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Solver;
+        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Solver;
 
-        public SymbolicValue(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver)
+        public SymbolicValue(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver)
         {
             this.Solver = solver;
         }
 
-        internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+        internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other);
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other);
 
         internal abstract TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter);
     }
 }

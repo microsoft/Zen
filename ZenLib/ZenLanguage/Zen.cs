@@ -518,7 +518,8 @@ namespace ZenLib
             if (type == ReflectionUtilities.BoolType ||
                 type == ReflectionUtilities.StringType ||
                 ReflectionUtilities.IsIntegerType(type) ||
-                ReflectionUtilities.IsIDictType(type))
+                ReflectionUtilities.IsIDictType(type) ||
+                ReflectionUtilities.IsSeqType(type))
             {
                 return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
             }

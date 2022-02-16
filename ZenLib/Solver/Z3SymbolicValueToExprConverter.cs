@@ -76,5 +76,10 @@ namespace ZenLib.Solver
         {
             return v.Value;
         }
+
+        public Expr VisitSymbolicSeq(SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        {
+            return v.Value;
+        }
     }
 }

@@ -15,13 +15,13 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Visitor that computes a symbolic representation for the function.
     /// </summary>
-    internal sealed class SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
-        : IZenExprVisitor<SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>
+    internal sealed class SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
+        : IZenExprVisitor<SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>
     {
         /// <summary>
-        /// Gets the decision diagram manager object.
+        /// Gets the solver.
         /// </summary>
-        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Solver { get; }
+        public ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Solver { get; }
 
         /// <summary>
         /// Gets the set of variables.
@@ -36,30 +36,30 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Cache of results to avoid the cost of common subexpressions.
         /// </summary>
-        private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>();
+        private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>> Cache { get; } = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>();
 
-        public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver)
+        public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver)
         {
             this.Solver = solver;
             this.Variables = new List<TVar>();
             this.ArbitraryVariables = new Dictionary<object, TVar>();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr1.Accept(this, parameter);
-            var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr2.Accept(this, parameter);
-            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.And(v1.Value, v2.Value));
+            var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr1.Accept(this, parameter);
+            var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr2.Accept(this, parameter);
+            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.And(v1.Value, v2.Value));
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -72,7 +72,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateBoolVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -83,7 +83,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateByteVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -94,7 +94,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateShortVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -105,7 +105,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateIntVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -116,7 +116,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateStringVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -127,7 +127,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateLongVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -138,7 +138,7 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateBigIntegerVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
@@ -149,25 +149,40 @@ namespace ZenLib.ModelChecking
             {
                 var (variable, expr) = this.Solver.CreateDictVar(expression);
                 this.Variables.Add(variable);
-                var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+                var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
                 this.ArbitraryVariables[expression] = variable;
 
                 this.Cache[expression] = result;
                 return result;
             }
 
-            // Fixed width integer case
-            var size = CommonUtilities.IntegerSize(type);
-            var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
-            this.Variables.Add(v);
-            var r = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var size = CommonUtilities.IntegerSize(type);
+                var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
+                this.Variables.Add(v);
+                var r = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
 
-            this.ArbitraryVariables[expression] = v;
-            this.Cache[expression] = r;
-            return r;
+                this.ArbitraryVariables[expression] = v;
+                this.Cache[expression] = r;
+                return r;
+            }
+
+            if (ReflectionUtilities.IsSeqType(type))
+            {
+                var (v, e) = this.Solver.CreateSeqVar(expression);
+                this.Variables.Add(v);
+                var r = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
+
+                this.ArbitraryVariables[expression] = v;
+                this.Cache[expression] = r;
+                return r;
+            }
+
+            throw new ZenUnreachableException();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -181,9 +196,9 @@ namespace ZenLib.ModelChecking
                     var acceptMethod = expr.GetType()
                         .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
                         .MakeGenericMethod(
-                            typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>),
-                            typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>));
-                    var result = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)acceptMethod.Invoke(expr, new object[] { this, parameter });
+                            typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>),
+                            typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>));
+                    var result = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)acceptMethod.Invoke(expr, new object[] { this, parameter });
                     this.Cache[expression] = result;
                     return result;
                 }
@@ -198,7 +213,7 @@ namespace ZenLib.ModelChecking
             return res;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenIntegerBinopExpr<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenIntegerBinopExpr<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -208,81 +223,84 @@ namespace ZenLib.ModelChecking
             var e1 = expression.Expr1.Accept(this, parameter);
             var e2 = expression.Expr2.Accept(this, parameter);
 
-            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)
+            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
 
                 switch (expression.Operation)
                 {
                     case Op.Addition:
-                        var result1 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
+                        var result1 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
                         this.Cache[expression] = result1;
                         return result1;
                     case Op.Subtraction:
-                        var result2 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
+                        var result2 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result2;
                         return result2;
                     case Op.Multiplication:
-                        var result3 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
+                        var result3 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result3;
                         return result3;
                     default:
                         throw new ZenUnreachableException();
                 }
             }
-            else
+
+            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
             {
-                var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+                var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
+                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
 
                 switch (expression.Operation)
                 {
                     case Op.BitwiseAnd:
-                        var result1 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
+                        var result1 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.BitwiseAnd(v1.Value, v2.Value));
                         this.Cache[expression] = result1;
                         return result1;
                     case Op.BitwiseOr:
-                        var result2 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
+                        var result2 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.BitwiseOr(v1.Value, v2.Value));
                         this.Cache[expression] = result2;
                         return result2;
                     case Op.BitwiseXor:
-                        var result3 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
+                        var result3 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.BitwiseXor(v1.Value, v2.Value));
                         this.Cache[expression] = result3;
                         return result3;
                     case Op.Addition:
-                        var result4 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
+                        var result4 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Add(v1.Value, v2.Value));
                         this.Cache[expression] = result4;
                         return result4;
                     case Op.Subtraction:
-                        var result5 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
+                        var result5 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result5;
                         return result5;
                     case Op.Multiplication:
-                        var result6 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
+                        var result6 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result6;
                         return result6;
                     default:
                         throw new ZenUnreachableException();
                 }
             }
+
+            throw new ZenUnreachableException();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
-            var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.BitwiseNot(v.Value));
+            var v = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
+            var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.BitwiseNot(v.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -294,7 +312,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.BigIntType)
             {
                 var bi = this.Solver.CreateBigIntegerConst((BigInteger)(object)expression.Value);
-                var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bi);
+                var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bi);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -302,7 +320,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.BoolType)
             {
                 var b = (bool)(object)expression.Value ? this.Solver.True() : this.Solver.False();
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, b);
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, b);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -310,7 +328,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.ByteType)
             {
                 var bv = this.Solver.CreateByteConst((byte)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -318,7 +336,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.ShortType)
             {
                 var bv = this.Solver.CreateShortConst((short)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -326,7 +344,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.UshortType)
             {
                 var bv = this.Solver.CreateShortConst((short)(ushort)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -334,7 +352,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.IntType)
             {
                 var bv = this.Solver.CreateIntConst((int)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -342,7 +360,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.UintType)
             {
                 var bv = this.Solver.CreateIntConst((int)(uint)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -350,7 +368,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.LongType)
             {
                 var bv = this.Solver.CreateLongConst((long)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -358,7 +376,7 @@ namespace ZenLib.ModelChecking
             if (type == ReflectionUtilities.UlongType)
             {
                 var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
@@ -366,20 +384,24 @@ namespace ZenLib.ModelChecking
             if (ReflectionUtilities.IsFixedIntegerType(type))
             {
                 var bv = this.Solver.CreateBitvecConst(((dynamic)expression.Value).GetBits());
-                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, bv);
+                var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
 
-            // string type.
-            var s = CommonUtilities.ConvertCSharpStringToZ3((string)(object)expression.Value);
-            var v = this.Solver.CreateStringConst(s);
-            var r = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, v);
-            this.Cache[expression] = r;
-            return r;
+            if (type == ReflectionUtilities.StringType)
+            {
+                var s = CommonUtilities.ConvertCSharpStringToZ3((string)(object)expression.Value);
+                var v = this.Solver.CreateStringConst(s);
+                var r = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, v);
+                this.Cache[expression] = r;
+                return r;
+            }
+
+            throw new ZenUnreachableException();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -388,20 +410,20 @@ namespace ZenLib.ModelChecking
 
             try
             {
-                var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
+                var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
                 foreach (var fieldValuePair in expression.Fields)
                 {
                     var field = fieldValuePair.Key;
                     var acceptMethod = fieldValuePair.Value.GetType()
                         .GetMethod("Accept", BindingFlags.NonPublic | BindingFlags.Instance)
                         .MakeGenericMethod(
-                            typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>),
-                            typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>));
+                            typeof(SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>),
+                            typeof(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>));
 
-                    fields = fields.Add(field, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter })); // fieldValue.Accept(this, parameter));
+                    fields = fields.Add(field, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)acceptMethod.Invoke(fieldValuePair.Value, new object[] { this, parameter })); // fieldValue.Accept(this, parameter));
                 }
 
-                var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(TObject), this.Solver, fields);
+                var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(typeof(TObject), this.Solver, fields);
 
                 this.Cache[expression] = result;
                 return result;
@@ -412,28 +434,28 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var v = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
             var result = v.Fields[expression.FieldName];
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.GuardExpr.Accept(this, parameter);
+            var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.GuardExpr.Accept(this, parameter);
             var vtrue = expression.TrueExpr.Accept(this, parameter);
             var vfalse = expression.FalseExpr.Accept(this, parameter);
             var result = vtrue.Merge(v.Value, vfalse);
@@ -442,7 +464,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -452,46 +474,58 @@ namespace ZenLib.ModelChecking
             var e1 = expression.Expr1.Accept(this, parameter);
             var e2 = expression.Expr2.Accept(this, parameter);
 
-            if (e1 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b1 &&
-                e2 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> b2)
+            if (e1 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> b1 &&
+                e2 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> b2)
             {
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
 
-            if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s1 &&
-                e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> s2)
+            if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s1 &&
+                e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s2)
             {
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
 
-            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi1 &&
-                e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> bi2)
+            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi1 &&
+                e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi2)
             {
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
 
-            if (e1 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> di1 &&
-                e2 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> di2)
+            if (e1 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di1 &&
+                e2 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di2)
             {
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(di1.Value, di2.Value));
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(di1.Value, di2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
 
-            var i1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-            var i2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
-            var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
-            this.Cache[expression] = res;
-            return res;
+            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i1 &&
+                e2 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i2)
+            {
+                var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
+                this.Cache[expression] = res;
+                return res;
+            }
+
+            if (e1 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> seq1 &&
+                e2 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> seq2)
+            {
+                var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(seq1.Value, seq2.Value));
+                this.Cache[expression] = res;
+                return res;
+            }
+
+            throw new ZenUnreachableException();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -501,11 +535,11 @@ namespace ZenLib.ModelChecking
             var e1 = expression.Expr1.Accept(this, parameter);
             var e2 = expression.Expr2.Accept(this, parameter);
 
-            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)
+            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
             {
-                var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver,
+                var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
+                var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver,
                     expression.ComparisonType == ComparisonType.Geq ?
                         this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
                         this.Solver.LessThanOrEqual(v1.Value, v2.Value));
@@ -513,10 +547,11 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-            else
+
+            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
             {
-                var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e1;
-                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)e2;
+                var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
+                var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
                 var r = ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
                         (expression.ComparisonType == ComparisonType.Geq ?
                             this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
@@ -524,60 +559,62 @@ namespace ZenLib.ModelChecking
                         (expression.ComparisonType == ComparisonType.Geq ?
                             this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value) :
                             this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value));
-                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, r);
+                var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, r);
 
                 this.Cache[expression] = result;
                 return result;
             }
+
+            throw new ZenUnreachableException();
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var v = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
             var elt = expression.Element.Accept(this, parameter);
 
-            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
+            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
             foreach (var kv in v.GuardedListGroup.Mapping)
             {
                 var guard = kv.Value.Guard;
                 var values = kv.Value.Values.Insert(0, elt);
-                mapping = mapping.Add(kv.Key + 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(guard, values));
+                mapping = mapping.Add(kv.Key + 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(guard, values));
             }
 
-            var listGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(mapping);
-            var result = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, listGroup);
+            var listGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(mapping);
+            var result = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, listGroup);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
-            var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
-            mapping = mapping.Add(0, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver.True(), list));
-            var guardedListGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(mapping);
-            var result = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, guardedListGroup);
+            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
+            var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
+            mapping = mapping.Add(0, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver.True(), list));
+            var guardedListGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(mapping);
+            var result = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, guardedListGroup);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
-            var list = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.ListExpr.Accept(this, parameter);
+            var list = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.ListExpr.Accept(this, parameter);
 
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> result = null;
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> result = null;
 
             foreach (var kv in list.GuardedListGroup.Mapping)
             {
@@ -594,19 +631,19 @@ namespace ZenLib.ModelChecking
                 {
                     // split the symbolic list
                     var (hd, tl) = CommonUtilities.SplitHead(values);
-                    var tlImmutable = CommonUtilities.ToImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>(tl);
+                    var tlImmutable = CommonUtilities.ToImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>(tl);
 
                     // push the guard into the tail of the list
-                    var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty;
-                    map = map.Add(length - 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver.True(), tlImmutable));
-                    var group = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(map);
-                    var rest = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, group);
+                    var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
+                    map = map.Add(length - 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver.True(), tlImmutable));
+                    var group = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(map);
+                    var rest = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, group);
 
                     // execute the cons case with placeholder values to get a new Zen value.
                     var arg1 = new ZenArgumentExpr<TList>();
                     var arg2 = new ZenArgumentExpr<IList<TList>>();
                     var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
-                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(parameter.ArgumentsToExpr, args);
+                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(parameter.ArgumentsToExpr, args);
                     var newExpression = expression.ConsCase(arg1, arg2);
 
                     // model check the resulting value using the computed values for the placeholders.
@@ -618,72 +655,72 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
-            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Not(v.Value));
+            var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
+            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Not(v.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr1.Accept(this, parameter);
-            var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr2.Accept(this, parameter);
-            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
+            var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr1.Accept(this, parameter);
+            var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr2.Accept(this, parameter);
+            var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenConcatExpr(ZenConcatExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenConcatExpr(ZenConcatExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr1.Accept(this, parameter);
-            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr2.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Concat(v1.Value, v2.Value));
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr1.Accept(this, parameter);
+            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr2.Accept(this, parameter);
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Concat(v1.Value, v2.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.StringExpr.Accept(this, parameter);
-            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.SubstringExpr.Accept(this, parameter);
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
+            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubstringExpr.Accept(this, parameter);
 
             switch (expression.ContainmentType)
             {
                 case ContainmentType.PrefixOf:
-                    var r1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.PrefixOf(v1.Value, v2.Value));
+                    var r1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.PrefixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r1;
                     return r1;
                 case ContainmentType.SuffixOf:
-                    var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
+                    var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r2;
                     return r2;
                 case ContainmentType.Contains:
-                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
+                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
                     this.Cache[expression] = r3;
                     return r3;
                 default:
@@ -691,99 +728,99 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.StringExpr.Accept(this, parameter);
-            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.SubstringExpr.Accept(this, parameter);
-            var v3 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.ReplaceExpr.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.ReplaceFirst(v1.Value, v2.Value, v3.Value));
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
+            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubstringExpr.Accept(this, parameter);
+            var v3 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.ReplaceExpr.Accept(this, parameter);
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.ReplaceFirst(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.StringExpr.Accept(this, parameter);
-            var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.OffsetExpr.Accept(this, parameter);
-            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.LengthExpr.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Substring(v1.Value, v2.Value, v3.Value));
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
+            var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
+            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.LengthExpr.Accept(this, parameter);
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Substring(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringAtExpr(ZenStringAtExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringAtExpr(ZenStringAtExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.StringExpr.Accept(this, parameter);
-            var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.IndexExpr.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.At(v1.Value, v2.Value));
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
+            var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.IndexExpr.Accept(this, parameter);
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.At(v1.Value, v2.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringLengthExpr(ZenStringLengthExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringLengthExpr(ZenStringLengthExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.Length(v.Value));
+            var v = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Length(v.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.StringExpr.Accept(this, parameter);
-            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.SubstringExpr.Accept(this, parameter);
-            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.OffsetExpr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
+            var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
+            var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubstringExpr.Accept(this, parameter);
+            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Expr.Accept(this, parameter);
+            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
             var f = expression.FieldValue.Accept(this, parameter);
-            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -791,77 +828,77 @@ namespace ZenLib.ModelChecking
             }
 
             var emptyDict = this.Solver.DictEmpty(typeof(TKey), typeof(TValue));
-            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, emptyDict);
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptyDict);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
             var e3 = expression.ValueExpr.Accept(this, parameter);
             var e = this.Solver.DictSet(e1.Value, e2, e3, typeof(TKey), typeof(TValue));
-            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
             var e = this.Solver.DictDelete(e1.Value, e2, typeof(TKey), typeof(TValue));
-            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, e);
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr.Accept(this, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.DictExpr.Accept(this, parameter);
             var e2 = expression.KeyExpr.Accept(this, parameter);
             var (flag, e) = this.Solver.DictGet(e1.Value, e2, typeof(TKey), typeof(TValue));
 
-            var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, flag);
+            var hasValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, flag);
             var optionValue = this.Solver.ConvertExprToSymbolicValue(e, typeof(TValue));
 
-            var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>>.Empty
+            var fields = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty
                 .Add("HasValue", hasValue).Add("Value", optionValue);
 
-            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(typeof(Option<TValue>), this.Solver, fields);
+            var result = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(typeof(Option<TValue>), this.Solver, fields);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
                 return value;
             }
 
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr1.Accept(this, parameter);
-            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.DictExpr2.Accept(this, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.DictExpr1.Accept(this, parameter);
+            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.DictExpr2.Accept(this, parameter);
 
             TArray expr;
             switch (expression.CombinationType)
@@ -876,32 +913,61 @@ namespace ZenLib.ModelChecking
                     throw new ZenUnreachableException();
             }
 
-            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, expr);
+            var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
 
             this.Cache[expression] = result;
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var emptySeq = this.Solver.SeqEmpty(typeof(T));
+            var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptySeq);
+
+            this.Cache[expression] = result;
+            return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e = expression.ValueExpr.Accept(this, parameter);
+            var unitSeq = this.Solver.SeqUnit(e, typeof(T));
+            var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, unitSeq);
+
+            this.Cache[expression] = result;
+            return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
-            throw new NotImplementedException();
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr1.Accept(this, parameter);
+            var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr2.Accept(this, parameter);
+            var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Concat(v1.Value, v2.Value));
+
+            this.Cache[expression] = result;
+            return result;
         }
 
         [ExcludeFromCodeCoverage]
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> v1,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> v2)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v1,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v2)
         {
             if (v2 == null)
             {

@@ -175,7 +175,30 @@ namespace ZenLib.Solver
 
         public object VisitSeq(Func<Type, Expr, object> recurse, Type sequenceType, Type innerType, Expr parameter)
         {
-            throw new NotImplementedException();
+            Console.WriteLine(parameter);
+
+            if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.empty")
+            {
+                var c = sequenceType.GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.unit")
+            {
+                var value = this.solver.ConvertExprToObject(parameter.Args[0], innerType);
+                var c = sequenceType.GetConstructor(new Type[] { innerType });
+                return c.Invoke(new object[] { value });
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++")
+            {
+                var seq1 = this.solver.ConvertExprToObject(parameter.Args[0], sequenceType);
+                var seq2 = this.solver.ConvertExprToObject(parameter.Args[1], sequenceType);
+                var m = sequenceType.GetMethod("Concat");
+                return m.Invoke(seq1, new object[] { seq2 });
+            }
+            else
+            {
+                throw new ZenUnreachableException();
+            }
         }
     }
 }

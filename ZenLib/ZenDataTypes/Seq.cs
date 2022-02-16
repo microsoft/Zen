@@ -5,6 +5,7 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
 
@@ -38,6 +39,15 @@ namespace ZenLib
         private Seq(ImmutableList<T> values)
         {
             this.Values = values;
+        }
+
+        /// <summary>
+        /// Get the sequence as a list.
+        /// </summary>
+        /// <returns></returns>
+        public IList<T> ToList()
+        {
+            return this.Values;
         }
 
         /// <summary>
@@ -146,6 +156,22 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The Zen value for a singleton seq.
+        /// </summary>
+        /// <param name="value">The single element value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Seq<T>> Unit<T>(Zen<T> value)
+        {
+            return ZenSeqUnitExpr<T>.Create(value);
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for Zen seq objects.
+    /// </summary>
+    public static class SeqExtensions
+    {
+        /// <summary>
         /// Concatenate two Zen sequences.
         /// </summary>
         /// <param name="seqExpr1">The first sequence.</param>
@@ -158,12 +184,5 @@ namespace ZenLib
 
             return ZenSeqConcatExpr<T>.Create(seqExpr1, seqExpr2);
         }
-    }
-
-    /// <summary>
-    /// Extension methods for Zen seq objects.
-    /// </summary>
-    public static class SeqExtensions
-    {
     }
 }

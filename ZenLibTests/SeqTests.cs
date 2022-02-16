@@ -61,35 +61,59 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test seq evaluation with empty.
+        /// Test seq find with empty.
         /// </summary>
         [TestMethod]
         public void TestSeqFindEmpty()
         {
-            var zf = new ZenConstraint<Seq<int>>(s => s == new Seq<int>());
-            var seq = zf.Find();
-            Console.WriteLine(seq);
+            var result = new ZenConstraint<Seq<int>>(s => s == new Seq<int>()).Find();
+            Assert.AreEqual(new Seq<int>(), result.Value);
         }
 
-        /* /// <summary>
+        /// <summary>
+        /// Test seq find with unit.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindUnit()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s == Seq.Unit<int>(0)).Find();
+            Assert.AreEqual(new Seq<int>(0), result.Value);
+        }
+
+        /// <summary>
+        /// Test seq find with concat.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindConcat()
+        {
+            var zero = new Seq<int>(0);
+            var one = new Seq<int>(1);
+
+            var result = new ZenConstraint<Seq<int>>(s => s == zero.Concat(one)).Find();
+            Assert.AreEqual(zero.Concat(one), result.Value);
+        }
+
+        /// <summary>
         /// Test set equality and hashcode.
         /// </summary>
         [TestMethod]
         public void TestSeqEqualsHashcode()
         {
-            var s1 = new Seq<int>().Add(11).Add(10);
-            var s2 = new Set<int>().Add(10).Add(11);
-            var s3 = new Set<int>().Add(1).Add(2);
-            var s4 = new Set<int>();
+            var empty = new Seq<int>();
+            var zero = new Seq<int>(0);
+            var one = new Seq<int>(1);
+            var two = new Seq<int>(2);
+
+            var s1 = empty.Concat(zero).Concat(one);
+            var s2 = zero.Concat(one);
+            var s3 = zero.Concat(one).Concat(two);
             Assert.IsTrue(s1.Equals(s2));
             Assert.IsTrue(s1.Equals((object)s2));
             Assert.IsFalse(s1.Equals(10));
             Assert.IsFalse(s1 == s3);
-            Assert.IsFalse(s1 == s4);
             Assert.IsTrue(s1 != s3);
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
             Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
-            Assert.AreEqual(0, new SetUnit().GetHashCode());
-        } */
+        }
     }
 }

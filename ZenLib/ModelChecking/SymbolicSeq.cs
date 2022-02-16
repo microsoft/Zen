@@ -1,4 +1,4 @@
-﻿// <copyright file="SymbolicBool.cs" company="Microsoft">
+﻿// <copyright file="SymbolicSeq.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,31 +8,31 @@ namespace ZenLib.ModelChecking
     using ZenLib.Solver;
 
     /// <summary>
-    /// Representation of a symbolic boolean value.
+    /// Representation of a symbolic sequence value.
     /// </summary>
-    internal class SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
+    internal class SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
     {
-        public SymbolicBool(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TBool value) : base(solver)
+        public SymbolicSeq(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TSeq value) : base(solver)
         {
             this.Value = value;
         }
 
-        public TBool Value { get; }
+        public TSeq Value { get; }
 
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other)
         {
-            var o = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
+            var o = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
+            return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
             ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter)
         {
-            return visitor.VisitSymbolicBool(this, parameter);
+            return visitor.VisitSymbolicSeq(this, parameter);
         }
 
         /// <summary>
@@ -42,17 +42,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            if (this.Value.Equals(this.Solver.False()))
-            {
-                return "false";
-            }
-
-            if (this.Value.Equals(this.Solver.True()))
-            {
-                return "true";
-            }
-
-            return "<symbool>";
+            return "<symseq>";
         }
     }
 }
