@@ -375,17 +375,17 @@ namespace ZenLib.Solver
             return this.Context.MkSuffixOf(y, x);
         }
 
-        public BoolExpr Contains(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqContains(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkContains(x, y);
         }
 
-        public SeqExpr ReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
+        public SeqExpr SeqReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
         {
             return this.Context.MkReplace(x, y, z);
         }
 
-        public SeqExpr Substring(SeqExpr x, IntExpr y, IntExpr z)
+        public SeqExpr SeqSlice(SeqExpr x, IntExpr y, IntExpr z)
         {
             return this.Context.MkExtract(x, y, z);
         }
@@ -395,12 +395,12 @@ namespace ZenLib.Solver
             return this.Context.MkAt(x, y);
         }
 
-        public IntExpr Length(SeqExpr x)
+        public IntExpr SeqLength(SeqExpr x)
         {
             return this.Context.MkLength(x);
         }
 
-        public IntExpr IndexOf(SeqExpr x, SeqExpr y, IntExpr z)
+        public IntExpr SeqIndexOf(SeqExpr x, SeqExpr y, IntExpr z)
         {
             return this.Context.MkIndexOf(x, y, z);
         }

@@ -961,6 +961,18 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.OffsetExpr.Accept(this, parameter);
+                var e3 = expression.LengthExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("SliceBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
+        }
+
         private ParameterExpression FreshVariable(Type type)
         {
             return Expression.Variable(type, "v" + nextVariableId++);

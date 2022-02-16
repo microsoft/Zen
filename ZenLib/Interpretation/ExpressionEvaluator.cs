@@ -719,5 +719,21 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (Seq<T>)expression.SeqExpr.Accept(this, parameter);
+            var e2 = (BigInteger)expression.OffsetExpr.Accept(this, parameter);
+            var e3 = (BigInteger)expression.LengthExpr.Accept(this, parameter);
+            var result = e1.SliceBigInteger(e2, e3);
+
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }

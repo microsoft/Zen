@@ -311,7 +311,7 @@ namespace ZenLib.Solver
         /// <param name="x">The string expression.</param>
         /// <param name="y">The substring expression.</param>
         /// <returns></returns>
-        TBool Contains(TSeq x, TSeq y);
+        TBool SeqContains(TSeq x, TSeq y);
 
         /// <summary>
         /// The string 'Replace' operation.
@@ -320,7 +320,7 @@ namespace ZenLib.Solver
         /// <param name="y">The substring expression.</param>
         /// <param name="z">The replacement expression.</param>
         /// <returns></returns>
-        TSeq ReplaceFirst(TSeq x, TSeq y, TSeq z);
+        TSeq SeqReplaceFirst(TSeq x, TSeq y, TSeq z);
 
         /// <summary>
         /// The string 'Substring' operation.
@@ -329,7 +329,7 @@ namespace ZenLib.Solver
         /// <param name="y">The offset expression.</param>
         /// <param name="z">The length expression.</param>
         /// <returns></returns>
-        TSeq Substring(TSeq x, TInteger y, TInteger z);
+        TSeq SeqSlice(TSeq x, TInteger y, TInteger z);
 
         /// <summary>
         /// The string 'At' operation.
@@ -344,7 +344,7 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="x">The string expression.</param>
         /// <returns></returns>
-        TInteger Length(TSeq x);
+        TInteger SeqLength(TSeq x);
 
         /// <summary>
         /// The string 'IndexOf' operation.
@@ -353,7 +353,7 @@ namespace ZenLib.Solver
         /// <param name="y">The substring expression.</param>
         /// <param name="z">The offset expression.</param>
         /// <returns></returns>
-        TInteger IndexOf(TSeq x, TSeq y, TInteger z);
+        TInteger SeqIndexOf(TSeq x, TSeq y, TInteger z);
 
         /// <summary>
         /// The empty dictionary.

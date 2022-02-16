@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -719,7 +720,7 @@ namespace ZenLib.ModelChecking
                     this.Cache[expression] = r2;
                     return r2;
                 case ContainmentType.Contains:
-                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
+                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqContains(v1.Value, v2.Value));
                     this.Cache[expression] = r3;
                     return r3;
                 default:
@@ -737,7 +738,7 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
             var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubstringExpr.Accept(this, parameter);
             var v3 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.ReplaceExpr.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.ReplaceFirst(v1.Value, v2.Value, v3.Value));
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqReplaceFirst(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
@@ -753,7 +754,7 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
             var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.LengthExpr.Accept(this, parameter);
-            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Substring(v1.Value, v2.Value, v3.Value));
+            var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqSlice(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
@@ -782,7 +783,7 @@ namespace ZenLib.ModelChecking
             }
 
             var v = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Expr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Length(v.Value));
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqLength(v.Value));
 
             this.Cache[expression] = result;
             return result;
@@ -798,7 +799,7 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.StringExpr.Accept(this, parameter);
             var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubstringExpr.Accept(this, parameter);
             var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqIndexOf(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;
@@ -970,7 +971,7 @@ namespace ZenLib.ModelChecking
             }
 
             var v = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Length(v.Value));
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqLength(v.Value));
 
             this.Cache[expression] = result;
             return result;
@@ -1026,7 +1027,7 @@ namespace ZenLib.ModelChecking
                     this.Cache[expression] = r2;
                     return r2;
                 case SeqContainmentType.Contains:
-                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
+                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqContains(v1.Value, v2.Value));
                     this.Cache[expression] = r3;
                     return r3;
                 default:
@@ -1044,7 +1045,23 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubseqExpr.Accept(this, parameter);
             var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
-            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqIndexOf(v1.Value, v2.Value, v3.Value));
+
+            this.Cache[expression] = result;
+            return result;
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
+            var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
+            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.LengthExpr.Accept(this, parameter);
+            var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqSlice(v1.Value, v2.Value, v3.Value));
 
             this.Cache[expression] = result;
             return result;

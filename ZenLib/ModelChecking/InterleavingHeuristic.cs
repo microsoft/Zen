@@ -485,5 +485,11 @@ namespace ZenLib.ModelChecking
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
     }
 }

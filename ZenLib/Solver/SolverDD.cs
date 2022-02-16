@@ -538,19 +538,19 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public DD Contains(Unit x, Unit y)
+        public DD SeqContains(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit ReplaceFirst(Unit x, Unit y, Unit z)
+        public Unit SeqReplaceFirst(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit Substring(Unit x, Unit y, Unit z)
+        public Unit SeqSlice(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
@@ -562,13 +562,13 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit Length(Unit x)
+        public Unit SeqLength(Unit x)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit IndexOf(Unit x, Unit y, Unit z)
+        public Unit SeqIndexOf(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }

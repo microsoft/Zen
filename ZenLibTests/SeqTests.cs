@@ -21,8 +21,6 @@ namespace ZenLib.Tests
     {
         private static Seq<int> empty = new Seq<int>();
 
-        private static Seq<int> zero = new Seq<int>(0);
-
         private static Seq<int> one = new Seq<int>(1);
 
         private static Seq<int> two = new Seq<int>(2);
@@ -33,10 +31,11 @@ namespace ZenLib.Tests
         /// Test that some basic set equations hold.
         /// </summary>
         [TestMethod]
-        public void TestSetEquations()
+        public void TestSeqEquations()
         {
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(Not(s1.Contains(s2)), s1.IndexOf(s2) < BigInteger.Zero), runBdds: false);
             CheckValid<Seq<int>, int>((s, x) => Implies(s.Contains(Seq.Unit(x)), s.IndexOf(Seq.Unit(x)) >= BigInteger.Zero), runBdds: false);
+            CheckValid<Seq<int>>(s => s.IndexOf(Seq.Empty<int>()) == BigInteger.Zero, runBdds: false);
             CheckValid<Seq<int>, Seq<int>, Seq<int>>((s1, s2, s3) => s1.Concat(s2).Concat(s3) == s1.Concat(s2.Concat(s3)), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => s1.Length() + s2.Length() == s1.Concat(s2).Length(), runBdds: false);
             CheckValid<Seq<int>, BigInteger>((s, i) => Implies(s == Seq.Empty<int>(), s.At(i).IsNone()), runBdds: false);
@@ -44,6 +43,11 @@ namespace ZenLib.Tests
             CheckValid<Seq<int>, int>((s, x) => Implies(s == Seq.Unit(x), s.At(BigInteger.Zero).Value() == x), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasPrefix(s2), s1.Contains(s2)), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasSuffix(s2), s1.Contains(s2)), runBdds: false);
+            CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(l < BigInteger.Zero, s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
+            CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o < BigInteger.Zero, s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
+            CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o > s.Length(), s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
+            CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => s.Slice(o, l).Length() <= s.Length(), runBdds: false);
+            CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o < s.Length(), s.Slice(o, l).Length() <= s.Length() - o), runBdds: false);
         }
 
         /// <summary>
@@ -205,7 +209,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test seq evaluation with hasprefix.
+        /// Test seq evaluation with indexof.
         /// </summary>
         [TestMethod]
         public void TestSeqIndexOf()
@@ -214,7 +218,7 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, one, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, empty, BigInteger.Zero));
-            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(empty, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(empty, empty, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), three, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), one, BigInteger.One));
             Assert.AreEqual(new BigInteger(2), zf.Evaluate(one.Concat(two).Concat(three), three, BigInteger.One));
@@ -224,7 +228,7 @@ namespace ZenLib.Tests
             zf.Compile();
             Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, one, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, empty, BigInteger.Zero));
-            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(empty, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(empty, empty, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), three, BigInteger.Zero));
             Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), one, BigInteger.One));
             Assert.AreEqual(new BigInteger(2), zf.Evaluate(one.Concat(two).Concat(three), three, BigInteger.One));
@@ -233,12 +237,52 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(0, one.IndexOf(one, 0));
             Assert.AreEqual(0, one.IndexOf(empty, 0));
-            Assert.AreEqual(-1, empty.IndexOf(empty, 0));
+            Assert.AreEqual(0, empty.IndexOf(empty, 0));
             Assert.AreEqual(-1, one.Concat(two).IndexOf(three, 0));
             Assert.AreEqual(-1, one.Concat(two).IndexOf(one, 1));
             Assert.AreEqual(2, one.Concat(two).Concat(three).IndexOf(three, 1));
             Assert.AreEqual(1, one.Concat(two).Concat(three).IndexOf(two.Concat(three), 1));
             Assert.AreEqual(1, one.Concat(one).IndexOf(one, 1));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with slice.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqSlice()
+        {
+            var zf = new ZenFunction<Seq<int>, BigInteger, BigInteger, Seq<int>>((s1, o, l) => s1.Slice(o, l));
+
+            Assert.AreEqual(0, zf.Evaluate(empty, BigInteger.Zero, BigInteger.Zero).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.Zero, BigInteger.Zero).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.Zero, BigInteger.MinusOne).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.MinusOne, BigInteger.One).Length());
+            Assert.AreEqual(1, zf.Evaluate(one, BigInteger.Zero, BigInteger.One).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.One, BigInteger.One).Length());
+            Assert.AreEqual(1, zf.Evaluate(one.Concat(two), BigInteger.Zero, BigInteger.One).Length());
+            Assert.AreEqual(2, zf.Evaluate(one.Concat(two), BigInteger.Zero, new BigInteger(2)).Length());
+            Assert.AreEqual(1, zf.Evaluate(one.Concat(two), BigInteger.One, new BigInteger(2)).Length());
+
+            zf.Compile();
+            Assert.AreEqual(0, zf.Evaluate(empty, BigInteger.Zero, BigInteger.Zero).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.Zero, BigInteger.Zero).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.Zero, BigInteger.MinusOne).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.MinusOne, BigInteger.One).Length());
+            Assert.AreEqual(1, zf.Evaluate(one, BigInteger.Zero, BigInteger.One).Length());
+            Assert.AreEqual(0, zf.Evaluate(one, BigInteger.One, BigInteger.One).Length());
+            Assert.AreEqual(1, zf.Evaluate(one.Concat(two), BigInteger.Zero, BigInteger.One).Length());
+            Assert.AreEqual(2, zf.Evaluate(one.Concat(two), BigInteger.Zero, new BigInteger(2)).Length());
+            Assert.AreEqual(1, zf.Evaluate(one.Concat(two), BigInteger.One, new BigInteger(2)).Length());
+
+            Assert.AreEqual(0, empty.Slice(0, 0).Length());
+            Assert.AreEqual(0, one.Slice(0, 0).Length());
+            Assert.AreEqual(0, one.Slice(0, -1).Length());
+            Assert.AreEqual(0, one.Slice(-1, 1).Length());
+            Assert.AreEqual(1, one.Slice(0, 1).Length());
+            Assert.AreEqual(0, one.Slice(1, 2).Length());
+            Assert.AreEqual(1, one.Concat(two).Slice(0, 1).Length());
+            Assert.AreEqual(2, one.Concat(two).Slice(0, 2).Length());
+            Assert.AreEqual(1, one.Concat(two).Slice(1, 2).Length());
         }
 
         /// <summary>
@@ -345,6 +389,18 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Seq<int>, Seq<int>>((s1, s2) => s1.IndexOf(s2) == new BigInteger(2)).Find();
             Assert.AreEqual(new BigInteger(2), result.Value.Item1.IndexOf(result.Value.Item2));
+        }
+
+        /// <summary>
+        /// Test seq find with slice.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindSlice()
+        {
+            var result = new ZenConstraint<Seq<int>>(
+                s => s.Slice(BigInteger.One, new BigInteger(2)) == Seq.Unit<int>(1).Concat(Seq.Unit<int>(2))).Find();
+
+            Assert.AreEqual(new Seq<int>(1).Concat(new Seq<int>(2)), result.Value.Slice(1, 2));
         }
 
         /// <summary>

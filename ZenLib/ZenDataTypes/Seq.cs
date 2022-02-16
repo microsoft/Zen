@@ -52,6 +52,34 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the slice of a sequence at an offset and length.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>A substring.</returns>
+        public Seq<T> Slice(int offset, int length)
+        {
+            if (offset < 0 || offset >= this.Length() || length < 0)
+            {
+                return new Seq<T>();
+            }
+
+            var len = offset + length > this.Length() ? this.Length() - offset : length;
+            return new Seq<T>(this.Values.GetRange(offset, len));
+        }
+
+        /// <summary>
+        /// Get the slice of a sequence at an offset and length.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>A substring.</returns>
+        internal Seq<T> SliceBigInteger(BigInteger offset, BigInteger length)
+        {
+            return this.Slice(int.Parse(offset.ToString()), int.Parse(length.ToString()));
+        }
+
+        /// <summary>
         /// Gets the index of the other subsequence after the offset.
         /// Return -1 if other is no such index exists..
         /// </summary>
@@ -71,6 +99,11 @@ namespace ZenLib
         /// <returns>Index of the first match or -1.</returns>
         public int IndexOf(Seq<T> other, int offset)
         {
+            if (other.Length() == 0)
+            {
+                return 0;
+            }
+
             if (offset >= this.Length() || other.Length() > this.Length())
             {
                 return -1;
@@ -438,6 +471,22 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(offset);
 
             return ZenSeqIndexOfExpr<T>.Create(seqExpr, subseqExpr, offset);
+        }
+
+        /// <summary>
+        /// Slice of a Zen sequences at an offset and with a length.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Seq<T>> Slice<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> offset, Zen<BigInteger> length)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(offset);
+            CommonUtilities.ValidateNotNull(length);
+
+            return ZenSeqSliceExpr<T>.Create(seqExpr, offset, length);
         }
     }
 }
