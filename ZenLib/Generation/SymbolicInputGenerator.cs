@@ -27,6 +27,11 @@ namespace ZenLib.Generation
         private static MethodInfo arbitraryDictMethod = typeof(Zen).GetMethod("ArbitraryDict", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// The method for creating the empty seq at runtime.
+        /// </summary>
+        private static MethodInfo arbitrarySeqMethod = typeof(Zen).GetMethod("ArbitrarySeq", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
         /// The method for creating and if expression at runtime.
         /// </summary>
         private static MethodInfo ifConditionMethod = typeof(Zen).GetMethod("If");
@@ -102,6 +107,14 @@ namespace ZenLib.Generation
         public object VisitDictionary(Func<Type, DepthConfiguration, object> recurse, Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
+            var e = method.Invoke(null, CommonUtilities.EmptyArray);
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
+        public object VisitSeq(Func<Type, DepthConfiguration, object> recurse, Type sequenceType, Type innerType, DepthConfiguration parameter)
+        {
+            var method = arbitrarySeqMethod.MakeGenericMethod(innerType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
             this.ArbitraryExpressions.Add(e);
             return e;

@@ -1210,12 +1210,21 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The Zen value for an empty List.
+        /// The Zen value for an empty dict.
         /// </summary>
         /// <returns>Zen value.</returns>
         internal static Zen<IDictionary<TKey, TValue>> ArbitraryDict<TKey, TValue>()
         {
             return new ZenArbitraryExpr<IDictionary<TKey, TValue>>();
+        }
+
+        /// <summary>
+        /// The Zen value for an empty seq.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<Seq<T>> ArbitrarySeq<T>()
+        {
+            return new ZenArbitraryExpr<Seq<T>>();
         }
 
         /// <summary>

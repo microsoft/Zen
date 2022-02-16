@@ -29,7 +29,7 @@ namespace ZenLib
         public readonly static Type FiniteStringType = typeof(FString);
 
         /// <summary>
-        /// The type of unit values.
+        /// The type of set unit values.
         /// </summary>
         public readonly static Type SetUnitType = typeof(SetUnit);
 
@@ -79,6 +79,11 @@ namespace ZenLib
         public readonly static Type BigIntType = typeof(BigInteger);
 
         /// <summary>
+        /// The type of seq values.
+        /// </summary>
+        public readonly static Type SeqType = typeof(Seq<>);
+
+        /// <summary>
         /// Type of an IList.
         /// </summary>
         public readonly static Type IListType = typeof(IList<>);
@@ -107,6 +112,12 @@ namespace ZenLib
         /// The object creation method.
         /// </summary>
         public static MethodInfo CreateMethod = typeof(Zen).GetMethod("Create");
+
+        /// <summary>
+        /// The zen constant list creation method.
+        /// </summary>
+        public static MethodInfo CreateZenSeqConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenSeqConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// The zen constant list creation method.
@@ -307,13 +318,23 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Check if a type is a List type.
+        /// Check if a type is a Seq type.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns></returns>
-        public static bool IsListType(Type type)
+        public static bool IsSeqType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ListType;
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == SeqType;
+        }
+
+        /// <summary>
+        /// Check if a type is a Zen type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsZenType(Type type)
+        {
+            return type.IsGenericType && !typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached());
         }
 
         /// <summary>
@@ -395,7 +416,7 @@ namespace ZenLib
         /// <param name="type">The object type.</param>
         public static void ValidateIsZenType(Type type)
         {
-            if (!type.IsGenericType || typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached()))
+            if (!IsZenType(type))
             {
                 throw new ZenException($"Attempting to use value of non-Zen type: {type}");
             }
@@ -621,6 +642,13 @@ namespace ZenLib
             if (IsFixedIntegerType(type))
                 return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
 
+            if (IsSeqType(type))
+            {
+                var innerType = type.GetGenericArgumentsCached()[0];
+                var c = SeqType.MakeGenericType(innerType).GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
+            }
+
             if (IsIDictType(type))
             {
                 var typeParameters = type.GetGenericArgumentsCached();
@@ -687,6 +715,12 @@ namespace ZenLib
             if (IsFixedIntegerType(type))
                 return visitor.VisitFixedInteger(type, parameter);
 
+            if (IsSeqType(type))
+            {
+                var t = type.GetGenericArgumentsCached()[0];
+                return visitor.VisitSeq((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
+            }
+
             if (IsIDictType(type))
             {
                 var typeParameters = type.GetGenericArgumentsCached();
@@ -699,11 +733,6 @@ namespace ZenLib
             {
                 var t = type.GetGenericArgumentsCached()[0];
                 return visitor.VisitList((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
-            }
-
-            if (IsListType(type))
-            {
-                throw new ZenException($"Unsupported object field type: {type}");
             }
 
             // some class or struct
@@ -731,6 +760,22 @@ namespace ZenLib
             }
 
             return fieldTypes;
+        }
+
+        /// <summary>
+        /// Create a constant Zen Seq value.
+        /// </summary>
+        /// <param name="value">The seq value.</param>
+        /// <returns>The Zen value representing the seq.</returns>
+        internal static Zen<Seq<T>> CreateZenSeqConstant<T>(Seq<T> value)
+        {
+            Zen<Seq<T>> seq = ZenSeqEmptyExpr<T>.Instance;
+            foreach (var elt in value.Values)
+            {
+                seq = ZenSeqConcatExpr<T>.Create(seq, ZenSeqUnitExpr<T>.Create(elt));
+            }
+
+            return seq;
         }
 
         /// <summary>
@@ -802,6 +847,12 @@ namespace ZenLib
                 }
 
                 var typeArgs = type.GetGenericArgumentsCached();
+
+                if (IsSeqType(type))
+                {
+                    var innerType = typeArgs[0];
+                    return CreateZenSeqConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
+                }
 
                 if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
                 {

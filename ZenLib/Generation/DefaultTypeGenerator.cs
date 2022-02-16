@@ -16,6 +16,11 @@ namespace ZenLib.Generation
     internal class DefaultTypeGenerator : ITypeVisitor<object, Unit>
     {
         /// <summary>
+        /// Method for the creating an empty Zen seq.
+        /// </summary>
+        private static MethodInfo emptySeqMethod = typeof(Seq).GetMethod("Empty");
+
+        /// <summary>
         /// Method for the creating an empty Zen list.
         /// </summary>
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
@@ -48,6 +53,12 @@ namespace ZenLib.Generation
         public object VisitList(Func<Type, Unit, object> recurse, Type listType, Type innerType, Unit u)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
+            return method.Invoke(null, CommonUtilities.EmptyArray);
+        }
+
+        public object VisitSeq(Func<Type, Unit, object> recurse, Type sequenceType, Type innerType, Unit parameter)
+        {
+            var method = emptySeqMethod.MakeGenericMethod(innerType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 

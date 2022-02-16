@@ -10,7 +10,6 @@ namespace ZenLib.Solver
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
-    using System.Reflection;
     using Microsoft.Z3;
 
     /// <summary>
@@ -172,6 +171,11 @@ namespace ZenLib.Solver
         public object VisitUshort(Expr parameter)
         {
             return ushort.Parse(parameter.ToString());
+        }
+
+        public object VisitSeq(Func<Type, Expr, object> recurse, Type sequenceType, Type innerType, Expr parameter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

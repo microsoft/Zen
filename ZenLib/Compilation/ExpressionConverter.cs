@@ -708,13 +708,36 @@ namespace ZenLib.Compilation
             });
         }
 
-        /// <summary>
-        /// Create an object given the fields.
-        /// </summary>
-        /// <typeparam name="TObject">The object type.</typeparam>
-        /// <param name="objects"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        public Expression VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var c = typeof(Seq<T>).GetConstructor(new Type[] { });
+                return Expression.New(c);
+            });
+        }
+
+        public Expression VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });
+                var e = expression.ValueExpr.Accept(this, parameter);
+                return Expression.New(c, new Expression[] { e });
+            });
+        }
+
+        public Expression VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = expression.SeqExpr1.Accept(this, parameter);
+                var r = expression.SeqExpr2.Accept(this, parameter);
+                var m = ReflectionUtilities.SeqType.MakeGenericType(typeof(T)).GetMethod("Concat");
+                return Expression.Call(l, m, new Expression[] { r });
+            });
+        }
+
         private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
         {
             Expression[] exprs = new Expression[fields.Length + 2];
@@ -735,11 +758,6 @@ namespace ZenLib.Compilation
             return Expression.Block(new ParameterExpression[] { variable }, exprs);
         }
 
-        /// <summary>
-        /// Create a copy of an object with a field updated.
-        /// </summary>
-        /// <typeparam name="TObject">The object type.</typeparam>
-        /// <returns></returns>
         private Expression WithField<TObject>(Expression obj, string modifyField, Expression value)
         {
             var fields = ReflectionUtilities.GetAllFields(typeof(TObject));

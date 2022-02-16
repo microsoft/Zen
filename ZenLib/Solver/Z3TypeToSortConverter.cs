@@ -150,5 +150,10 @@ namespace ZenLib.Solver
         {
             return this.solver.ShortSort;
         }
+
+        public Sort VisitSeq(Func<Type, Unit, Sort> recurse, Type sequenceType, Type innerType, Unit parameter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

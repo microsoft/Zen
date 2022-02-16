@@ -188,6 +188,30 @@ namespace ZenLib
         TReturn VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a SeqEmptyExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ZenSeqUnitExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ZenSeqConcatExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a GetFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

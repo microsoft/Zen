@@ -85,6 +85,12 @@ namespace ZenLib
         T VisitDictionary(Func<Type, TParam, T> recurse, Type dictionaryType, Type keyType, Type valueType, TParam parameter);
 
         /// <summary>
+        /// Visit the sequence type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitSeq(Func<Type, TParam, T> recurse, Type sequenceType, Type innerType, TParam parameter);
+
+        /// <summary>
         /// Visit the list type.
         /// </summary>
         /// <returns>A value.</returns>

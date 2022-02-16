@@ -610,5 +610,39 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return new Seq<T>();
+        }
+
+        public object VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (Seq<T>)expression.SeqExpr1.Accept(this, parameter);
+            var e2 = (Seq<T>)expression.SeqExpr2.Accept(this, parameter);
+            var result = e1.Concat(e2);
+
+            this.cache[expression] = result;
+            return result;
+        }
+
+        public object VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (T)expression.ValueExpr.Accept(this, parameter);
+            var result = new Seq<T>(e1);
+
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }
