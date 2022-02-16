@@ -735,5 +735,20 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (Seq<T>)expression.SeqExpr.Accept(this, parameter);
+            var e2 = (Seq<T>)expression.SubseqExpr.Accept(this, parameter);
+            var e3 = (Seq<T>)expression.ReplaceExpr.Accept(this, parameter);
+            var result = e1.ReplaceFirst(e2, e3);
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }

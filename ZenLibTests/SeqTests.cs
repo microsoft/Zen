@@ -48,6 +48,7 @@ namespace ZenLib.Tests
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o > s.Length(), s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => s.Slice(o, l).Length() <= s.Length(), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o < s.Length(), s.Slice(o, l).Length() <= s.Length() - o), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => s1.ReplaceFirst(Seq.Empty<int>(), s2) == s2.Concat(s1), runBdds: false);
         }
 
         /// <summary>
@@ -286,6 +287,43 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with replacefirst.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqReplaceFirst()
+        {
+            var zf = new ZenFunction<Seq<int>, Seq<int>, Seq<int>, Seq<int>>((s1, s2, s3) => s1.ReplaceFirst(s2, s3));
+
+            Assert.AreEqual(empty, zf.Evaluate(empty, empty, empty));
+            Assert.AreEqual(empty, zf.Evaluate(empty, one, two));
+            Assert.AreEqual(two.Concat(one), zf.Evaluate(one, empty, two));
+            Assert.AreEqual(one, zf.Evaluate(one.Concat(two), two, empty));
+            Assert.AreEqual(two, zf.Evaluate(one.Concat(two), one, empty));
+            Assert.AreEqual(three.Concat(two), zf.Evaluate(one.Concat(two), one, three));
+            Assert.AreEqual(one.Concat(three), zf.Evaluate(one.Concat(two), two, three));
+            Assert.AreEqual(three.Concat(two).Concat(one), zf.Evaluate(one.Concat(two).Concat(one), one, three));
+
+            zf.Compile();
+            Assert.AreEqual(empty, zf.Evaluate(empty, empty, empty));
+            Assert.AreEqual(empty, zf.Evaluate(empty, one, two));
+            Assert.AreEqual(two.Concat(one), zf.Evaluate(one, empty, two));
+            Assert.AreEqual(one, zf.Evaluate(one.Concat(two), two, empty));
+            Assert.AreEqual(two, zf.Evaluate(one.Concat(two), one, empty));
+            Assert.AreEqual(three.Concat(two), zf.Evaluate(one.Concat(two), one, three));
+            Assert.AreEqual(one.Concat(three), zf.Evaluate(one.Concat(two), two, three));
+            Assert.AreEqual(three.Concat(two).Concat(one), zf.Evaluate(one.Concat(two).Concat(one), one, three));
+
+            Assert.AreEqual(empty, empty.ReplaceFirst(empty, empty));
+            Assert.AreEqual(empty, empty.ReplaceFirst(one, two));
+            Assert.AreEqual(two.Concat(one), one.ReplaceFirst(empty, two));
+            Assert.AreEqual(one, one.Concat(two).ReplaceFirst(two, empty));
+            Assert.AreEqual(two, one.Concat(two).ReplaceFirst(one, empty));
+            Assert.AreEqual(three.Concat(two), one.Concat(two).ReplaceFirst(one, three));
+            Assert.AreEqual(one.Concat(three), one.Concat(two).ReplaceFirst(two, three));
+            Assert.AreEqual(three.Concat(two).Concat(one), one.Concat(two).Concat(one).ReplaceFirst(one, three));
+        }
+
+        /// <summary>
         /// Test seq find with empty.
         /// </summary>
         [TestMethod]
@@ -401,6 +439,22 @@ namespace ZenLib.Tests
                 s => s.Slice(BigInteger.One, new BigInteger(2)) == Seq.Unit<int>(1).Concat(Seq.Unit<int>(2))).Find();
 
             Assert.AreEqual(new Seq<int>(1).Concat(new Seq<int>(2)), result.Value.Slice(1, 2));
+        }
+
+        /// <summary>
+        /// Test seq find with replacefirst.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindReplaceFirst()
+        {
+            var result = new ZenConstraint<Seq<int>>(
+                s => And(s.Length() == new BigInteger(2),
+                     And(s.Contains(new Seq<int>(3)),
+                         s.ReplaceFirst(new Seq<int>(3), new Seq<int>(4)) == Seq.Unit<int>(5).Concat(Seq.Unit<int>(4))))).Find();
+
+            Console.WriteLine(result);
+            Assert.AreEqual(Option.Some(5), result.Value.At(0));
+            Assert.AreEqual(Option.Some(3), result.Value.At(1));
         }
 
         /// <summary>

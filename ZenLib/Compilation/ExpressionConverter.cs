@@ -977,5 +977,17 @@ namespace ZenLib.Compilation
         {
             return Expression.Variable(type, "v" + nextVariableId++);
         }
+
+        public Expression VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
+                var e3 = expression.ReplaceExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("ReplaceFirst");
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
+        }
     }
 }

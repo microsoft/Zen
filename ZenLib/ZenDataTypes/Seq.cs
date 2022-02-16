@@ -52,11 +52,34 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Replace the first instance of a subsequence in a seq with a new seq.
+        /// </summary>
+        /// <param name="match">The subseq to match.</param>
+        /// <param name="replace">The replacement seq.</param>
+        /// <returns>A new seq.</returns>
+        public Seq<T> ReplaceFirst(Seq<T> match, Seq<T> replace)
+        {
+            if (match.Length() == 0)
+            {
+                return replace.Concat(this);
+            }
+
+            var idx = this.IndexOf(match);
+            if (idx < 0)
+            {
+                return this;
+            }
+
+            var afterMatch = idx + match.Length();
+            return this.Slice(0, idx).Concat(replace).Concat(this.Slice(afterMatch, this.Length() - afterMatch));
+        }
+
+        /// <summary>
         /// Get the slice of a sequence at an offset and length.
         /// </summary>
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
-        /// <returns>A substring.</returns>
+        /// <returns>A subseq.</returns>
         public Seq<T> Slice(int offset, int length)
         {
             if (offset < 0 || offset >= this.Length() || length < 0)
@@ -487,6 +510,22 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(length);
 
             return ZenSeqSliceExpr<T>.Create(seqExpr, offset, length);
+        }
+
+        /// <summary>
+        /// ReplaceFirst for a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence to match.</param>
+        /// <param name="replaceExpr">The replacement sequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Seq<T>> ReplaceFirst<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr, Zen<Seq<T>> replaceExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+            CommonUtilities.ValidateNotNull(replaceExpr);
+
+            return ZenSeqReplaceFirstExpr<T>.Create(seqExpr, subseqExpr, replaceExpr);
         }
     }
 }
