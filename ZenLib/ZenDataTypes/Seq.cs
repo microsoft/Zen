@@ -52,27 +52,62 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Gets the index of the other subsequence after the offset.
+        /// Return -1 if other is no such index exists..
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <returns>Index of the first match or -1.</returns>
+        public int IndexOf(Seq<T> other)
+        {
+            return this.IndexOf(other, 0);
+        }
+
+        /// <summary>
+        /// Gets the index of the other subsequence after the offset.
+        /// Return -1 if other is no such index exists..
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <param name="offset">The initial offset.</param>
+        /// <returns>Index of the first match or -1.</returns>
+        public int IndexOf(Seq<T> other, int offset)
+        {
+            if (offset >= this.Length() || other.Length() > this.Length())
+            {
+                return -1;
+            }
+
+            var difference = this.Length() - other.Length();
+            for (int i = offset; i < difference + 1; i++)
+            {
+                if (IsMatch(other, i))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the index of the other subsequence after the offset.
+        /// Return -1 if other is no such index exists..
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <param name="offset">The initial offset.</param>
+        /// <returns>Index of the first match or -1.</returns>
+        internal BigInteger IndexOfBigInteger(Seq<T> other, BigInteger offset)
+        {
+            return new BigInteger(this.IndexOf(other, int.Parse(offset.ToString())));
+        }
+
+        /// <summary>
         /// Determines if this sequence contains the other subsequence.
         /// </summary>
         /// <param name="other">The other sequence.</param>
         /// <returns>True if the other sequence is a subsequence of this one.</returns>
         public bool Contains(Seq<T> other)
         {
-            if (other.Length() > this.Length())
-            {
-                return false;
-            }
-
-            var difference = this.Length() - other.Length();
-            for (int i = 0; i < difference + 1; i++)
-            {
-                if (IsMatch(other, i))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return this.IndexOf(other, 0) >= 0;
         }
 
         private bool IsMatch(Seq<T> other, int index)
@@ -156,7 +191,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The value at the index.</returns>
-        private Option<T> AtBigInteger(BigInteger index)
+        internal Option<T> AtBigInteger(BigInteger index)
         {
             return At(int.Parse(index.ToString()));
         }
@@ -373,6 +408,36 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(subseqExpr);
 
             return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.HasSuffix);
+        }
+
+        /// <summary>
+        /// IndexOf for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> IndexOf<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+
+            return ZenSeqIndexOfExpr<T>.Create(seqExpr, subseqExpr, BigInteger.Zero);
+        }
+
+        /// <summary>
+        /// IndexOf for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence.</param>
+        /// <param name="offset">The offset.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> IndexOf<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr, Zen<BigInteger> offset)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+            CommonUtilities.ValidateNotNull(offset);
+
+            return ZenSeqIndexOfExpr<T>.Create(seqExpr, subseqExpr, offset);
         }
     }
 }

@@ -228,6 +228,108 @@ namespace ZenLib.Compilation
             });
         }
 
+        private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
+        {
+            var type = typeof(T);
+            return Expression.Convert(f(Expression.Convert(input, type)), type);
+        }
+
+        private Expression WrapMathBinary<T1, T2>(Expression left, Expression right, Func<Expression, Expression, Expression> f)
+        {
+            var type = typeof(T1);
+            var l = Expression.Convert(left, type);
+            var r = Expression.Convert(right, type);
+            return Expression.Convert(f(l, r), typeof(T2));
+        }
+
+        private Expression BitwiseNot<T>(Expression e)
+        {
+            return WrapMathUnary<T>(e, Expression.OnesComplement);
+        }
+
+        private Expression BitwiseOr<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseOr");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Or);
+        }
+
+        private Expression BitwiseAnd<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseAnd");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.And);
+        }
+
+        private Expression BitwiseXor<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseXor");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.ExclusiveOr);
+        }
+
+        private Expression Add<T>(Expression left, Expression right)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Add(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethodCached("Add");
+                return Expression.Call(left, method, right);
+            }
+
+            if (type == ReflectionUtilities.ByteType ||
+                type == ReflectionUtilities.ShortType ||
+                type == ReflectionUtilities.UshortType)
+            {
+                return WrapMathBinary<int, T>(left, right, Expression.Add);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Add);
+        }
+
+        private Expression Subtract<T>(Expression left, Expression right)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Subtract(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethodCached("Subtract");
+                return Expression.Call(left, method, right);
+            }
+
+            if (type == ReflectionUtilities.ByteType ||
+                type == ReflectionUtilities.ShortType ||
+                type == ReflectionUtilities.UshortType)
+            {
+                return WrapMathBinary<int, T>(left, right, Expression.Subtract);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Subtract);
+        }
+
         public Expression VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
@@ -255,6 +357,26 @@ namespace ZenLib.Compilation
 
                 return CreateObject<TObject>(parameters.ToArray(), fieldNames.ToArray());
             });
+        }
+
+        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
+        {
+            Expression[] exprs = new Expression[fields.Length + 2];
+
+            // first use new default constructor.
+            var variable = FreshVariable(typeof(TObject));
+            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
+
+            // assign each field
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = Expression.PropertyOrField(variable, fields[i]);
+                exprs[i + 1] = Expression.Assign(field, objects[i]);
+            }
+
+            // return a block with the variable.
+            exprs[fields.Length + 1] = variable;
+            return Expression.Block(new ParameterExpression[] { variable }, exprs);
         }
 
         public Expression VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
@@ -610,6 +732,51 @@ namespace ZenLib.Compilation
             });
         }
 
+        private Expression WithField<TObject>(Expression obj, string modifyField, Expression value)
+        {
+            var fields = ReflectionUtilities.GetAllFields(typeof(TObject));
+            var properties = ReflectionUtilities.GetAllProperties(typeof(TObject));
+
+            Expression[] exprs = new Expression[fields.Length + properties.Length + 2];
+
+            // first use new default constructor.
+            var variable = FreshVariable(typeof(TObject));
+            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
+
+            int i = 1;
+
+            // assign each field
+            foreach (var field in fields)
+            {
+                exprs[i++] = WithUpdate(field, modifyField, variable, obj, value);
+            }
+
+            // assign each property
+            foreach (var property in properties)
+            {
+                exprs[i++] = WithUpdate(property, modifyField, variable, obj, value);
+            }
+
+            // return a block with the variable.
+            exprs[fields.Length + properties.Length + 1] = variable;
+            return Expression.Block(new ParameterExpression[] { variable }, exprs);
+        }
+
+        private Expression WithUpdate(dynamic field, string modifyField, ParameterExpression variable, Expression obj, Expression value)
+        {
+            if (field.Name == modifyField)
+            {
+                var propertyOrFieldToSet = Expression.PropertyOrField(variable, field.Name);
+                return Expression.Assign(propertyOrFieldToSet, value);
+            }
+            else
+            {
+                var propertyOrFieldToSet = Expression.PropertyOrField(variable, field.Name);
+                var propertyOrFieldToGet = Expression.PropertyOrField(obj, field.Name);
+                return Expression.Assign(propertyOrFieldToSet, propertyOrFieldToGet);
+            }
+        }
+
         public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -754,10 +921,10 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var l = expression.SeqExpr.Accept(this, parameter);
-                var r = expression.IndexExpr.Accept(this, parameter);
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.IndexExpr.Accept(this, parameter);
                 var m = typeof(Seq<T>).GetMethod("AtBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
-                return Expression.Call(l, m, new Expression[] { r });
+                return Expression.Call(e1, m, new Expression[] { e2 });
             });
         }
 
@@ -765,193 +932,38 @@ namespace ZenLib.Compilation
         {
             return LookupOrCompute(expression, () =>
             {
-                var l = expression.SeqExpr.Accept(this, parameter);
-                var r = expression.SubseqExpr.Accept(this, parameter);
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
 
                 switch (expression.ContainmentType)
                 {
                     case SeqContainmentType.HasPrefix:
-                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { r });
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { e2 });
                     case SeqContainmentType.HasSuffix:
-                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { r });
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { e2 });
                     case SeqContainmentType.Contains:
-                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { r });
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
                     default:
                         throw new ZenUnreachableException();
                 }
             });
         }
 
-        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
+        public Expression VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            Expression[] exprs = new Expression[fields.Length + 2];
-
-            // first use new default constructor.
-            var variable = FreshVariable(typeof(TObject));
-            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
-
-            // assign each field
-            for (int i = 0; i < fields.Length; i++)
+            return LookupOrCompute(expression, () =>
             {
-                var field = Expression.PropertyOrField(variable, fields[i]);
-                exprs[i + 1] = Expression.Assign(field, objects[i]);
-            }
-
-            // return a block with the variable.
-            exprs[fields.Length + 1] = variable;
-            return Expression.Block(new ParameterExpression[] { variable }, exprs);
-        }
-
-        private Expression WithField<TObject>(Expression obj, string modifyField, Expression value)
-        {
-            var fields = ReflectionUtilities.GetAllFields(typeof(TObject));
-            var properties = ReflectionUtilities.GetAllProperties(typeof(TObject));
-
-            Expression[] exprs = new Expression[fields.Length + properties.Length + 2];
-
-            // first use new default constructor.
-            var variable = FreshVariable(typeof(TObject));
-            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
-
-            int i = 1;
-
-            // assign each field
-            foreach (var field in fields)
-            {
-                exprs[i++] = WithUpdate(field, modifyField, variable, obj, value);
-            }
-
-            // assign each property
-            foreach (var property in properties)
-            {
-                exprs[i++] = WithUpdate(property, modifyField, variable, obj, value);
-            }
-
-            // return a block with the variable.
-            exprs[fields.Length + properties.Length + 1] = variable;
-            return Expression.Block(new ParameterExpression[] { variable }, exprs);
-        }
-
-        private Expression WithUpdate(dynamic field, string modifyField, ParameterExpression variable, Expression obj, Expression value)
-        {
-            if (field.Name == modifyField)
-            {
-                var propertyOrFieldToSet = Expression.PropertyOrField(variable, field.Name);
-                return Expression.Assign(propertyOrFieldToSet, value);
-            }
-            else
-            {
-                var propertyOrFieldToSet = Expression.PropertyOrField(variable, field.Name);
-                var propertyOrFieldToGet = Expression.PropertyOrField(obj, field.Name);
-                return Expression.Assign(propertyOrFieldToSet, propertyOrFieldToGet);
-            }
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
+                var e3 = expression.OffsetExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("IndexOfBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
         }
 
         private ParameterExpression FreshVariable(Type type)
         {
             return Expression.Variable(type, "v" + nextVariableId++);
-        }
-
-        private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
-        {
-            var type = typeof(T);
-            return Expression.Convert(f(Expression.Convert(input, type)), type);
-        }
-
-        private Expression WrapMathBinary<T1, T2>(Expression left, Expression right, Func<Expression, Expression, Expression> f)
-        {
-            var type = typeof(T1);
-            var l = Expression.Convert(left, type);
-            var r = Expression.Convert(right, type);
-            return Expression.Convert(f(l, r), typeof(T2));
-        }
-
-        private Expression BitwiseNot<T>(Expression e)
-        {
-            return WrapMathUnary<T>(e, Expression.OnesComplement);
-        }
-
-        private Expression BitwiseOr<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                var method = typeof(T).GetMethodCached("BitwiseOr");
-                return Expression.Call(left, method, right);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.Or);
-        }
-
-        private Expression BitwiseAnd<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                var method = typeof(T).GetMethodCached("BitwiseAnd");
-                return Expression.Call(left, method, right);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.And);
-        }
-
-        private Expression BitwiseXor<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                var method = typeof(T).GetMethodCached("BitwiseXor");
-                return Expression.Call(left, method, right);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.ExclusiveOr);
-        }
-
-        private Expression Add<T>(Expression left, Expression right)
-        {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return Expression.Add(left, right);
-            }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var method = typeof(T).GetMethodCached("Add");
-                return Expression.Call(left, method, right);
-            }
-
-            if (type == ReflectionUtilities.ByteType ||
-                type == ReflectionUtilities.ShortType ||
-                type == ReflectionUtilities.UshortType)
-            {
-                return WrapMathBinary<int, T>(left, right, Expression.Add);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.Add);
-        }
-
-        private Expression Subtract<T>(Expression left, Expression right)
-        {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return Expression.Subtract(left, right);
-            }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var method = typeof(T).GetMethodCached("Subtract");
-                return Expression.Call(left, method, right);
-            }
-
-            if (type == ReflectionUtilities.ByteType ||
-                type == ReflectionUtilities.ShortType ||
-                type == ReflectionUtilities.UshortType)
-            {
-                return WrapMathBinary<int, T>(left, right, Expression.Subtract);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.Subtract);
         }
     }
 }

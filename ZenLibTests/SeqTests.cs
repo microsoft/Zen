@@ -29,19 +29,22 @@ namespace ZenLib.Tests
 
         private static Seq<int> three = new Seq<int>(3);
 
-        /* /// <summary>
+        /// <summary>
         /// Test that some basic set equations hold.
         /// </summary>
         [TestMethod]
         public void TestSetEquations()
         {
-            CheckValid<Set<byte>, byte>((d, e) => d.Add(e).Delete(e) == d.Delete(e), runBdds: false);
-            CheckValid<Set<byte>, byte>((d, e) => d.Delete(e).Add(e) == d.Add(e), runBdds: false);
-            CheckValid<Set<byte>, byte>((d, e) => Implies(d.Contains(e), d.Add(e) == d), runBdds: false);
-            CheckValid<Set<byte>, byte>((d, e) => Implies(Not(d.Contains(e)), d.Delete(e) == d), runBdds: false);
-            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), s2.Contains(e)) == s1.Intersect(s2).Contains(e), runBdds: false);
-            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => Or(s1.Contains(e), s2.Contains(e)) == s1.Union(s2).Contains(e), runBdds: false);
-        } */
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(Not(s1.Contains(s2)), s1.IndexOf(s2) < BigInteger.Zero), runBdds: false);
+            CheckValid<Seq<int>, int>((s, x) => Implies(s.Contains(Seq.Unit(x)), s.IndexOf(Seq.Unit(x)) >= BigInteger.Zero), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>, Seq<int>>((s1, s2, s3) => s1.Concat(s2).Concat(s3) == s1.Concat(s2.Concat(s3)), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => s1.Length() + s2.Length() == s1.Concat(s2).Length(), runBdds: false);
+            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(s == Seq.Empty<int>(), s.At(i).IsNone()), runBdds: false);
+            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(And(i >= BigInteger.Zero, i < s.Length()), s.At(i).IsSome()), runBdds: false);
+            CheckValid<Seq<int>, int>((s, x) => Implies(s == Seq.Unit(x), s.At(BigInteger.Zero).Value() == x), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasPrefix(s2), s1.Contains(s2)), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasSuffix(s2), s1.Contains(s2)), runBdds: false);
+        }
 
         /// <summary>
         /// Test seq evaluation with concat.
@@ -202,6 +205,43 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with hasprefix.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqIndexOf()
+        {
+            var zf = new ZenFunction<Seq<int>, Seq<int>, BigInteger, BigInteger>((s1, s2, o) => s1.IndexOf(s2, o));
+
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, one, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(empty, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), three, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), one, BigInteger.One));
+            Assert.AreEqual(new BigInteger(2), zf.Evaluate(one.Concat(two).Concat(three), three, BigInteger.One));
+            Assert.AreEqual(new BigInteger(1), zf.Evaluate(one.Concat(two).Concat(three), two.Concat(three), BigInteger.One));
+            Assert.AreEqual(new BigInteger(1), zf.Evaluate(one.Concat(one), one, BigInteger.One));
+
+            zf.Compile();
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, one, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(0), zf.Evaluate(one, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(empty, empty, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), three, BigInteger.Zero));
+            Assert.AreEqual(new BigInteger(-1), zf.Evaluate(one.Concat(two), one, BigInteger.One));
+            Assert.AreEqual(new BigInteger(2), zf.Evaluate(one.Concat(two).Concat(three), three, BigInteger.One));
+            Assert.AreEqual(new BigInteger(1), zf.Evaluate(one.Concat(two).Concat(three), two.Concat(three), BigInteger.One));
+            Assert.AreEqual(new BigInteger(1), zf.Evaluate(one.Concat(one), one, BigInteger.One));
+
+            Assert.AreEqual(0, one.IndexOf(one, 0));
+            Assert.AreEqual(0, one.IndexOf(empty, 0));
+            Assert.AreEqual(-1, empty.IndexOf(empty, 0));
+            Assert.AreEqual(-1, one.Concat(two).IndexOf(three, 0));
+            Assert.AreEqual(-1, one.Concat(two).IndexOf(one, 1));
+            Assert.AreEqual(2, one.Concat(two).Concat(three).IndexOf(three, 1));
+            Assert.AreEqual(1, one.Concat(two).Concat(three).IndexOf(two.Concat(three), 1));
+            Assert.AreEqual(1, one.Concat(one).IndexOf(one, 1));
+        }
+
+        /// <summary>
         /// Test seq find with empty.
         /// </summary>
         [TestMethod]
@@ -285,6 +325,26 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Seq<int>>(s => s.HasSuffix(one.Concat(two))).Find();
             Assert.IsTrue(result.Value.HasSuffix(one.Concat(two)));
+        }
+
+        /// <summary>
+        /// Test seq find with indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindIndexOf1()
+        {
+            var result = new ZenConstraint<Seq<int>, Seq<int>, BigInteger>((s1, s2, i) => s1.IndexOf(s2, i) == new BigInteger(2)).Find();
+            Assert.AreEqual(new BigInteger(2), result.Value.Item1.IndexOfBigInteger(result.Value.Item2, result.Value.Item3));
+        }
+
+        /// <summary>
+        /// Test seq find with indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindIndexOf2()
+        {
+            var result = new ZenConstraint<Seq<int>, Seq<int>>((s1, s2) => s1.IndexOf(s2) == new BigInteger(2)).Find();
+            Assert.AreEqual(new BigInteger(2), result.Value.Item1.IndexOf(result.Value.Item2));
         }
 
         /// <summary>

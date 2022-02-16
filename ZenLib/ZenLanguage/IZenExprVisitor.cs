@@ -236,6 +236,14 @@ namespace ZenLib
         TReturn VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ZenSeqIndexOfExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a GetFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

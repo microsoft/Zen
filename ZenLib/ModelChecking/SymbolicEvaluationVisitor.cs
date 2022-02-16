@@ -1033,5 +1033,21 @@ namespace ZenLib.ModelChecking
                     throw new ZenUnreachableException();
             }
         }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
+            var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubseqExpr.Accept(this, parameter);
+            var v3 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.OffsetExpr.Accept(this, parameter);
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.IndexOf(v1.Value, v2.Value, v3.Value));
+
+            this.Cache[expression] = result;
+            return result;
+        }
     }
 }
