@@ -19,6 +19,16 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class SeqTests
     {
+        private static Seq<int> empty = new Seq<int>();
+
+        private static Seq<int> zero = new Seq<int>(0);
+
+        private static Seq<int> one = new Seq<int>(1);
+
+        private static Seq<int> two = new Seq<int>(2);
+
+        private static Seq<int> three = new Seq<int>(3);
+
         /* /// <summary>
         /// Test that some basic set equations hold.
         /// </summary>
@@ -39,11 +49,6 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqConcat()
         {
-            var empty = new Seq<int>();
-            var one = new Seq<int>(1);
-            var two = new Seq<int>(2);
-            var three = new Seq<int>(3);
-
             var zf = new ZenFunction<Seq<int>, Seq<int>, Seq<int>>((s1, s2) => s1.Concat(s2));
 
             Assert.AreEqual(empty, zf.Evaluate(empty, empty));
@@ -66,11 +71,6 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqLength()
         {
-            var empty = new Seq<int>();
-            var one = new Seq<int>(1);
-            var two = new Seq<int>(2);
-            var three = new Seq<int>(3);
-
             var zf = new ZenFunction<Seq<int>, BigInteger>(s => s.Length());
 
             Assert.AreEqual(new BigInteger(empty.Length()), zf.Evaluate(empty));
@@ -89,11 +89,6 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqAt()
         {
-            var empty = new Seq<int>();
-            var one = new Seq<int>(1);
-            var two = new Seq<int>(2);
-            var three = new Seq<int>(3);
-
             var zf = new ZenFunction<Seq<int>, BigInteger, Option<int>>((s, i) => s.At(i));
 
             Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty, new BigInteger(1)));
@@ -114,6 +109,96 @@ namespace ZenLib.Tests
             Assert.AreEqual(Option.Some(2), empty.Concat(one).Concat(two).At(1));
             Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(2));
             Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(-1));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with contains.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqContains()
+        {
+            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.Contains(s2));
+
+            Assert.AreEqual(true, zf.Evaluate(empty, empty));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(two).Concat(three)));
+
+            zf.Compile();
+            Assert.AreEqual(true, zf.Evaluate(empty, empty));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(two).Concat(three)));
+
+            Assert.AreEqual(true, empty.Contains(empty));
+            Assert.AreEqual(true, empty.Concat(one).Contains(empty));
+            Assert.AreEqual(false, empty.Contains(empty.Concat(one)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).Concat(three).Contains(empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).Concat(three).Contains(empty.Concat(two)));
+            Assert.AreEqual(false, empty.Concat(one).Concat(two).Contains(empty.Concat(two).Concat(three)));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with hasprefix.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqHasPrefix()
+        {
+            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.HasPrefix(s2));
+
+            Assert.AreEqual(true, zf.Evaluate(empty, empty));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(one).Concat(two)));
+
+            zf.Compile();
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(one).Concat(two)));
+
+            Assert.AreEqual(true, empty.Concat(one).HasPrefix(empty));
+            Assert.AreEqual(false, empty.HasPrefix(empty.Concat(one)));
+            Assert.AreEqual(false, empty.Concat(one).Concat(two).Concat(three).HasPrefix(empty.Concat(two).Concat(three)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).Concat(three).HasPrefix(empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).HasPrefix(empty.Concat(one).Concat(two)));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with hasprefix.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqHasSuffix()
+        {
+            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.HasSuffix(s2));
+
+            Assert.AreEqual(true, zf.Evaluate(empty, empty));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(one).Concat(two)));
+
+            zf.Compile();
+            Assert.AreEqual(true, zf.Evaluate(empty, empty));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
+            Assert.AreEqual(false, zf.Evaluate(empty, empty.Concat(one)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(two).Concat(three)));
+            Assert.AreEqual(false, zf.Evaluate(empty.Concat(one).Concat(two).Concat(three), empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, zf.Evaluate(empty.Concat(one).Concat(two), empty.Concat(one).Concat(two)));
+
+            Assert.AreEqual(true, empty.Concat(one).HasSuffix(empty));
+            Assert.AreEqual(false, empty.HasSuffix(empty.Concat(one)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).Concat(three).HasSuffix(empty.Concat(two).Concat(three)));
+            Assert.AreEqual(false, empty.Concat(one).Concat(two).Concat(three).HasSuffix(empty.Concat(one).Concat(two)));
+            Assert.AreEqual(true, empty.Concat(one).Concat(two).HasSuffix(empty.Concat(one).Concat(two)));
         }
 
         /// <summary>
@@ -170,6 +255,36 @@ namespace ZenLib.Tests
 
             result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Option.None<int>()).Find();
             Assert.IsTrue(result.Value.Length() < 3 || result.Value.At(2).IsNone());
+        }
+
+        /// <summary>
+        /// Test seq find with contains.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindContains()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s.Contains(one.Concat(two))).Find();
+            Assert.IsTrue(result.Value.Contains(one.Concat(two)));
+        }
+
+        /// <summary>
+        /// Test seq find with hasprefix.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindHasPrefix()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s.HasPrefix(one.Concat(two))).Find();
+            Assert.IsTrue(result.Value.HasPrefix(one.Concat(two)));
+        }
+
+        /// <summary>
+        /// Test seq find with hassuffix.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindHasSuffix()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s.HasSuffix(one.Concat(two))).Find();
+            Assert.IsTrue(result.Value.HasSuffix(one.Concat(two)));
         }
 
         /// <summary>

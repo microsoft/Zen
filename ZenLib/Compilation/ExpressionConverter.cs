@@ -761,6 +761,27 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = expression.SeqExpr.Accept(this, parameter);
+                var r = expression.SubseqExpr.Accept(this, parameter);
+
+                switch (expression.ContainmentType)
+                {
+                    case SeqContainmentType.HasPrefix:
+                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { r });
+                    case SeqContainmentType.HasSuffix:
+                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { r });
+                    case SeqContainmentType.Contains:
+                        return Expression.Call(l, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { r });
+                    default:
+                        throw new ZenUnreachableException();
+                }
+            });
+        }
+
         private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
         {
             Expression[] exprs = new Expression[fields.Length + 2];

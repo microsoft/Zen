@@ -52,6 +52,91 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Determines if this sequence contains the other subsequence.
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <returns>True if the other sequence is a subsequence of this one.</returns>
+        public bool Contains(Seq<T> other)
+        {
+            if (other.Length() > this.Length())
+            {
+                return false;
+            }
+
+            var difference = this.Length() - other.Length();
+            for (int i = 0; i < difference + 1; i++)
+            {
+                if (IsMatch(other, i))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsMatch(Seq<T> other, int index)
+        {
+            for (int i = index; i < index + other.Length(); i++)
+            {
+                if (!this.Values[i].Equals(other.Values[i - index]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines if this sequence has a prefix of the other subsequence.
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <returns>True if this sequence has the other sequence as a prefix.</returns>
+        public bool HasPrefix(Seq<T> other)
+        {
+            if (other.Length() > this.Length())
+            {
+                return false;
+            }
+
+            for (int i = 0; i < other.Length(); i++)
+            {
+                if (!this.Values[i].Equals(other.Values[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines if this sequence has a suffix of the other subsequence.
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <returns>True if this sequence has the other sequence as a suffix.</returns>
+        public bool HasSuffix(Seq<T> other)
+        {
+            if (other.Length() > this.Length())
+            {
+                return false;
+            }
+
+            var difference = this.Length() - other.Length();
+
+            for (int i = 0; i < other.Length(); i++)
+            {
+                if (!this.Values[i + difference].Equals(other.Values[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Get the value at a given index.
         /// </summary>
         /// <param name="index">The index.</param>
@@ -246,6 +331,48 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(indexExpr);
 
             return ZenSeqAtExpr<T>.Create(seqExpr, indexExpr);
+        }
+
+        /// <summary>
+        /// Containment for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> Contains<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+
+            return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.Contains);
+        }
+
+        /// <summary>
+        /// HasPrefix for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> HasPrefix<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+
+            return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.HasPrefix);
+        }
+
+        /// <summary>
+        /// HasSuffix for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="subseqExpr">The subsequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> HasSuffix<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(subseqExpr);
+
+            return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.HasSuffix);
         }
     }
 }

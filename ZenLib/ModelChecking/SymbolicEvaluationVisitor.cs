@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -1004,6 +1003,35 @@ namespace ZenLib.ModelChecking
             }
 
             return v1.Merge(guard, v2);
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
+            var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SubseqExpr.Accept(this, parameter);
+
+            switch (expression.ContainmentType)
+            {
+                case SeqContainmentType.HasPrefix:
+                    var r1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.PrefixOf(v1.Value, v2.Value));
+                    this.Cache[expression] = r1;
+                    return r1;
+                case SeqContainmentType.HasSuffix:
+                    var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
+                    this.Cache[expression] = r2;
+                    return r2;
+                case SeqContainmentType.Contains:
+                    var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Contains(v1.Value, v2.Value));
+                    this.Cache[expression] = r3;
+                    return r3;
+                default:
+                    throw new ZenUnreachableException();
+            }
         }
     }
 }

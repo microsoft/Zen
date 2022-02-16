@@ -673,5 +673,35 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (Seq<T>)expression.SeqExpr.Accept(this, parameter);
+            var e2 = (Seq<T>)expression.SubseqExpr.Accept(this, parameter);
+
+            object result;
+            switch (expression.ContainmentType)
+            {
+                case SeqContainmentType.HasPrefix:
+                    result = e1.HasPrefix(e2);
+                    break;
+                case SeqContainmentType.HasSuffix:
+                    result = e1.HasSuffix(e2);
+                    break;
+                case SeqContainmentType.Contains:
+                    result = e1.Contains(e2);
+                    break;
+                default:
+                    throw new ZenUnreachableException();
+            }
+
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }
