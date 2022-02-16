@@ -404,6 +404,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq find with objects.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithObjects()
+        {
+            var result = new ZenConstraint<Seq<Pair<int, int>>>(s =>
+            {
+                var elt2 = s.At(new BigInteger(2));
+                return And(elt2.IsSome(), elt2.Value().Item1() == 4);
+            }).Find();
+
+            Assert.IsTrue(result.Value.At(2).HasValue);
+            Assert.AreEqual(4, result.Value.At(2).Value.Item1);
+        }
+
+        /// <summary>
         /// Test set equality and hashcode.
         /// </summary>
         [TestMethod]
