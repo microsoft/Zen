@@ -41,6 +41,16 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         private static Zen<Seq<T>> Simplify(Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2)
         {
+            if (seqExpr1 is ZenSeqEmptyExpr<T> e1)
+            {
+                return seqExpr2;
+            }
+
+            if (seqExpr2 is ZenSeqEmptyExpr<T> e2)
+            {
+                return seqExpr1;
+            }
+
             return new ZenSeqConcatExpr<T>(seqExpr1, seqExpr2);
         }
 

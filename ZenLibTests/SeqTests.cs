@@ -42,8 +42,8 @@ namespace ZenLib.Tests
             CheckValid<Seq<int>, BigInteger>((s, i) => Implies(s == Seq.Empty<int>(), s.At(i).IsNone()), runBdds: false);
             CheckValid<Seq<int>, BigInteger>((s, i) => Implies(And(i >= BigInteger.Zero, i < s.Length()), s.At(i).IsSome()), runBdds: false);
             CheckValid<Seq<int>, int>((s, x) => Implies(s == Seq.Unit(x), s.At(BigInteger.Zero).Value() == x), runBdds: false);
-            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasPrefix(s2), s1.Contains(s2)), runBdds: false);
-            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.HasSuffix(s2), s1.Contains(s2)), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.StartsWith(s2), s1.Contains(s2)), runBdds: false);
+            CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.EndsWith(s2), s1.Contains(s2)), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(l < BigInteger.Zero, s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o < BigInteger.Zero, s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(o > s.Length(), s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
@@ -157,7 +157,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqHasPrefix()
         {
-            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.HasPrefix(s2));
+            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.StartsWith(s2));
 
             Assert.AreEqual(true, zf.Evaluate(empty, empty));
             Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
@@ -186,7 +186,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqHasSuffix()
         {
-            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.HasSuffix(s2));
+            var zf = new ZenFunction<Seq<int>, Seq<int>, bool>((s1, s2) => s1.EndsWith(s2));
 
             Assert.AreEqual(true, zf.Evaluate(empty, empty));
             Assert.AreEqual(true, zf.Evaluate(empty.Concat(one), empty));
@@ -396,7 +396,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqFindHasPrefix()
         {
-            var result = new ZenConstraint<Seq<int>>(s => s.HasPrefix(one.Concat(two))).Find();
+            var result = new ZenConstraint<Seq<int>>(s => s.StartsWith(one.Concat(two))).Find();
             Assert.IsTrue(result.Value.HasPrefix(one.Concat(two)));
         }
 
@@ -406,7 +406,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqFindHasSuffix()
         {
-            var result = new ZenConstraint<Seq<int>>(s => s.HasSuffix(one.Concat(two))).Find();
+            var result = new ZenConstraint<Seq<int>>(s => s.EndsWith(one.Concat(two))).Find();
             Assert.IsTrue(result.Value.HasSuffix(one.Concat(two)));
         }
 

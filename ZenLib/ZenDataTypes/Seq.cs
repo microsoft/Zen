@@ -487,7 +487,7 @@ namespace ZenLib
         /// <param name="seqExpr">The sequence.</param>
         /// <param name="subseqExpr">The subsequence.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> HasPrefix<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        public static Zen<bool> StartsWith<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
             CommonUtilities.ValidateNotNull(seqExpr);
             CommonUtilities.ValidateNotNull(subseqExpr);
@@ -501,7 +501,7 @@ namespace ZenLib
         /// <param name="seqExpr">The sequence.</param>
         /// <param name="subseqExpr">The subsequence.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> HasSuffix<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
+        public static Zen<bool> EndsWith<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
             CommonUtilities.ValidateNotNull(seqExpr);
             CommonUtilities.ValidateNotNull(subseqExpr);

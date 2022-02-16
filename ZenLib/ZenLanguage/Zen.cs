@@ -139,6 +139,13 @@ namespace ZenLib
                 return Zen.Concat(expr1 as Zen<string>, expr2 as Zen<string>) as Zen<T>;
             }
 
+            if (ReflectionUtilities.IsSeqType(type))
+            {
+                var innerType = type.GetGenericArguments()[0];
+                var method = typeof(SeqExtensions).GetMethod("Concat").MakeGenericMethod(innerType);
+                return (Zen<T>)method.Invoke(null, new object[] { expr1, expr2 });
+            }
+
             return Zen.Plus(expr1, expr2);
         }
 
@@ -714,7 +721,7 @@ namespace ZenLib
         /// <param name="offset">The offset Zen expression.</param>
         /// <param name="length">The length Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> Substring(this Zen<string> str, Zen<BigInteger> offset, Zen<BigInteger> length)
+        public static Zen<string> Slice(this Zen<string> str, Zen<BigInteger> offset, Zen<BigInteger> length)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(offset);
@@ -730,7 +737,22 @@ namespace ZenLib
         /// <param name="str">The string Zen expression.</param>
         /// <param name="index">The index Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<string> At(this Zen<string> str, Zen<BigInteger> index)
+        public static Zen<Option<byte>> At(this Zen<string> str, Zen<BigInteger> index)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(index);
+
+            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
+            return ZenSeqAtExpr<byte>.Create(e1, index);
+        }
+
+        /// <summary>
+        /// Get the character for a string at a given index.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="index">The index Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<string> Char(this Zen<string> str, Zen<BigInteger> index)
         {
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(index);
