@@ -124,14 +124,14 @@ namespace ZenLib
         /// <returns>Index of the first match or -1.</returns>
         public int IndexOf(Seq<T> other, int offset)
         {
-            if (other.Length() == 0)
-            {
-                return 0;
-            }
-
-            if (offset >= this.Length() || other.Length() > this.Length())
+            if (offset < 0 || offset > this.Length() || other.Length() > this.Length())
             {
                 return -1;
+            }
+
+            if (other.Length() == 0)
+            {
+                return offset;
             }
 
             var difference = this.Length() - other.Length();
@@ -165,7 +165,26 @@ namespace ZenLib
         /// <returns>True if the other sequence is a subsequence of this one.</returns>
         public bool Contains(Seq<T> other)
         {
-            return this.IndexOf(other, 0) >= 0;
+            if (other.Length() == 0)
+            {
+                return true;
+            }
+
+            if (0 >= this.Length() || other.Length() > this.Length())
+            {
+                return false;
+            }
+
+            var difference = this.Length() - other.Length();
+            for (int i = 0; i < difference + 1; i++)
+            {
+                if (IsMatch(other, i))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsMatch(Seq<T> other, int index)
@@ -365,7 +384,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        internal static Seq<byte> FromString(string s)
+        public static Seq<byte> FromString(string s)
         {
             return new Seq<byte>(ImmutableList.CreateRange(Encoding.ASCII.GetBytes(s)));
         }
@@ -376,7 +395,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        internal static string AsString(this Seq<byte> seq)
+        public static string AsString(this Seq<byte> seq)
         {
             return Encoding.ASCII.GetString(seq.Values.ToArray());
         }

@@ -845,13 +845,19 @@ namespace ZenLib
                 var type = typeof(T);
 
                 if (value is bool || value is byte || value is short || value is ushort || value is int ||
-                    value is uint || value is long || value is ulong || value is string || value is BigInteger ||
+                    value is uint || value is long || value is ulong || value is BigInteger ||
                     IsFixedIntegerType(type))
                 {
                     return ZenConstantExpr<T>.Create((dynamic)value);
                 }
 
                 var typeArgs = type.GetGenericArgumentsCached();
+
+                if (type == StringType)
+                {
+                    var asSeq = (Zen<Seq<byte>>)CreateZenConstant(Seq.FromString((string)(object)value));
+                    return ZenCastExpr<Seq<byte>, string>.Create(asSeq);
+                }
 
                 if (IsSeqType(type))
                 {

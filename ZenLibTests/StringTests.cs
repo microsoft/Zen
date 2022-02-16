@@ -159,8 +159,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSubstringAgreement()
         {
-            var offset = new BigInteger(RandomByte());
-            var length = new BigInteger(RandomByte());
+            var offset = new BigInteger(2);
+            var length = new BigInteger(3);
             CheckAgreement<string>(s => s.Substring(offset, length).EndsWith("ab"));
         }
 
@@ -286,7 +286,7 @@ namespace ZenLib.Tests
         [DataRow("brown cow", "cow", "fox", "brown fox")]
         [DataRow("aabbcc", "b", "d", "aadbcc")]
         [DataRow("hello", "ll", "rrr", "herrro")]
-        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("hello", "", " abc", " abchello")]
         [DataRow("abc", "b", "", "ac")]
         public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
         {
