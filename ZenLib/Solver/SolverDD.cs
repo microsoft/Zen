@@ -520,7 +520,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit Concat(Unit x, Unit y)
+        public Unit SeqConcat(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
@@ -677,6 +677,12 @@ namespace ZenLib.Solver
 
         [ExcludeFromCodeCoverage]
         public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> valueExpr, Type type)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public SymbolicObject<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> SeqAt(Unit x, Type seqInnerType, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }

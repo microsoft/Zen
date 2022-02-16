@@ -278,7 +278,16 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TSeq Concat(TSeq x, TSeq y);
+        TSeq SeqConcat(TSeq x, TSeq y);
+
+        /// <summary>
+        /// The string 'At' operation.
+        /// </summary>
+        /// <param name="x">The string expression.</param>
+        /// <param name="seqInnerType">The seq inner type.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
+        SymbolicObject<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> SeqAt(TSeq x, Type seqInnerType, TInteger y);
 
         /// <summary>
         /// The 'PrefixOf' of two expressions.

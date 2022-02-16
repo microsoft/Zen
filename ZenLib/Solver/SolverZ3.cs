@@ -6,6 +6,7 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -359,7 +360,7 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkMul(x, y);
         }
 
-        public SeqExpr Concat(SeqExpr x, SeqExpr y)
+        public SeqExpr SeqConcat(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkConcat(x, y);
         }
@@ -513,6 +514,30 @@ namespace ZenLib.Solver
             var sort = GetSortForType(type);
             var seqSort = this.Context.MkSeqSort(sort);
             return this.Context.MkEmptySeq(seqSort);
+        }
+
+        public SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> SeqAt(SeqExpr x, Type seqInnerType, IntExpr y)
+        {
+            var sort = this.GetSortForType(seqInnerType);
+            var result = this.Context.MkAt(x, y);
+            var resultIsEmpty = this.Context.MkEq(result, this.SeqEmpty(seqInnerType));
+
+            // create fresh variables to represent that flag and value for an option result
+            var freshVariable = this.Context.MkConst(FreshSymbol(), sort);
+            var freshSequence = this.Context.MkUnit(freshVariable);
+            var freshFlag = (BoolExpr)this.Context.MkConst(FreshSymbol(), this.BoolSort);
+
+            // ensure the values for the fresh flag and value are constrained appropriately
+            this.Solver.Assert(this.Context.MkEq(resultIsEmpty, this.Context.MkNot(freshFlag)));
+            this.Solver.Assert(this.Context.MkImplies(this.Context.MkNot(resultIsEmpty), this.Context.MkEq(freshSequence, result)));
+
+            // build the resulting symbolic object
+            var fields = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
+            fields = fields.Add("HasValue", new SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, freshFlag));
+            fields = fields.Add("Value", this.ExprToSymbolicValueConverter.ConvertExpr(freshVariable, seqInnerType));
+
+            var objectType = typeof(Option<>).MakeGenericType(seqInnerType);
+            return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this, fields);
         }
 
         public object Get(Model m, Expr v, Type type)

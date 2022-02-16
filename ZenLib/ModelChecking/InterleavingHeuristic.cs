@@ -456,6 +456,7 @@ namespace ZenLib.ModelChecking
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
+        [ExcludeFromCodeCoverage]
         public InterleavingResult VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
@@ -464,7 +465,13 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, Dictionary<long, object> parameter)
         {
-            throw new System.NotImplementedException();
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
     }
 }

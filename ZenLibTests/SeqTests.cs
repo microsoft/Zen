@@ -84,6 +84,39 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with at.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqAt()
+        {
+            var empty = new Seq<int>();
+            var one = new Seq<int>(1);
+            var two = new Seq<int>(2);
+            var three = new Seq<int>(3);
+
+            var zf = new ZenFunction<Seq<int>, BigInteger, Option<int>>((s, i) => s.At(i));
+
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(Option.Some(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(Option.Some(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+
+            zf.Compile();
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(Option.Some(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(Option.Some(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+
+            Assert.AreEqual(Option.None<int>(), empty.At(1));
+            Assert.AreEqual(Option.Some(1), empty.Concat(one).Concat(two).At(0));
+            Assert.AreEqual(Option.Some(2), empty.Concat(one).Concat(two).At(1));
+            Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(2));
+            Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(-1));
+        }
+
+        /// <summary>
         /// Test seq find with empty.
         /// </summary>
         [TestMethod]
@@ -124,6 +157,19 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Seq<int>>(s => s.Length() == new BigInteger(4)).Find();
             Assert.AreEqual(4, result.Value.Length());
+        }
+
+        /// <summary>
+        /// Test seq find with at.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindAt()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Option.Some(10)).Find();
+            Assert.AreEqual(10, result.Value.At(2).Value);
+
+            result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Option.None<int>()).Find();
+            Assert.IsTrue(result.Value.Length() < 3 || result.Value.At(2).IsNone());
         }
 
         /// <summary>

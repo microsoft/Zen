@@ -658,5 +658,20 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e1 = (Seq<T>)expression.SeqExpr.Accept(this, parameter);
+            var e2 = (BigInteger)expression.IndexExpr.Accept(this, parameter);
+            var result = e1.At(int.Parse(e2.ToString()));
+
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }

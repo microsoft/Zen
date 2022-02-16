@@ -52,6 +52,31 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the value at a given index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The value at the index.</returns>
+        public Option<T> At(int index)
+        {
+            if (index >= this.Values.Count || index < 0)
+            {
+                return Option.None<T>();
+            }
+
+            return Option.Some(this.Values[index]);
+        }
+
+        /// <summary>
+        /// Get the value at a given index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The value at the index.</returns>
+        private Option<T> AtBigInteger(BigInteger index)
+        {
+            return At(int.Parse(index.ToString()));
+        }
+
+        /// <summary>
         /// Length of the sequence.
         /// </summary>
         /// <returns>The length as an integer.</returns>
@@ -207,6 +232,20 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(seqExpr);
 
             return ZenSeqLengthExpr<T>.Create(seqExpr);
+        }
+
+        /// <summary>
+        /// Gets the singleton subsequence at an index, or the empty sequence if out of bounds.
+        /// </summary>
+        /// <param name="seqExpr">The sequence expr.</param>
+        /// <param name="indexExpr">The index expr.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(indexExpr);
+
+            return ZenSeqAtExpr<T>.Create(seqExpr, indexExpr);
         }
     }
 }

@@ -750,6 +750,17 @@ namespace ZenLib.Compilation
             });
         }
 
+        public Expression VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = expression.SeqExpr.Accept(this, parameter);
+                var r = expression.IndexExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("AtBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(l, m, new Expression[] { r });
+            });
+        }
+
         private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
         {
             Expression[] exprs = new Expression[fields.Length + 2];
