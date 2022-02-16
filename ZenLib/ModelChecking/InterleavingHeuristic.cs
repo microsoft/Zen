@@ -134,22 +134,6 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public InterleavingResult VisitZenConcatExpr(ZenConcatExpr expression, Dictionary<long, object> parameter)
-        {
-            if (this.cache.TryGetValue(expression, out var value))
-            {
-                return value;
-            }
-
-            var x = expression.Expr1.Accept(this, parameter);
-            var y = expression.Expr2.Accept(this, parameter);
-            this.Combine(x, y);
-            var result = x.Union(y);
-
-            this.cache[expression] = result;
-            return result;
-        }
-
         public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
@@ -376,42 +360,6 @@ namespace ZenLib.ModelChecking
                     }
                 }
             }
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringAtExpr(ZenStringAtExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringLengthExpr(ZenStringLengthExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]

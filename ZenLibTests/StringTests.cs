@@ -265,21 +265,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test string replace first.
-        /// </summary>
-        [TestMethod]
-        [DataRow("brown cow", "cow", "fox", "brown fox")]
-        [DataRow("aabbcc", "b", "d", "aadbcc")]
-        [DataRow("hello", "ll", "rrr", "herrro")]
-        [DataRow("hello", "", " abc", "hello abc")]
-        [DataRow("abc", "b", "", "ac")]
-        [DataRow("abcd", "e", "f", "abcd")]
-        public void TestReplaceFirst(string s, string sub, string replace, string expected)
-        {
-            Assert.AreEqual(expected, CommonUtilities.ReplaceFirst(s, sub, replace));
-        }
-
-        /// <summary>
         /// Test contains replace first.
         /// </summary>
         [TestMethod]

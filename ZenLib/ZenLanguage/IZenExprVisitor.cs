@@ -52,62 +52,6 @@ namespace ZenLib
         TReturn VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a ConcatExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenConcatExpr(ZenConcatExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a ContainmentExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringReplaceExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringSubstringExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringLengthExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringLengthExpr(ZenStringLengthExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringAtExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringAtExpr(ZenStringAtExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a StringIndexOfExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, TParam parameter);
-
-        /// <summary>
         /// Visit a BitwiseAndExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
