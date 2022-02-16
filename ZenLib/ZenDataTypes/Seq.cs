@@ -8,6 +8,7 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
 
     /// <summary>
     /// A class representing an arbitrary sized sequence.
@@ -48,6 +49,15 @@ namespace ZenLib
         public IList<T> ToList()
         {
             return this.Values;
+        }
+
+        /// <summary>
+        /// Length of the sequence.
+        /// </summary>
+        /// <returns>The length as an integer.</returns>
+        public int Length()
+        {
+            return this.Values.Count;
         }
 
         /// <summary>
@@ -162,6 +172,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Unit<T>(Zen<T> value)
         {
+            CommonUtilities.ValidateNotNull(value);
+
             return ZenSeqUnitExpr<T>.Create(value);
         }
     }
@@ -183,6 +195,18 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(seqExpr2);
 
             return ZenSeqConcatExpr<T>.Create(seqExpr1, seqExpr2);
+        }
+
+        /// <summary>
+        /// Get the length of a sequence.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<BigInteger> Length<T>(this Zen<Seq<T>> seqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+
+            return ZenSeqLengthExpr<T>.Create(seqExpr);
         }
     }
 }

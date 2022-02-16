@@ -963,6 +963,20 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var v = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
+            var result = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Length(v.Value));
+
+            this.Cache[expression] = result;
+            return result;
+        }
+
         [ExcludeFromCodeCoverage]
         private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,

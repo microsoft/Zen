@@ -212,6 +212,14 @@ namespace ZenLib
         TReturn VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ZenSeqLengthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a GetFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

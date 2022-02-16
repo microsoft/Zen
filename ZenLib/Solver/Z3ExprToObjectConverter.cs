@@ -175,7 +175,7 @@ namespace ZenLib.Solver
 
         public object VisitSeq(Func<Type, Expr, object> recurse, Type sequenceType, Type innerType, Expr parameter)
         {
-            Console.WriteLine(parameter);
+            // Console.WriteLine(parameter);
 
             if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.empty")
             {

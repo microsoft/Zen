@@ -61,6 +61,29 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with length.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqLength()
+        {
+            var empty = new Seq<int>();
+            var one = new Seq<int>(1);
+            var two = new Seq<int>(2);
+            var three = new Seq<int>(3);
+
+            var zf = new ZenFunction<Seq<int>, BigInteger>(s => s.Length());
+
+            Assert.AreEqual(new BigInteger(empty.Length()), zf.Evaluate(empty));
+            Assert.AreEqual(new BigInteger(empty.Concat(one).Length()), zf.Evaluate(empty.Concat(one)));
+            Assert.AreEqual(new BigInteger(empty.Concat(one).Concat(two).Length()), zf.Evaluate(empty.Concat(one).Concat(two)));
+
+            zf.Compile();
+            Assert.AreEqual(new BigInteger(empty.Length()), zf.Evaluate(empty));
+            Assert.AreEqual(new BigInteger(empty.Concat(one).Length()), zf.Evaluate(empty.Concat(one)));
+            Assert.AreEqual(new BigInteger(empty.Concat(one).Concat(two).Length()), zf.Evaluate(empty.Concat(one).Concat(two)));
+        }
+
+        /// <summary>
         /// Test seq find with empty.
         /// </summary>
         [TestMethod]
@@ -91,6 +114,16 @@ namespace ZenLib.Tests
 
             var result = new ZenConstraint<Seq<int>>(s => s == zero.Concat(one)).Find();
             Assert.AreEqual(zero.Concat(one), result.Value);
+        }
+
+        /// <summary>
+        /// Test seq find with concat.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindLength()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => s.Length() == new BigInteger(4)).Find();
+            Assert.AreEqual(4, result.Value.Length());
         }
 
         /// <summary>

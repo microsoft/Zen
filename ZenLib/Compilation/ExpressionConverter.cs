@@ -733,8 +733,20 @@ namespace ZenLib.Compilation
             {
                 var l = expression.SeqExpr1.Accept(this, parameter);
                 var r = expression.SeqExpr2.Accept(this, parameter);
-                var m = ReflectionUtilities.SeqType.MakeGenericType(typeof(T)).GetMethod("Concat");
+                var m = typeof(Seq<T>).GetMethod("Concat");
                 return Expression.Call(l, m, new Expression[] { r });
+            });
+        }
+
+        public Expression VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var s = expression.SeqExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("Length");
+                var e = Expression.Call(s, m);
+                var c = typeof(BigInteger).GetConstructor(new Type[] { typeof(int) });
+                return Expression.New(c, e);
             });
         }
 

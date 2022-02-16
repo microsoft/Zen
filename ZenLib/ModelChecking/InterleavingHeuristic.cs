@@ -150,90 +150,6 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringAtExpr(ZenStringAtExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringLengthExpr(ZenStringLengthExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
-        }
-
         public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
@@ -460,6 +376,95 @@ namespace ZenLib.ModelChecking
                     }
                 }
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringAtExpr(ZenStringAtExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringLengthExpr(ZenStringLengthExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid string type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
+
+        public InterleavingResult VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

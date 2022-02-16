@@ -644,5 +644,19 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e = (Seq<T>)expression.SeqExpr.Accept(this, parameter);
+            var result = new BigInteger(e.Length());
+
+            this.cache[expression] = result;
+            return result;
+        }
     }
 }
