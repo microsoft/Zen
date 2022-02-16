@@ -24,6 +24,11 @@ namespace ZenLib
         public readonly static Type StringType = typeof(string);
 
         /// <summary>
+        /// The type of byte sequences values.
+        /// </summary>
+        public readonly static Type ByteSequenceType = typeof(Seq<byte>);
+
+        /// <summary>
         /// The type of finite string values.
         /// </summary>
         public readonly static Type FiniteStringType = typeof(FString);

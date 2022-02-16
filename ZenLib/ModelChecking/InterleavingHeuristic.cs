@@ -497,5 +497,11 @@ namespace ZenLib.ModelChecking
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid cast used with Decision Diagram backend.");
+        }
     }
 }

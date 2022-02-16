@@ -989,5 +989,27 @@ namespace ZenLib.Compilation
                 return Expression.Call(e1, m, new Expression[] { e2, e3 });
             });
         }
+
+        public Expression VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e = expression.SourceExpr.Accept(this, parameter);
+
+                if (typeof(TKey) == ReflectionUtilities.StringType)
+                {
+                    var m = typeof(Seq).GetMethod("FromString");
+                    return Expression.Call(null, m, new Expression[] { e });
+                }
+
+                if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+                {
+                    var m = typeof(Seq).GetMethod("AsString");
+                    return Expression.Call(null, m, new Expression[] { e });
+                }
+
+                throw new ZenUnreachableException();
+            });
+        }
     }
 }

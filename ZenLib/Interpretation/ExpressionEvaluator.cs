@@ -750,5 +750,31 @@ namespace ZenLib.Interpretation
             this.cache[expression] = result;
             return result;
         }
+
+        public object VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            if (this.cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            var e = expression.SourceExpr.Accept(this, parameter);
+
+            if (typeof(TKey) == ReflectionUtilities.StringType)
+            {
+                var result = Seq.FromString((string)e);
+                this.cache[expression] = result;
+                return result;
+            }
+
+            if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+            {
+                var result = Seq.AsString((Seq<byte>)e);
+                this.cache[expression] = result;
+                return result;
+            }
+
+            throw new ZenUnreachableException();
+        }
     }
 }

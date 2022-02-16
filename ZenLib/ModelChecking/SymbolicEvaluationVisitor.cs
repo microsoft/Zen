@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -1081,6 +1080,32 @@ namespace ZenLib.ModelChecking
 
             this.Cache[expression] = result;
             return result;
+        }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            if (this.Cache.TryGetValue(expression, out var value))
+            {
+                return value;
+            }
+
+            if (typeof(TKey) == ReflectionUtilities.StringType)
+            {
+                var e = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SourceExpr.Accept(this, parameter);
+                var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e.Value);
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+            {
+                var e = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SourceExpr.Accept(this, parameter);
+                var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e.Value);
+                this.Cache[expression] = result;
+                return result;
+            }
+
+            throw new ZenUnreachableException();
         }
     }
 }

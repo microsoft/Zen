@@ -8,7 +8,9 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
+    using System.Text;
 
     /// <summary>
     /// A class representing an arbitrary sized sequence.
@@ -37,7 +39,7 @@ namespace ZenLib
             this.Values = ImmutableList<T>.Empty.Add(value);
         }
 
-        private Seq(ImmutableList<T> values)
+        internal Seq(ImmutableList<T> values)
         {
             this.Values = values;
         }
@@ -357,6 +359,28 @@ namespace ZenLib
     /// </summary>
     public static class Seq
     {
+        /// <summary>
+        /// Create a byte sequence from a string.
+        /// The bytes correspond to the ASCII values.
+        /// </summary>
+        /// <param name="s">The string value.</param>
+        /// <returns>A sequence of bytes.</returns>
+        internal static Seq<byte> FromString(string s)
+        {
+            return new Seq<byte>(ImmutableList.CreateRange(Encoding.ASCII.GetBytes(s)));
+        }
+
+        /// <summary>
+        /// Create a string from a byte sequence.
+        /// The bytes correspond to the ASCII values.
+        /// </summary>
+        /// <param name="seq">The sequence of bytes.</param>
+        /// <returns>The string for the bytes.</returns>
+        internal static string AsString(this Seq<byte> seq)
+        {
+            return Encoding.ASCII.GetString(seq.Values.ToArray());
+        }
+
         /// <summary>
         /// The Zen value for an empty seq.
         /// </summary>

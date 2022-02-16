@@ -314,5 +314,13 @@ namespace ZenLib
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
         TReturn VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a CastExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, TParam parameter);
     }
 }

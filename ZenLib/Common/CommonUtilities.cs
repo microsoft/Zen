@@ -207,6 +207,26 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Validate that a cast is valid.
+        /// </summary>
+        /// <param name="sourceType">The source type.</param>
+        /// <param name="targetType">The target type.</param>
+        public static void ValidateIsSafeCast(Type sourceType, Type targetType)
+        {
+            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.ByteSequenceType)
+            {
+                return;
+            }
+
+            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.ByteSequenceType)
+            {
+                return;
+            }
+
+            throw new ZenException($"Invalid cast from type {sourceType} to type {targetType}.");
+        }
+
+        /// <summary>
         /// Validate that an argument is not null.
         /// </summary>
         /// <param name="obj">The argument.</param>
