@@ -1572,5 +1572,15 @@ namespace ZenLib.Tests
         {
             Zen.Cast<string, Seq<byte>>(null);
         }
+
+        /// <summary>
+        /// Exception thrown for ascii strings.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidAscii()
+        {
+            Constant("hello∆");
+        }
     }
 }

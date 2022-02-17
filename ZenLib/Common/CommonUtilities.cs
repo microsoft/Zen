@@ -106,20 +106,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Convert to an immutable list if necessary.
-        /// </summary>
-        /// <returns></returns>
-        public static ImmutableList<T> ToImmutableList<T>(object obj)
-        {
-            if (obj is ImmutableList<T>)
-            {
-                return (ImmutableList<T>)obj;
-            }
-
-            return ImmutableList.CreateRange((IList<T>)obj);
-        }
-
-        /// <summary>
         /// Convert to an immutable dictionary if necessary.
         /// </summary>
         /// <returns></returns>

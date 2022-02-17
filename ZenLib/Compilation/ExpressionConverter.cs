@@ -457,13 +457,7 @@ namespace ZenLib.Compilation
             {
                 var method = typeof(ImmutableList<T>).GetMethodCached("Insert");
                 var list = expression.Expr.Accept(this, parameter);
-
-                var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableList")
-                    .MakeGenericMethod(typeof(T));
-
-                var immutableListExpr = Expression.Call(null, toImmutableListMethod, list);
-
+                var immutableListExpr = Expression.Convert(list, typeof(ImmutableList<T>));
                 var element = expression.Element.Accept(this, parameter);
                 return Expression.Call(immutableListExpr, method, Expression.Constant(0), element);
             });
@@ -486,15 +480,7 @@ namespace ZenLib.Compilation
 
                 // compile the list expression
                 var listExpr = expression.ListExpr.Accept(this, parameter);
-
-                // Console.WriteLine($"listExpr: {listExpr}");
-
-                // cast to an immutable list, since it will return IList
-                var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableList")
-                    .MakeGenericMethod(typeof(TList));
-
-                var immutableListExpr = Expression.Call(toImmutableListMethod, listExpr);
+                var immutableListExpr = Expression.Convert(listExpr, typeof(ImmutableList<TList>));
 
                 var listVariable = FreshVariable(immutableListType);
                 this.Variables.Add(listVariable);

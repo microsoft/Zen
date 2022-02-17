@@ -236,7 +236,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqRemoveFirstCount()
         {
-            RandomBytes(x => CheckValid<FSeq<int>>(l => l.RemoveFirst(x).Duplicates(x) == l.Duplicates(x)));
+            RandomBytes(x => CheckValid<FSeq<int>>(
+                l => Implies(l.Contains(x), l.RemoveFirst(x).Duplicates(x) != l.Duplicates(x))));
         }
 
         /// <summary>

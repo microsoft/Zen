@@ -610,7 +610,7 @@ namespace ZenLib.ModelChecking
                 {
                     // split the symbolic list
                     var (hd, tl) = CommonUtilities.SplitHead(values);
-                    var tlImmutable = CommonUtilities.ToImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>(tl);
+                    var tlImmutable = (ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>)tl;
 
                     // push the guard into the tail of the list
                     var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;

@@ -373,7 +373,7 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e1 = CommonUtilities.ToImmutableList<T>(expression.Expr.Accept(this, parameter));
+            var e1 = (ImmutableList<T>)(expression.Expr.Accept(this, parameter));
             var e2 = (T)expression.Element.Accept(this, parameter);
             var result = e1.Insert(0, e2);
             this.cache[expression] = result;
@@ -387,7 +387,7 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e = CommonUtilities.ToImmutableList<T>(expression.ListExpr.Accept(this, parameter));
+            var e = (ImmutableList<T>)(expression.ListExpr.Accept(this, parameter));
 
             if (e.Count == 0)
             {
@@ -441,7 +441,7 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e1 = (ImmutableDictionary<TKey, TValue>)(expression.DictExpr.Accept(this, parameter));
             var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
             var e3 = (TValue)expression.ValueExpr.Accept(this, parameter);
             var result = e1.SetItem(e2, e3);
@@ -456,7 +456,7 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e1 = (ImmutableDictionary<TKey, TValue>)(expression.DictExpr.Accept(this, parameter));
             var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
             var result = e1.Remove(e2);
             this.cache[expression] = result;
@@ -470,7 +470,7 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e1 = CommonUtilities.ToImmutableDictionary<TKey, TValue>(expression.DictExpr.Accept(this, parameter));
+            var e1 = (ImmutableDictionary<TKey, TValue>)(expression.DictExpr.Accept(this, parameter));
             var e2 = (TKey)expression.KeyExpr.Accept(this, parameter);
             var result = CommonUtilities.DictionaryGet(e1, e2);
             this.cache[expression] = result;
@@ -484,8 +484,8 @@ namespace ZenLib.Interpretation
                 return value;
             }
 
-            var e1 = CommonUtilities.ToImmutableDictionary<TKey, SetUnit>(expression.DictExpr1.Accept(this, parameter));
-            var e2 = CommonUtilities.ToImmutableDictionary<TKey, SetUnit>(expression.DictExpr2.Accept(this, parameter));
+            var e1 = (ImmutableDictionary<TKey, SetUnit>)(expression.DictExpr1.Accept(this, parameter));
+            var e2 = (ImmutableDictionary<TKey, SetUnit>)(expression.DictExpr2.Accept(this, parameter));
 
             object result;
             switch (expression.CombinationType)

@@ -336,7 +336,7 @@ namespace ZenLib
             return seqExpr.Case(
                 empty: Constant<ushort>(0),
                 cons: (hd, tl) =>
-                    If(hd == valueExpr, tl.Duplicates(valueExpr), tl.Duplicates(valueExpr) + Constant<ushort>(1)));
+                    If(hd == valueExpr, Constant<ushort>(1) + tl.Duplicates(valueExpr), tl.Duplicates(valueExpr)));
         }
 
         /// <summary>
