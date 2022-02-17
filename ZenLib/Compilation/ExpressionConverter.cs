@@ -80,46 +80,6 @@ namespace ZenLib.Compilation
         private int maxMatchUnrollingDepth;
 
         /// <summary>
-        /// String concatenation method.
-        /// </summary>
-        private static MethodInfo concatMethod = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
-
-        /// <summary>
-        /// String prefix of method.
-        /// </summary>
-        private static MethodInfo prefixOfMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
-
-        /// <summary>
-        /// String suffix of method.
-        /// </summary>
-        private static MethodInfo suffixOfMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo replaceMethod = typeof(CommonUtilities).GetMethod("ReplaceFirst");
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo substringMethod = typeof(CommonUtilities).GetMethod("Substring");
-
-        /// <summary>
-        /// String at method.
-        /// </summary>
-        private static MethodInfo atMethod = typeof(CommonUtilities).GetMethod("At");
-
-        /// <summary>
-        /// String indexof method.
-        /// </summary>
-        private static MethodInfo indexOfMethod = typeof(CommonUtilities).GetMethod("IndexOf");
-
-        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.

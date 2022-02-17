@@ -227,9 +227,8 @@ namespace ZenLib.Generation
 
         public object VisitString(DepthConfiguration parameter)
         {
-            var e = new ZenArbitraryExpr<string>();
-            this.ArbitraryExpressions.Add(e);
-            return e;
+            var v = (Zen<Seq<byte>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<byte>), parameter);
+            return ZenCastExpr<Seq<byte>, string>.Create(v);
         }
     }
 }

@@ -407,8 +407,10 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(x.Intersect(y).Intersect(y), x.Intersect(y));
             Assert.AreEqual(x.Intersect(y).Intersect(x), x.Intersect(y));
+            Assert.AreEqual(x.Intersect(y.Intersect(x)), y.Intersect(x));
             Assert.AreEqual(x.Union(y).Union(y), x.Union(y));
             Assert.AreEqual(x.Union(y).Union(x), x.Union(y));
+            Assert.AreEqual(x.Union(y.Union(x)), y.Union(x));
             Assert.AreNotEqual(x.Union(y).Intersect(y), x.Union(y));
             Assert.AreNotEqual(x.Intersect(y).Union(x), x.Intersect(y));
         }

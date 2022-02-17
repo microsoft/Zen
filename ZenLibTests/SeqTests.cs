@@ -475,6 +475,39 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq find with strings in sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindInSet1()
+        {
+            var result = new ZenConstraint<Set<string>>(s => s.Contains("ab" + "bc")).Find();
+
+            Assert.IsTrue(result.Value.Contains("abbc"));
+        }
+
+        /// <summary>
+        /// Test seq find with seqs in sets.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindInSet2()
+        {
+            var result = new ZenConstraint<Set<Seq<int>>>(s => s.Contains(Seq.Empty<int>().Concat(one).Concat(two))).Find();
+
+            Assert.IsTrue(result.Value.Contains(one.Concat(two)));
+        }
+
+        /// <summary>
+        /// Test seq find with ite.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithIte()
+        {
+            var result = new ZenConstraint<Seq<int>, bool>((s, b) => If(b, Seq.Empty<int>(), Seq.Empty<int>() + new Seq<int>(10)).Contains(new Seq<int>(11))).Find();
+
+            Assert.IsFalse(result.HasValue);
+        }
+
+        /// <summary>
         /// Test set equality and hashcode.
         /// </summary>
         [TestMethod]

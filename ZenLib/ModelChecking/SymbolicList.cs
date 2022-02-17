@@ -24,6 +24,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> GuardedListGroup { get; }
 
+        [ExcludeFromCodeCoverage]
         internal override TReturn Accept<TParam, TReturn>(
             ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter)

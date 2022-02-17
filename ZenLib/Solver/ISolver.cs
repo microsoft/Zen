@@ -127,19 +127,6 @@ namespace ZenLib.Solver
         (TVariable, TSeq) CreateSeqVar(object e);
 
         /// <summary>
-        /// Create a new string expression.
-        /// </summary>
-        /// <param name="e">Zen arbitrary expr.</param>
-        /// <returns>The expression.</returns>
-        (TVariable, TSeq) CreateStringVar(object e);
-
-        /// <summary>
-        /// Create a string constant.
-        /// </summary>
-        /// <returns></returns>
-        TSeq CreateStringConst(string s);
-
-        /// <summary>
         /// Create a new dictionary expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
@@ -281,76 +268,76 @@ namespace ZenLib.Solver
         TSeq SeqConcat(TSeq x, TSeq y);
 
         /// <summary>
-        /// The string 'At' operation.
+        /// The sequence 'At' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <param name="seqInnerType">The seq inner type.</param>
         /// <param name="y">The index expression.</param>
         /// <returns></returns>
-        SymbolicObject<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> SeqAt(TSeq x, Type seqInnerType, TInteger y);
+        SymbolicObject<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> SeqGet(TSeq x, Type seqInnerType, TInteger y);
 
         /// <summary>
         /// The 'PrefixOf' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
-        TBool PrefixOf(TSeq x, TSeq y);
+        TBool SeqPrefixOf(TSeq x, TSeq y);
 
         /// <summary>
         /// The 'SuffixOf' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
-        TBool SuffixOf(TSeq x, TSeq y);
+        TBool SeqSuffixOf(TSeq x, TSeq y);
 
         /// <summary>
         /// The 'Contains' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
         TBool SeqContains(TSeq x, TSeq y);
 
         /// <summary>
-        /// The string 'Replace' operation.
+        /// The seq 'Replace' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <param name="z">The replacement expression.</param>
         /// <returns></returns>
         TSeq SeqReplaceFirst(TSeq x, TSeq y, TSeq z);
 
         /// <summary>
-        /// The string 'Substring' operation.
+        /// The seq 'Slice' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <param name="y">The offset expression.</param>
         /// <param name="z">The length expression.</param>
         /// <returns></returns>
         TSeq SeqSlice(TSeq x, TInteger y, TInteger z);
 
         /// <summary>
-        /// The string 'At' operation.
+        /// The seq 'At' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <param name="y">The index expression.</param>
         /// <returns></returns>
-        TSeq At(TSeq x, TInteger y);
+        TSeq SeqAt(TSeq x, TInteger y);
 
         /// <summary>
-        /// The string 'Length' operation.
+        /// The seq 'Length' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <returns></returns>
         TInteger SeqLength(TSeq x);
 
         /// <summary>
-        /// The string 'IndexOf' operation.
+        /// The seq 'IndexOf' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <param name="z">The offset expression.</param>
         /// <returns></returns>
         TInteger SeqIndexOf(TSeq x, TSeq y, TInteger z);
@@ -427,7 +414,7 @@ namespace ZenLib.Solver
         TBool Eq(TInteger x, TInteger y);
 
         /// <summary>
-        /// The 'Equal' of two strings.
+        /// The 'Equal' of two seqs.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>

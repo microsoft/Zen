@@ -38,13 +38,14 @@ namespace ZenLib.Tests
         [DataRow("\"")]
         [DataRow("\\")]
         [DataRow("\\x5C\\x6E")]
+        [DataRow("\\n")]
         [DataRow("endline\n")]
         [DataRow("\x01\\x01")]
         public void TestStringConversions(string s)
         {
             var context = new Context();
-            var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
-            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+            var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
+            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
             Assert.AreEqual(s, tocs);
         }
 
@@ -58,8 +59,8 @@ namespace ZenLib.Tests
             {
                 string s = RandomString();
                 var context = new Context();
-                var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
-                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+                var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
+                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
                 Assert.AreEqual(s, tocs);
             }
         }

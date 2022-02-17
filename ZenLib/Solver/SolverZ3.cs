@@ -7,6 +7,7 @@ namespace ZenLib.Solver
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -183,17 +184,6 @@ namespace ZenLib.Solver
             return (v, (IntExpr)v);
         }
 
-        public SeqExpr CreateStringConst(string s)
-        {
-            return this.Context.MkString(s);
-        }
-
-        public (Expr, SeqExpr) CreateStringVar(object e)
-        {
-            var v = this.Context.MkConst(FreshSymbol(), this.StringSort);
-            return (v, (SeqExpr)v);
-        }
-
         public (Expr, SeqExpr) CreateSeqVar(object e)
         {
             var seqType = e.GetType().GetGenericArgumentsCached()[0];
@@ -365,12 +355,12 @@ namespace ZenLib.Solver
             return this.Context.MkConcat(x, y);
         }
 
-        public BoolExpr PrefixOf(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqPrefixOf(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkPrefixOf(y, x);
         }
 
-        public BoolExpr SuffixOf(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqSuffixOf(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkSuffixOf(y, x);
         }
@@ -390,7 +380,8 @@ namespace ZenLib.Solver
             return this.Context.MkExtract(x, y, z);
         }
 
-        public SeqExpr At(SeqExpr x, IntExpr y)
+        [ExcludeFromCodeCoverage] // not used yet
+        public SeqExpr SeqAt(SeqExpr x, IntExpr y)
         {
             return this.Context.MkAt(x, y);
         }
@@ -516,7 +507,7 @@ namespace ZenLib.Solver
             return this.Context.MkEmptySeq(seqSort);
         }
 
-        public SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> SeqAt(SeqExpr x, Type seqInnerType, IntExpr y)
+        public SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> SeqGet(SeqExpr x, Type seqInnerType, IntExpr y)
         {
             var sort = this.GetSortForType(seqInnerType);
             var result = this.Context.MkAt(x, y);

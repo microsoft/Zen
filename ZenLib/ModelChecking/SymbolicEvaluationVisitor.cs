@@ -111,17 +111,6 @@ namespace ZenLib.ModelChecking
                 return result;
             }
 
-            if (type == ReflectionUtilities.StringType)
-            {
-                var (variable, expr) = this.Solver.CreateStringVar(expression);
-                this.Variables.Add(variable);
-                var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
-                this.ArbitraryVariables[expression] = variable;
-
-                this.Cache[expression] = result;
-                return result;
-            }
-
             if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
             {
                 var (variable, expr) = this.Solver.CreateLongVar(expression);
@@ -386,15 +375,6 @@ namespace ZenLib.ModelChecking
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
-            }
-
-            if (type == ReflectionUtilities.StringType)
-            {
-                var s = CommonUtilities.ConvertCSharpStringToZ3((string)(object)expression.Value);
-                var v = this.Solver.CreateStringConst(s);
-                var r = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, v);
-                this.Cache[expression] = r;
-                return r;
             }
 
             throw new ZenUnreachableException();
@@ -864,7 +844,7 @@ namespace ZenLib.ModelChecking
 
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SeqExpr.Accept(this, parameter);
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.IndexExpr.Accept(this, parameter);
-            var result = this.Solver.SeqAt(v1.Value, typeof(T), v2.Value);
+            var result = this.Solver.SeqGet(v1.Value, typeof(T), v2.Value);
 
             this.Cache[expression] = result;
             return result;
@@ -897,11 +877,11 @@ namespace ZenLib.ModelChecking
             switch (expression.ContainmentType)
             {
                 case SeqContainmentType.HasPrefix:
-                    var r1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.PrefixOf(v1.Value, v2.Value));
+                    var r1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqPrefixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r1;
                     return r1;
                 case SeqContainmentType.HasSuffix:
-                    var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SuffixOf(v1.Value, v2.Value));
+                    var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqSuffixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r2;
                     return r2;
                 case SeqContainmentType.Contains:

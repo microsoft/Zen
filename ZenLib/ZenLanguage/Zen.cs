@@ -808,6 +808,18 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Cast one value to another.
+        /// </summary>
+        /// <param name="expr">Source Zen expressions.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<TTarget> Cast<TSource, TTarget>(Zen<TSource> expr)
+        {
+            CommonUtilities.ValidateNotNull(expr);
+
+            return ZenCastExpr<TSource, TTarget>.Create(expr);
+        }
+
+        /// <summary>
         /// Compute the difference of Zen values.
         /// </summary>
         /// <param name="expr1">First Zen expressions.</param>

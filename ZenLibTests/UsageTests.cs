@@ -1542,5 +1542,35 @@ namespace ZenLib.Tests
         {
             Zen.Create<Object1>(("Field1", Constant(0))).WithField("Field1", Constant(true));
         }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast1()
+        {
+            Zen.Cast<string, int>("");
+        }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast2()
+        {
+            Zen.Cast<int, uint>(1);
+        }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast3()
+        {
+            Zen.Cast<string, Seq<byte>>(null);
+        }
     }
 }

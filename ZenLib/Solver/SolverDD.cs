@@ -403,18 +403,6 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public (Variable<T>, Unit) CreateStringVar(object e)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit CreateStringConst(string s)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateDictVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support dictionary operations. Use Z3 backend.");
@@ -526,13 +514,13 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public DD PrefixOf(Unit x, Unit y)
+        public DD SeqPrefixOf(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public DD SuffixOf(Unit x, Unit y)
+        public DD SeqSuffixOf(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
@@ -556,7 +544,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit At(Unit x, Unit y)
+        public Unit SeqAt(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
@@ -682,7 +670,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicObject<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> SeqAt(Unit x, Type seqInnerType, Unit y)
+        public SymbolicObject<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> SeqGet(Unit x, Type seqInnerType, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
