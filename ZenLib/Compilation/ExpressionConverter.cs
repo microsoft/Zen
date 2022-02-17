@@ -397,12 +397,9 @@ namespace ZenLib.Compilation
                     var dict1 = expression.Expr1.Accept(this, parameter);
                     var dict2 = expression.Expr2.Accept(this, parameter);
 
-                    var toImmutableDictMethod = typeof(CommonUtilities)
-                        .GetMethodCached("ToImmutableDictionary")
-                        .MakeGenericMethod(keyType, valueType);
-
-                    var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                    var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+                    var dictType = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType);
+                    var immutableDictExpr1 = Expression.Convert(dict1, dictType);
+                    var immutableDictExpr2 = Expression.Convert(dict2, dictType);
 
                     return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
                 }
@@ -656,13 +653,7 @@ namespace ZenLib.Compilation
             {
                 var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("SetItem");
                 var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
                 var key = expression.KeyExpr.Accept(this, parameter);
                 var value = expression.ValueExpr.Accept(this, parameter);
                 return Expression.Call(immutableDictExpr, method, key, value);
@@ -675,13 +666,7 @@ namespace ZenLib.Compilation
             {
                 var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("Remove");
                 var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
                 var key = expression.KeyExpr.Accept(this, parameter);
                 return Expression.Call(immutableDictExpr, method, key);
             });
@@ -694,15 +679,8 @@ namespace ZenLib.Compilation
                 var method = typeof(CommonUtilities)
                     .GetMethodCached("DictionaryGet")
                     .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
                 var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
                 var key = expression.KeyExpr.Accept(this, parameter);
                 return Expression.Call(null, method, immutableDictExpr, key);
             });
@@ -727,14 +705,8 @@ namespace ZenLib.Compilation
 
                 var dict1 = expression.DictExpr1.Accept(this, parameter);
                 var dict2 = expression.DictExpr2.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(SetUnit));
-
-                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
-
+                var immutableDictExpr1 = Expression.Convert(dict1, typeof(ImmutableDictionary<TKey, SetUnit>));
+                var immutableDictExpr2 = Expression.Convert(dict2, typeof(ImmutableDictionary<TKey, SetUnit>));
                 return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
             });
         }

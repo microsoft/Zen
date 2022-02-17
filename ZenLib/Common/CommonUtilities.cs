@@ -106,20 +106,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Convert to an immutable dictionary if necessary.
-        /// </summary>
-        /// <returns></returns>
-        public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(object obj)
-        {
-            if (obj is ImmutableDictionary<TKey, TValue>)
-            {
-                return (ImmutableDictionary<TKey, TValue>)obj;
-            }
-
-            return ImmutableDictionary.CreateRange((IDictionary<TKey, TValue>)obj);
-        }
-
-        /// <summary>
         /// Gets a value from a dictionary if the key exists.
         /// </summary>
         /// <typeparam name="TKey">The dictionary key type.</typeparam>

@@ -285,13 +285,7 @@ namespace ZenLib.Interpretation
             object result;
             if (ReflectionUtilities.IsIDictType(typeof(T)))
             {
-                var typeArgs = typeof(T).GetGenericArgumentsCached();
-                var keyType = typeArgs[0];
-                var valueType = typeArgs[1];
-                var method = typeof(CommonUtilities).GetMethodCached("ToImmutableDictionary").MakeGenericMethod(keyType, valueType);
-                dynamic d1 = method.Invoke(null, new object[] { e1 });
-                dynamic d2 = method.Invoke(null, new object[] { e2 });
-                result = CommonUtilities.DictionaryEquals(d1, d2);
+                result = CommonUtilities.DictionaryEquals((dynamic)e1, (dynamic)e2);
             }
             else
             {
