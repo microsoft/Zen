@@ -128,13 +128,7 @@ namespace ZenLib
         {
             return Create<FMap<TKey, TValue>>(("Values", FSeq.Empty<Pair<TKey, TValue>>()));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen dictionary objects.
-    /// </summary>
-    public static class FMapExtensions
-    {
         /// <summary>
         /// Add a value to a Zen map.
         /// </summary>

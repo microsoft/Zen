@@ -142,7 +142,7 @@ namespace ZenLib
             if (ReflectionUtilities.IsSeqType(type))
             {
                 var innerType = type.GetGenericArguments()[0];
-                var method = typeof(SeqExtensions).GetMethod("Concat").MakeGenericMethod(innerType);
+                var method = typeof(Seq).GetMethod("Concat").MakeGenericMethod(innerType);
                 return (Zen<T>)method.Invoke(null, new object[] { expr1, expr2 });
             }
 

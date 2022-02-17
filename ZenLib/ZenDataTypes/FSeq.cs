@@ -111,13 +111,7 @@ namespace ZenLib
 
             return FSeq.Create(Zen.List(elements.ToArray()));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen sequence objects.
-    /// </summary>
-    public static class FSeqExtensions
-    {
         /// <summary>
         /// The Zen expression for whether an option has a value.
         /// </summary>

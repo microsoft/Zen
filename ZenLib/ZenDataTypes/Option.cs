@@ -203,13 +203,7 @@ namespace ZenLib
 
             return Zen.Create<Option<T>>(("HasValue", True()), ("Value", expr));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen for option types.
-    /// </summary>
-    public static class OptionExtensions
-    {
         /// <summary>
         /// The Zen expression for mapping over an option.
         /// </summary>

@@ -76,13 +76,7 @@ namespace ZenLib
             var asOptions = elements.Select(Option.Create);
             return FBag.Create(FSeq.Create(asOptions));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen bag objects.
-    /// </summary>
-    public static class FBagExtensions
-    {
         /// <summary>
         /// Gets the underlying sequence for a bag.
         /// </summary>

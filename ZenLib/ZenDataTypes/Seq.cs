@@ -420,13 +420,7 @@ namespace ZenLib
 
             return ZenSeqUnitExpr<T>.Create(value);
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen seq objects.
-    /// </summary>
-    public static class SeqExtensions
-    {
         /// <summary>
         /// Concatenate two Zen sequences.
         /// </summary>
