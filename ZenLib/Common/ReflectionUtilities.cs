@@ -957,22 +957,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Get a constant string value.
-        /// </summary>
-        /// <typeparam name="T">The type.</typeparam>
-        /// <param name="value">The Zen string value.</param>
-        /// <returns>A string.</returns>
-        public static string GetConstantString<T>(Zen<T> value)
-        {
-            if (value is ZenConstantExpr<string> xs)
-            {
-                return xs.Value;
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Create a constant Zen integer value.
         /// </summary>
         /// <typeparam name="T">The integer gype.</typeparam>
@@ -998,16 +982,6 @@ namespace ZenLib
                 return (Zen<T>)(object)ZenConstantExpr<long>.Create(value);
 
             return (Zen<T>)(object)ZenConstantExpr<ulong>.Create((ulong)value);
-        }
-
-        /// <summary>
-        /// Create a constant Zen string value.
-        /// </summary>
-        /// <param name="value">The Zen string value.</param>
-        /// <returns>A string.</returns>
-        public static Zen<string> CreateConstantString(string value)
-        {
-            return (Zen<string>)(object)ZenConstantExpr<string>.Create(value);
         }
 
         /// <summary>

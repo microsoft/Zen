@@ -642,9 +642,9 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(expr1);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(expr2);
-            return ZenCastExpr<Seq<byte>, string>.Create(ZenSeqConcatExpr<byte>.Create(e1, e2));
+            var e1 = Cast<string, Seq<byte>>(expr1);
+            var e2 = Cast<string, Seq<byte>>(expr2);
+            return Cast<Seq<byte>, string>(ZenSeqConcatExpr<byte>.Create(e1, e2));
         }
 
         /// <summary>
@@ -658,8 +658,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(substr);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(substr);
+            var e1 = Cast<string, Seq<byte>>(str);
+            var e2 = Cast<string, Seq<byte>>(substr);
             return ZenSeqContainsExpr<byte>.Create(e1, e2, SeqContainmentType.HasPrefix);
         }
 
@@ -674,8 +674,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(substr);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(substr);
+            var e1 = Cast<string, Seq<byte>>(str);
+            var e2 = Cast<string, Seq<byte>>(substr);
             return ZenSeqContainsExpr<byte>.Create(e1, e2, SeqContainmentType.HasSuffix);
         }
 
@@ -690,8 +690,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(substr);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(substr);
+            var e1 = Cast<string, Seq<byte>>(str);
+            var e2 = Cast<string, Seq<byte>>(substr);
             return ZenSeqContainsExpr<byte>.Create(e1, e2, SeqContainmentType.Contains);
         }
 
@@ -708,10 +708,10 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(substr);
             CommonUtilities.ValidateNotNull(replace);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(substr);
-            var e3 = ZenCastExpr<string, Seq<byte>>.Create(replace);
-            return ZenCastExpr<Seq<byte>, string>.Create(ZenSeqReplaceFirstExpr<byte>.Create(e1, e2, e3));
+            var e1 = Cast<string, Seq<byte>>(str);
+            var e2 = Cast<string, Seq<byte>>(substr);
+            var e3 = Cast<string, Seq<byte>>(replace);
+            return Cast<Seq<byte>, string>(ZenSeqReplaceFirstExpr<byte>.Create(e1, e2, e3));
         }
 
         /// <summary>
@@ -727,8 +727,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(offset);
             CommonUtilities.ValidateNotNull(length);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            return ZenCastExpr<Seq<byte>, string>.Create(ZenSeqSliceExpr<byte>.Create(e1, offset, length));
+            var e1 = Cast<string, Seq<byte>>(str);
+            return Cast<Seq<byte>, string>(ZenSeqSliceExpr<byte>.Create(e1, offset, length));
         }
 
         /// <summary>
@@ -742,7 +742,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(index);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
+            var e1 = Cast<string, Seq<byte>>(str);
             return ZenSeqAtExpr<byte>.Create(e1, index);
         }
 
@@ -757,11 +757,11 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(str);
             CommonUtilities.ValidateNotNull(index);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
+            var e1 = Cast<string, Seq<byte>>(str);
             var value = ZenSeqAtExpr<byte>.Create(e1, index);
             return If(value.IsNone(),
-                   ZenCastExpr<Seq<byte>, string>.Create(Seq.Empty<byte>()),
-                   ZenCastExpr<Seq<byte>, string>.Create(Seq.Unit(value.Value())));
+                   Cast<Seq<byte>, string>(Seq.Empty<byte>()),
+                   Cast<Seq<byte>, string>(Seq.Unit(value.Value())));
         }
 
         /// <summary>
@@ -773,7 +773,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(str);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
+            var e1 = Cast<string, Seq<byte>>(str);
             return ZenSeqLengthExpr<byte>.Create(e1);
         }
 
@@ -791,8 +791,8 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(sub);
             CommonUtilities.ValidateNotNull(offset);
 
-            var e1 = ZenCastExpr<string, Seq<byte>>.Create(str);
-            var e2 = ZenCastExpr<string, Seq<byte>>.Create(sub);
+            var e1 = Cast<string, Seq<byte>>(str);
+            var e2 = Cast<string, Seq<byte>>(sub);
             return ZenSeqIndexOfExpr<byte>.Create(e1, e2, offset);
         }
 

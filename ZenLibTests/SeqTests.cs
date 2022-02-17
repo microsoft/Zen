@@ -508,26 +508,37 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test set equality and hashcode.
+        /// Test seq equality and hashcode.
         /// </summary>
         [TestMethod]
         public void TestSeqEqualsHashcode()
         {
-            var empty = new Seq<int>();
             var zero = new Seq<int>(0);
-            var one = new Seq<int>(1);
-            var two = new Seq<int>(2);
 
             var s1 = empty.Concat(zero).Concat(one);
             var s2 = zero.Concat(one);
             var s3 = zero.Concat(one).Concat(two);
+            var s4 = empty.Concat(zero).Concat(two);
             Assert.IsTrue(s1.Equals(s2));
             Assert.IsTrue(s1.Equals((object)s2));
             Assert.IsFalse(s1.Equals(10));
             Assert.IsFalse(s1 == s3);
             Assert.IsTrue(s1 != s3);
+            Assert.IsFalse(s1 == s4);
             Assert.IsTrue(s1.GetHashCode() != s3.GetHashCode());
             Assert.IsTrue(s1.GetHashCode() == s2.GetHashCode());
+        }
+
+        /// <summary>
+        /// Test seq tolist.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqToList()
+        {
+            var zero = new Seq<int>(0);
+
+            Assert.AreEqual(0, empty.ToList().Count);
+            Assert.AreEqual(2, zero.Concat(one).ToList().Count);
         }
     }
 }
