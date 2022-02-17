@@ -54,7 +54,7 @@ namespace ZenLib.Solver
             return this.solver.ByteSort;
         }
 
-        public Sort VisitDictionary(Func<Type, Unit, Sort> recurse, Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             if (this.typeToSort.TryGetValue(dictionaryType, out var sort))
             {
@@ -93,7 +93,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Sort VisitList(Func<Type, Unit, Sort> recurse, Type listType, Type innerType, Unit parameter)
+        public Sort VisitList(Type listType, Type innerType, Unit parameter)
         {
             throw new ZenException("Can not use finite sequence type in another map.");
         }
@@ -103,7 +103,7 @@ namespace ZenLib.Solver
             return this.solver.LongSort;
         }
 
-        public Sort VisitObject(Func<Type, Unit, Sort> recurse, Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
+        public Sort VisitObject(Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
         {
             if (this.typeToSort.TryGetValue(objectType, out var sort))
             {
@@ -151,7 +151,7 @@ namespace ZenLib.Solver
             return this.solver.ShortSort;
         }
 
-        public Sort VisitSeq(Func<Type, Unit, Sort> recurse, Type sequenceType, Type innerType, Unit parameter)
+        public Sort VisitSeq(Type sequenceType, Type innerType, Unit parameter)
         {
             if (this.typeToSort.TryGetValue(sequenceType, out var sort))
             {

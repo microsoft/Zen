@@ -723,7 +723,7 @@ namespace ZenLib
             if (IsSeqType(type))
             {
                 var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitSeq((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
+                return visitor.VisitSeq(type, t, parameter);
             }
 
             if (IsIDictType(type))
@@ -731,18 +731,18 @@ namespace ZenLib
                 var typeParameters = type.GetGenericArgumentsCached();
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
-                return visitor.VisitDictionary((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, keyType, valueType, parameter);
+                return visitor.VisitDictionary(type, keyType, valueType, parameter);
             }
 
             if (IsIListType(type))
             {
                 var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitList((ty, p) => ApplyTypeVisitor(visitor, ty, p), type, t, parameter);
+                return visitor.VisitList(type, t, parameter);
             }
 
             // some class or struct
             var dict = GetAllFieldAndPropertyTypes(type);
-            return visitor.VisitObject((t, p) => ApplyTypeVisitor(visitor, t, p), type, dict, parameter);
+            return visitor.VisitObject(type, dict, parameter);
         }
 
         /// <summary>

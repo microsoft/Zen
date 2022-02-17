@@ -5,6 +5,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -152,6 +153,7 @@ namespace ZenLib.ModelChecking
             return new InterleavingSet(emptyVariableSet);
         }
 
+        [ExcludeFromCodeCoverage] // always wrapped in an FSeq object.
         public InterleavingResult VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))
@@ -199,6 +201,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
+        [ExcludeFromCodeCoverage] // ListEmpty currently doesn't create an interleaving class for its type, which causes the special case
         public InterleavingResult VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             if (this.cache.TryGetValue(expression, out var value))

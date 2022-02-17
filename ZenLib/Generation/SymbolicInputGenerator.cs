@@ -79,11 +79,11 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitList(Func<Type, DepthConfiguration, object> recurse, Type listType, Type elementType, DepthConfiguration config)
+        public object VisitList(Type listType, Type elementType, DepthConfiguration config)
         {
             if (!config.ExhaustiveDepth)
             {
-                return ApplyToList(recurse, elementType, config, config.Depth);
+                return ApplyToList(elementType, config, config.Depth);
             }
 
             var length = Arbitrary<byte>();
@@ -97,14 +97,14 @@ namespace ZenLib.Generation
             for (int i = config.Depth; i > 0; i--)
             {
                 var guard = length == Constant((byte)i);
-                var trueBranch = ApplyToList(recurse, elementType, config, i);
+                var trueBranch = ApplyToList(elementType, config, i);
                 list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
             }
 
             return list;
         }
 
-        public object VisitDictionary(Func<Type, DepthConfiguration, object> recurse, Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
@@ -112,7 +112,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitSeq(Func<Type, DepthConfiguration, object> recurse, Type sequenceType, Type innerType, DepthConfiguration parameter)
+        public object VisitSeq(Type sequenceType, Type innerType, DepthConfiguration parameter)
         {
             var method = arbitrarySeqMethod.MakeGenericMethod(innerType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
@@ -120,14 +120,14 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public static object ApplyToList(Func<Type, DepthConfiguration, object> recurse, Type innerType, DepthConfiguration config, int size)
+        public object ApplyToList(Type innerType, DepthConfiguration config, int size)
         {
             var method = listMethod.MakeGenericMethod(innerType);
 
             var args = new object[size];
             for (int i = 0; i < size; i++)
             {
-                var arg = recurse(innerType, config);
+                var arg = ReflectionUtilities.ApplyTypeVisitor(this, innerType, config);
                 args[i] = arg;
             }
 
@@ -144,7 +144,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitObject(Func<Type, DepthConfiguration, object> recurse, Type objectType, SortedDictionary<string, Type> fields, DepthConfiguration config)
+        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, DepthConfiguration config)
         {
             var asList = fields.ToArray();
 
@@ -156,7 +156,7 @@ namespace ZenLib.Generation
                 var fieldName = asList[i].Key;
                 var fieldType = asList[i].Value;
                 var newConfig = UpdateDepthConfiguration(config, GetSizeAttribute(objectType, fieldName));
-                args[i] = (fieldName, recurse(fieldType, newConfig));
+                args[i] = (fieldName, ReflectionUtilities.ApplyTypeVisitor(this, fieldType, newConfig));
             }
 
             return method.Invoke(null, new object[] { args });

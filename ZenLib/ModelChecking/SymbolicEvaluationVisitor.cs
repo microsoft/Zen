@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -755,16 +756,8 @@ namespace ZenLib.ModelChecking
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
-            if (this.Cache.TryGetValue(expression, out var value))
-            {
-                return value;
-            }
-
             var emptySeq = this.Solver.SeqEmpty(typeof(T));
-            var result = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptySeq);
-
-            this.Cache[expression] = result;
-            return result;
+            return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptySeq);
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)

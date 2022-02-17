@@ -39,7 +39,7 @@ namespace ZenLib.Solver
             return byte.Parse(parameter.ToString());
         }
 
-        public object VisitDictionary(Func<Type, Expr, object> recurse, Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
             {
@@ -122,7 +122,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public object VisitList(Func<Type, Expr, object> recurse, Type listType, Type innerType, Expr parameter)
+        public object VisitList(Type listType, Type innerType, Expr parameter)
         {
             throw new ZenException("Invalid use of list in map or set type.");
         }
@@ -132,7 +132,7 @@ namespace ZenLib.Solver
             return (long)ulong.Parse(parameter.ToString());
         }
 
-        public object VisitObject(Func<Type, Expr, object> recurse, Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
+        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
         {
             var fieldsAndTypes = fields.ToArray();
             var fieldNames = new string[fieldsAndTypes.Length];
@@ -171,7 +171,7 @@ namespace ZenLib.Solver
             return ushort.Parse(parameter.ToString());
         }
 
-        public object VisitSeq(Func<Type, Expr, object> recurse, Type sequenceType, Type innerType, Expr parameter)
+        public object VisitSeq(Type sequenceType, Type innerType, Expr parameter)
         {
             if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.empty")
             {
