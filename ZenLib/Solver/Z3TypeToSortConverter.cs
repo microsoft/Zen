@@ -39,6 +39,27 @@ namespace ZenLib.Solver
             this.typeToSort[typeof(string)] = this.solver.StringSort;
         }
 
+        public Sort GetSortForType(Type type)
+        {
+            if (this.typeToSort.TryGetValue(type, out var sort))
+            {
+                return sort;
+            }
+
+            Sort result;
+            if (type == ReflectionUtilities.SetUnitType)
+            {
+                result = this.solver.BoolSort;
+            }
+            else
+            {
+                result = ReflectionUtilities.ApplyTypeVisitor(this, type, new Unit());
+            }
+
+            this.typeToSort[type] = result;
+            return result;
+        }
+
         public Sort VisitBigInteger(Unit parameter)
         {
             return this.solver.BigIntSort;
@@ -56,35 +77,21 @@ namespace ZenLib.Solver
 
         public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
-            if (this.typeToSort.TryGetValue(dictionaryType, out var sort))
-            {
-                return sort;
-            }
-
-            var keySort = this.solver.GetSortForType(keyType);
-            var valueSort = this.solver.GetSortForType(valueType);
+            var keySort = this.GetSortForType(keyType);
+            var valueSort = this.GetSortForType(valueType);
 
             if (valueType != ReflectionUtilities.SetUnitType)
             {
                 valueSort = this.solver.GetOrCreateOptionSort(valueSort);
             }
 
-            var dictionarySort = this.solver.Context.MkArraySort(keySort, valueSort);
-            this.typeToSort[dictionaryType] = dictionarySort;
-            return dictionarySort;
+            return this.solver.Context.MkArraySort(keySort, valueSort);
         }
 
         public Sort VisitFixedInteger(Type intType, Unit parameter)
         {
-            if (this.typeToSort.TryGetValue(intType, out var sort))
-            {
-                return sort;
-            }
-
             int size = ((dynamic)Activator.CreateInstance(intType, 0L)).Size;
-            var bitvecSort = this.solver.Context.MkBitVecSort((uint)size);
-            this.typeToSort[intType] = bitvecSort;
-            return bitvecSort;
+            return this.solver.Context.MkBitVecSort((uint)size);
         }
 
         public Sort VisitInt(Unit parameter)
@@ -105,25 +112,18 @@ namespace ZenLib.Solver
 
         public Sort VisitObject(Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
         {
-            if (this.typeToSort.TryGetValue(objectType, out var sort))
-            {
-                return sort;
-            }
-
             var fields = objectFields.ToArray();
             var fieldNames = new string[fields.Length];
             var fieldSorts = new Sort[fields.Length];
             for (int i = 0; i < fields.Length; i++)
             {
                 fieldNames[i] = fields[i].Key;
-                fieldSorts[i] = this.solver.GetSortForType(fields[i].Value);
+                fieldSorts[i] = this.GetSortForType(fields[i].Value);
             }
 
-            var objectConstructor = this.solver.Context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
-            var objectSort = this.solver.Context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
             this.ObjectAppNames.Add(objectType.ToString());
-            this.typeToSort[objectType] = objectSort;
-            return objectSort;
+            var objectConstructor = this.solver.Context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
+            return this.solver.Context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
         }
 
         public Sort VisitShort(Unit parameter)
@@ -153,16 +153,8 @@ namespace ZenLib.Solver
 
         public Sort VisitSeq(Type sequenceType, Type innerType, Unit parameter)
         {
-            if (this.typeToSort.TryGetValue(sequenceType, out var sort))
-            {
-                return sort;
-            }
-
-            var valueSort = this.solver.GetSortForType(innerType);
-
-            var seqSort = this.solver.Context.MkSeqSort(valueSort);
-            this.typeToSort[sequenceType] = seqSort;
-            return seqSort;
+            var valueSort = this.GetSortForType(innerType);
+            return this.solver.Context.MkSeqSort(valueSort);
         }
     }
 }

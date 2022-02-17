@@ -24,6 +24,21 @@ namespace ZenLib.Solver
             this.solver = solver;
         }
 
+        public object Convert(Expr e, Type type)
+        {
+            if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
+            {
+                return Convert(e.Args[0], type);
+            }
+
+            if (e.IsApp && e.FuncDecl.Name.ToString() == "None")
+            {
+                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
+            }
+
+            return ReflectionUtilities.ApplyTypeVisitor(this, type, e);
+        }
+
         public object VisitBigInteger(Expr parameter)
         {
             return BigInteger.Parse(parameter.ToString());
@@ -50,16 +65,16 @@ namespace ZenLib.Solver
                 var arrayExpr = parameter.Args[0];
                 var keyExpr = parameter.Args[1];
                 var valueExpr = parameter.Args[2];
-                var dict = this.solver.ConvertExprToObject(arrayExpr, dictionaryType);
-                var key = this.solver.ConvertExprToObject(keyExpr, keyType);
-                var value = this.solver.ConvertExprToObject(valueExpr, valueType);
+                var dict = Convert(arrayExpr, dictionaryType);
+                var key = Convert(keyExpr, keyType);
+                var value = Convert(valueExpr, valueType);
                 return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
             {
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
-                var e1 = this.solver.ConvertExprToObject(parameter.Args[0], dictionaryType);
-                var e2 = this.solver.ConvertExprToObject(parameter.Args[1], dictionaryType);
+                var e1 = Convert(parameter.Args[0], dictionaryType);
+                var e2 = Convert(parameter.Args[1], dictionaryType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
@@ -78,8 +93,8 @@ namespace ZenLib.Solver
                 {
                     var keyExpr = interpretation.Entries[i].Args[0];
                     var valueExpr = interpretation.Entries[i].Value;
-                    var key = this.solver.ConvertExprToObject(keyExpr, keyType);
-                    var value = this.solver.ConvertExprToObject(valueExpr, valueType);
+                    var key = Convert(keyExpr, keyType);
+                    var value = Convert(valueExpr, valueType);
                     dict = AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
                 }
 
@@ -140,7 +155,7 @@ namespace ZenLib.Solver
             for (int i = 0; i < fieldsAndTypes.Length; i++)
             {
                 fieldNames[i] = fieldsAndTypes[i].Key;
-                fieldValues[i] = this.solver.ConvertExprToObject(parameter.Args[i], fieldsAndTypes[i].Value);
+                fieldValues[i] = Convert(parameter.Args[i], fieldsAndTypes[i].Value);
             }
 
             return ReflectionUtilities.CreateInstance(objectType, fieldNames, fieldValues);
@@ -180,14 +195,14 @@ namespace ZenLib.Solver
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.unit")
             {
-                var value = this.solver.ConvertExprToObject(parameter.Args[0], innerType);
+                var value = Convert(parameter.Args[0], innerType);
                 var c = sequenceType.GetConstructor(new Type[] { innerType });
                 return c.Invoke(new object[] { value });
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++")
             {
-                var seq1 = this.solver.ConvertExprToObject(parameter.Args[0], sequenceType);
-                var seq2 = this.solver.ConvertExprToObject(parameter.Args[1], sequenceType);
+                var seq1 = Convert(parameter.Args[0], sequenceType);
+                var seq2 = Convert(parameter.Args[1], sequenceType);
                 var m = sequenceType.GetMethod("Concat");
                 return m.Invoke(seq1, new object[] { seq2 });
             }

@@ -66,7 +66,7 @@ namespace ZenLib.Solver
                 fieldExprs[i] = fields[i].Value.Accept(this, fieldTypes[fieldNames[i]]);
             }
 
-            var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(parameter);
+            var dataTypeSort = (DatatypeSort)this.solver.TypeToSortConverter.GetSortForType(parameter);
             var objectConstructor = dataTypeSort.Constructors[0];
             var ret = this.solver.Context.MkApp(objectConstructor, fieldExprs);
             return ret;

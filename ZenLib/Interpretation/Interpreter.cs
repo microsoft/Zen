@@ -31,7 +31,7 @@ namespace ZenLib.Interpretation
         {
             var environment = new ExpressionEvaluatorEnvironment(arguments);
             var interpreter = new ExpressionEvaluator(trackBranches);
-            var result = (T)expression.Accept(interpreter, environment);
+            var result = (T)interpreter.Evaluate(expression, environment);
             return (result, interpreter.PathConstraint);
         }
 

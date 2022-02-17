@@ -77,7 +77,7 @@ namespace ZenLib.Solver
 
             if (objectType != ReflectionUtilities.SetUnitType)
             {
-                var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(objectType);
+                var dataTypeSort = (DatatypeSort)this.solver.TypeToSortConverter.GetSortForType(objectType);
                 var fieldsAndTypes = fields.ToArray();
                 for (int i = 0; i < fieldsAndTypes.Length; i++)
                 {
