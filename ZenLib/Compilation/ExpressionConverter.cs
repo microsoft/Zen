@@ -169,13 +169,11 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case Op.Multiplication:
+                    default:
+                        Contract.Assert(expression.Operation == Op.Multiplication);
                         return Expression.Multiply(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -429,7 +427,8 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case ComparisonType.Leq:
+                    default:
+                        Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
                         if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
                         {
                             return Expression.Call(
@@ -441,9 +440,6 @@ namespace ZenLib.Compilation
                         return Expression.LessThanOrEqual(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -696,11 +692,10 @@ namespace ZenLib.Compilation
                     case ZenDictCombineExpr<TKey>.CombineType.Union:
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                         break;
-                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                    default:
+                        Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Intersect);
                         method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
                         break;
-                    default:
-                        throw new ZenUnreachableException();
                 }
 
                 var dict1 = expression.DictExpr1.Accept(this, parameter);
@@ -777,10 +772,9 @@ namespace ZenLib.Compilation
                         return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { e2 });
                     case SeqContainmentType.HasSuffix:
                         return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { e2 });
-                    case SeqContainmentType.Contains:
-                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
                     default:
-                        throw new ZenUnreachableException();
+                        Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
                 }
             });
         }
@@ -837,14 +831,12 @@ namespace ZenLib.Compilation
                     var m = typeof(Seq).GetMethod("FromString");
                     return Expression.Call(null, m, new Expression[] { e });
                 }
-
-                if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+                else
                 {
+                    Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
                     var m = typeof(Seq).GetMethod("AsString");
                     return Expression.Call(null, m, new Expression[] { e });
                 }
-
-                throw new ZenUnreachableException();
             });
         }
     }

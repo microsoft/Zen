@@ -1582,5 +1582,24 @@ namespace ZenLib.Tests
         {
             Constant("hello∆");
         }
+
+        /// <summary>
+        /// Exception thrown for ascii strings.
+        /// </summary>
+        [TestMethod]
+        public void TestInvalidAsciiOk()
+        {
+            Constant("hello");
+        }
+
+        /// <summary>
+        /// Exception thrown for contract violation.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidContract()
+        {
+            Contract.Assert(false);
+        }
     }
 }

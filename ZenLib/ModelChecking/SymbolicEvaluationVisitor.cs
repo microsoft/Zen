@@ -77,8 +77,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.ByteType)
+            else if (type == ReflectionUtilities.ByteType)
             {
                 var (variable, expr) = this.Solver.CreateByteVar(expression);
                 this.Variables.Add(variable);
@@ -88,8 +87,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
+            else if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
             {
                 var (variable, expr) = this.Solver.CreateShortVar(expression);
                 this.Variables.Add(variable);
@@ -99,8 +97,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
+            else if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
             {
                 var (variable, expr) = this.Solver.CreateIntVar(expression);
                 this.Variables.Add(variable);
@@ -110,8 +107,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
+            else if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
             {
                 var (variable, expr) = this.Solver.CreateLongVar(expression);
                 this.Variables.Add(variable);
@@ -121,8 +117,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.BigIntType)
+            else if (type == ReflectionUtilities.BigIntType)
             {
                 var (variable, expr) = this.Solver.CreateBigIntegerVar(expression);
                 this.Variables.Add(variable);
@@ -132,8 +127,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (ReflectionUtilities.IsIDictType(type))
+            else if (ReflectionUtilities.IsIDictType(type))
             {
                 var (variable, expr) = this.Solver.CreateDictVar(expression);
                 this.Variables.Add(variable);
@@ -143,8 +137,7 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
+            else if (ReflectionUtilities.IsFixedIntegerType(type))
             {
                 var size = CommonUtilities.IntegerSize(type);
                 var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
@@ -155,9 +148,10 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = r;
                 return r;
             }
-
-            if (ReflectionUtilities.IsSeqType(type))
+            else
             {
+                Contract.Assert(ReflectionUtilities.IsSeqType(type));
+
                 var (v, e) = this.Solver.CreateSeqVar(expression);
                 this.Variables.Add(v);
                 var r = new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
@@ -166,8 +160,6 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = r;
                 return r;
             }
-
-            throw new ZenUnreachableException();
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
@@ -226,17 +218,17 @@ namespace ZenLib.ModelChecking
                         var result2 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result2;
                         return result2;
-                    case Op.Multiplication:
+                    default:
+                        Contract.Assert(expression.Operation == Op.Multiplication);
                         var result3 = new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result3;
                         return result3;
-                    default:
-                        throw new ZenUnreachableException();
                 }
             }
-
-            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
+            else
             {
+                Contract.Assert(e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>);
+
                 var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
                 var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
 
@@ -262,16 +254,13 @@ namespace ZenLib.ModelChecking
                         var result5 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Subtract(v1.Value, v2.Value));
                         this.Cache[expression] = result5;
                         return result5;
-                    case Op.Multiplication:
+                    default:
+                        Contract.Assert(expression.Operation == Op.Multiplication);
                         var result6 = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Multiply(v1.Value, v2.Value));
                         this.Cache[expression] = result6;
                         return result6;
-                    default:
-                        throw new ZenUnreachableException();
                 }
             }
-
-            throw new ZenUnreachableException();
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
@@ -304,80 +293,71 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.BoolType)
+            else if (type == ReflectionUtilities.BoolType)
             {
                 var b = (bool)(object)expression.Value ? this.Solver.True() : this.Solver.False();
                 var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, b);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.ByteType)
+            else if (type == ReflectionUtilities.ByteType)
             {
                 var bv = this.Solver.CreateByteConst((byte)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.ShortType)
+            else if (type == ReflectionUtilities.ShortType)
             {
                 var bv = this.Solver.CreateShortConst((short)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.UshortType)
+            else if (type == ReflectionUtilities.UshortType)
             {
                 var bv = this.Solver.CreateShortConst((short)(ushort)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.IntType)
+            else if (type == ReflectionUtilities.IntType)
             {
                 var bv = this.Solver.CreateIntConst((int)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.UintType)
+            else if (type == ReflectionUtilities.UintType)
             {
                 var bv = this.Solver.CreateIntConst((int)(uint)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.LongType)
+            else if (type == ReflectionUtilities.LongType)
             {
                 var bv = this.Solver.CreateLongConst((long)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (type == ReflectionUtilities.UlongType)
+            else if (type == ReflectionUtilities.UlongType)
             {
                 var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
+            else
             {
+                Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
+
                 var bv = this.Solver.CreateBitvecConst(((dynamic)expression.Value).GetBits());
                 var result = new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, bv);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            throw new ZenUnreachableException();
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
@@ -460,48 +440,46 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s1 &&
-                e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s2)
+            else if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s1 &&
+                     e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> s2)
             {
                 var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi1 &&
-                e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi2)
+            else if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi1 &&
+                     e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> bi2)
             {
                 var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (e1 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di1 &&
-                e2 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di2)
+            else if (e1 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di1 &&
+                     e2 is SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> di2)
             {
                 var result = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(di1.Value, di2.Value));
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i1 &&
-                e2 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i2)
+            else if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i1 &&
+                     e2 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> i2)
             {
                 var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
                 this.Cache[expression] = res;
                 return res;
             }
-
-            if (e1 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> seq1 &&
-                e2 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> seq2)
+            else
             {
+                Contract.Assert(e1 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>);
+                Contract.Assert(e2 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>);
+
+                var seq1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
+                var seq2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
+
                 var res = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Eq(seq1.Value, seq2.Value));
                 this.Cache[expression] = res;
                 return res;
             }
-
-            throw new ZenUnreachableException();
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
@@ -526,9 +504,10 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
+            else
             {
+                Contract.Assert(e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>);
+
                 var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e1;
                 var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)e2;
                 var r = ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
@@ -543,8 +522,6 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            throw new ZenUnreachableException();
         }
 
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
@@ -764,11 +741,10 @@ namespace ZenLib.ModelChecking
                 case ZenDictCombineExpr<TKey>.CombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                default:
+                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Intersect);
                     expr = this.Solver.DictIntersect(e1.Value, e2.Value);
                     break;
-                default:
-                    throw new ZenUnreachableException();
             }
 
             var result = new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
@@ -884,12 +860,11 @@ namespace ZenLib.ModelChecking
                     var r2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqSuffixOf(v1.Value, v2.Value));
                     this.Cache[expression] = r2;
                     return r2;
-                case SeqContainmentType.Contains:
+                default:
+                    Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
                     var r3 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqContains(v1.Value, v2.Value));
                     this.Cache[expression] = r3;
                     return r3;
-                default:
-                    throw new ZenUnreachableException();
             }
         }
 
@@ -955,16 +930,15 @@ namespace ZenLib.ModelChecking
                 this.Cache[expression] = result;
                 return result;
             }
-
-            if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+            else
             {
+                Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
+
                 var e = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.SourceExpr.Accept(this, parameter);
                 var result = new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e.Value);
                 this.Cache[expression] = result;
                 return result;
             }
-
-            throw new ZenUnreachableException();
         }
     }
 }

@@ -141,7 +141,8 @@ namespace ZenLib.Interpretation
                         result = ((dynamic)e1).Subtract((dynamic)e2);
                     break;
 
-                case Op.Multiplication:
+                default:
+                    Contract.Assert(expression.Operation == Op.Multiplication);
                     if (type == ReflectionUtilities.ByteType)
                         result = (byte)((byte)e1 * (byte)e2);
                     else if (type == ReflectionUtilities.ShortType)
@@ -159,9 +160,6 @@ namespace ZenLib.Interpretation
                     else
                         result = (BigInteger)e1 * (BigInteger)e2;
                     break;
-
-                default:
-                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -331,7 +329,8 @@ namespace ZenLib.Interpretation
                         result = ((dynamic)e1) >= ((dynamic)e2);
                     break;
 
-                case ComparisonType.Leq:
+                default:
+                    Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
                     if (type == ReflectionUtilities.ByteType)
                         result = (byte)e1 <= (byte)e2;
                     else if (type == ReflectionUtilities.ShortType)
@@ -351,9 +350,6 @@ namespace ZenLib.Interpretation
                     else
                         result = ((dynamic)e1) <= ((dynamic)e2);
                     break;
-
-                default:
-                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -487,11 +483,10 @@ namespace ZenLib.Interpretation
                 case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     result = CommonUtilities.DictionaryIntersect(e1, e2);
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                default:
+                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Union);
                     result = CommonUtilities.DictionaryUnion(e1, e2);
                     break;
-                default:
-                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -580,11 +575,10 @@ namespace ZenLib.Interpretation
                 case SeqContainmentType.HasSuffix:
                     result = e1.HasSuffix(e2);
                     break;
-                case SeqContainmentType.Contains:
+                default:
+                    Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
                     result = e1.Contains(e2);
                     break;
-                default:
-                    throw new ZenUnreachableException();
             }
 
             this.cache[expression] = result;
@@ -653,15 +647,14 @@ namespace ZenLib.Interpretation
                 this.cache[expression] = result;
                 return result;
             }
-
-            if (typeof(TKey) == ReflectionUtilities.ByteSequenceType)
+            else
             {
+                Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
+
                 var result = Seq.AsString((Seq<byte>)e);
                 this.cache[expression] = result;
                 return result;
             }
-
-            throw new ZenUnreachableException();
         }
     }
 }
