@@ -45,8 +45,7 @@ namespace ZenLib.ModelChecking
         {
             var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(solver);
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(arguments);
-            var symbolicResult =
-                (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)expression.Accept(symbolicEvaluator, env);
+            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)symbolicEvaluator.Evaluate(expression, env);
 
             var model = solver.Satisfiable(symbolicResult.Value);
 

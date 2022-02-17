@@ -187,16 +187,10 @@ namespace ZenLib.Interpretation
                 var evaluateMethod = typeof(ExpressionEvaluator)
                     .GetMethod("Evaluate", BindingFlags.Public | BindingFlags.Instance)
                     .MakeGenericMethod(innerType);
-                try
-                {
-                    var valueResult = evaluateMethod.Invoke(this, new object[] { fieldValuePair.Value, parameter });
-                    fieldNames.Add(field);
-                    parameters.Add(valueResult);
-                }
-                catch (TargetInvocationException e)
-                {
-                    throw e.InnerException;
-                }
+
+                var valueResult = evaluateMethod.Invoke(this, new object[] { fieldValuePair.Value, parameter });
+                fieldNames.Add(field);
+                parameters.Add(valueResult);
             }
 
             return ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());

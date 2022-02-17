@@ -31,11 +31,6 @@ namespace ZenLib.Solver
                 return Convert(e.Args[0], type);
             }
 
-            if (e.IsApp && e.FuncDecl.Name.ToString() == "None")
-            {
-                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
-            }
-
             return ReflectionUtilities.ApplyTypeVisitor(this, type, e);
         }
 
