@@ -64,8 +64,10 @@ namespace ZenLib.Solver
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
-            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "as-array")
+            else
             {
+                Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "as-array");
+
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl;
                 var interpretation = this.solver.Solver.Model.FuncInterp(lambda);
                 var elseCase = interpretation.Else.ToString();
@@ -82,10 +84,6 @@ namespace ZenLib.Solver
                 }
 
                 return dict;
-            }
-            else
-            {
-                throw new ZenException("Internal error. Unexpected Z3 AST type.");
             }
         }
 
@@ -193,14 +191,12 @@ namespace ZenLib.Solver
                 var m = sequenceType.GetMethod("Concat");
                 return m.Invoke(seq1, new object[] { seq2 });
             }
-            else if (parameter.IsString)
-            {
-                var s = CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString());
-                return Seq.FromString(s);
-            }
             else
             {
-                throw new ZenUnreachableException();
+                Contract.Assert(parameter.IsString);
+
+                var s = CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString());
+                return Seq.FromString(s);
             }
         }
     }
