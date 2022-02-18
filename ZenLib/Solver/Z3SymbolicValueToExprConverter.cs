@@ -66,13 +66,18 @@ namespace ZenLib.Solver
                 fieldExprs[i] = fields[i].Value.Accept(this, fieldTypes[fieldNames[i]]);
             }
 
-            var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(parameter);
+            var dataTypeSort = (DatatypeSort)this.solver.TypeToSortConverter.GetSortForType(parameter);
             var objectConstructor = dataTypeSort.Constructors[0];
             var ret = this.solver.Context.MkApp(objectConstructor, fieldExprs);
             return ret;
         }
 
         public Expr VisitSymbolicString(SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        {
+            return v.Value;
+        }
+
+        public Expr VisitSymbolicSeq(SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
         {
             return v.Value;
         }

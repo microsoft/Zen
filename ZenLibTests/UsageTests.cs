@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException1()
         {
-            FMapExtensions.Set(null, Constant(1), Constant(1));
+            FMap.Set(null, Constant(1), Constant(1));
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException2()
         {
-            FMapExtensions.Set(FMap.Empty<int, int>(), null, 1);
+            FMap.Set(FMap.Empty<int, int>(), null, 1);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddException3()
         {
-            FMapExtensions.Set(FMap.Empty<int, int>(), 1, null);
+            FMap.Set(FMap.Empty<int, int>(), 1, null);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddBackException1()
         {
-            FSeqExtensions.AddBack(null, Constant(1));
+            FSeq.AddBack(null, Constant(1));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddBackException2()
         {
-            FSeqExtensions.AddBack(FSeq.Empty<int>(), null);
+            FSeq.AddBack(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException1()
         {
-            FSeqExtensions.AddFront(null, Constant(1));
+            FSeq.AddFront(null, Constant(1));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException2()
         {
-            FSeqExtensions.AddFront(FSeq.Empty<int>(), null);
+            FSeq.AddFront(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAllException1()
         {
-            FSeqExtensions.All<int>(null, null);
+            FSeq.All<int>(null, null);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAllException2()
         {
-            FSeqExtensions.All(FSeq.Empty<int>(), null);
+            FSeq.All(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAnyException1()
         {
-            FSeqExtensions.Any<int>(null, null);
+            FSeq.Any<int>(null, null);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAnyException2()
         {
-            FSeqExtensions.Any(FSeq.Empty<int>(), null);
+            FSeq.Any(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAppendException1()
         {
-            FSeqExtensions.Append(null, FSeq.Empty<int>());
+            FSeq.Append(null, FSeq.Empty<int>());
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAppendException2()
         {
-            FSeqExtensions.Append(FSeq.Empty<int>(), null);
+            FSeq.Append(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAtException1()
         {
-            FSeqExtensions.At<int>(null, 0);
+            FSeq.At<int>(null, 0);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAtException2()
         {
-            FSeqExtensions.At(FSeq.Empty<int>(), null);
+            FSeq.At(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsException1()
         {
-            FSeqExtensions.Contains<int>(null, 0);
+            FSeq.Contains<int>(null, 0);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsException2()
         {
-            FSeqExtensions.Contains(FSeq.Empty<int>(), null);
+            FSeq.Contains(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException1()
         {
-            FMapExtensions.ContainsKey<int, int>(null, 0);
+            FMap.ContainsKey<int, int>(null, 0);
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestContainsKeyException2()
         {
-            FMapExtensions.ContainsKey(FMap.Empty<int, int>(), null);
+            FMap.ContainsKey(FMap.Empty<int, int>(), null);
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropException1()
         {
-            FSeqExtensions.Drop<int>(null, 0);
+            FSeq.Drop<int>(null, 0);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropException2()
         {
-            FSeqExtensions.Drop(FSeq.Empty<int>(), null);
+            FSeq.Drop(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -336,7 +336,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropWhileException1()
         {
-            FSeqExtensions.DropWhile<int>(null, null);
+            FSeq.DropWhile<int>(null, null);
         }
 
         /// <summary>
@@ -346,7 +346,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDropWhileException2()
         {
-            FSeqExtensions.DropWhile(FSeq.Empty<int>(), null);
+            FSeq.DropWhile(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDuplicatesException1()
         {
-            FSeqExtensions.Duplicates<int>(null, null);
+            FSeq.Duplicates<int>(null, null);
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestDuplicatesException2()
         {
-            FSeqExtensions.Duplicates(FSeq.Empty<int>(), null);
+            FSeq.Duplicates(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFindException1()
         {
-            FSeqExtensions.Find<int>(null, null);
+            FSeq.Find<int>(null, null);
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFindException2()
         {
-            FSeqExtensions.Find(FSeq.Empty<int>(), null);
+            FSeq.Find(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFoldException1()
         {
-            FSeqExtensions.Fold<int, int>(null, null, null);
+            FSeq.Fold<int, int>(null, null, null);
         }
 
         /// <summary>
@@ -426,7 +426,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFoldException2()
         {
-            FSeqExtensions.Fold<int, int>(FSeq.Empty<int>(), null, null);
+            FSeq.Fold<int, int>(FSeq.Empty<int>(), null, null);
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestFoldException3()
         {
-            FSeqExtensions.Fold<int, int>(FSeq.Empty<int>(), 0, null);
+            FSeq.Fold<int, int>(FSeq.Empty<int>(), 0, null);
         }
 
         /// <summary>
@@ -476,7 +476,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException1()
         {
-            FMapExtensions.Get<int, int>(null, null);
+            FMap.Get<int, int>(null, null);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestGetException2()
         {
-            FMapExtensions.Get(FMap.Empty<int, int>(), null);
+            FMap.Get(FMap.Empty<int, int>(), null);
         }
 
         /// <summary>
@@ -536,7 +536,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestHasValueException()
         {
-            OptionExtensions.IsSome<int>(null);
+            Option.IsSome<int>(null);
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIndexOfException1()
         {
-            FSeqExtensions.IndexOf<int>(null, null);
+            FSeq.IndexOf<int>(null, null);
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIndexOfException2()
         {
-            FSeqExtensions.IndexOf(FSeq.Empty<int>(), null);
+            FSeq.IndexOf(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -616,7 +616,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestInsertException1()
         {
-            FSeqExtensions.Insert<int>(null, null);
+            FSeq.Insert<int>(null, null);
         }
 
         /// <summary>
@@ -626,7 +626,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestInsertException2()
         {
-            FSeqExtensions.Insert<int>(0, null);
+            FSeq.Insert<int>(0, null);
         }
 
         /// <summary>
@@ -636,7 +636,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIntersperseException1()
         {
-            FSeqExtensions.Intersperse<int>(null, null);
+            FSeq.Intersperse<int>(null, null);
         }
 
         /// <summary>
@@ -646,7 +646,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIntersperseException2()
         {
-            FSeqExtensions.Intersperse(FSeq.Empty<int>(), null);
+            FSeq.Intersperse(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -656,7 +656,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIsEmptyException1()
         {
-            FSeqExtensions.IsEmpty<int>(null);
+            FSeq.IsEmpty<int>(null);
         }
 
         /// <summary>
@@ -666,7 +666,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestIsSortedException1()
         {
-            FSeqExtensions.IsSorted<int>(null);
+            FSeq.IsSorted<int>(null);
         }
 
         /// <summary>
@@ -677,7 +677,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception1()
         {
             Zen<Pair<int, int>> x = null;
-            PairExtensions.Item1(x);
+            Pair.Item1(x);
         }
 
         /// <summary>
@@ -688,7 +688,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
-            PairExtensions.Item1(x);
+            Pair.Item1(x);
         }
 
         /// <summary>
@@ -699,7 +699,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            PairExtensions.Item1(x);
+            Pair.Item1(x);
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace ZenLib.Tests
         public void TestItem1Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            PairExtensions.Item1(x);
+            Pair.Item1(x);
         }
 
         /// <summary>
@@ -721,7 +721,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception1()
         {
             Zen<Pair<int, int>> x = null;
-            PairExtensions.Item2(x);
+            Pair.Item2(x);
         }
 
         /// <summary>
@@ -732,7 +732,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception2()
         {
             Zen<Pair<int, int, int>> x = null;
-            PairExtensions.Item2(x);
+            Pair.Item2(x);
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception3()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            PairExtensions.Item2(x);
+            Pair.Item2(x);
         }
 
         /// <summary>
@@ -754,7 +754,7 @@ namespace ZenLib.Tests
         public void TestItem2Exception4()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            PairExtensions.Item2(x);
+            Pair.Item2(x);
         }
 
         /// <summary>
@@ -765,7 +765,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception1()
         {
             Zen<Pair<int, int, int>> x = null;
-            PairExtensions.Item3(x);
+            Pair.Item3(x);
         }
 
         /// <summary>
@@ -776,7 +776,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception2()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            PairExtensions.Item3(x);
+            Pair.Item3(x);
         }
 
         /// <summary>
@@ -787,7 +787,7 @@ namespace ZenLib.Tests
         public void TestItem3Exception3()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            PairExtensions.Item3(x);
+            Pair.Item3(x);
         }
 
         /// <summary>
@@ -798,7 +798,7 @@ namespace ZenLib.Tests
         public void TestItem4Exception1()
         {
             Zen<Pair<int, int, int, int>> x = null;
-            PairExtensions.Item4(x);
+            Pair.Item4(x);
         }
 
         /// <summary>
@@ -809,7 +809,7 @@ namespace ZenLib.Tests
         public void TestItem4Exception2()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            PairExtensions.Item4(x);
+            Pair.Item4(x);
         }
 
         /// <summary>
@@ -820,7 +820,7 @@ namespace ZenLib.Tests
         public void TestItem5Exception1()
         {
             Zen<Pair<int, int, int, int, int>> x = null;
-            PairExtensions.Item5(x);
+            Pair.Item5(x);
         }
 
         /// <summary>
@@ -830,7 +830,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestLengthException()
         {
-            FSeqExtensions.Length<int>(null);
+            FSeq.Length<int>(null);
         }
 
         /// <summary>
@@ -932,7 +932,7 @@ namespace ZenLib.Tests
         public void TestCaseSeqException1()
         {
             Zen<FSeq<int>> x = null;
-            FSeqExtensions.Case<int, int>(x, null, null);
+            FSeq.Case<int, int>(x, null, null);
         }
 
         /// <summary>
@@ -942,7 +942,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseSeqException2()
         {
-            FSeqExtensions.Case<int, int>(FSeq.Empty<int>(), null, null);
+            FSeq.Case<int, int>(FSeq.Empty<int>(), null, null);
         }
 
         /// <summary>
@@ -952,7 +952,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestCaseSeqException3()
         {
-            FSeqExtensions.Case<int, int>(FSeq.Empty<int>(), 0, null);
+            FSeq.Case<int, int>(FSeq.Empty<int>(), 0, null);
         }
 
         /// <summary>
@@ -1092,7 +1092,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveAllException1()
         {
-            FSeqExtensions.RemoveAll<int>(null, null);
+            FSeq.RemoveAll<int>(null, null);
         }
 
         /// <summary>
@@ -1102,7 +1102,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveAllException2()
         {
-            FSeqExtensions.RemoveAll(FSeq.Empty<int>(), null);
+            FSeq.RemoveAll(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1112,7 +1112,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveFirstException1()
         {
-            FSeqExtensions.RemoveFirst<int>(null, null);
+            FSeq.RemoveFirst<int>(null, null);
         }
 
         /// <summary>
@@ -1122,7 +1122,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestRemoveFirstException2()
         {
-            FSeqExtensions.RemoveFirst(FSeq.Empty<int>(), null);
+            FSeq.RemoveFirst(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1132,7 +1132,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestReverseException()
         {
-            FSeqExtensions.Reverse<int>(null);
+            FSeq.Reverse<int>(null);
         }
 
         /// <summary>
@@ -1165,7 +1165,7 @@ namespace ZenLib.Tests
         public void TestSelectException3()
         {
             Zen<FSeq<int>> x = null;
-            FSeqExtensions.Select<int, int>(x, null);
+            FSeq.Select<int, int>(x, null);
         }
 
         /// <summary>
@@ -1176,7 +1176,7 @@ namespace ZenLib.Tests
         public void TestSelectException4()
         {
             Zen<FSeq<int>> x = FSeq.Empty<int>();
-            FSeqExtensions.Select<int, int>(x, null);
+            FSeq.Select<int, int>(x, null);
         }
 
         /// <summary>
@@ -1207,7 +1207,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSortException()
         {
-            FSeqExtensions.Sort<int>(null);
+            FSeq.Sort<int>(null);
         }
 
         /// <summary>
@@ -1217,7 +1217,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSplitAtException1()
         {
-            FSeqExtensions.SplitAt<int>(null, null);
+            FSeq.SplitAt<int>(null, null);
         }
 
         /// <summary>
@@ -1227,7 +1227,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSplitAtException2()
         {
-            FSeqExtensions.SplitAt(FSeq.Empty<int>(), null);
+            FSeq.SplitAt(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1237,7 +1237,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeException1()
         {
-            FSeqExtensions.Take<int>(null, 0);
+            FSeq.Take<int>(null, 0);
         }
 
         /// <summary>
@@ -1247,7 +1247,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeException2()
         {
-            FSeqExtensions.Take(FSeq.Empty<int>(), null);
+            FSeq.Take(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1257,7 +1257,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeWhileException1()
         {
-            FSeqExtensions.TakeWhile<int>(null, null);
+            FSeq.TakeWhile<int>(null, null);
         }
 
         /// <summary>
@@ -1267,7 +1267,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTakeWhileException2()
         {
-            FSeqExtensions.TakeWhile(FSeq.Empty<int>(), null);
+            FSeq.TakeWhile(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1277,7 +1277,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestToSeqException()
         {
-            OptionExtensions.ToSequence<int>(null);
+            Option.ToSequence<int>(null);
         }
 
         /// <summary>
@@ -1317,7 +1317,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestValueOrDefaultException1()
         {
-            OptionExtensions.ValueOrDefault<int>(null, null);
+            Option.ValueOrDefault<int>(null, null);
         }
 
         /// <summary>
@@ -1360,7 +1360,7 @@ namespace ZenLib.Tests
         public void TestWhereException3()
         {
             Zen<FSeq<int>> x = null;
-            FSeqExtensions.Where(x, null);
+            FSeq.Where(x, null);
         }
 
         /// <summary>
@@ -1371,7 +1371,7 @@ namespace ZenLib.Tests
         public void TestWhereException4()
         {
             Zen<FSeq<int>> x = FSeq.Empty<int>();
-            FSeqExtensions.Where(x, null);
+            FSeq.Where(x, null);
         }
 
         /// <summary>
@@ -1541,6 +1541,65 @@ namespace ZenLib.Tests
         public void TestInvalidFieldZenType()
         {
             Zen.Create<Object1>(("Field1", Constant(0))).WithField("Field1", Constant(true));
+        }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast1()
+        {
+            Zen.Cast<string, int>("");
+        }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast2()
+        {
+            Zen.Cast<int, uint>(1);
+        }
+
+        /// <summary>
+        /// Exception thrown for invalid casts.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidCast3()
+        {
+            Zen.Cast<string, Seq<byte>>(null);
+        }
+
+        /// <summary>
+        /// Exception thrown for ascii strings.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidAscii()
+        {
+            Constant("hello∆");
+        }
+
+        /// <summary>
+        /// Exception thrown for ascii strings.
+        /// </summary>
+        [TestMethod]
+        public void TestInvalidAsciiOk()
+        {
+            Constant("hello");
+        }
+
+        /// <summary>
+        /// Exception thrown for contract violation.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestInvalidContract()
+        {
+            Contract.Assert(false);
         }
     }
 }

@@ -178,13 +178,7 @@ namespace ZenLib
         {
             return Create<Set<T>>(("Values", Map.Empty<T, SetUnit>()));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen set objects.
-    /// </summary>
-    public static class SetExtensions
-    {
         /// <summary>
         /// The underlying map.
         /// </summary>

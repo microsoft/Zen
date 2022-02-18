@@ -6,6 +6,8 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -182,14 +184,13 @@ namespace ZenLib.Solver
             return (v, (IntExpr)v);
         }
 
-        public SeqExpr CreateStringConst(string s)
+        public (Expr, SeqExpr) CreateSeqVar(object e)
         {
-            return this.Context.MkString(s);
-        }
-
-        public (Expr, SeqExpr) CreateStringVar(object e)
-        {
-            var v = this.Context.MkConst(FreshSymbol(), this.StringSort);
+            var seqType = e.GetType().GetGenericArgumentsCached()[0];
+            var innerType = seqType.GetGenericArgumentsCached()[0];
+            var innerSort = this.TypeToSortConverter.GetSortForType(innerType);
+            var seqSort = this.Context.MkSeqSort(innerSort);
+            var v = this.Context.MkConst(FreshSymbol(), seqSort);
             return (v, (SeqExpr)v);
         }
 
@@ -200,8 +201,8 @@ namespace ZenLib.Solver
             var keyType = typeArguments[0];
             var valueType = typeArguments[1];
 
-            var keySort = GetSortForType(keyType);
-            var valueSort = GetSortForType(valueType);
+            var keySort = this.TypeToSortConverter.GetSortForType(keyType);
+            var valueSort = this.TypeToSortConverter.GetSortForType(valueType);
 
             if (valueType == ReflectionUtilities.SetUnitType)
             {
@@ -349,54 +350,55 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkMul(x, y);
         }
 
-        public SeqExpr Concat(SeqExpr x, SeqExpr y)
+        public SeqExpr SeqConcat(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkConcat(x, y);
         }
 
-        public BoolExpr PrefixOf(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqPrefixOf(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkPrefixOf(y, x);
         }
 
-        public BoolExpr SuffixOf(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqSuffixOf(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkSuffixOf(y, x);
         }
 
-        public BoolExpr Contains(SeqExpr x, SeqExpr y)
+        public BoolExpr SeqContains(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkContains(x, y);
         }
 
-        public SeqExpr ReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
+        public SeqExpr SeqReplaceFirst(SeqExpr x, SeqExpr y, SeqExpr z)
         {
             return this.Context.MkReplace(x, y, z);
         }
 
-        public SeqExpr Substring(SeqExpr x, IntExpr y, IntExpr z)
+        public SeqExpr SeqSlice(SeqExpr x, IntExpr y, IntExpr z)
         {
             return this.Context.MkExtract(x, y, z);
         }
 
-        public SeqExpr At(SeqExpr x, IntExpr y)
+        [ExcludeFromCodeCoverage] // not used yet
+        public SeqExpr SeqAt(SeqExpr x, IntExpr y)
         {
             return this.Context.MkAt(x, y);
         }
 
-        public IntExpr Length(SeqExpr x)
+        public IntExpr SeqLength(SeqExpr x)
         {
             return this.Context.MkLength(x);
         }
 
-        public IntExpr IndexOf(SeqExpr x, SeqExpr y, IntExpr z)
+        public IntExpr SeqIndexOf(SeqExpr x, SeqExpr y, IntExpr z)
         {
             return this.Context.MkIndexOf(x, y, z);
         }
 
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
-            var keySort = GetSortForType(keyType);
+            var keySort = this.TypeToSortConverter.GetSortForType(keyType);
 
             if (valueType == ReflectionUtilities.SetUnitType)
             {
@@ -404,7 +406,7 @@ namespace ZenLib.Solver
             }
             else
             {
-                var valueSort = GetSortForType(valueType);
+                var valueSort = this.TypeToSortConverter.GetSortForType(valueType);
                 var optionSort = GetOrCreateOptionSort(valueSort);
                 var none = this.Context.MkApp(optionSort.Constructors[0]);
                 return this.Context.MkConstArray(keySort, none);
@@ -427,11 +429,19 @@ namespace ZenLib.Solver
             else
             {
                 var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, valueType);
-                var valueSort = GetSortForType(valueType);
+                var valueSort = this.TypeToSortConverter.GetSortForType(valueType);
                 var optionSort = GetOrCreateOptionSort(valueSort);
                 var some = this.Context.MkApp(optionSort.Constructors[1], value);
                 return this.Context.MkStore(arrayExpr, key, some);
             }
+        }
+
+        public SeqExpr SeqUnit(
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            Type type)
+        {
+            var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, type);
+            return this.Context.MkUnit(value);
         }
 
         public ArrayExpr DictDelete(
@@ -448,7 +458,7 @@ namespace ZenLib.Solver
             }
             else
             {
-                var valueSort = GetSortForType(valueType);
+                var valueSort = this.TypeToSortConverter.GetSortForType(valueType);
                 var optionSort = GetOrCreateOptionSort(valueSort);
                 var none = this.Context.MkApp(optionSort.Constructors[0]);
                 return this.Context.MkStore(arrayExpr, key, none);
@@ -462,7 +472,7 @@ namespace ZenLib.Solver
             Type valueType)
         {
             var key = this.SymbolicValueToExprConverter.ConvertSymbolicValue(keyExpr, keyType);
-            var valueSort = GetSortForType(valueType);
+            var valueSort = this.TypeToSortConverter.GetSortForType(valueType);
             var optionSort = GetOrCreateOptionSort(valueSort);
 
             if (valueType == ReflectionUtilities.SetUnitType)
@@ -490,10 +500,41 @@ namespace ZenLib.Solver
             return this.Context.MkSetIntersection(arrayExpr1, arrayExpr2);
         }
 
+        public SeqExpr SeqEmpty(Type type)
+        {
+            var sort = this.TypeToSortConverter.GetSortForType(type);
+            var seqSort = this.Context.MkSeqSort(sort);
+            return this.Context.MkEmptySeq(seqSort);
+        }
+
+        public SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> SeqGet(SeqExpr x, Type seqInnerType, IntExpr y)
+        {
+            var sort = this.TypeToSortConverter.GetSortForType(seqInnerType);
+            var result = this.Context.MkAt(x, y);
+            var resultIsEmpty = this.Context.MkEq(result, this.SeqEmpty(seqInnerType));
+
+            // create fresh variables to represent that flag and value for an option result
+            var freshVariable = this.Context.MkConst(FreshSymbol(), sort);
+            var freshSequence = this.Context.MkUnit(freshVariable);
+            var freshFlag = (BoolExpr)this.Context.MkConst(FreshSymbol(), this.BoolSort);
+
+            // ensure the values for the fresh flag and value are constrained appropriately
+            this.Solver.Assert(this.Context.MkEq(resultIsEmpty, this.Context.MkNot(freshFlag)));
+            this.Solver.Assert(this.Context.MkImplies(this.Context.MkNot(resultIsEmpty), this.Context.MkEq(freshSequence, result)));
+
+            // build the resulting symbolic object
+            var fields = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
+            fields = fields.Add("HasValue", new SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, freshFlag));
+            fields = fields.Add("Value", this.ExprToSymbolicValueConverter.ConvertExpr(freshVariable, seqInnerType));
+
+            var objectType = typeof(Option<>).MakeGenericType(seqInnerType);
+            return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this, fields);
+        }
+
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
-            return ConvertExprToObject(e, type);
+            return this.ExprToObjectConverter.Convert(e, type);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
@@ -513,31 +554,7 @@ namespace ZenLib.Solver
             return this.Solver.Model;
         }
 
-        public object ConvertExprToObject(Expr e, Type type)
-        {
-            if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
-            {
-                return ConvertExprToObject(e.Args[0], type);
-            }
-
-            if (e.IsApp && e.FuncDecl.Name.ToString() == "None")
-            {
-                return typeof(Option).GetMethod("None").MakeGenericMethod(type).Invoke(null, CommonUtilities.EmptyArray);
-            }
-
-            return ReflectionUtilities.ApplyTypeVisitor(this.ExprToObjectConverter, type, e);
-        }
-
-        public Sort GetSortForType(Type type)
-        {
-            if (type == ReflectionUtilities.SetUnitType)
-            {
-                return this.BoolSort;
-            }
-
-            return ReflectionUtilities.ApplyTypeVisitor(this.TypeToSortConverter, type, new Unit());
-        }
-
+        [ExcludeFromCodeCoverage] // some weird coverage bug in MkDatatypeSort.
         public DatatypeSort GetOrCreateOptionSort(Sort valueSort)
         {
             if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))

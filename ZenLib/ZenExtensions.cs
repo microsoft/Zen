@@ -50,7 +50,7 @@ namespace ZenLib
             var solution = constraints.Solve();
             var environment = new ExpressionEvaluatorEnvironment(solution.ArbitraryAssignment);
             var interpreter = new ExpressionEvaluator(false);
-            return (T)expr.Accept(interpreter, environment);
+            return (T)interpreter.Evaluate(expr, environment);
         }
 
         /// <summary>

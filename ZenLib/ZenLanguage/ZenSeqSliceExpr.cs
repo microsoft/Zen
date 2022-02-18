@@ -1,4 +1,4 @@
-// <copyright file="ZenStringSubstringExpr.cs" company="Microsoft">
+// <copyright file="ZenSeqSliceExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -9,54 +9,49 @@ namespace ZenLib
     using System.Numerics;
 
     /// <summary>
-    /// Class representing a substring expression.
+    /// Class representing a sequence slice expression.
     /// </summary>
-    internal sealed class ZenStringSubstringExpr : Zen<string>
+    internal sealed class ZenSeqSliceExpr<T> : Zen<Seq<T>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<string>, Zen<BigInteger>, Zen<BigInteger>), Zen<string>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<Seq<T>>, Zen<BigInteger>, Zen<BigInteger>), Zen<Seq<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
-        /// Hash cons table for ZenStringSubstringExpr.
+        /// Hash cons table for ZenSeqSliceExpr.
         /// </summary>
-        private static HashConsTable<(long, long, long), Zen<string>> hashConsTable = new HashConsTable<(long, long, long), Zen<string>>();
+        private static HashConsTable<(long, long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long, long), Zen<Seq<T>>>();
 
         /// <summary>
-        /// Unroll a ZenStringSubstringExpr.
+        /// Unroll a ZenSeqSliceExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
-        public override Zen<string> Unroll()
+        public override Zen<Seq<T>> Unroll()
         {
-            return Create(this.StringExpr.Unroll(), this.OffsetExpr.Unroll(), this.LengthExpr.Unroll());
+            return Create(this.SeqExpr.Unroll(), this.OffsetExpr.Unroll(), this.LengthExpr.Unroll());
         }
 
         /// <summary>
-        /// Simplify and create a new ZenStringSubstringExpr.
+        /// Simplify and create a new ZenSeqSliceExpr.
         /// </summary>
-        /// <param name="e1">The string expression.</param>
+        /// <param name="e1">The seq expression.</param>
         /// <param name="e2">The offset expression.</param>
         /// <param name="e3">The length expression.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<string> Simplify(Zen<string> e1, Zen<BigInteger> e2, Zen<BigInteger> e3)
+        public static Zen<Seq<T>> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2, Zen<BigInteger> e3)
         {
-            var x = ReflectionUtilities.GetConstantString(e1);
-
-            if (x != null && e2 is ZenConstantExpr<BigInteger> be2 && e3 is ZenConstantExpr<BigInteger> be3)
-                return CommonUtilities.Substring(x, be2.Value, be3.Value);
-
-            return new ZenStringSubstringExpr(e1, e2, e3);
+            return new ZenSeqSliceExpr<T>(e1, e2, e3);
         }
 
         /// <summary>
-        /// Create a new ZenStringSubstringExpr.
+        /// Create a new ZenSeqSliceExpr.
         /// </summary>
-        /// <param name="expr1">The string expression.</param>
+        /// <param name="expr1">The seq expression.</param>
         /// <param name="expr2">The offset expression.</param>
         /// <param name="expr3">The length expression.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<string> Create(Zen<string> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
+        public static Zen<Seq<T>> Create(Zen<Seq<T>> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
@@ -68,30 +63,30 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenStringSubstringExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenSeqSliceExpr{T}"/> class.
         /// </summary>
-        /// <param name="expr1">The string expression.</param>
-        /// <param name="expr2">The subtring match.</param>
-        /// <param name="expr3">The substituted string.</param>
-        private ZenStringSubstringExpr(Zen<string> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
+        /// <param name="expr1">The seq expression.</param>
+        /// <param name="expr2">The offset expression.</param>
+        /// <param name="expr3">The length expression.</param>
+        private ZenSeqSliceExpr(Zen<Seq<T>> expr1, Zen<BigInteger> expr2, Zen<BigInteger> expr3)
         {
-            this.StringExpr = expr1;
+            this.SeqExpr = expr1;
             this.OffsetExpr = expr2;
             this.LengthExpr = expr3;
         }
 
         /// <summary>
-        /// Gets the first expression.
+        /// Gets the seq expression.
         /// </summary>
-        internal Zen<string> StringExpr { get; }
+        internal Zen<Seq<T>> SeqExpr { get; }
 
         /// <summary>
-        /// Gets the second expression.
+        /// Gets the offset expression.
         /// </summary>
         internal Zen<BigInteger> OffsetExpr { get; }
 
         /// <summary>
-        /// Gets the third expression.
+        /// Gets the length expression.
         /// </summary>
         internal Zen<BigInteger> LengthExpr { get; }
 
@@ -102,7 +97,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Substring({this.StringExpr}, {this.OffsetExpr}, {this.LengthExpr})";
+            return $"Slice({this.SeqExpr}, {this.OffsetExpr}, {this.LengthExpr})";
         }
 
         /// <summary>
@@ -115,7 +110,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenStringSubstringExpr(this, parameter);
+            return visitor.VisitZenSeqSliceExpr(this, parameter);
         }
     }
 }

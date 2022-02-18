@@ -45,8 +45,7 @@ namespace ZenLib.Solver
             return new SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (BitVecExpr)parameter);
         }
 
-        [ExcludeFromCodeCoverage]
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitDictionary(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             return new SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (ArrayExpr)parameter);
         }
@@ -62,7 +61,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitList(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type listType, Type innerType, Expr parameter)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitList(Type listType, Type innerType, Expr parameter)
         {
             throw new ZenException("Invalid use of list in map or set type");
         }
@@ -72,13 +71,13 @@ namespace ZenLib.Solver
             return new SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (BitVecExpr)parameter);
         }
 
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitObject(Func<Type, Expr, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>> recurse, Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitObject(Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
         {
             var result = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
 
             if (objectType != ReflectionUtilities.SetUnitType)
             {
-                var dataTypeSort = (DatatypeSort)this.solver.GetSortForType(objectType);
+                var dataTypeSort = (DatatypeSort)this.solver.TypeToSortConverter.GetSortForType(objectType);
                 var fieldsAndTypes = fields.ToArray();
                 for (int i = 0; i < fieldsAndTypes.Length; i++)
                 {
@@ -90,6 +89,11 @@ namespace ZenLib.Solver
             }
 
             return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this.solver, result);
+        }
+
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitSeq(Type sequenceType, Type innerType, Expr parameter)
+        {
+            return new SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (SeqExpr)parameter);
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitShort(Expr parameter)

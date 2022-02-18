@@ -5,7 +5,7 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
@@ -31,10 +31,10 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         public FString(string s)
         {
-            var chars = new List<ushort>();
+            var chars = ImmutableList.Create<ushort>();
             foreach (var c in s)
             {
-                chars.Add(c);
+                chars = chars.Add(c);
             }
 
             this.Characters = new FSeq<ushort> { Values = chars };

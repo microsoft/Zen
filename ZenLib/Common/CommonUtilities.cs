@@ -10,7 +10,6 @@ namespace ZenLib
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
-    using System.Numerics;
     using System.Text;
     using System.Threading;
 
@@ -106,34 +105,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Convert to an immutable list if necessary.
-        /// </summary>
-        /// <returns></returns>
-        public static ImmutableList<T> ToImmutableList<T>(object obj)
-        {
-            if (obj is ImmutableList<T>)
-            {
-                return (ImmutableList<T>)obj;
-            }
-
-            return ImmutableList.CreateRange((IList<T>)obj);
-        }
-
-        /// <summary>
-        /// Convert to an immutable dictionary if necessary.
-        /// </summary>
-        /// <returns></returns>
-        public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(object obj)
-        {
-            if (obj is ImmutableDictionary<TKey, TValue>)
-            {
-                return (ImmutableDictionary<TKey, TValue>)obj;
-            }
-
-            return ImmutableDictionary.CreateRange((IDictionary<TKey, TValue>)obj);
-        }
-
-        /// <summary>
         /// Gets a value from a dictionary if the key exists.
         /// </summary>
         /// <typeparam name="TKey">The dictionary key type.</typeparam>
@@ -204,6 +175,26 @@ namespace ZenLib
             {
                 throw new ZenException(message);
             }
+        }
+
+        /// <summary>
+        /// Validate that a cast is valid.
+        /// </summary>
+        /// <param name="sourceType">The source type.</param>
+        /// <param name="targetType">The target type.</param>
+        public static void ValidateIsSafeCast(Type sourceType, Type targetType)
+        {
+            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.ByteSequenceType)
+            {
+                return;
+            }
+
+            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.ByteSequenceType)
+            {
+                return;
+            }
+
+            throw new ZenException($"Invalid cast from type {sourceType} to type {targetType}.");
         }
 
         /// <summary>
@@ -395,88 +386,6 @@ namespace ZenLib
             }
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Replace the first instance of a substring in a string with a new string.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="sub">The substring.</param>
-        /// <param name="replace">The replacement string.</param>
-        /// <returns>A new string.</returns>
-        public static string ReplaceFirst(string s, string sub, string replace)
-        {
-            if (sub == string.Empty)
-            {
-                return s + replace;
-            }
-
-            var idx = s.IndexOf(sub);
-            if (idx < 0)
-            {
-                return s;
-            }
-
-            var afterMatch = idx + sub.Length;
-            return s.Substring(0, idx) + replace + s.Substring(afterMatch, s.Length - afterMatch);
-        }
-
-        /// <summary>
-        /// Get the substring at an offset and length. Follows SMT-LIB semantics.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="length">The length.</param>
-        /// <returns>A substring.</returns>
-        public static string Substring(string s, BigInteger offset, BigInteger length)
-        {
-            if (offset >= s.Length)
-            {
-                return string.Empty;
-            }
-
-            var len = offset + length > s.Length ? s.Length - offset : length;
-            return s.Substring((int)offset, (int)len);
-        }
-
-        /// <summary>
-        /// Get the index of a substring starting at an offset.
-        /// If the substring is the empty string, returns the offset if in bounds.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="sub">The substring.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns>The index and a match.</returns>
-        public static BigInteger IndexOf(string s, string sub, BigInteger offset)
-        {
-            if (offset >= s.Length)
-            {
-                return -1;
-            }
-
-            if (sub == string.Empty)
-            {
-                return (short)offset;
-            }
-
-            return (short)s.IndexOf(sub, (int)offset);
-        }
-
-        /// <summary>
-        /// Get the substring character at an index.
-        /// Returns the empty string if out of bounds.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="index">The index.</param>
-        /// <returns>A substring at that character.</returns>
-        public static string At(string s, BigInteger index)
-        {
-            if (index >= s.Length)
-            {
-                return string.Empty;
-            }
-
-            return s[(int)index].ToString();
         }
     }
 }

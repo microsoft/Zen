@@ -80,46 +80,6 @@ namespace ZenLib.Compilation
         private int maxMatchUnrollingDepth;
 
         /// <summary>
-        /// String concatenation method.
-        /// </summary>
-        private static MethodInfo concatMethod = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
-
-        /// <summary>
-        /// String prefix of method.
-        /// </summary>
-        private static MethodInfo prefixOfMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
-
-        /// <summary>
-        /// String suffix of method.
-        /// </summary>
-        private static MethodInfo suffixOfMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo replaceMethod = typeof(CommonUtilities).GetMethod("ReplaceFirst");
-
-        /// <summary>
-        /// String contains method.
-        /// </summary>
-        private static MethodInfo substringMethod = typeof(CommonUtilities).GetMethod("Substring");
-
-        /// <summary>
-        /// String at method.
-        /// </summary>
-        private static MethodInfo atMethod = typeof(CommonUtilities).GetMethod("At");
-
-        /// <summary>
-        /// String indexof method.
-        /// </summary>
-        private static MethodInfo indexOfMethod = typeof(CommonUtilities).GetMethod("IndexOf");
-
-        /// <summary>
         /// Lookup an existing variable for the expression if defined.
         /// Otherwise, compile the expression, assign it a variable, and
         /// return this variable. Add the assignment to the blockExpressions.
@@ -209,13 +169,11 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case Op.Multiplication:
+                    default:
+                        Contract.Assert(expression.Operation == Op.Multiplication);
                         return Expression.Multiply(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -226,6 +184,108 @@ namespace ZenLib.Compilation
             {
                 return BitwiseNot<T>(expression.Expr.Accept(this, parameter));
             });
+        }
+
+        private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
+        {
+            var type = typeof(T);
+            return Expression.Convert(f(Expression.Convert(input, type)), type);
+        }
+
+        private Expression WrapMathBinary<T1, T2>(Expression left, Expression right, Func<Expression, Expression, Expression> f)
+        {
+            var type = typeof(T1);
+            var l = Expression.Convert(left, type);
+            var r = Expression.Convert(right, type);
+            return Expression.Convert(f(l, r), typeof(T2));
+        }
+
+        private Expression BitwiseNot<T>(Expression e)
+        {
+            return WrapMathUnary<T>(e, Expression.OnesComplement);
+        }
+
+        private Expression BitwiseOr<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseOr");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Or);
+        }
+
+        private Expression BitwiseAnd<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseAnd");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.And);
+        }
+
+        private Expression BitwiseXor<T>(Expression left, Expression right)
+        {
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                var method = typeof(T).GetMethodCached("BitwiseXor");
+                return Expression.Call(left, method, right);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.ExclusiveOr);
+        }
+
+        private Expression Add<T>(Expression left, Expression right)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Add(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethodCached("Add");
+                return Expression.Call(left, method, right);
+            }
+
+            if (type == ReflectionUtilities.ByteType ||
+                type == ReflectionUtilities.ShortType ||
+                type == ReflectionUtilities.UshortType)
+            {
+                return WrapMathBinary<int, T>(left, right, Expression.Add);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Add);
+        }
+
+        private Expression Subtract<T>(Expression left, Expression right)
+        {
+            var type = typeof(T);
+
+            if (type == ReflectionUtilities.BigIntType)
+            {
+                return Expression.Subtract(left, right);
+            }
+
+            if (ReflectionUtilities.IsFixedIntegerType(type))
+            {
+                var method = typeof(T).GetMethodCached("Subtract");
+                return Expression.Call(left, method, right);
+            }
+
+            if (type == ReflectionUtilities.ByteType ||
+                type == ReflectionUtilities.ShortType ||
+                type == ReflectionUtilities.UshortType)
+            {
+                return WrapMathBinary<int, T>(left, right, Expression.Subtract);
+            }
+
+            return WrapMathBinary<T, T>(left, right, Expression.Subtract);
         }
 
         public Expression VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
@@ -255,6 +315,26 @@ namespace ZenLib.Compilation
 
                 return CreateObject<TObject>(parameters.ToArray(), fieldNames.ToArray());
             });
+        }
+
+        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
+        {
+            Expression[] exprs = new Expression[fields.Length + 2];
+
+            // first use new default constructor.
+            var variable = FreshVariable(typeof(TObject));
+            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
+
+            // assign each field
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = Expression.PropertyOrField(variable, fields[i]);
+                exprs[i + 1] = Expression.Assign(field, objects[i]);
+            }
+
+            // return a block with the variable.
+            exprs[fields.Length + 1] = variable;
+            return Expression.Block(new ParameterExpression[] { variable }, exprs);
         }
 
         public Expression VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
@@ -315,12 +395,9 @@ namespace ZenLib.Compilation
                     var dict1 = expression.Expr1.Accept(this, parameter);
                     var dict2 = expression.Expr2.Accept(this, parameter);
 
-                    var toImmutableDictMethod = typeof(CommonUtilities)
-                        .GetMethodCached("ToImmutableDictionary")
-                        .MakeGenericMethod(keyType, valueType);
-
-                    var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                    var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
+                    var dictType = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType);
+                    var immutableDictExpr1 = Expression.Convert(dict1, dictType);
+                    var immutableDictExpr2 = Expression.Convert(dict2, dictType);
 
                     return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
                 }
@@ -350,7 +427,8 @@ namespace ZenLib.Compilation
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
 
-                    case ComparisonType.Leq:
+                    default:
+                        Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
                         if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
                         {
                             return Expression.Call(
@@ -362,9 +440,6 @@ namespace ZenLib.Compilation
                         return Expression.LessThanOrEqual(
                             expression.Expr1.Accept(this, parameter),
                             expression.Expr2.Accept(this, parameter));
-
-                    default:
-                        throw new ZenUnreachableException();
                 }
             });
         }
@@ -375,13 +450,7 @@ namespace ZenLib.Compilation
             {
                 var method = typeof(ImmutableList<T>).GetMethodCached("Insert");
                 var list = expression.Expr.Accept(this, parameter);
-
-                var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableList")
-                    .MakeGenericMethod(typeof(T));
-
-                var immutableListExpr = Expression.Call(null, toImmutableListMethod, list);
-
+                var immutableListExpr = Expression.Convert(list, typeof(ImmutableList<T>));
                 var element = expression.Element.Accept(this, parameter);
                 return Expression.Call(immutableListExpr, method, Expression.Constant(0), element);
             });
@@ -404,15 +473,7 @@ namespace ZenLib.Compilation
 
                 // compile the list expression
                 var listExpr = expression.ListExpr.Accept(this, parameter);
-
-                // Console.WriteLine($"listExpr: {listExpr}");
-
-                // cast to an immutable list, since it will return IList
-                var toImmutableListMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableList")
-                    .MakeGenericMethod(typeof(TList));
-
-                var immutableListExpr = Expression.Call(toImmutableListMethod, listExpr);
+                var immutableListExpr = Expression.Convert(listExpr, typeof(ImmutableList<TList>));
 
                 var listVariable = FreshVariable(immutableListType);
                 this.Variables.Add(listVariable);
@@ -518,88 +579,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenConcatExpr(ZenConcatExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var l = expression.Expr1.Accept(this, parameter);
-                var r = expression.Expr2.Accept(this, parameter);
-                return Expression.Add(l, r, concatMethod);
-            });
-        }
-
-        public Expression VisitZenStringContainmentExpr(ZenStringContainmentExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var l = expression.StringExpr.Accept(this, parameter);
-                var r = expression.SubstringExpr.Accept(this, parameter);
-
-                switch (expression.ContainmentType)
-                {
-                    case ContainmentType.PrefixOf:
-                        return Expression.Call(l, prefixOfMethod, new Expression[] { r });
-                    case ContainmentType.SuffixOf:
-                        return Expression.Call(l, suffixOfMethod, new Expression[] { r });
-                    case ContainmentType.Contains:
-                        return Expression.Call(l, containsMethod, new Expression[] { r });
-                    default:
-                        throw new ZenUnreachableException();
-                }
-            });
-        }
-
-        public Expression VisitZenStringReplaceExpr(ZenStringReplaceExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var e1 = expression.StringExpr.Accept(this, parameter);
-                var e2 = expression.SubstringExpr.Accept(this, parameter);
-                var e3 = expression.ReplaceExpr.Accept(this, parameter);
-                return Expression.Call(null, replaceMethod, new Expression[] { e1, e2, e3 });
-            });
-        }
-
-        public Expression VisitZenStringSubstringExpr(ZenStringSubstringExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var e1 = expression.StringExpr.Accept(this, parameter);
-                var e2 = expression.OffsetExpr.Accept(this, parameter);
-                var e3 = expression.LengthExpr.Accept(this, parameter);
-                return Expression.Call(null, substringMethod, new Expression[] { e1, e2, e3 });
-            });
-        }
-
-        public Expression VisitZenStringAtExpr(ZenStringAtExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var e1 = expression.StringExpr.Accept(this, parameter);
-                var e2 = expression.IndexExpr.Accept(this, parameter);
-                return Expression.Call(null, atMethod, new Expression[] { e1, e2 });
-            });
-        }
-
-        public Expression VisitZenStringLengthExpr(ZenStringLengthExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var e = expression.Expr.Accept(this, parameter);
-                return Expression.Convert(Expression.PropertyOrField(e, "Length"), typeof(BigInteger));
-            });
-        }
-        public Expression VisitZenStringIndexOfExpr(ZenStringIndexOfExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var e1 = expression.StringExpr.Accept(this, parameter);
-                var e2 = expression.SubstringExpr.Accept(this, parameter);
-                var e3 = expression.OffsetExpr.Accept(this, parameter);
-                return Expression.Call(null, indexOfMethod, new Expression[] { e1, e2, e3 });
-            });
-        }
-
         public Expression VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
@@ -610,136 +589,6 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var fieldInfo = typeof(ImmutableDictionary<TKey, TValue>).GetFieldCached("Empty");
-                return Expression.Field(null, fieldInfo);
-            });
-        }
-
-        public Expression VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("SetItem");
-                var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
-                var key = expression.KeyExpr.Accept(this, parameter);
-                var value = expression.ValueExpr.Accept(this, parameter);
-                return Expression.Call(immutableDictExpr, method, key, value);
-            });
-        }
-
-        public Expression VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("Remove");
-                var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
-                var key = expression.KeyExpr.Accept(this, parameter);
-                return Expression.Call(immutableDictExpr, method, key);
-            });
-        }
-
-        public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                var method = typeof(CommonUtilities)
-                    .GetMethodCached("DictionaryGet")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var dict = expression.DictExpr.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
-
-                var immutableDictExpr = Expression.Call(null, toImmutableDictMethod, dict);
-
-                var key = expression.KeyExpr.Accept(this, parameter);
-                return Expression.Call(null, method, immutableDictExpr, key);
-            });
-        }
-
-        public Expression VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
-        {
-            return LookupOrCompute(expression, () =>
-            {
-                MethodInfo method;
-                switch (expression.CombinationType)
-                {
-                    case ZenDictCombineExpr<TKey>.CombineType.Union:
-                        method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
-                        break;
-                    case ZenDictCombineExpr<TKey>.CombineType.Intersect:
-                        method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
-                        break;
-                    default:
-                        throw new ZenUnreachableException();
-                }
-
-                var dict1 = expression.DictExpr1.Accept(this, parameter);
-                var dict2 = expression.DictExpr2.Accept(this, parameter);
-
-                var toImmutableDictMethod = typeof(CommonUtilities)
-                    .GetMethodCached("ToImmutableDictionary")
-                    .MakeGenericMethod(typeof(TKey), typeof(SetUnit));
-
-                var immutableDictExpr1 = Expression.Call(null, toImmutableDictMethod, dict1);
-                var immutableDictExpr2 = Expression.Call(null, toImmutableDictMethod, dict2);
-
-                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
-            });
-        }
-
-        /// <summary>
-        /// Create an object given the fields.
-        /// </summary>
-        /// <typeparam name="TObject">The object type.</typeparam>
-        /// <param name="objects"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
-        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
-        {
-            Expression[] exprs = new Expression[fields.Length + 2];
-
-            // first use new default constructor.
-            var variable = FreshVariable(typeof(TObject));
-            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
-
-            // assign each field
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var field = Expression.PropertyOrField(variable, fields[i]);
-                exprs[i + 1] = Expression.Assign(field, objects[i]);
-            }
-
-            // return a block with the variable.
-            exprs[fields.Length + 1] = variable;
-            return Expression.Block(new ParameterExpression[] { variable }, exprs);
-        }
-
-        /// <summary>
-        /// Create a copy of an object with a field updated.
-        /// </summary>
-        /// <typeparam name="TObject">The object type.</typeparam>
-        /// <returns></returns>
         private Expression WithField<TObject>(Expression obj, string modifyField, Expression value)
         {
             var fields = ReflectionUtilities.GetAllFields(typeof(TObject));
@@ -785,111 +634,210 @@ namespace ZenLib.Compilation
             }
         }
 
+        public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var fieldInfo = typeof(ImmutableDictionary<TKey, TValue>).GetFieldCached("Empty");
+                return Expression.Field(null, fieldInfo);
+            });
+        }
+
+        public Expression VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("SetItem");
+                var dict = expression.DictExpr.Accept(this, parameter);
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
+                var key = expression.KeyExpr.Accept(this, parameter);
+                var value = expression.ValueExpr.Accept(this, parameter);
+                return Expression.Call(immutableDictExpr, method, key, value);
+            });
+        }
+
+        public Expression VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("Remove");
+                var dict = expression.DictExpr.Accept(this, parameter);
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
+                var key = expression.KeyExpr.Accept(this, parameter);
+                return Expression.Call(immutableDictExpr, method, key);
+            });
+        }
+
+        public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var method = typeof(CommonUtilities)
+                    .GetMethodCached("DictionaryGet")
+                    .MakeGenericMethod(typeof(TKey), typeof(TValue));
+                var dict = expression.DictExpr.Accept(this, parameter);
+                var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
+                var key = expression.KeyExpr.Accept(this, parameter);
+                return Expression.Call(null, method, immutableDictExpr, key);
+            });
+        }
+
+        public Expression VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                MethodInfo method;
+                switch (expression.CombinationType)
+                {
+                    case ZenDictCombineExpr<TKey>.CombineType.Union:
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
+                        break;
+                    default:
+                        Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Intersect);
+                        method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
+                        break;
+                }
+
+                var dict1 = expression.DictExpr1.Accept(this, parameter);
+                var dict2 = expression.DictExpr2.Accept(this, parameter);
+                var immutableDictExpr1 = Expression.Convert(dict1, typeof(ImmutableDictionary<TKey, SetUnit>));
+                var immutableDictExpr2 = Expression.Convert(dict2, typeof(ImmutableDictionary<TKey, SetUnit>));
+                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+            });
+        }
+
+        public Expression VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var c = typeof(Seq<T>).GetConstructor(new Type[] { });
+                return Expression.New(c);
+            });
+        }
+
+        public Expression VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });
+                var e = expression.ValueExpr.Accept(this, parameter);
+                return Expression.New(c, new Expression[] { e });
+            });
+        }
+
+        public Expression VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var l = expression.SeqExpr1.Accept(this, parameter);
+                var r = expression.SeqExpr2.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("Concat");
+                return Expression.Call(l, m, new Expression[] { r });
+            });
+        }
+
+        public Expression VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var s = expression.SeqExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("Length");
+                var e = Expression.Call(s, m);
+                var c = typeof(BigInteger).GetConstructor(new Type[] { typeof(int) });
+                return Expression.New(c, e);
+            });
+        }
+
+        public Expression VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.IndexExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("AtBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(e1, m, new Expression[] { e2 });
+            });
+        }
+
+        public Expression VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
+
+                switch (expression.ContainmentType)
+                {
+                    case SeqContainmentType.HasPrefix:
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { e2 });
+                    case SeqContainmentType.HasSuffix:
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { e2 });
+                    default:
+                        Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
+                        return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
+                }
+            });
+        }
+
+        public Expression VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
+                var e3 = expression.OffsetExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("IndexOfBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
+        }
+
+        public Expression VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.OffsetExpr.Accept(this, parameter);
+                var e3 = expression.LengthExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("SliceBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
+        }
+
         private ParameterExpression FreshVariable(Type type)
         {
             return Expression.Variable(type, "v" + nextVariableId++);
         }
 
-        private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
+        public Expression VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var type = typeof(T);
-            return Expression.Convert(f(Expression.Convert(input, type)), type);
+            return LookupOrCompute(expression, () =>
+            {
+                var e1 = expression.SeqExpr.Accept(this, parameter);
+                var e2 = expression.SubseqExpr.Accept(this, parameter);
+                var e3 = expression.ReplaceExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("ReplaceFirst");
+                return Expression.Call(e1, m, new Expression[] { e2, e3 });
+            });
         }
 
-        private Expression WrapMathBinary<T1, T2>(Expression left, Expression right, Func<Expression, Expression, Expression> f)
+        public Expression VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var type = typeof(T1);
-            var l = Expression.Convert(left, type);
-            var r = Expression.Convert(right, type);
-            return Expression.Convert(f(l, r), typeof(T2));
-        }
-
-        private Expression BitwiseNot<T>(Expression e)
-        {
-            return WrapMathUnary<T>(e, Expression.OnesComplement);
-        }
-
-        private Expression BitwiseOr<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            return LookupOrCompute(expression, () =>
             {
-                var method = typeof(T).GetMethodCached("BitwiseOr");
-                return Expression.Call(left, method, right);
-            }
+                var e = expression.SourceExpr.Accept(this, parameter);
 
-            return WrapMathBinary<T, T>(left, right, Expression.Or);
-        }
-
-        private Expression BitwiseAnd<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                var method = typeof(T).GetMethodCached("BitwiseAnd");
-                return Expression.Call(left, method, right);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.And);
-        }
-
-        private Expression BitwiseXor<T>(Expression left, Expression right)
-        {
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                var method = typeof(T).GetMethodCached("BitwiseXor");
-                return Expression.Call(left, method, right);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.ExclusiveOr);
-        }
-
-        private Expression Add<T>(Expression left, Expression right)
-        {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return Expression.Add(left, right);
-            }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var method = typeof(T).GetMethodCached("Add");
-                return Expression.Call(left, method, right);
-            }
-
-            if (type == ReflectionUtilities.ByteType ||
-                type == ReflectionUtilities.ShortType ||
-                type == ReflectionUtilities.UshortType)
-            {
-                return WrapMathBinary<int, T>(left, right, Expression.Add);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.Add);
-        }
-
-        private Expression Subtract<T>(Expression left, Expression right)
-        {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BigIntType)
-            {
-                return Expression.Subtract(left, right);
-            }
-
-            if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var method = typeof(T).GetMethodCached("Subtract");
-                return Expression.Call(left, method, right);
-            }
-
-            if (type == ReflectionUtilities.ByteType ||
-                type == ReflectionUtilities.ShortType ||
-                type == ReflectionUtilities.UshortType)
-            {
-                return WrapMathBinary<int, T>(left, right, Expression.Subtract);
-            }
-
-            return WrapMathBinary<T, T>(left, right, Expression.Subtract);
+                if (typeof(TKey) == ReflectionUtilities.StringType)
+                {
+                    var m = typeof(Seq).GetMethod("FromString");
+                    return Expression.Call(null, m, new Expression[] { e });
+                }
+                else
+                {
+                    Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
+                    var m = typeof(Seq).GetMethod("AsString");
+                    return Expression.Call(null, m, new Expression[] { e });
+                }
+            });
         }
     }
 }

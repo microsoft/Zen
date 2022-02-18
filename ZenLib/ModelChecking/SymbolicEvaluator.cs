@@ -47,7 +47,8 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result = (T)input.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var interpreter = new ExpressionEvaluator(false);
+            var result = (T)interpreter.Evaluate(input, interpreterEnv);
             return Option.Some(result);
         }
 
@@ -77,8 +78,9 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = (T1)input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result2 = (T2)input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var interpreter = new ExpressionEvaluator(false);
+            var result1 = (T1)interpreter.Evaluate(input1, interpreterEnv);
+            var result2 = (T2)interpreter.Evaluate(input2, interpreterEnv);
             return Option.Some((result1, result2));
         }
 
@@ -109,9 +111,10 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = (T1)input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result2 = (T2)input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result3 = (T3)input3.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var interpreter = new ExpressionEvaluator(false);
+            var result1 = (T1)interpreter.Evaluate(input1, interpreterEnv);
+            var result2 = (T2)interpreter.Evaluate(input2, interpreterEnv);
+            var result3 = (T3)interpreter.Evaluate(input3, interpreterEnv);
             return Option.Some((result1, result2, result3));
         }
 
@@ -144,10 +147,11 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var result1 = (T1)input1.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result2 = (T2)input2.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result3 = (T3)input3.Accept(new ExpressionEvaluator(false), interpreterEnv);
-            var result4 = (T4)input4.Accept(new ExpressionEvaluator(false), interpreterEnv);
+            var interpreter = new ExpressionEvaluator(false);
+            var result1 = (T1)interpreter.Evaluate(input1, interpreterEnv);
+            var result2 = (T2)interpreter.Evaluate(input2, interpreterEnv);
+            var result3 = (T3)interpreter.Evaluate(input3, interpreterEnv);
+            var result4 = (T4)interpreter.Evaluate(input4, interpreterEnv);
             return Option.Some((result1, result2, result3, result4));
         }
     }

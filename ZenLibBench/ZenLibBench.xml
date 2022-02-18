@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZenLibBench</name>
+    </assembly>
+    <members>
+        <member name="T:ZenLibBench.AclBench">
+            <summary>
+            Benchmark for encoding ACLs of various sizes.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.AclBench.Backend">
+            <summary>
+            The backend to use.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.AclBench.NumLines">
+            <summary>
+            The number of ACL lines to benchmark.
+            </summary>
+        </member>
+        <member name="F:ZenLibBench.AclBench.Acl">
+            <summary>
+            The ACL.
+            </summary>
+        </member>
+        <member name="M:ZenLibBench.AclBench.CreateAcl">
+            <summary>
+            Create a deterministic random ACL of a given size.
+            </summary>
+        </member>
+        <member name="M:ZenLibBench.AclBench.VerifyAclProvenance">
+            <summary>
+            Find a packet that does not match any line of the ACL.
+            </summary>
+        </member>
+        <member name="T:ZenLibBench.Program">
+            <summary>
+            Run a collection of benchmarks for Zen.
+            </summary>
+        </member>
+        <member name="T:ZenLibBench.TestObject">
+            <summary>
+                A test class.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.TestObject.DstIp">
+            <summary>
+                Gets or sets the destination IP address.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.TestObject.SrcIp">
+            <summary>
+                Gets or sets the source IP address.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.TestObject.Foo">
+            <summary>
+            Foo field.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.TestObject.Bar">
+            <summary>
+            Bar field.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.TestObject.Baz">
+            <summary>
+            Baz field.
+            </summary>
+        </member>
+        <member name="T:ZenLibBench.RouteBench">
+            <summary>
+            Benchmark for encoding ACLs of various sizes.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.RouteBench.Backend">
+            <summary>
+            Gets or sets the backend to use.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.RouteBench.ListSize">
+            <summary>
+            The maximum bounded list input size.
+            </summary>
+        </member>
+        <member name="P:ZenLibBench.RouteBench.NumLines">
+            <summary>
+            The number of ACL lines to benchmark.
+            </summary>
+        </member>
+        <member name="M:ZenLibBench.RouteBench.CreateRouteMap">
+            <summary>
+            Create a deterministic random ACL of a given size.
+            </summary>
+        </member>
+        <member name="M:ZenLibBench.RouteBench.VerifyRouteMapProvenance">
+            <summary>
+            Find a route that does not match any line of the route map.
+            </summary>
+        </member>
+        <member name="M:ZenLibBench.RouteBench.VerifyRouteMap">
+            <summary>
+            Find a route that does not match any line of the route map.
+            </summary>
+        </member>
+    </members>
+</doc>

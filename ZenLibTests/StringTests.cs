@@ -38,13 +38,14 @@ namespace ZenLib.Tests
         [DataRow("\"")]
         [DataRow("\\")]
         [DataRow("\\x5C\\x6E")]
+        [DataRow("\\n")]
         [DataRow("endline\n")]
         [DataRow("\x01\\x01")]
         public void TestStringConversions(string s)
         {
             var context = new Context();
-            var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
-            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+            var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
+            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
             Assert.AreEqual(s, tocs);
         }
 
@@ -58,8 +59,8 @@ namespace ZenLib.Tests
             {
                 string s = RandomString();
                 var context = new Context();
-                var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
-                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+                var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
+                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
                 Assert.AreEqual(s, tocs);
             }
         }
@@ -150,7 +151,7 @@ namespace ZenLib.Tests
         {
             RandomBytes(offset =>
             RandomBytes(length =>
-                CheckValid<string>(s => s.Contains(s.Substring(new BigInteger(offset), new BigInteger(length))))));
+                CheckValid<string>(s => s.Contains(s.Slice(new BigInteger(offset), new BigInteger(length))))));
         }
 
         /// <summary>
@@ -159,9 +160,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSubstringAgreement()
         {
-            var offset = new BigInteger(RandomByte());
-            var length = new BigInteger(RandomByte());
-            CheckAgreement<string>(s => s.Substring(offset, length).EndsWith("ab"));
+            var offset = new BigInteger(2);
+            var length = new BigInteger(3);
+            CheckAgreement<string>(s => s.Slice(offset, length).EndsWith("ab"));
         }
 
         /// <summary>
@@ -265,28 +266,13 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test string replace first.
-        /// </summary>
-        [TestMethod]
-        [DataRow("brown cow", "cow", "fox", "brown fox")]
-        [DataRow("aabbcc", "b", "d", "aadbcc")]
-        [DataRow("hello", "ll", "rrr", "herrro")]
-        [DataRow("hello", "", " abc", "hello abc")]
-        [DataRow("abc", "b", "", "ac")]
-        [DataRow("abcd", "e", "f", "abcd")]
-        public void TestReplaceFirst(string s, string sub, string replace, string expected)
-        {
-            Assert.AreEqual(expected, CommonUtilities.ReplaceFirst(s, sub, replace));
-        }
-
-        /// <summary>
         /// Test contains replace first.
         /// </summary>
         [TestMethod]
         [DataRow("brown cow", "cow", "fox", "brown fox")]
         [DataRow("aabbcc", "b", "d", "aadbcc")]
         [DataRow("hello", "ll", "rrr", "herrro")]
-        [DataRow("hello", "", " abc", "hello abc")]
+        [DataRow("hello", "", " abc", " abchello")]
         [DataRow("abc", "b", "", "ac")]
         public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
         {
@@ -306,7 +292,7 @@ namespace ZenLib.Tests
         [DataRow("hello", 0, 20, "hello")]
         public void TestSubstringEvaluation(string s, int offset, int length, string expected)
         {
-            var f = new ZenFunction<string, string>(s => s.Substring(new BigInteger(offset), new BigInteger(length)));
+            var f = new ZenFunction<string, string>(s => s.Slice(new BigInteger(offset), new BigInteger(length)));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -327,7 +313,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.At(idx));
+            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.Char(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -398,8 +384,8 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<string, bool>(s =>
             {
-                var c = s.At(new BigInteger(3));
-                var s2 = s.Substring(new BigInteger(5), new BigInteger(2));
+                var c = s.Char(new BigInteger(3));
+                var s2 = s.Slice(new BigInteger(5), new BigInteger(2));
                 return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == new BigInteger(10));
             });
 
@@ -414,11 +400,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtIsSubstring()
         {
-            CheckValid<string>(s => s.At(new BigInteger(0)) == s.Substring(new BigInteger(0), new BigInteger(1)));
-            CheckValid<string>(s => s.At(new BigInteger(1)) == s.Substring(new BigInteger(1), new BigInteger(1)));
-            CheckValid<string>(s => s.At(new BigInteger(2)) == s.Substring(new BigInteger(2), new BigInteger(1)));
-            CheckValid<string>(s => s.At(new BigInteger(3)) == s.Substring(new BigInteger(3), new BigInteger(1)));
-            CheckValid<string>(s => s.At(new BigInteger(4)) == s.Substring(new BigInteger(4), new BigInteger(1)));
+            CheckValid<string>(s => s.Char(new BigInteger(0)) == s.Slice(new BigInteger(0), new BigInteger(1)));
+            CheckValid<string>(s => s.Char(new BigInteger(1)) == s.Slice(new BigInteger(1), new BigInteger(1)));
+            CheckValid<string>(s => s.Char(new BigInteger(2)) == s.Slice(new BigInteger(2), new BigInteger(1)));
+            CheckValid<string>(s => s.Char(new BigInteger(3)) == s.Slice(new BigInteger(3), new BigInteger(1)));
+            CheckValid<string>(s => s.Char(new BigInteger(4)) == s.Slice(new BigInteger(4), new BigInteger(1)));
         }
 
         /// <summary>

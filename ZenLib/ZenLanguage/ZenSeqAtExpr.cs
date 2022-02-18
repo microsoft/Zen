@@ -1,4 +1,4 @@
-// <copyright file="ZenStringAtExpr.cs" company="Microsoft">
+// <copyright file="ZenSeqAtExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -9,59 +9,47 @@ namespace ZenLib
     using System.Numerics;
 
     /// <summary>
-    /// Class representing a substring expression.
+    /// Class representing a sequence at expression.
     /// </summary>
-    internal sealed class ZenStringAtExpr : Zen<string>
+    internal sealed class ZenSeqAtExpr<T> : Zen<Option<T>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<string>, Zen<BigInteger>), Zen<string>> createFunc = (v) => Simplify(v.Item1, v.Item2);
+        private static Func<(Zen<Seq<T>>, Zen<BigInteger>), Zen<Option<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2);
 
         /// <summary>
-        /// Hash cons table for ZenStringAtExpr.
+        /// Hash cons table for ZenSeqAtExpr.
         /// </summary>
-        private static HashConsTable<(long, long), Zen<string>> hashConsTable = new HashConsTable<(long, long), Zen<string>>();
+        private static HashConsTable<(long, long), Zen<Option<T>>> hashConsTable = new HashConsTable<(long, long), Zen<Option<T>>>();
 
         /// <summary>
-        /// Unroll a ZenStringAtExpr.
+        /// Unroll a ZenSeqAtExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<string> Unroll()
+        public override Zen<Option<T>> Unroll()
         {
-            return Create(this.StringExpr.Unroll(), this.IndexExpr.Unroll());
+            return Create(this.SeqExpr.Unroll(), this.IndexExpr.Unroll());
         }
 
         /// <summary>
-        /// Simplify and create a ZenStringAtExpr.
+        /// Simplify and create a ZenSeqAtExpr.
         /// </summary>
-        /// <param name="e1">The string expr.</param>
+        /// <param name="e1">The seq expr.</param>
         /// <param name="e2">The index expr.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<string> Simplify(Zen<string> e1, Zen<BigInteger> e2)
+        public static Zen<Option<T>> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2)
         {
-            var x = ReflectionUtilities.GetConstantString(e1);
-
-            if (x != null && e2 is ZenConstantExpr<BigInteger> be)
-            {
-                return CommonUtilities.At(x, be.Value);
-            }
-
-            if (x == string.Empty)
-            {
-                return string.Empty;
-            }
-
-            return new ZenStringAtExpr(e1, e2);
+            return new ZenSeqAtExpr<T>(e1, e2);
         }
 
         /// <summary>
-        /// Create a new ZenStringAtExpr.
+        /// Create a new ZenSeqAtExpr.
         /// </summary>
-        /// <param name="expr1">The string expr.</param>
+        /// <param name="expr1">The seq expr.</param>
         /// <param name="expr2">The index expr.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<string> Create(Zen<string> expr1, Zen<BigInteger> expr2)
+        public static Zen<Option<T>> Create(Zen<Seq<T>> expr1, Zen<BigInteger> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
@@ -72,23 +60,23 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenStringAtExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenSeqAtExpr{T}"/> class.
         /// </summary>
-        /// <param name="expr1">The string expression.</param>
-        /// <param name="expr2">The index expression.</param>
-        private ZenStringAtExpr(Zen<string> expr1, Zen<BigInteger> expr2)
+        /// <param name="seqExpr">The seq expression.</param>
+        /// <param name="indexExpr">The index expression.</param>
+        private ZenSeqAtExpr(Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
         {
-            this.StringExpr = expr1;
-            this.IndexExpr = expr2;
+            this.SeqExpr = seqExpr;
+            this.IndexExpr = indexExpr;
         }
 
         /// <summary>
-        /// Gets the first expression.
+        /// Gets the seq expression.
         /// </summary>
-        internal Zen<string> StringExpr { get; }
+        internal Zen<Seq<T>> SeqExpr { get; }
 
         /// <summary>
-        /// Gets the second expression.
+        /// Gets the index expression.
         /// </summary>
         internal Zen<BigInteger> IndexExpr { get; }
 
@@ -99,7 +87,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"At({this.StringExpr}, {this.IndexExpr})";
+            return $"At({this.SeqExpr}, {this.IndexExpr})";
         }
 
         /// <summary>
@@ -112,7 +100,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenStringAtExpr(this, parameter);
+            return visitor.VisitZenSeqAtExpr(this, parameter);
         }
     }
 }

@@ -16,6 +16,11 @@ namespace ZenLib.Generation
     internal class DefaultTypeGenerator : ITypeVisitor<object, Unit>
     {
         /// <summary>
+        /// Method for the creating an empty Zen seq.
+        /// </summary>
+        private static MethodInfo emptySeqMethod = typeof(Seq).GetMethod("Empty");
+
+        /// <summary>
         /// Method for the creating an empty Zen list.
         /// </summary>
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
@@ -45,13 +50,19 @@ namespace ZenLib.Generation
             return ZenConstantExpr<int>.Create(0);
         }
 
-        public object VisitList(Func<Type, Unit, object> recurse, Type listType, Type innerType, Unit u)
+        public object VisitList(Type listType, Type innerType, Unit u)
         {
             var method = emptyListMethod.MakeGenericMethod(innerType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
-        public object VisitDictionary(Func<Type, Unit, object> recurse, Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public object VisitSeq(Type sequenceType, Type innerType, Unit parameter)
+        {
+            var method = emptySeqMethod.MakeGenericMethod(innerType);
+            return method.Invoke(null, CommonUtilities.EmptyArray);
+        }
+
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
@@ -74,7 +85,7 @@ namespace ZenLib.Generation
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
 
-        public object VisitObject(Func<Type, Unit, object> recurse, Type objectType, SortedDictionary<string, Type> fields, Unit u)
+        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Unit u)
         {
             var asList = fields.ToArray();
 
@@ -83,7 +94,7 @@ namespace ZenLib.Generation
             var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                args[i] = (asList[i].Key, recurse(asList[i].Value, new Unit()));
+                args[i] = (asList[i].Key, ReflectionUtilities.ApplyTypeVisitor(this, asList[i].Value, new Unit()));
             }
 
             return method.Invoke(null, new object[] { args });
@@ -109,10 +120,10 @@ namespace ZenLib.Generation
             return ZenConstantExpr<ushort>.Create(0);
         }
 
-        // FIXME: default value for a c# string is null, not empty. How to represent null strings?
         public object VisitString(Unit parameter)
         {
-            return ZenConstantExpr<string>.Create("");
+            var v = (Zen<Seq<byte>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<byte>), parameter);
+            return ZenCastExpr<Seq<byte>, string>.Create(v);
         }
     }
 }

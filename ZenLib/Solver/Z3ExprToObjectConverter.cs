@@ -10,7 +10,6 @@ namespace ZenLib.Solver
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
-    using System.Reflection;
     using Microsoft.Z3;
 
     /// <summary>
@@ -23,6 +22,16 @@ namespace ZenLib.Solver
         public Z3ExprToObjectConverter(SolverZ3 solver)
         {
             this.solver = solver;
+        }
+
+        public object Convert(Expr e, Type type)
+        {
+            if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
+            {
+                return Convert(e.Args[0], type);
+            }
+
+            return ReflectionUtilities.ApplyTypeVisitor(this, type, e);
         }
 
         public object VisitBigInteger(Expr parameter)
@@ -40,7 +49,7 @@ namespace ZenLib.Solver
             return byte.Parse(parameter.ToString());
         }
 
-        public object VisitDictionary(Func<Type, Expr, object> recurse, Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
             {
@@ -51,22 +60,25 @@ namespace ZenLib.Solver
                 var arrayExpr = parameter.Args[0];
                 var keyExpr = parameter.Args[1];
                 var valueExpr = parameter.Args[2];
-                var dict = this.solver.ConvertExprToObject(arrayExpr, dictionaryType);
-                var key = this.solver.ConvertExprToObject(keyExpr, keyType);
-                var value = this.solver.ConvertExprToObject(valueExpr, valueType);
+                var dict = Convert(arrayExpr, dictionaryType);
+                var key = Convert(keyExpr, keyType);
+                var value = Convert(valueExpr, valueType);
                 return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
             {
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
-                var e1 = this.solver.ConvertExprToObject(parameter.Args[0], dictionaryType);
-                var e2 = this.solver.ConvertExprToObject(parameter.Args[1], dictionaryType);
+                var e1 = Convert(parameter.Args[0], dictionaryType);
+                var e2 = Convert(parameter.Args[1], dictionaryType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
-            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "as-array")
+            else
             {
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "as-array");
+
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl;
                 var interpretation = this.solver.Solver.Model.FuncInterp(lambda);
                 var elseCase = interpretation.Else.ToString();
@@ -77,16 +89,12 @@ namespace ZenLib.Solver
                 {
                     var keyExpr = interpretation.Entries[i].Args[0];
                     var valueExpr = interpretation.Entries[i].Value;
-                    var key = this.solver.ConvertExprToObject(keyExpr, keyType);
-                    var value = this.solver.ConvertExprToObject(valueExpr, valueType);
+                    var key = Convert(keyExpr, keyType);
+                    var value = Convert(valueExpr, valueType);
                     dict = AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
                 }
 
                 return dict;
-            }
-            else
-            {
-                throw new ZenException("Internal error. Unexpected Z3 AST type.");
             }
         }
 
@@ -125,7 +133,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public object VisitList(Func<Type, Expr, object> recurse, Type listType, Type innerType, Expr parameter)
+        public object VisitList(Type listType, Type innerType, Expr parameter)
         {
             throw new ZenException("Invalid use of list in map or set type.");
         }
@@ -135,7 +143,7 @@ namespace ZenLib.Solver
             return (long)ulong.Parse(parameter.ToString());
         }
 
-        public object VisitObject(Func<Type, Expr, object> recurse, Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
+        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
         {
             var fieldsAndTypes = fields.ToArray();
             var fieldNames = new string[fieldsAndTypes.Length];
@@ -143,7 +151,7 @@ namespace ZenLib.Solver
             for (int i = 0; i < fieldsAndTypes.Length; i++)
             {
                 fieldNames[i] = fieldsAndTypes[i].Key;
-                fieldValues[i] = this.solver.ConvertExprToObject(parameter.Args[i], fieldsAndTypes[i].Value);
+                fieldValues[i] = Convert(parameter.Args[i], fieldsAndTypes[i].Value);
             }
 
             return ReflectionUtilities.CreateInstance(objectType, fieldNames, fieldValues);
@@ -172,6 +180,35 @@ namespace ZenLib.Solver
         public object VisitUshort(Expr parameter)
         {
             return ushort.Parse(parameter.ToString());
+        }
+
+        public object VisitSeq(Type sequenceType, Type innerType, Expr parameter)
+        {
+            if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.empty")
+            {
+                var c = sequenceType.GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.unit")
+            {
+                var value = Convert(parameter.Args[0], innerType);
+                var c = sequenceType.GetConstructor(new Type[] { innerType });
+                return c.Invoke(new object[] { value });
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++")
+            {
+                var seq1 = Convert(parameter.Args[0], sequenceType);
+                var seq2 = Convert(parameter.Args[1], sequenceType);
+                var m = sequenceType.GetMethod("Concat");
+                return m.Invoke(seq1, new object[] { seq2 });
+            }
+            else
+            {
+                Contract.Assert(parameter.IsString);
+
+                var s = CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString());
+                return Seq.FromString(s);
+            }
         }
     }
 }

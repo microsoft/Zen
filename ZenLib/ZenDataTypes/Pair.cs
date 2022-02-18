@@ -439,13 +439,7 @@ namespace ZenLib
                 ("Item4", expr4),
                 ("Item5", expr5));
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen Pair objects.
-    /// </summary>
-    public static class PairExtensions
-    {
         /// <summary>
         /// Get the first element of a Zen tuple.
         /// </summary>

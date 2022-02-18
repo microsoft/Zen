@@ -10,26 +10,26 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic integer value.
     /// </summary>
-    internal class SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
+    internal class SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
     {
-        public SymbolicInteger(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, TInt value) : base(solver)
+        public SymbolicInteger(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TInt value) : base(solver)
         {
             this.Value = value;
         }
 
         public TInt Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other)
         {
-            var o = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
+            var o = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
+            return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.VisitSymbolicInteger(this, parameter);

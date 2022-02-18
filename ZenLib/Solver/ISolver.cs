@@ -16,9 +16,9 @@ namespace ZenLib.Solver
     /// <typeparam name="TBool">The boolean expression type.</typeparam>
     /// <typeparam name="TBitvec">The finite integer type.</typeparam>
     /// <typeparam name="TInteger">The integer type.</typeparam>
-    /// <typeparam name="TString">The string type.</typeparam>
+    /// <typeparam name="TSeq">The sequence type.</typeparam>
     /// <typeparam name="TArray">The array type.</typeparam>
-    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray>
+    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray>
     {
         /// <summary>
         /// The false expression.
@@ -120,17 +120,11 @@ namespace ZenLib.Solver
         TInteger CreateBigIntegerConst(BigInteger b);
 
         /// <summary>
-        /// Create a new string expression.
+        /// Create a new sequence expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
         /// <returns>The expression.</returns>
-        (TVariable, TString) CreateStringVar(object e);
-
-        /// <summary>
-        /// Create a string constant.
-        /// </summary>
-        /// <returns></returns>
-        TString CreateStringConst(string s);
+        (TVariable, TSeq) CreateSeqVar(object e);
 
         /// <summary>
         /// Create a new dictionary expression.
@@ -156,6 +150,7 @@ namespace ZenLib.Solver
         TBool Iff(TBool x, TBool y);
 
         /// <summary>
+        /// The 'Or' of two expressions.
         /// The 'Or' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -250,78 +245,102 @@ namespace ZenLib.Solver
         TInteger Multiply(TInteger x, TInteger y);
 
         /// <summary>
+        /// The 'EmptySeq' for a given type.
+        /// </summary>
+        /// <param name="type">The type of the sequence.</param>
+        /// <returns></returns>
+        TSeq SeqEmpty(Type type);
+
+        /// <summary>
+        /// The 'EmptySeq' for a given type.
+        /// </summary>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <param name="type">The type of the sequence.</param>
+        /// <returns></returns>
+        TSeq SeqUnit(SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> valueExpr, Type type);
+
+        /// <summary>
         /// The 'Concat' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TString Concat(TString x, TString y);
+        TSeq SeqConcat(TSeq x, TSeq y);
+
+        /// <summary>
+        /// The sequence 'At' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="seqInnerType">The seq inner type.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
+        SymbolicObject<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> SeqGet(TSeq x, Type seqInnerType, TInteger y);
 
         /// <summary>
         /// The 'PrefixOf' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
-        TBool PrefixOf(TString x, TString y);
+        TBool SeqPrefixOf(TSeq x, TSeq y);
 
         /// <summary>
         /// The 'SuffixOf' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
-        TBool SuffixOf(TString x, TString y);
+        TBool SeqSuffixOf(TSeq x, TSeq y);
 
         /// <summary>
         /// The 'Contains' of two expressions.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <returns></returns>
-        TBool Contains(TString x, TString y);
+        TBool SeqContains(TSeq x, TSeq y);
 
         /// <summary>
-        /// The string 'Replace' operation.
+        /// The seq 'Replace' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <param name="z">The replacement expression.</param>
         /// <returns></returns>
-        TString ReplaceFirst(TString x, TString y, TString z);
+        TSeq SeqReplaceFirst(TSeq x, TSeq y, TSeq z);
 
         /// <summary>
-        /// The string 'Substring' operation.
+        /// The seq 'Slice' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <param name="y">The offset expression.</param>
         /// <param name="z">The length expression.</param>
         /// <returns></returns>
-        TString Substring(TString x, TInteger y, TInteger z);
+        TSeq SeqSlice(TSeq x, TInteger y, TInteger z);
 
         /// <summary>
-        /// The string 'At' operation.
+        /// The seq 'At' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <param name="y">The index expression.</param>
         /// <returns></returns>
-        TString At(TString x, TInteger y);
+        TSeq SeqAt(TSeq x, TInteger y);
 
         /// <summary>
-        /// The string 'Length' operation.
+        /// The seq 'Length' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
+        /// <param name="x">The seq expression.</param>
         /// <returns></returns>
-        TInteger Length(TString x);
+        TInteger SeqLength(TSeq x);
 
         /// <summary>
-        /// The string 'IndexOf' operation.
+        /// The seq 'IndexOf' operation.
         /// </summary>
-        /// <param name="x">The string expression.</param>
-        /// <param name="y">The substring expression.</param>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
         /// <param name="z">The offset expression.</param>
         /// <returns></returns>
-        TInteger IndexOf(TString x, TString y, TInteger z);
+        TInteger SeqIndexOf(TSeq x, TSeq y, TInteger z);
 
         /// <summary>
         /// The empty dictionary.
@@ -340,7 +359,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> valueExpr, Type keyType, Type valueType);
+        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> valueExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of setting a key to a value for an array.
@@ -350,7 +369,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, Type keyType, Type valueType);
+        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of getting a value for a key from an array.
@@ -360,7 +379,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> keyExpr, Type keyType, Type valueType);
+        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of unioning two arrays.
@@ -395,12 +414,12 @@ namespace ZenLib.Solver
         TBool Eq(TInteger x, TInteger y);
 
         /// <summary>
-        /// The 'Equal' of two strings.
+        /// The 'Equal' of two seqs.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TBool Eq(TString x, TString y);
+        TBool Eq(TSeq x, TSeq y);
 
         /// <summary>
         /// The 'Equal' of two arrays.
@@ -492,7 +511,7 @@ namespace ZenLib.Solver
         /// <param name="t">The true expression.</param>
         /// <param name="f">The false expression.</param>
         /// <returns></returns>
-        TString Ite(TBool g, TString t, TString f);
+        TSeq Ite(TBool g, TSeq t, TSeq f);
 
         /// <summary>
         /// The 'Ite' of a guard and two arrays.
@@ -525,6 +544,6 @@ namespace ZenLib.Solver
         /// <param name="e"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TString, TArray> ConvertExprToSymbolicValue(object e, Type type);
+        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> ConvertExprToSymbolicValue(object e, Type type);
     }
 }

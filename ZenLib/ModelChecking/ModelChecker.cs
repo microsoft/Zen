@@ -17,17 +17,17 @@ namespace ZenLib.ModelChecking
     /// <typeparam name="TBool">The boolean expression type.</typeparam>
     /// <typeparam name="TBitvec">The bitvector expression type.</typeparam>
     /// <typeparam name="TInt">The integer expression type.</typeparam>
-    /// <typeparam name="TString">The string expression type.</typeparam>
+    /// <typeparam name="TSeq">The sequence expression type.</typeparam>
     /// <typeparam name="TArray">The array expression type.</typeparam>
-    internal class ModelChecker<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : IModelChecker
+    internal class ModelChecker<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : IModelChecker
     {
-        private ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver;
+        private ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver;
 
         /// <summary>
         /// Create an in instance of the class.
         /// </summary>
         /// <param name="solver">The solver.</param>
-        public ModelChecker(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver)
+        public ModelChecker(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver)
         {
             this.solver = solver;
         }
@@ -43,10 +43,9 @@ namespace ZenLib.ModelChecking
         /// </returns>
         public Dictionary<object, object> ModelCheck(Zen<bool> expression, Dictionary<long, object> arguments)
         {
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(solver);
-            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(arguments);
-            var symbolicResult =
-                (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)expression.Accept(symbolicEvaluator, env);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(solver);
+            var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(arguments);
+            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)symbolicEvaluator.Evaluate(expression, env);
 
             var model = solver.Satisfiable(symbolicResult.Value);
 

@@ -257,126 +257,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatenationSimplification()
         {
-            Assert.AreEqual(Constant("hello") + Constant(""), Constant("hello"));
-            Assert.AreEqual(Constant("a") + Constant("hello"), Constant("ahello"));
-            CheckValid<string>(x => x + "" == x);
-            CheckValid<string>(x => "" + x == x);
-        }
-
-        /// <summary>
-        /// Simplify for string starts with.
-        /// </summary>
-        [TestMethod]
-        public void TestStartsWithSimplification()
-        {
-            var s1 = Constant("hello");
-            var s2 = Constant("he");
-            var s3 = Constant("lo");
-
-            Assert.AreEqual(s1.StartsWith(s2), True());
-            Assert.AreEqual(s1.StartsWith(s3), False());
-            CheckValid<string>(s => s.StartsWith(""));
-            CheckValid<string>(s => Not(Constant("").StartsWith(s)));
-        }
-
-        /// <summary>
-        /// Simplify for string ends with.
-        /// </summary>
-        [TestMethod]
-        public void TestEndsWithSimplification()
-        {
-            var s1 = Constant("hello");
-            var s2 = Constant("he");
-            var s3 = Constant("lo");
-
-            Assert.AreEqual(s1.EndsWith(s2), False());
-            Assert.AreEqual(s1.EndsWith(s3), True());
-            CheckValid<string>(s => s.EndsWith(""));
-            CheckValid<string>(s => Not(Constant("").EndsWith(s)));
-        }
-
-        /// <summary>
-        /// Simplify for string contains.
-        /// </summary>
-        [TestMethod]
-        public void TestContainsSimplification()
-        {
-            var s1 = Constant("hello");
-            var s2 = Constant("elo");
-            var s3 = Constant("ll");
-
-            Assert.AreEqual(s1.Contains(s2), False());
-            Assert.AreEqual(s1.Contains(s3), True());
-            CheckValid<string>(s => s.Contains(""));
-            CheckValid<string>(s => Not(Constant("").Contains(s1)));
-        }
-
-        /// <summary>
-        /// Simplify for string replace.
-        /// </summary>
-        [TestMethod]
-        public void TestReplaceSimplification()
-        {
-            var s1 = Constant("hello");
-            var s2 = Constant("ll");
-            var s3 = Constant("ll");
-
-            Assert.AreEqual(Constant("abc").ReplaceFirst("b", "c"), Constant("acc"));
-            Assert.AreEqual(Constant("abc").ReplaceFirst("", "d"), Constant("abcd"));
-
-            CheckValid<string, string>((s1, s2) => s1.ReplaceFirst("", s2) == s1 + s2);
-            CheckValid<string, string>((s1, s2) => Constant("").ReplaceFirst(s1, s2) == "");
-        }
-
-        /// <summary>
-        /// Simplify for string substring.
-        /// </summary>
-        [TestMethod]
-        public void TestSubstringSimplification()
-        {
-            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(1)), Constant("a"));
-            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(2)), Constant("ab"));
-            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(3)), Constant("abc"));
-            Assert.AreEqual(Constant("abc").Substring(new BigInteger(0), new BigInteger(4)), Constant("abc"));
-        }
-
-        /// <summary>
-        /// Simplify for string at.
-        /// </summary>
-        [TestMethod]
-        public void TestAtSimplification()
-        {
-            Assert.AreEqual(Constant("abc").At(new BigInteger(0)), Constant("a"));
-            Assert.AreEqual(Constant("abc").At(new BigInteger(1)), Constant("b"));
-            Assert.AreEqual(Constant("abc").At(new BigInteger(2)), Constant("c"));
-            Assert.AreEqual(Constant("abc").At(new BigInteger(3)), Constant(""));
-            var x = Arbitrary<BigInteger>();
-            Assert.AreEqual(Constant("").At(x), Constant(""));
-        }
-
-        /// <summary>
-        /// Simplify for string length.
-        /// </summary>
-        [TestMethod]
-        public void TestLengthSimplification()
-        {
-            Assert.AreEqual(Constant("a").Length(), Constant<BigInteger>(1));
-            Assert.AreEqual(Constant("ab").Length(), Constant<BigInteger>(2));
-            Assert.AreEqual(Constant("abc").Length(), Constant<BigInteger>(3));
-            Assert.AreEqual(Constant("").Length(), Constant<BigInteger>(0));
-        }
-
-        /// <summary>
-        /// Simplify for string indexof.
-        /// </summary>
-        [TestMethod]
-        public void TestIndexOfSimplification()
-        {
-            Assert.AreEqual(Constant("abc").IndexOf(""), Constant<BigInteger>(0));
-            Assert.AreEqual(Constant("abc").IndexOf("a"), Constant<BigInteger>(0));
-            Assert.AreEqual(Constant("abc").IndexOf("b"), Constant<BigInteger>(1));
-            Assert.AreEqual(Constant("abc").IndexOf("c"), Constant<BigInteger>(2));
-            Assert.AreEqual(Constant("abc").IndexOf("d"), Constant<BigInteger>(-1));
+            Assert.AreEqual(Seq.Empty<int>() + new Seq<int>(1), Constant(new Seq<int>(1)));
+            Assert.AreEqual(new Seq<int>(1) + Seq.Empty<int>(), Constant(new Seq<int>(1)));
         }
 
         /// <summary>
@@ -428,10 +310,10 @@ namespace ZenLib.Tests
         public void TestSubstringHashCons()
         {
             var s = Arbitrary<string>();
-            var e1 = s.Substring(new BigInteger(0), new BigInteger(1));
-            var e2 = s.Substring(new BigInteger(0), new BigInteger(1));
-            var e3 = s.Substring(new BigInteger(0), new BigInteger(2));
-            var e4 = s.Substring(new BigInteger(1), new BigInteger(1));
+            var e1 = s.Slice(new BigInteger(0), new BigInteger(1));
+            var e2 = s.Slice(new BigInteger(0), new BigInteger(1));
+            var e3 = s.Slice(new BigInteger(0), new BigInteger(2));
+            var e4 = s.Slice(new BigInteger(1), new BigInteger(1));
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
             Assert.IsFalse(ReferenceEquals(e1, e4));
@@ -444,9 +326,9 @@ namespace ZenLib.Tests
         public void TestAtHashCons()
         {
             var s = Arbitrary<string>();
-            var e1 = s.At(new BigInteger(0));
-            var e2 = s.At(new BigInteger(0));
-            var e3 = s.At(new BigInteger(1));
+            var e1 = s.Char(new BigInteger(0));
+            var e2 = s.Char(new BigInteger(0));
+            var e3 = s.Char(new BigInteger(1));
             Assert.IsTrue(ReferenceEquals(e1, e2));
             Assert.IsFalse(ReferenceEquals(e1, e3));
         }
@@ -525,8 +407,10 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(x.Intersect(y).Intersect(y), x.Intersect(y));
             Assert.AreEqual(x.Intersect(y).Intersect(x), x.Intersect(y));
+            Assert.AreEqual(x.Intersect(y.Intersect(x)), y.Intersect(x));
             Assert.AreEqual(x.Union(y).Union(y), x.Union(y));
             Assert.AreEqual(x.Union(y).Union(x), x.Union(y));
+            Assert.AreEqual(x.Union(y.Union(x)), y.Union(x));
             Assert.AreNotEqual(x.Union(y).Intersect(y), x.Union(y));
             Assert.AreNotEqual(x.Intersect(y).Union(x), x.Intersect(y));
         }

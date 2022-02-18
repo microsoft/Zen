@@ -249,76 +249,6 @@ namespace ZenLib.Solver
             return this.Manager.Subtract(x, y);
         }
 
-        public BitVector<T> Multiply(BitVector<T> x, BitVector<T> y)
-        {
-            throw new ZenException("Decision diagram backend does not support multiplication");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit Concat(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public DD PrefixOf(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public DD SuffixOf(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public DD Contains(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit ReplaceFirst(Unit x, Unit y, Unit z)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit Substring(Unit x, Unit y, Unit z)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit At(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit Length(Unit x)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit IndexOf(Unit x, Unit y, Unit z)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        public DD Eq(BitVector<T> x, BitVector<T> y)
-        {
-            return this.Manager.Eq(x, y);
-        }
-
-        [ExcludeFromCodeCoverage]
-        public DD Eq(Unit x, Unit y)
-        {
-            throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
-        }
-
         public DD LessThanOrEqual(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.LessOrEqual(x, y);
@@ -467,16 +397,9 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(dds);
         }
 
-        [ExcludeFromCodeCoverage]
-        public (Variable<T>, Unit) CreateStringVar(object e)
+        public DD Eq(BitVector<T> x, BitVector<T> y)
         {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit CreateStringConst(string s)
-        {
-            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+            return this.Manager.Eq(x, y);
         }
 
         [ExcludeFromCodeCoverage]
@@ -579,6 +502,71 @@ namespace ZenLib.Solver
             return this.Manager.Sat(x);
         }
 
+        public BitVector<T> Multiply(BitVector<T> x, BitVector<T> y)
+        {
+            throw new ZenException("Decision diagram backend does not support multiplication");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqConcat(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD SeqPrefixOf(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD SeqSuffixOf(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD SeqContains(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqReplaceFirst(Unit x, Unit y, Unit z)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqSlice(Unit x, Unit y, Unit z)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqAt(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqLength(Unit x)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqIndexOf(Unit x, Unit y, Unit z)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD Eq(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
+        }
+
         [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateBigIntegerVar(object e)
         {
@@ -661,6 +649,30 @@ namespace ZenLib.Solver
         public Unit DictIntersect(Unit arrayExpr1, Unit arrayExpr2)
         {
             throw new ZenException("Decision diagram backend does not support IDictionary operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateSeqVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqEmpty(Type type)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> valueExpr, Type type)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public SymbolicObject<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit> SeqGet(Unit x, Type seqInnerType, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
     }
 }

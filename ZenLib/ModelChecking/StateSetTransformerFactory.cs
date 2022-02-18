@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using DecisionDiagrams;
     using ZenLib.Generation;
@@ -96,7 +97,7 @@ namespace ZenLib.ModelChecking
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(solver);
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(arguments);
-            var symbolicValue = newExpression.Accept(symbolicEvaluator, env);
+            var symbolicValue = symbolicEvaluator.Evaluate(newExpression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 
@@ -209,7 +210,7 @@ namespace ZenLib.ModelChecking
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(solver);
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>(arguments);
-            var symbolicValue = expression.Accept(symbolicEvaluator, env);
+            var symbolicValue = symbolicEvaluator.Evaluate(expression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 
@@ -316,9 +317,15 @@ namespace ZenLib.ModelChecking
             throw new ZenException($"Unsupported type: {zenExpr.GetType()} in transformer.");
         }
 
+        [ExcludeFromCodeCoverage]
         private static int MaxOrDefault(this IEnumerable<int> enumerable)
         {
-            return enumerable.Count() == 0 ? 0 : enumerable.Max();
+            if (enumerable.Count() == 0)
+            {
+                return 0;
+            }
+
+            return enumerable.Max();
         }
     }
 }

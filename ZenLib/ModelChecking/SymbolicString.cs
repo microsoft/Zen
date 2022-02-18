@@ -10,26 +10,26 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic string value.
     /// </summary>
-    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>
+    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
     {
-        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> solver, TString value) : base(solver)
+        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TSeq value) : base(solver)
         {
             this.Value = value;
         }
 
-        public TString Value { get; }
+        public TSeq Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TString, TArray> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other)
         {
-            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>)other;
+            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TString, TArray>(this.Solver, value);
+            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TString, TArray, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.VisitSymbolicString(this, parameter);
