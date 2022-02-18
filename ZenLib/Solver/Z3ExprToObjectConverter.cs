@@ -76,7 +76,8 @@ namespace ZenLib.Solver
             }
             else
             {
-                Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "as-array");
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "as-array");
 
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl;
                 var interpretation = this.solver.Solver.Model.FuncInterp(lambda);

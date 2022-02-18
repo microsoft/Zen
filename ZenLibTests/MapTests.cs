@@ -458,6 +458,26 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that map types do work with fixed integer values.
+        /// </summary>
+        [TestMethod]
+        public void TestMapWithFixedIntegers()
+        {
+            var sat = new ZenConstraint<Map<uint, UInt3>>(m => m.Get(10).IsSome()).Find();
+            Assert.IsTrue(sat.Value.ContainsKey(10));
+        }
+
+        /// <summary>
+        /// Test that map types do work with sequence values.
+        /// </summary>
+        [TestMethod]
+        public void TestMapWithSequences()
+        {
+            var sat = new ZenConstraint<Map<uint, Seq<long>>>(m => m.Get(10).IsSome()).Find();
+            Assert.IsTrue(sat.Value.ContainsKey(10));
+        }
+
+        /// <summary>
         /// Test that map types do work with map keys.
         /// </summary>
         [TestMethod]

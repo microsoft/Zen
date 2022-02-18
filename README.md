@@ -254,6 +254,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
+| `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
@@ -313,6 +314,10 @@ Zen supports a number of high-level data types that are finite (bounded) in size
 ### Unbounded Sets and Maps
 
 Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain sequences or other maps/sets. For instance primitive types (bool, integers, string, BigInteger) as well as classes/structs are allowed.
+
+### Unbounded sequences
+
+Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<byte>` for ascii strings. As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` instead, which will model a finite sequence up to a given depth.
 
 
 ### Custom classes and structs

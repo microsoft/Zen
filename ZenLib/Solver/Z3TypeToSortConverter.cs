@@ -8,7 +8,6 @@ namespace ZenLib.Solver
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Numerics;
     using Microsoft.Z3;
 
     /// <summary>
@@ -27,16 +26,6 @@ namespace ZenLib.Solver
             this.solver = solver;
             this.ObjectAppNames = new HashSet<string>();
             this.typeToSort = new Dictionary<Type, Sort>();
-            this.typeToSort[typeof(bool)] = this.solver.BoolSort;
-            this.typeToSort[typeof(byte)] = this.solver.ByteSort;
-            this.typeToSort[typeof(short)] = this.solver.ShortSort;
-            this.typeToSort[typeof(ushort)] = this.solver.ShortSort;
-            this.typeToSort[typeof(int)] = this.solver.IntSort;
-            this.typeToSort[typeof(uint)] = this.solver.IntSort;
-            this.typeToSort[typeof(long)] = this.solver.LongSort;
-            this.typeToSort[typeof(ulong)] = this.solver.LongSort;
-            this.typeToSort[typeof(BigInteger)] = this.solver.BigIntSort;
-            this.typeToSort[typeof(string)] = this.solver.StringSort;
         }
 
         public Sort GetSortForType(Type type)

@@ -554,6 +554,7 @@ namespace ZenLib.Solver
             return this.Solver.Model;
         }
 
+        [ExcludeFromCodeCoverage] // some weird coverage bug in MkDatatypeSort.
         public DatatypeSort GetOrCreateOptionSort(Sort valueSort)
         {
             if (this.OptionSorts.TryGetValue(valueSort, out var optionSort))
