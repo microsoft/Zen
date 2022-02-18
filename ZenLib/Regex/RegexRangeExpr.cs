@@ -31,7 +31,7 @@ namespace ZenLib
         /// <returns>The new Regex expr.</returns>
         private static Regex<T> Simplify(T low, T high)
         {
-            var range = new Range<T>(low, high);
+            var range = new CharRange<T>(low, high);
 
             if (range.IsEmpty())
             {
@@ -58,7 +58,7 @@ namespace ZenLib
         /// Initializes a new instance of the <see cref="RegexRangeExpr{T}"/> class.
         /// </summary>
         /// <param name="range">The character range.</param>
-        private RegexRangeExpr(Range<T> range)
+        private RegexRangeExpr(CharRange<T> range)
         {
             this.CharacterRange = range;
         }
@@ -66,7 +66,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the first Regex expression.
         /// </summary>
-        internal Range<T> CharacterRange { get; }
+        internal CharRange<T> CharacterRange { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -88,7 +88,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IRegexExprVisitor<T, TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitRegexRangeExpr(this, parameter);
+            return visitor.Visit(this, parameter);
         }
     }
 }

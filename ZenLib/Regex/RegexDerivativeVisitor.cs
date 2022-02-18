@@ -28,28 +28,28 @@ namespace ZenLib
             return regex.Accept(this, value);
         }
 
-        public Regex<T> VisitRegexAllExpr(RegexAllExpr<T> expression, T parameter)
+        public Regex<T> Visit(RegexBinopExpr<T> expression, T parameter)
         {
-            throw new NotImplementedException();
-        }
+            var r = expression.Expr1;
+            var s = expression.Expr2;
+            var dr = Compute(r, parameter);
+            var ds = Compute(s, parameter);
 
-        public Regex<T> VisitRegexBinopExpr(RegexBinopExpr<T> expression, T parameter)
-        {
-            var d1 = Compute(expression.Expr1, parameter);
-            var d2 = Compute(expression.Expr2, parameter);
             switch (expression.OpType)
             {
                 case RegexBinopExprType.Union:
-                    return Regex.Union(d1, d2);
+                    return Regex.Union(dr, ds);
                 case RegexBinopExprType.Intersection:
-                    return Regex.Intersect(d1, d2);
+                    return Regex.Intersect(dr, ds);
                 default:
                     Contract.Assert(expression.OpType == RegexBinopExprType.Concatenation);
-                    return Regex.Union(Regex.Concat(d1, expression.Expr2), Regex.Concat(nullableVisitor.Compute(expression.Expr1), d2));
+                    var left = Regex.Concat(dr, s);
+                    var right = Regex.Concat(nullableVisitor.Compute(r), ds);
+                    return Regex.Union(left, right);
             }
         }
 
-        public Regex<T> VisitRegexRangeExpr(RegexRangeExpr<T> expression, T parameter)
+        public Regex<T> Visit(RegexRangeExpr<T> expression, T parameter)
         {
             if (expression.CharacterRange.Contains(parameter))
             {
@@ -61,17 +61,17 @@ namespace ZenLib
             }
         }
 
-        public Regex<T> VisitRegexEmptyExpr(RegexEmptyExpr<T> expression, T parameter)
+        public Regex<T> Visit(RegexEmptyExpr<T> expression, T parameter)
         {
             return expression;
         }
 
-        public Regex<T> VisitRegexEpsilonExpr(RegexEpsilonExpr<T> expression, T parameter)
+        public Regex<T> Visit(RegexEpsilonExpr<T> expression, T parameter)
         {
             return Regex.Empty<T>();
         }
 
-        public Regex<T> VisitRegexUnopExpr(RegexUnopExpr<T> expression, T parameter)
+        public Regex<T> Visit(RegexUnopExpr<T> expression, T parameter)
         {
             switch (expression.OpType)
             {

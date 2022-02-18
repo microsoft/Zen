@@ -227,7 +227,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IRegexExprVisitor<T, TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitRegexBinopExpr(this, parameter);
+            return visitor.Visit(this, parameter);
         }
     }
 

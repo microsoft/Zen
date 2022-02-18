@@ -21,15 +21,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitRegexEmptyExpr(RegexEmptyExpr<T> expression, TParam parameter);
-
-        /// <summary>
-        /// Visit a RegexAllExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn VisitRegexAllExpr(RegexAllExpr<T> expression, TParam parameter);
+        TReturn Visit(RegexEmptyExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a RegexEpsilonExpr.
@@ -37,7 +29,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitRegexEpsilonExpr(RegexEpsilonExpr<T> expression, TParam parameter);
+        TReturn Visit(RegexEpsilonExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a RegexCharExpr.
@@ -45,7 +37,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitRegexRangeExpr(RegexRangeExpr<T> expression, TParam parameter);
+        TReturn Visit(RegexRangeExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a RegexUnopExpr.
@@ -53,7 +45,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitRegexUnopExpr(RegexUnopExpr<T> expression, TParam parameter);
+        TReturn Visit(RegexUnopExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a RegexBinopExpr.
@@ -61,6 +53,6 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitRegexBinopExpr(RegexBinopExpr<T> expression, TParam parameter);
+        TReturn Visit(RegexBinopExpr<T> expression, TParam parameter);
     }
 }

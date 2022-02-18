@@ -1,17 +1,16 @@
-﻿// <copyright file="Range.cs" company="Microsoft">
+﻿// <copyright file="CharRange.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// A simple representation of a range.
     /// </summary>
-    public class Range<T> : IEquatable<Range<T>> where T : IComparable<T>
+    public class CharRange<T> : IEquatable<CharRange<T>> where T : IComparable<T>
     {
         /// <summary>
         /// The minimum value for a type.
@@ -34,11 +33,20 @@ namespace ZenLib
         public T High { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="Range{T}"/> class.
+        /// Creates a new instance of the <see cref="CharRange{T}"/> class.
+        /// </summary>
+        public CharRange()
+        {
+            Low = min;
+            High = max;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="CharRange{T}"/> class.
         /// </summary>
         /// <param name="low">The low value of the range.</param>
         /// <param name="high">The high value of the range.</param>
-        public Range(T low, T high)
+        public CharRange(T low, T high)
         {
             Low = low;
             High = high;
@@ -52,6 +60,44 @@ namespace ZenLib
         public bool Contains(T element)
         {
             return this.Low.CompareTo(element) <= 0 && this.High.CompareTo(element) >= 0;
+        }
+
+        /// <summary>
+        /// Get the intersection of this range and another.
+        /// </summary>
+        /// <param name="other">The other range.</param>
+        /// <returns>A new range representing the intersection.</returns>
+        public CharRange<T> Intersect(CharRange<T> other)
+        {
+            var newLo = this.Low.CompareTo(other.Low) > 0 ? this.Low : other.Low;
+            var newHi = this.High.CompareTo(other.High) < 0 ? this.High : other.High;
+            return new CharRange<T>(newLo, newHi);
+        }
+
+        /// <summary>
+        /// Get the complement ranges to this range that cover the whole space.
+        /// </summary>
+        /// <returns>Zero to two ranges that cover the rest of the space.</returns>
+        public CharRange<T>[] Complement()
+        {
+            if (this.IsFull())
+            {
+                return new CharRange<T>[] { };
+            }
+
+            if (this.Low.CompareTo(min) == 0)
+            {
+                return new CharRange<T>[] { new CharRange<T>(ReflectionUtilities.Add((dynamic)this.High, 1), max) };
+            }
+
+            if (this.High.CompareTo(max) == 0)
+            {
+                return new CharRange<T>[] { new CharRange<T>(min, ReflectionUtilities.Add((dynamic)this.Low, -1)) };
+            }
+
+            var r1 = new CharRange<T>(min, ReflectionUtilities.Add((dynamic)this.Low, -1));
+            var r2 = new CharRange<T>(ReflectionUtilities.Add((dynamic)this.High, 1), max);
+            return new CharRange<T>[] { r1, r2 };
         }
 
         /// <summary>
@@ -98,7 +144,7 @@ namespace ZenLib
         /// <returns>True if equal.</returns>
         public override bool Equals(object obj)
         {
-            return obj is Range<T> o && Equals(o);
+            return obj is CharRange<T> o && Equals(o);
         }
 
         /// <summary>
@@ -106,7 +152,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other range.</param>
         /// <returns>True if equal.</returns>
-        public bool Equals(Range<T> other)
+        public bool Equals(CharRange<T> other)
         {
             return other != null &&
                    this.Low.CompareTo(other.Low) == 0 &&

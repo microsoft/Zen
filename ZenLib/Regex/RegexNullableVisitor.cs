@@ -22,12 +22,7 @@ namespace ZenLib
             return regex.Accept(this, new Unit());
         }
 
-        public Regex<T> VisitRegexAllExpr(RegexAllExpr<T> expression, Unit parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Regex<T> VisitRegexBinopExpr(RegexBinopExpr<T> expression, Unit parameter)
+        public Regex<T> Visit(RegexBinopExpr<T> expression, Unit parameter)
         {
             var d1 = Compute(expression.Expr1);
             var d2 = Compute(expression.Expr2);
@@ -43,22 +38,22 @@ namespace ZenLib
             }
         }
 
-        public Regex<T> VisitRegexRangeExpr(RegexRangeExpr<T> expression, Unit parameter)
+        public Regex<T> Visit(RegexRangeExpr<T> expression, Unit parameter)
         {
             return Regex.Empty<T>();
         }
 
-        public Regex<T> VisitRegexEmptyExpr(RegexEmptyExpr<T> expression, Unit parameter)
+        public Regex<T> Visit(RegexEmptyExpr<T> expression, Unit parameter)
         {
             return Regex.Empty<T>();
         }
 
-        public Regex<T> VisitRegexEpsilonExpr(RegexEpsilonExpr<T> expression, Unit parameter)
+        public Regex<T> Visit(RegexEpsilonExpr<T> expression, Unit parameter)
         {
             return expression;
         }
 
-        public Regex<T> VisitRegexUnopExpr(RegexUnopExpr<T> expression, Unit parameter)
+        public Regex<T> Visit(RegexUnopExpr<T> expression, Unit parameter)
         {
             switch (expression.OpType)
             {

@@ -1086,5 +1086,40 @@ namespace ZenLib
                 return (T)(object)ulong.MaxValue;
             throw new ZenUnreachableException();
         }
+
+        public static byte Add(byte x, int i)
+        {
+            return (byte)(x + i);
+        }
+
+        public static short Add(short x, int i)
+        {
+            return (short)(x + i);
+        }
+
+        public static ushort Add(ushort x, int i)
+        {
+            return (ushort)(x + i);
+        }
+
+        public static int Add(int x, int i)
+        {
+            return (int)(x + i);
+        }
+
+        public static uint Add(uint x, int i)
+        {
+            return (uint)(x + i);
+        }
+
+        public static long Add(long x, int i)
+        {
+            return (long)(x + i);
+        }
+
+        public static ulong Add(ulong x, int i)
+        {
+            return (ulong)(x + (ulong)i);
+        }
     }
 }

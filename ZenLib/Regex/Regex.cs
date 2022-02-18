@@ -5,6 +5,7 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
 
     /// <summary>
@@ -69,7 +70,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts all strings.</returns>
         public static Regex<T> All<T>() where T : IComparable<T>
         {
-            return RegexAllExpr<T>.Instance;
+            return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
         }
 
         /// <summary>
@@ -153,6 +154,57 @@ namespace ZenLib
         public static Regex<T> Negation<T>(Regex<T> expr) where T : IComparable<T>
         {
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Negation);
+        }
+
+        /// <summary>
+        /// Determines if a regular expression accepts 'Epsilon'.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <returns>True if the regex accepts the empty sequence.</returns>
+        public static bool IsNullable<T>(Regex<T> expr) where T : IComparable<T>
+        {
+            var visitor = new RegexNullableVisitor<T>();
+            return visitor.Compute(expr).Equals(Regex.Epsilon<T>());
+        }
+
+        /// <summary>
+        /// Computes the character classes for the regex for the next character.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <returns>True if the regex accepts the empty sequence.</returns>
+        public static Set<CharRange<T>> CharacterClasses<T>(Regex<T> expr) where T : IComparable<T>
+        {
+            var visitor = new RegexCharacterClassVisitor<T>();
+            return visitor.Compute(expr);
+        }
+
+        /// <summary>
+        /// Computes the derivative of a regex with respect to a character.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <param name="value">The character value.</param>
+        /// <returns>True if the regex accepts the empty sequence.</returns>
+        public static Regex<T> Derivative<T>(Regex<T> expr, T value) where T : IComparable<T>
+        {
+            var visitor = new RegexDerivativeVisitor<T>();
+            return visitor.Compute(expr, value);
+        }
+
+        /// <summary>
+        /// Checks if a Regex matches a sequence.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <param name="sequence">The sequence of characters.</param>
+        /// <returns>True if the sequence is in the language of the Regex.</returns>
+        public static bool IsMatch<T>(Regex<T> expr, IEnumerable<T> sequence) where T : IComparable<T>
+        {
+            var regex = expr;
+            foreach (var item in sequence)
+            {
+                regex = Regex.Derivative(regex, item);
+            }
+
+            return Regex.IsNullable(regex);
         }
     }
 }
