@@ -1032,5 +1032,59 @@ namespace ZenLib
                 return (long)value;
             return (long)(ulong)value;
         }
+
+        /// <summary>
+        /// Gets the minimum value for a type.
+        /// This is a workaround for lack of integer interfaces.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <returns></returns>
+        public static T MinValue<T>()
+        {
+            var type = typeof(T);
+
+            if (type == ByteType)
+                return (T)(object)byte.MinValue;
+            if (type == ShortType)
+                return (T)(object)short.MinValue;
+            if (type == UshortType)
+                return (T)(object)ushort.MinValue;
+            if (type == IntType)
+                return (T)(object)int.MinValue;
+            if (type == UintType)
+                return (T)(object)uint.MinValue;
+            if (type == LongType)
+                return (T)(object)long.MinValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MinValue;
+            throw new ZenUnreachableException();
+        }
+
+        /// <summary>
+        /// Gets the maximum value for a type.
+        /// This is a workaround for lack of integer interfaces.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <returns></returns>
+        public static T MaxValue<T>()
+        {
+            var type = typeof(T);
+
+            if (type == ByteType)
+                return (T)(object)byte.MaxValue;
+            if (type == ShortType)
+                return (T)(object)short.MaxValue;
+            if (type == UshortType)
+                return (T)(object)ushort.MaxValue;
+            if (type == IntType)
+                return (T)(object)int.MaxValue;
+            if (type == UintType)
+                return (T)(object)uint.MaxValue;
+            if (type == LongType)
+                return (T)(object)long.MaxValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MaxValue;
+            throw new ZenUnreachableException();
+        }
     }
 }
