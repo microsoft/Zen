@@ -56,26 +56,26 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public InterleavingResult VisitZenAndExpr(ZenAndExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit(ZenAndExpr expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
             return x.Union(y);
         }
 
-        public InterleavingResult VisitZenOrExpr(ZenOrExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit(ZenOrExpr expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
             return x.Union(y);
         }
 
-        public InterleavingResult VisitZenNotExpr(ZenNotExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit(ZenNotExpr expression, Dictionary<long, object> parameter)
         {
             return Evaluate(expression.Expr, parameter);
         }
 
-        public InterleavingResult VisitZenIfExpr<T>(ZenIfExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenIfExpr<T> expression, Dictionary<long, object> parameter)
         {
             Evaluate(expression.GuardExpr, parameter);
             var t = Evaluate(expression.TrueExpr, parameter);
@@ -83,12 +83,12 @@ namespace ZenLib.ModelChecking
             return t.Union(f);
         }
 
-        public InterleavingResult VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
         {
             return new InterleavingSet(emptyVariableSet);
         }
 
-        public InterleavingResult VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenIntegerBinopExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
@@ -107,33 +107,33 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public InterleavingResult VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenBitwiseNotExpr<T> expression, Dictionary<long, object> parameter)
         {
             return Evaluate(expression.Expr, parameter);
         }
 
-        public InterleavingResult VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
             // TODO: should return an InterleavingClass if T is an object type, so other cases don't need to check.
             return new InterleavingSet(emptyVariableSet);
         }
 
         [ExcludeFromCodeCoverage] // always wrapped in an FSeq object.
-        public InterleavingResult VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Element, parameter);
             var y = Evaluate(expression.Expr, parameter);
             return x.Union(y);
         }
 
-        public InterleavingResult VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.ListExpr, parameter);
             var e = Evaluate(expression.EmptyCase, parameter);
             return x.Union(e); // no easy way to evaluate cons case.
         }
 
-        public InterleavingResult VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             var result = Evaluate(expression.Expr, parameter);
             if (result is InterleavingClass rc)
@@ -147,7 +147,7 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage] // ListEmpty currently doesn't create an interleaving class for its type, which causes the special case
-        public InterleavingResult VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr, parameter);
             var y = Evaluate(expression.FieldValue, parameter);
@@ -162,7 +162,7 @@ namespace ZenLib.ModelChecking
             return x.Union(y);
         }
 
-        public InterleavingResult VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TObject>(ZenCreateObjectExpr<TObject> expression, Dictionary<long, object> parameter)
         {
             var fieldMapping = ImmutableDictionary<string, InterleavingResult>.Empty;
             foreach (var fieldValuePair in expression.Fields)
@@ -188,7 +188,7 @@ namespace ZenLib.ModelChecking
             return new InterleavingClass(fieldMapping);
         }
 
-        public InterleavingResult VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenEqualityExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
@@ -196,7 +196,7 @@ namespace ZenLib.ModelChecking
             return x.Union(y);
         }
 
-        public InterleavingResult VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenIntegerComparisonExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
@@ -205,7 +205,7 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenArgumentExpr<T> expression, Dictionary<long, object> parameter)
         {
             try
             {
@@ -222,7 +222,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public InterleavingResult VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenArbitraryExpr<T> expression, Dictionary<long, object> parameter)
         {
             this.DisjointSets.Add(expression);
             var variableSet = emptyVariableSet.Add(expression);
@@ -271,91 +271,91 @@ namespace ZenLib.ModelChecking
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqConcatExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqUnitExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqLengthExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqAtExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqContainsExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqIndexOfExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqSliceExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenSeqReplaceFirstExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid cast used with Decision Diagram backend.");
         }

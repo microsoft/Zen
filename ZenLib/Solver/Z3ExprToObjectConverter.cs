@@ -164,7 +164,8 @@ namespace ZenLib.Solver
 
         public object VisitString(Expr parameter)
         {
-            return CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString());
+            var result = (Seq<byte>)Convert(parameter, ReflectionUtilities.ByteSequenceType);
+            return Seq.AsString(result);
         }
 
         public object VisitUint(Expr parameter)

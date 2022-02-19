@@ -1,34 +1,27 @@
-﻿// <copyright file="ZenSeqEmptyExpr.cs" company="Microsoft">
+﻿// <copyright file="RegexEpsilonExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing an empty sequence expression.
+    /// Class representing a Regex epsilon expression.
     /// </summary>
-    internal sealed class ZenSeqEmptyExpr<T> : Zen<Seq<T>>
+    internal sealed class RegexEpsilonExpr<T> : Regex<T>
+        where T : IComparable<T>
     {
         /// <summary>
-        /// The empty seq instance.
+        /// The epsilon Regex instance.
         /// </summary>
-        public static ZenSeqEmptyExpr<T> Instance = new ZenSeqEmptyExpr<T>();
+        public static Regex<T> Instance = new RegexEpsilonExpr<T>();
 
         /// <summary>
-        /// Unroll the expression.
+        /// Initializes a new instance of the <see cref="RegexEpsilonExpr{T}"/> class.
         /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ZenSeqEmptyExpr{T}"/> class.
-        /// </summary>
-        private ZenSeqEmptyExpr()
+        private RegexEpsilonExpr()
         {
         }
 
@@ -39,7 +32,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"[]";
+            return $"Epsilon";
         }
 
         /// <summary>
@@ -50,7 +43,7 @@ namespace ZenLib
         /// <typeparam name="TParam">The visitor parameter type.</typeparam>
         /// <typeparam name="TReturn">The visitor return type.</typeparam>
         /// <returns>A return value.</returns>
-        internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
+        internal override TReturn Accept<TParam, TReturn>(IRegexExprVisitor<T, TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
         }

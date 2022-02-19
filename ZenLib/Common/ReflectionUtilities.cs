@@ -1032,5 +1032,92 @@ namespace ZenLib
                 return (long)value;
             return (long)(ulong)value;
         }
+
+        /// <summary>
+        /// Gets the minimum value for a type.
+        /// This is a workaround for lack of integer interfaces.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <returns></returns>
+        public static T MinValue<T>()
+        {
+            var type = typeof(T);
+
+            if (type == ByteType)
+                return (T)(object)byte.MinValue;
+            if (type == ShortType)
+                return (T)(object)short.MinValue;
+            if (type == UshortType)
+                return (T)(object)ushort.MinValue;
+            if (type == IntType)
+                return (T)(object)int.MinValue;
+            if (type == UintType)
+                return (T)(object)uint.MinValue;
+            if (type == LongType)
+                return (T)(object)long.MinValue;
+            Contract.Assert(type == UlongType);
+            return (T)(object)ulong.MinValue;
+        }
+
+        /// <summary>
+        /// Gets the maximum value for a type.
+        /// This is a workaround for lack of integer interfaces.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <returns></returns>
+        public static T MaxValue<T>()
+        {
+            var type = typeof(T);
+
+            if (type == ByteType)
+                return (T)(object)byte.MaxValue;
+            if (type == ShortType)
+                return (T)(object)short.MaxValue;
+            if (type == UshortType)
+                return (T)(object)ushort.MaxValue;
+            if (type == IntType)
+                return (T)(object)int.MaxValue;
+            if (type == UintType)
+                return (T)(object)uint.MaxValue;
+            if (type == LongType)
+                return (T)(object)long.MaxValue;
+            Contract.Assert(type == UlongType);
+            return (T)(object)ulong.MaxValue;
+        }
+
+        public static byte Add(byte x, int i)
+        {
+            return (byte)(x + i);
+        }
+
+        public static short Add(short x, int i)
+        {
+            return (short)(x + i);
+        }
+
+        public static ushort Add(ushort x, int i)
+        {
+            return (ushort)(x + i);
+        }
+
+        public static int Add(int x, int i)
+        {
+            return (int)(x + i);
+        }
+
+        public static uint Add(uint x, int i)
+        {
+            return (uint)(x + i);
+        }
+
+        public static long Add(long x, int i)
+        {
+            return (long)(x + i);
+        }
+
+        public static ulong Add(ulong x, int i)
+        {
+            return (ulong)(x + (ulong)i);
+        }
     }
 }

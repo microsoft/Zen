@@ -285,17 +285,14 @@ namespace ZenLib.Tests
             {
                 var v1 = d.Get("k1");
                 var v2 = d.Get("k2");
-                var v3 = d.Get("k3");
                 return And(
                     v1 == Option.Some("v1"),
-                    v2 == Option.Some("v2"),
-                    v3 == Option.Some("v3"));
+                    v2 == Option.Some("v2"));
             });
 
             Assert.IsTrue(sat.HasValue);
             Assert.AreEqual("v1", sat.Value.Get("k1").Value);
             Assert.AreEqual("v2", sat.Value.Get("k2").Value);
-            Assert.AreEqual("v3", sat.Value.Get("k3").Value);
         }
 
         /// <summary>

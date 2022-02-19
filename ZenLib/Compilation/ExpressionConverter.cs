@@ -103,7 +103,7 @@ namespace ZenLib.Compilation
             return variable;
         }
 
-        public Expression VisitZenAndExpr(ZenAndExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit(ZenAndExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -125,7 +125,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -133,12 +133,12 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
-        public Expression VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -178,7 +178,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -288,12 +288,12 @@ namespace ZenLib.Compilation
             return WrapMathBinary<T, T>(left, right, Expression.Subtract);
         }
 
-        public Expression VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
 
-        public Expression VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -337,7 +337,7 @@ namespace ZenLib.Compilation
             return Expression.Block(new ParameterExpression[] { variable }, exprs);
         }
 
-        public Expression VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -346,7 +346,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenIfExpr<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -370,7 +370,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -408,7 +408,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -444,7 +444,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -456,7 +456,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -465,7 +465,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -549,7 +549,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenNotExpr(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -557,7 +557,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenOrExpr(ZenOrExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit(ZenOrExpr expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -579,7 +579,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -634,7 +634,7 @@ namespace ZenLib.Compilation
             }
         }
 
-        public Expression VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -643,7 +643,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -656,7 +656,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -668,7 +668,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -682,7 +682,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -706,7 +706,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -715,7 +715,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -725,7 +725,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -736,7 +736,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -748,7 +748,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -759,7 +759,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -779,7 +779,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -791,7 +791,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -808,7 +808,7 @@ namespace ZenLib.Compilation
             return Expression.Variable(type, "v" + nextVariableId++);
         }
 
-        public Expression VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {
@@ -820,7 +820,7 @@ namespace ZenLib.Compilation
             });
         }
 
-        public Expression VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             return LookupOrCompute(expression, () =>
             {

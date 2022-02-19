@@ -55,14 +55,14 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenAndExpr(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit(ZenAndExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr1, parameter);
             var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr2, parameter);
             return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.And(v1.Value, v2.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenArbitraryExpr<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var type = typeof(T1);
 
@@ -134,7 +134,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenArgumentExpr<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (parameter.ArgumentsToExpr.TryGetValue(expression.ArgumentId, out var expr))
             {
@@ -159,7 +159,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenIntegerBinopExpr<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenIntegerBinopExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -206,13 +206,13 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenBitwiseNotExpr<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenBitwiseNotExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr, parameter);
             return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.BitwiseNot(v.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var type = typeof(T);
 
@@ -269,7 +269,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             try
             {
@@ -293,13 +293,13 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr, parameter);
             return v.Fields[expression.FieldName];
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenIfExpr<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenIfExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.GuardExpr, parameter);
             var vtrue = Evaluate(expression.TrueExpr, parameter);
@@ -307,7 +307,7 @@ namespace ZenLib.ModelChecking
             return vtrue.Merge(v.Value, vfalse);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenEqualityExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -347,7 +347,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenComparisonExpr<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenIntegerComparisonExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -378,7 +378,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListAddFrontExpr<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr, parameter);
             var elt = Evaluate(expression.Element, parameter);
@@ -395,7 +395,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, listGroup);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListEmptyExpr<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
             var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>.Empty;
@@ -404,7 +404,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, guardedListGroup);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var list = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.ListExpr, parameter);
 
@@ -449,33 +449,33 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenNotExpr(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit(ZenNotExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr, parameter);
             return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Not(v.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenOrExpr(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit(ZenOrExpr expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr1, parameter);
             var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr2, parameter);
             return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.Or(v1.Value, v2.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.Expr, parameter);
             var f = Evaluate(expression.FieldValue, parameter);
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var emptyDict = this.Solver.DictEmpty(typeof(TKey), typeof(TValue));
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptyDict);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.DictExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
@@ -484,7 +484,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.DictExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
@@ -492,7 +492,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.DictExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
@@ -507,7 +507,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(typeof(Option<TValue>), this.Solver, fields);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.DictExpr1, parameter);
             var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.DictExpr2, parameter);
@@ -527,33 +527,33 @@ namespace ZenLib.ModelChecking
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqEmptyExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var emptySeq = this.Solver.SeqEmpty(typeof(T));
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, emptySeq);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqUnitExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var e = Evaluate(expression.ValueExpr, parameter);
             var unitSeq = this.Solver.SeqUnit(e, typeof(T));
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, unitSeq);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqConcatExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr1, parameter);
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr2, parameter);
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqConcat(v1.Value, v2.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqLengthExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqLength(v.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqAtExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.IndexExpr, parameter);
@@ -573,7 +573,7 @@ namespace ZenLib.ModelChecking
             return v1.Merge(guard, v2);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqContainsExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SubseqExpr, parameter);
@@ -590,7 +590,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqIndexOfExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SubseqExpr, parameter);
@@ -598,7 +598,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqIndexOf(v1.Value, v2.Value, v3.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqSliceExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.OffsetExpr, parameter);
@@ -606,7 +606,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqSlice(v1.Value, v2.Value, v3.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqReplaceFirstExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SubseqExpr, parameter);
@@ -614,7 +614,7 @@ namespace ZenLib.ModelChecking
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqReplaceFirst(v1.Value, v2.Value, v3.Value));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
         {
             if (typeof(TKey) == ReflectionUtilities.StringType)
             {
