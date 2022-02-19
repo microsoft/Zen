@@ -11,7 +11,6 @@ namespace ZenLib
     /// Class representing a Regex epsilon expression.
     /// </summary>
     internal sealed class RegexEpsilonExpr<T> : Regex<T>
-        where T : IComparable<T>
     {
         /// <summary>
         /// The epsilon Regex instance.

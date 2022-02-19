@@ -10,7 +10,6 @@ namespace ZenLib
     /// A class to check if a regex is nullable.
     /// </summary>
     internal class RegexNullableVisitor<T> : IRegexExprVisitor<T, Unit, Regex<T>>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Compute whether a regular expression is nullable.

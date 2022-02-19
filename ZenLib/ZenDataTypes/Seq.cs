@@ -54,6 +54,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Regex match for a sequence.
+        /// </summary>
+        /// <param name="regex">The regex to match.</param>
+        /// <returns>True if the regex matches the sequence.</returns>
+        public bool MatchesRegex(Regex<T> regex)
+        {
+            return regex.IsMatch(this.Values);
+        }
+
+        /// <summary>
         /// Replace the first instance of a subsequence in a seq with a new seq.
         /// </summary>
         /// <param name="match">The subseq to match.</param>
@@ -563,6 +573,20 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(replaceExpr);
 
             return ZenSeqReplaceFirstExpr<T>.Create(seqExpr, subseqExpr, replaceExpr);
+        }
+
+        /// <summary>
+        /// Regex match for a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="regex">The regex to match.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> MatchesRegex<T>(this Zen<Seq<T>> seqExpr, Regex<T> regex)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(regex);
+
+            return ZenSeqRegexExpr<T>.Create(seqExpr, regex);
         }
     }
 }

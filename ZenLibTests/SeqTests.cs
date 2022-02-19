@@ -325,6 +325,33 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with replacefirst.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqRegex()
+        {
+            var r = Regex.Concat(Regex.Char<byte>(1), Regex.Char<byte>(2));
+
+            var zf = new ZenFunction<Seq<byte>, bool>(s => s.MatchesRegex(r));
+
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1)));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2))));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3))));
+
+            zf.Compile();
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1)));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2))));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3))));
+
+            Assert.AreEqual(false, new Seq<byte>().MatchesRegex(r));
+            Assert.AreEqual(false, new Seq<byte>(1).MatchesRegex(r));
+            Assert.AreEqual(true, new Seq<byte>(1).Concat(new Seq<byte>(2)).MatchesRegex(r));
+            Assert.AreEqual(false, new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3)).MatchesRegex(r));
+        }
+
+        /// <summary>
         /// Test seq find with empty.
         /// </summary>
         [TestMethod]
@@ -506,6 +533,19 @@ namespace ZenLib.Tests
             var result = new ZenConstraint<Seq<int>, bool>((s, b) => If(b, Seq.Empty<int>(), Seq.Empty<int>() + new Seq<int>(10)).Contains(new Seq<int>(11))).Find();
 
             Assert.IsFalse(result.HasValue);
+        }
+
+        /// <summary>
+        /// Test seq find with regex.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithRegex()
+        {
+            var r = Regex.Concat(Regex.Char<byte>(1), Regex.Star(Regex.Char<byte>(2)));
+            var result = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+
+            Assert.IsTrue(result.HasValue);
+            Assert.IsTrue(result.Value.MatchesRegex(r));
         }
 
         /// <summary>

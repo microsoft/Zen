@@ -10,7 +10,6 @@ namespace ZenLib
     /// A class to compute a regex derivative.
     /// </summary>
     internal class RegexDerivativeVisitor<T> : IRegexExprVisitor<T, T, Regex<T>>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Visitor to check if a regex is nullable.

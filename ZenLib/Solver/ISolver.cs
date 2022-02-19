@@ -343,6 +343,14 @@ namespace ZenLib.Solver
         TInteger SeqIndexOf(TSeq x, TSeq y, TInteger z);
 
         /// <summary>
+        /// The seq 'Regex' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The regex expression.</param>
+        /// <returns></returns>
+        TBool SeqRegex<T>(TSeq x, Regex<T> y);
+
+        /// <summary>
         /// The empty dictionary.
         /// </summary>
         /// <param name="keyType">The key type.</param>

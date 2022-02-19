@@ -674,5 +674,11 @@ namespace ZenLib.Solver
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public DD SeqRegex<T1>(Unit x, Regex<T1> y)
+        {
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
     }
 }

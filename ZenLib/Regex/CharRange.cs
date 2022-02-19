@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// A simple representation of a range.
     /// </summary>
-    public class CharRange<T> : IEquatable<CharRange<T>> where T : IComparable<T>
+    public class CharRange<T> : IEquatable<CharRange<T>>
     {
         /// <summary>
         /// The minimum value for a type.
@@ -59,7 +59,7 @@ namespace ZenLib
         /// <returns>True if the element is in the range.</returns>
         public bool Contains(T element)
         {
-            return this.Low.CompareTo(element) <= 0 && this.High.CompareTo(element) >= 0;
+            return CompareTo(this.Low, element) <= 0 && CompareTo(this.High, element) >= 0;
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace ZenLib
         /// <returns>A new range representing the intersection.</returns>
         public CharRange<T> Intersect(CharRange<T> other)
         {
-            var newLo = this.Low.CompareTo(other.Low) > 0 ? this.Low : other.Low;
-            var newHi = this.High.CompareTo(other.High) < 0 ? this.High : other.High;
+            var newLo = CompareTo(this.Low, other.Low) > 0 ? this.Low : other.Low;
+            var newHi = CompareTo(this.High, other.High) < 0 ? this.High : other.High;
             return new CharRange<T>(newLo, newHi);
         }
 
@@ -85,12 +85,12 @@ namespace ZenLib
                 return new CharRange<T>[] { };
             }
 
-            if (this.Low.CompareTo(min) == 0)
+            if (this.Low.Equals(min))
             {
                 return new CharRange<T>[] { new CharRange<T>(ReflectionUtilities.Add((dynamic)this.High, 1), max) };
             }
 
-            if (this.High.CompareTo(max) == 0)
+            if (this.High.Equals(max))
             {
                 return new CharRange<T>[] { new CharRange<T>(min, ReflectionUtilities.Add((dynamic)this.Low, -1)) };
             }
@@ -106,7 +106,7 @@ namespace ZenLib
         /// <returns></returns>
         public bool IsFull()
         {
-            return this.Low.CompareTo(min) == 0 && this.High.CompareTo(max) == 0;
+            return this.Low.Equals(min) && this.High.Equals(max);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool IsEmpty()
         {
-            return this.High.CompareTo(this.Low) < 0;
+            return CompareTo(this.High, this.Low) < 0;
         }
 
         /// <summary>
@@ -146,8 +146,13 @@ namespace ZenLib
         public bool Equals(CharRange<T> other)
         {
             return other != null &&
-                   this.Low.CompareTo(other.Low) == 0 &&
-                   this.High.CompareTo(other.High) == 0;
+                   this.Low.Equals(other.Low) &&
+                   this.High.Equals(other.High);
+        }
+
+        private int CompareTo(dynamic l, dynamic r)
+        {
+            return l.CompareTo(r);
         }
 
         /// <summary>

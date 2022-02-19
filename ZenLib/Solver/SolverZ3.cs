@@ -396,6 +396,14 @@ namespace ZenLib.Solver
             return this.Context.MkIndexOf(x, y, z);
         }
 
+        public BoolExpr SeqRegex<T>(SeqExpr x, Regex<T> y)
+        {
+            var regexConverter = new Z3RegexConverter<T>(this);
+            var seqSort = this.TypeToSortConverter.GetSortForType(typeof(T));
+            var regexExpr = y.Accept(regexConverter, seqSort);
+            return this.Context.MkInRe(x, regexExpr);
+        }
+
         public ArrayExpr DictEmpty(Type keyType, Type valueType)
         {
             var keySort = this.TypeToSortConverter.GetSortForType(keyType);
@@ -549,6 +557,11 @@ namespace ZenLib.Solver
             if (status == Status.UNSATISFIABLE)
             {
                 return null;
+            }
+
+            if (status == Status.UNKNOWN)
+            {
+                throw new ZenException("Unknown result");
             }
 
             return this.Solver.Model;

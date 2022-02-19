@@ -465,5 +465,11 @@ namespace ZenLib.Interpretation
                 return Seq.AsString((Seq<byte>)e);
             }
         }
+
+        public object Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
+            return e.MatchesRegex(expression.Regex);
+        }
     }
 }

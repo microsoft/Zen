@@ -629,5 +629,11 @@ namespace ZenLib.ModelChecking
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e.Value);
             }
         }
+
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Visit<T>(ZenSeqRegexExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> parameter)
+        {
+            var e = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SeqExpr, parameter);
+            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, this.Solver.SeqRegex(e.Value, expression.Regex));
+        }
     }
 }

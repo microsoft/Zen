@@ -11,7 +11,6 @@ namespace ZenLib
     /// Class representing a Regex binary operation expression.
     /// </summary>
     internal sealed class RegexBinopExpr<T> : Regex<T>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Static creation function for hash consing.

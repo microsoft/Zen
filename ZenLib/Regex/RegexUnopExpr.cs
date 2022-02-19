@@ -11,7 +11,6 @@ namespace ZenLib
     /// Class representing a Regex unary operation expression.
     /// </summary>
     internal sealed class RegexUnopExpr<T> : Regex<T>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Static creation function for hash consing.
