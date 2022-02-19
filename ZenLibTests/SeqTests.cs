@@ -482,6 +482,7 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Set<string>>(s => s.Contains("ab" + "bc")).Find();
 
+            Console.WriteLine(result);
             Assert.IsTrue(result.Value.Contains("abbc"));
         }
 
