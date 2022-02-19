@@ -19,7 +19,14 @@ namespace ZenLib
 
         public Set<CharRange<T>> Visit(RegexBinopExpr<T> expression, Unit parameter)
         {
-            return MakeDisjoint(Compute(expression.Expr1), Compute(expression.Expr2));
+            if (expression.OpType == RegexBinopExprType.Concatenation && expression.Expr1.IsNullable())
+            {
+                return Compute(expression.Expr1);
+            }
+            else
+            {
+                return MakeDisjoint(Compute(expression.Expr1), Compute(expression.Expr2));
+            }
         }
 
         public Set<CharRange<T>> Visit(RegexEmptyExpr<T> expression, Unit parameter)
@@ -58,7 +65,11 @@ namespace ZenLib
             {
                 foreach (var item2 in set2.Values.Values.Keys)
                 {
-                    result.Add(item1.Intersect(item2));
+                    var inter = item1.Intersect(item2);
+                    if (!inter.IsEmpty())
+                    {
+                        result = result.Add(inter);
+                    }
                 }
             }
 

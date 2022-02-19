@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,111 +23,6 @@ namespace ZenLib.Tests
         private static Regex<byte> two = Regex.Char<byte>(2);
 
         private static Regex<byte> three = Regex.Char<byte>(3);
-
-        /// <summary>
-        /// Test that Regex simplifications are working.
-        /// </summary>
-        [TestMethod]
-        public void TestRegexSimplifications()
-        {
-            var r = Regex.Char(1);
-            var s = Regex.Char(2);
-            var t = Regex.Char(3);
-            var range = Regex.Range<byte>(0, 255);
-
-            // unary simplifications
-            Assert.AreEqual(Regex.Star(Regex.Star(r)), Regex.Star(r));
-            Assert.AreEqual(Regex.Star(Regex.Epsilon<int>()), Regex.Epsilon<int>());
-            Assert.AreEqual(Regex.Star(Regex.Empty<int>()), Regex.Epsilon<int>());
-            Assert.AreEqual(Regex.Negation(Regex.Negation(r)), r);
-            Assert.AreEqual(Regex.Negation(range), Regex.Empty<byte>());
-            // concat simplifications
-            Assert.AreEqual(Regex.Concat(Regex.Empty<int>(), r), Regex.Empty<int>());
-            Assert.AreEqual(Regex.Empty<int>(), Regex.Concat(Regex.Empty<int>(), r));
-            Assert.AreEqual(Regex.Concat(Regex.Epsilon<int>(), r), r);
-            Assert.AreEqual(r, Regex.Concat(Regex.Epsilon<int>(), r));
-            Assert.AreEqual(Regex.Concat(r, Regex.Concat(s, t)), Regex.Concat(Regex.Concat(r, s), t));
-            // intersection simplifications
-            Assert.AreEqual(Regex.Intersect(r, r), r);
-            Assert.AreEqual(Regex.Intersect(s, r), Regex.Intersect(r, s));
-            Assert.AreEqual(Regex.Intersect(Regex.Intersect(r, s), t), Regex.Intersect(r, Regex.Intersect(s, t)));
-            Assert.AreEqual(Regex.Intersect(Regex.Empty<int>(), r), Regex.Empty<int>());
-            Assert.AreEqual(Regex.Intersect(r, Regex.Empty<int>()), Regex.Empty<int>());
-            Assert.AreEqual(Regex.Intersect(Regex.Negation(Regex.Empty<int>()), r), r);
-            Assert.AreEqual(Regex.Intersect(r, Regex.Negation(Regex.Empty<int>())), r);
-            // union simplifications
-            Assert.AreEqual(Regex.Union(r, r), r);
-            Assert.AreEqual(Regex.Union(r, Regex.Empty<int>()), r);
-            Assert.AreEqual(Regex.Union(Regex.Empty<int>(), r), r);
-            Assert.AreEqual(Regex.Union(r, Regex.Negation(Regex.Empty<int>())), Regex.Negation(Regex.Empty<int>()));
-            Assert.AreEqual(Regex.Union(Regex.Negation(Regex.Empty<int>()), r), Regex.Negation(Regex.Empty<int>()));
-            Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
-            Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
-        }
-
-        /// <summary>
-        /// Test that derivatives and regex matching are working.
-        /// </summary>
-        [TestMethod]
-        public void TestRegexMatch1()
-        {
-            var r = Regex.Concat(Regex.Concat(one, two), Regex.Star(three));
-
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 1 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 1, 2 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 1, 2, 3 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 1, 2, 3, 3 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 1, 2, 3, 1 }));
-        }
-
-        /// <summary>
-        /// Test that derivatives and regex matching are working.
-        /// </summary>
-        [TestMethod]
-        public void TestRegexMatch2()
-        {
-            var r = Regex.Union(Regex.Concat(zero, one), Regex.Concat(two, three));
-
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 1 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 2 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 0, 2 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 0, 3 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 0, 1 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 2, 3 }));
-        }
-
-        /// <summary>
-        /// Test that derivatives and regex matching are working.
-        /// </summary>
-        [TestMethod]
-        public void TestRegexMatch3()
-        {
-            var r = Regex.Intersect(Regex.Star(Regex.Union(zero, one)), Regex.Star(Regex.Union(one, two)));
-
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 1 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 2 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 0 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 1, 1, 1 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 1, 2 }));
-        }
-
-        /// <summary>
-        /// Test that derivatives and regex matching are working.
-        /// </summary>
-        [TestMethod]
-        public void TestRegexMatch4()
-        {
-            var r = Regex.Negation(Regex.Star(Regex.Range<byte>(0, 10)));
-
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 11, 12 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 0, 1, 2 }));
-            Assert.IsFalse(Regex.IsMatch(r, new byte[] { 10, 10, 10, 10 }));
-            Assert.IsTrue(Regex.IsMatch(r, new byte[] { 0, 1, 11 }));
-        }
 
         /// <summary>
         /// Test that the character range implementation is working.
@@ -178,6 +74,126 @@ namespace ZenLib.Tests
             Assert.IsFalse(r1.Contains(0));
             Assert.IsFalse(r1.Contains(11));
             Assert.IsFalse(r1.Contains(255));
+        }
+
+        /// <summary>
+        /// Test that Regex simplifications are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexSimplifications()
+        {
+            var r = Regex.Char(1);
+            var s = Regex.Char(2);
+            var t = Regex.Char(3);
+            var range = Regex.Range<byte>(0, 255);
+
+            // unary simplifications
+            Assert.AreEqual(Regex.Star(Regex.Star(r)), Regex.Star(r));
+            Assert.AreEqual(Regex.Star(Regex.Epsilon<int>()), Regex.Epsilon<int>());
+            Assert.AreEqual(Regex.Star(Regex.Empty<int>()), Regex.Epsilon<int>());
+            Assert.AreEqual(Regex.Negation(Regex.Negation(r)), r);
+            Assert.AreEqual(Regex.Negation(range), Regex.Empty<byte>());
+            // concat simplifications
+            Assert.AreEqual(Regex.Concat(Regex.Empty<int>(), r), Regex.Empty<int>());
+            Assert.AreEqual(Regex.Empty<int>(), Regex.Concat(Regex.Empty<int>(), r));
+            Assert.AreEqual(Regex.Concat(Regex.Epsilon<int>(), r), r);
+            Assert.AreEqual(r, Regex.Concat(Regex.Epsilon<int>(), r));
+            Assert.AreEqual(Regex.Concat(r, Regex.Concat(s, t)), Regex.Concat(Regex.Concat(r, s), t));
+            // intersection simplifications
+            Assert.AreEqual(Regex.Intersect(r, r), r);
+            Assert.AreEqual(Regex.Intersect(s, r), Regex.Intersect(r, s));
+            Assert.AreEqual(Regex.Intersect(Regex.Intersect(r, s), t), Regex.Intersect(r, Regex.Intersect(s, t)));
+            Assert.AreEqual(Regex.Intersect(Regex.Empty<int>(), r), Regex.Empty<int>());
+            Assert.AreEqual(Regex.Intersect(r, Regex.Empty<int>()), Regex.Empty<int>());
+            Assert.AreEqual(Regex.Intersect(Regex.Negation(Regex.Empty<int>()), r), r);
+            Assert.AreEqual(Regex.Intersect(r, Regex.Negation(Regex.Empty<int>())), r);
+            // union simplifications
+            Assert.AreEqual(Regex.Union(r, r), r);
+            Assert.AreEqual(Regex.Union(r, Regex.Empty<int>()), r);
+            Assert.AreEqual(Regex.Union(Regex.Empty<int>(), r), r);
+            Assert.AreEqual(Regex.Union(r, Regex.Negation(Regex.Empty<int>())), Regex.Negation(Regex.Empty<int>()));
+            Assert.AreEqual(Regex.Union(Regex.Negation(Regex.Empty<int>()), r), Regex.Negation(Regex.Empty<int>()));
+            Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
+            Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch1()
+        {
+            var r = Regex.Concat(Regex.Concat(one, two), Regex.Star(three));
+
+            // CheckIsNotMatch(r, new byte[] { });
+            CheckIsNotMatch(r, new byte[] { 1 });
+            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2, 3 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2, 3, 3 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 1, 2, 3, 1 }));
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch2()
+        {
+            var r = Regex.Union(Regex.Concat(zero, one), Regex.Concat(two, three));
+
+            Assert.IsFalse(r.IsMatch(new byte[] { }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 1 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 2 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 0, 2 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 0, 3 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 0, 1 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 2, 3 }));
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch3()
+        {
+            var r = Regex.Intersect(Regex.Star(Regex.Union(zero, one)), Regex.Star(Regex.Union(one, two)));
+
+            Assert.IsTrue(r.IsMatch(new byte[] { }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 1 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 2 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 0 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 1, 1, 1 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 1, 2 }));
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch4()
+        {
+            var r = Regex.Negation(Regex.Star(Regex.Range<byte>(0, 10)));
+
+            Assert.IsFalse(r.IsMatch(new byte[] { }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 11, 12 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 0, 1, 2 }));
+            Assert.IsFalse(r.IsMatch(new byte[] { 10, 10, 10, 10 }));
+            Assert.IsTrue(r.IsMatch(new byte[] { 0, 1, 11 }));
+        }
+
+        private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
+        {
+            var a = regex.ToAutomaton();
+            Assert.IsTrue(regex.IsMatch(sequence), "regex failed to match");
+            Assert.IsTrue(a.IsMatch(sequence), "automaton failed to match");
+        }
+
+        private void CheckIsNotMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
+        {
+            var a = regex.ToAutomaton();
+            Console.WriteLine(a);
+            Assert.IsFalse(regex.IsMatch(sequence), "regex matched but should not have");
+            Assert.IsFalse(a.IsMatch(sequence), "automaton matched but should not have");
         }
     }
 }
