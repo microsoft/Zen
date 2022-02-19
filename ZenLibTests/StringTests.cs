@@ -9,7 +9,6 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
     using static ZenLib.Zen;
@@ -21,50 +20,6 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class StringTests
     {
-        /// <summary>
-        /// Test string conversions.
-        /// </summary>
-        [TestMethod]
-        [DataRow("")]
-        [DataRow("AaBb")]
-        [DataRow("\t")]
-        [DataRow("\r")]
-        [DataRow("\n")]
-        [DataRow("\a")]
-        [DataRow("\b")]
-        [DataRow("\v")]
-        [DataRow("\f")]
-        [DataRow("\t")]
-        [DataRow("\"")]
-        [DataRow("\\")]
-        [DataRow("\\x5C\\x6E")]
-        [DataRow("\\n")]
-        [DataRow("endline\n")]
-        [DataRow("\x01\\x01")]
-        public void TestStringConversions(string s)
-        {
-            var context = new Context();
-            var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
-            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
-            Assert.AreEqual(s, tocs);
-        }
-
-        /// <summary>
-        /// Test string conversions.
-        /// </summary>
-        [TestMethod]
-        public void TestStringConversionsRandom()
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                string s = RandomString();
-                var context = new Context();
-                var escaped = CommonUtilities.ConvertCSharpStringToZ3(s);
-                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(escaped).ToString());
-                Assert.AreEqual(s, tocs);
-            }
-        }
-
         /// <summary>
         /// Test concatenation with empty string.
         /// </summary>

@@ -196,19 +196,14 @@ namespace ZenLib.Solver
                 var c = sequenceType.GetConstructor(new Type[] { innerType });
                 return c.Invoke(new object[] { value });
             }
-            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++")
+            else
             {
+                Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++");
+
                 var seq1 = Convert(parameter.Args[0], sequenceType);
                 var seq2 = Convert(parameter.Args[1], sequenceType);
                 var m = sequenceType.GetMethod("Concat");
                 return m.Invoke(seq1, new object[] { seq2 });
-            }
-            else
-            {
-                Contract.Assert(parameter.IsString);
-
-                var s = CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString());
-                return Seq.FromString(s);
             }
         }
     }

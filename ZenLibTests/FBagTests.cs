@@ -74,7 +74,7 @@ namespace ZenLib.Tests
         public void TestBagAddIfSpaceIsScalable()
         {
             var zf2 = new ZenFunction<FBag<byte>, FBag<byte>>(l => l.AddIfSpace(100));
-            var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 100);
+            var example2 = zf2.Find((l, b) => b.Size() == 4, depth: 50);
         }
 
         /// <summary>
