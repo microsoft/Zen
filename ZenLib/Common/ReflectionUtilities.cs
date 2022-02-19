@@ -1055,9 +1055,8 @@ namespace ZenLib
                 return (T)(object)uint.MinValue;
             if (type == LongType)
                 return (T)(object)long.MinValue;
-            if (type == UlongType)
-                return (T)(object)ulong.MinValue;
-            throw new ZenUnreachableException();
+            Contract.Assert(type == UlongType);
+            return (T)(object)ulong.MinValue;
         }
 
         /// <summary>
@@ -1082,9 +1081,8 @@ namespace ZenLib
                 return (T)(object)uint.MaxValue;
             if (type == LongType)
                 return (T)(object)long.MaxValue;
-            if (type == UlongType)
-                return (T)(object)ulong.MaxValue;
-            throw new ZenUnreachableException();
+            Contract.Assert(type == UlongType);
+            return (T)(object)ulong.MaxValue;
         }
 
         public static byte Add(byte x, int i)

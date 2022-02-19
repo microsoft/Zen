@@ -92,7 +92,6 @@ namespace ZenLib
             for (int i = 0; i < states.Count; i++)
             {
                 var state = states[i];
-                var characterClasses = state.CharacterClasses().Values.Values.Keys;
                 foreach (var characterClass in state.CharacterClasses().Values.Values.Keys)
                 {
                     var character = characterClass.Low;
@@ -106,7 +105,14 @@ namespace ZenLib
                 }
             }
 
-            automaton.FinalStates = new HashSet<Regex<T>>(states.Where(x => x.IsNullable()));
+            foreach (var state in states)
+            {
+                if (state.IsNullable())
+                {
+                    automaton.FinalStates.Add(state);
+                }
+            }
+
             return automaton;
         }
 

@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     /// <summary>
@@ -17,22 +18,22 @@ namespace ZenLib
         /// <summary>
         /// The initial state of the automaton.
         /// </summary>
-        internal Regex<T> InitialState { get; set; } = null;
+        internal Regex<T> InitialState { get; }
 
         /// <summary>
         /// The states of the automaton.
         /// </summary>
-        internal ISet<Regex<T>> States { get; set; } = new HashSet<Regex<T>>();
+        internal ISet<Regex<T>> States { get; } = new HashSet<Regex<T>>();
 
         /// <summary>
         /// The final states of the automaton.
         /// </summary>
-        internal ISet<Regex<T>> FinalStates { get; set; } = new HashSet<Regex<T>>();
+        internal ISet<Regex<T>> FinalStates { get; } = new HashSet<Regex<T>>();
 
         /// <summary>
         /// The transitions of the automaton.
         /// </summary>
-        internal Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>> Transitions { get; set; } = new Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>>();
+        internal Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>> Transitions { get; } = new Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>>();
 
         /// <summary>
         /// Creates a new instance of the <see cref="Automaton{T}"/> class.
@@ -90,7 +91,8 @@ namespace ZenLib
         /// <summary>
         /// Convert the automaton to a string.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The automaton as a string.</returns>
+        [ExcludeFromCodeCoverage]
         public override string ToString()
         {
             var states = "{" + string.Join(",", this.States.Select(x => x.Id)) + "}";

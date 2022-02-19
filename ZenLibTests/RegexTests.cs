@@ -74,6 +74,12 @@ namespace ZenLib.Tests
             Assert.IsFalse(r1.Contains(0));
             Assert.IsFalse(r1.Contains(11));
             Assert.IsFalse(r1.Contains(255));
+
+            // equals, hashcode
+            Assert.IsTrue(r1.Equals(r1));
+            Assert.IsFalse(r1.Equals(10));
+            Assert.IsFalse(r1.Equals(r2));
+            Assert.IsFalse(r2.Equals(r4));
         }
 
         /// <summary>
@@ -87,6 +93,8 @@ namespace ZenLib.Tests
             var t = Regex.Char(3);
             var range = Regex.Range<byte>(0, 255);
 
+            // range simplifications
+            Assert.AreEqual(Regex.Range<byte>(5, 4), Regex.Empty<byte>());
             // unary simplifications
             Assert.AreEqual(Regex.Star(Regex.Star(r)), Regex.Star(r));
             Assert.AreEqual(Regex.Star(Regex.Epsilon<int>()), Regex.Epsilon<int>());
@@ -97,7 +105,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Concat(Regex.Empty<int>(), r), Regex.Empty<int>());
             Assert.AreEqual(Regex.Empty<int>(), Regex.Concat(Regex.Empty<int>(), r));
             Assert.AreEqual(Regex.Concat(Regex.Epsilon<int>(), r), r);
-            Assert.AreEqual(r, Regex.Concat(Regex.Epsilon<int>(), r));
+            Assert.AreEqual(Regex.Concat(r, Regex.Epsilon<int>()), r);
             Assert.AreEqual(Regex.Concat(r, Regex.Concat(s, t)), Regex.Concat(Regex.Concat(r, s), t));
             // intersection simplifications
             Assert.AreEqual(Regex.Intersect(r, r), r);
@@ -179,6 +187,78 @@ namespace ZenLib.Tests
             CheckIsNotMatch(r, new byte[] { 0, 1, 2 });
             CheckIsNotMatch(r, new byte[] { 10, 10, 10, 10 });
             CheckIsMatch(r, new byte[] { 0, 1, 11 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch5()
+        {
+            var r = Regex.Union(Regex.Epsilon<byte>(), Regex.All<byte>());
+
+            CheckIsMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 1 });
+            CheckIsMatch(r, new byte[] { 3 });
+            CheckIsMatch(r, new byte[] { 255 });
+            CheckIsNotMatch(r, new byte[] { 1, 1 });
+            CheckIsNotMatch(r, new byte[] { 0, 0, 0 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch6()
+        {
+            var r1 = Regex.Union(one, two);
+            var r = Regex.Concat(r1, Regex.Star(r1));
+
+            CheckIsNotMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 1 });
+            CheckIsMatch(r, new byte[] { 2 });
+            CheckIsMatch(r, new byte[] { 1, 2, 1, 2 });
+            CheckIsNotMatch(r, new byte[] { 1, 2, 3 });
+            CheckIsNotMatch(r, new byte[] { 0, 0, 0 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch7()
+        {
+            var r = Regex.Concat(Regex.Star(one), two);
+
+            CheckIsNotMatch(r, new byte[] { });
+            CheckIsNotMatch(r, new byte[] { 1 });
+            CheckIsMatch(r, new byte[] { 2 });
+            CheckIsMatch(r, new byte[] { 1, 2 });
+            CheckIsMatch(r, new byte[] { 1, 1, 2 });
+            CheckIsNotMatch(r, new byte[] { 1, 2, 1 });
+            CheckIsNotMatch(r, new byte[] { 3, 2 });
+            CheckIsNotMatch(r, new byte[] { 2, 2 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexScalesToAllTypes()
+        {
+            var r1 = Regex.Star(Regex.Range<short>(1, 100));
+            var r2 = Regex.Star(Regex.Range<ushort>(1, 100));
+            var r3 = Regex.Star(Regex.Range<int>(1, 100));
+            var r4 = Regex.Star(Regex.Range<uint>(1, 100));
+            var r5 = Regex.Star(Regex.Range<long>(1, 100));
+            var r6 = Regex.Star(Regex.Range<ulong>(1, 100));
+
+            CheckIsMatch(r1, new short[] { 10, 20, 30, 100 });
+            CheckIsMatch(r2, new ushort[] { 10, 20, 30, 100 });
+            CheckIsMatch(r3, new int[] { 10, 20, 30, 100 });
+            CheckIsMatch(r4, new uint[] { 10, 20, 30, 100 });
+            CheckIsMatch(r5, new long[] { 10, 20, 30, 100 });
+            CheckIsMatch(r6, new ulong[] { 10, 20, 30, 100 });
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

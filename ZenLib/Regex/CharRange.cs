@@ -119,15 +119,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Determines if this range contains a single value.
-        /// </summary>
-        /// <returns>True or false.</returns>
-        public bool IsSingleton()
-        {
-            return this.High.CompareTo(this.Low) == 0;
-        }
-
-        /// <summary>
         /// Converts the range to a string.
         /// </summary>
         /// <returns>The range as a string.</returns>
