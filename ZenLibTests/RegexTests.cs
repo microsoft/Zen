@@ -125,12 +125,12 @@ namespace ZenLib.Tests
         {
             var r = Regex.Concat(Regex.Concat(one, two), Regex.Star(three));
 
-            // CheckIsNotMatch(r, new byte[] { });
+            CheckIsNotMatch(r, new byte[] { });
             CheckIsNotMatch(r, new byte[] { 1 });
-            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2, 3 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 1, 2, 3, 3 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 1, 2, 3, 1 }));
+            CheckIsMatch(r, new byte[] { 1, 2 });
+            CheckIsMatch(r, new byte[] { 1, 2, 3 });
+            CheckIsMatch(r, new byte[] { 1, 2, 3, 3 });
+            CheckIsNotMatch(r, new byte[] { 1, 2, 3, 1 });
         }
 
         /// <summary>
@@ -141,13 +141,13 @@ namespace ZenLib.Tests
         {
             var r = Regex.Union(Regex.Concat(zero, one), Regex.Concat(two, three));
 
-            Assert.IsFalse(r.IsMatch(new byte[] { }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 1 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 2 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 0, 2 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 0, 3 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 0, 1 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 2, 3 }));
+            CheckIsNotMatch(r, new byte[] { });
+            CheckIsNotMatch(r, new byte[] { 1 });
+            CheckIsNotMatch(r, new byte[] { 2 });
+            CheckIsNotMatch(r, new byte[] { 0, 2 });
+            CheckIsNotMatch(r, new byte[] { 0, 3 });
+            CheckIsMatch(r, new byte[] { 0, 1 });
+            CheckIsMatch(r, new byte[] { 2, 3 });
         }
 
         /// <summary>
@@ -158,12 +158,12 @@ namespace ZenLib.Tests
         {
             var r = Regex.Intersect(Regex.Star(Regex.Union(zero, one)), Regex.Star(Regex.Union(one, two)));
 
-            Assert.IsTrue(r.IsMatch(new byte[] { }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 1 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 2 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 0 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 1, 1, 1 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 1, 2 }));
+            CheckIsMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 1 });
+            CheckIsNotMatch(r, new byte[] { 2 });
+            CheckIsNotMatch(r, new byte[] { 0 });
+            CheckIsMatch(r, new byte[] { 1, 1, 1 });
+            CheckIsNotMatch(r, new byte[] { 1, 2 });
         }
 
         /// <summary>
@@ -174,11 +174,11 @@ namespace ZenLib.Tests
         {
             var r = Regex.Negation(Regex.Star(Regex.Range<byte>(0, 10)));
 
-            Assert.IsFalse(r.IsMatch(new byte[] { }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 11, 12 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 0, 1, 2 }));
-            Assert.IsFalse(r.IsMatch(new byte[] { 10, 10, 10, 10 }));
-            Assert.IsTrue(r.IsMatch(new byte[] { 0, 1, 11 }));
+            CheckIsNotMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 11, 12 });
+            CheckIsNotMatch(r, new byte[] { 0, 1, 2 });
+            CheckIsNotMatch(r, new byte[] { 10, 10, 10, 10 });
+            CheckIsMatch(r, new byte[] { 0, 1, 11 });
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
@@ -191,7 +191,6 @@ namespace ZenLib.Tests
         private void CheckIsNotMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
         {
             var a = regex.ToAutomaton();
-            Console.WriteLine(a);
             Assert.IsFalse(regex.IsMatch(sequence), "regex matched but should not have");
             Assert.IsFalse(a.IsMatch(sequence), "automaton matched but should not have");
         }
