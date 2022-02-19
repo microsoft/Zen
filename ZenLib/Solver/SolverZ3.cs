@@ -559,12 +559,17 @@ namespace ZenLib.Solver
                 return null;
             }
 
+            ThrowIfUnknown(status);
+            return this.Solver.Model;
+        }
+
+        [ExcludeFromCodeCoverage]
+        private void ThrowIfUnknown(Status status)
+        {
             if (status == Status.UNKNOWN)
             {
-                throw new ZenException("Unknown result");
+                throw new ZenException($"Unknown result: {this.Solver.ReasonUnknown}");
             }
-
-            return this.Solver.Model;
         }
 
         [ExcludeFromCodeCoverage] // some weird coverage bug in MkDatatypeSort.

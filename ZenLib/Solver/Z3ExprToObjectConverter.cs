@@ -65,8 +65,11 @@ namespace ZenLib.Solver
                 var value = Convert(valueExpr, valueType);
                 return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
             }
-            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
+            else
             {
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "map");
+
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
                 var e1 = Convert(parameter.Args[0], dictionaryType);
                 var e2 = Convert(parameter.Args[1], dictionaryType);
@@ -74,7 +77,7 @@ namespace ZenLib.Solver
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
-            else
+            /* else
             {
                 Contract.Assert(parameter.IsApp);
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "as-array");
@@ -95,7 +98,7 @@ namespace ZenLib.Solver
                 }
 
                 return dict;
-            }
+            } */
         }
 
         private object CreateEmptyDictionary(Type keyType, Type valueType)
@@ -106,8 +109,9 @@ namespace ZenLib.Solver
 
         private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
         {
+            Contract.Assert(!valueExpr.IsFalse);
             // for sets, don't add the key when the value is false.
-            if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
+            /* if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
             {
                 return dict;
             }
@@ -115,7 +119,10 @@ namespace ZenLib.Solver
             {
                 var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
                 return m.Invoke(dict, new object[] { key, value });
-            }
+            } */
+
+            var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
+            return m.Invoke(dict, new object[] { key, value });
         }
 
         public object VisitFixedInteger(Type intType, Expr parameter)
@@ -198,7 +205,8 @@ namespace ZenLib.Solver
             }
             else
             {
-                Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.++");
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "seq.++");
 
                 var seq1 = Convert(parameter.Args[0], sequenceType);
                 var seq2 = Convert(parameter.Args[1], sequenceType);

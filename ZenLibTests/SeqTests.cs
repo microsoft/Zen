@@ -541,11 +541,62 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqFindWithRegex()
         {
-            var r = Regex.Concat(Regex.Char<byte>(1), Regex.Star(Regex.Char<byte>(2)));
-            var result = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+            Func<Regex<byte>, Option<Seq<byte>>> solve =
+                (r) => new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
 
-            Assert.IsTrue(result.HasValue);
-            Assert.IsTrue(result.Value.MatchesRegex(r));
+            var c1 = Regex.Char<byte>(1);
+            var c2 = Regex.Char<byte>(2);
+            var any = Regex.Dot<byte>();
+
+            var r1 = Regex.Negation(Regex.Star(c1));
+            var r2 = Regex.Star(Regex.Union(c1, c2));
+            var r3 = Regex.Concat(c1, Regex.Star(c2));
+            var r4 = Regex.Epsilon<byte>();
+            var r5 = Regex.Empty<byte>();
+            var r6 = Regex.Intersect(Regex.Star(c1), Regex.Concat(c1, c1));
+
+            Assert.IsTrue(solve(r1).Value.MatchesRegex(r1));
+            Assert.IsTrue(solve(r2).Value.MatchesRegex(r2));
+            Assert.IsTrue(solve(r3).Value.MatchesRegex(r3));
+            Assert.IsTrue(solve(r4).Value.MatchesRegex(r4));
+            Assert.IsFalse(solve(r5).HasValue);
+            Assert.IsTrue(solve(r6).Value.MatchesRegex(r6));
+        }
+
+        /// <summary>
+        /// Test seq find with regex.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithRegexTypes()
+        {
+            var c1 = Regex.Char<byte>(1);
+            var c2 = Regex.Char<short>(1);
+            var c3 = Regex.Char<ushort>(1);
+            var c4 = Regex.Char<int>(1);
+            var c5 = Regex.Char<uint>(1);
+            var c6 = Regex.Char<long>(1);
+            var c7 = Regex.Char<ulong>(1);
+
+            Assert.IsTrue(new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(c1)).Find().Value.MatchesRegex(c1));
+            Assert.IsTrue(new ZenConstraint<Seq<short>>(s => s.MatchesRegex(c2)).Find().Value.MatchesRegex(c2));
+            Assert.IsTrue(new ZenConstraint<Seq<ushort>>(s => s.MatchesRegex(c3)).Find().Value.MatchesRegex(c3));
+            Assert.IsTrue(new ZenConstraint<Seq<int>>(s => s.MatchesRegex(c4)).Find().Value.MatchesRegex(c4));
+            Assert.IsTrue(new ZenConstraint<Seq<uint>>(s => s.MatchesRegex(c5)).Find().Value.MatchesRegex(c5));
+            Assert.IsTrue(new ZenConstraint<Seq<long>>(s => s.MatchesRegex(c6)).Find().Value.MatchesRegex(c6));
+            Assert.IsTrue(new ZenConstraint<Seq<ulong>>(s => s.MatchesRegex(c7)).Find().Value.MatchesRegex(c7));
+        }
+
+        /// <summary>
+        /// Test seq find with regex range exception.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqFindWithRegexRangeException()
+        {
+            Func<Regex<byte>, Option<Seq<byte>>> solve =
+                (r) => new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+
+            solve(Regex.Range<byte>(1, 4));
         }
 
         /// <summary>

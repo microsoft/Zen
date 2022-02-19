@@ -20,12 +20,15 @@ namespace ZenLib.Solver
 
         public ReExpr Visit(RegexEmptyExpr<T> expression, Sort parameter)
         {
-            return this.solver.Context.MkEmptyRe(parameter);
+            var seqSort = this.solver.Context.MkSeqSort(parameter);
+            var regexSort = this.solver.Context.MkReSort(seqSort);
+            return this.solver.Context.MkEmptyRe(regexSort);
         }
 
         public ReExpr Visit(RegexEpsilonExpr<T> expression, Sort parameter)
         {
-            var seq = this.solver.Context.MkEmptySeq(parameter);
+            var seqSort = this.solver.Context.MkSeqSort(parameter);
+            var seq = this.solver.Context.MkEmptySeq(seqSort);
             return this.solver.Context.MkToRe(seq);
         }
 
@@ -38,9 +41,10 @@ namespace ZenLib.Solver
             }
             else
             {
-                var low = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
-                var high = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.High));
-                return this.solver.Context.MkRange(low, high);
+                throw new ZenException($"Range regex currently not supported.");
+                // var low = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
+                // var high = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.High));
+                // return this.solver.Context.MkRange(low, high);
             }
         }
 
@@ -55,19 +59,21 @@ namespace ZenLib.Solver
                 return this.solver.Context.MkBV(value, 16);
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
                 return this.solver.Context.MkBV(value, 32);
-            if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
-                return this.solver.Context.MkBV(value, 64);
-            throw new ZenUnreachableException();
+            Contract.Assert(type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType);
+            return this.solver.Context.MkBV(value, 64);
         }
 
         public ReExpr Visit(RegexUnopExpr<T> expression, Sort parameter)
         {
+            var e = expression.Expr.Accept(this, parameter);
+
             switch (expression.OpType)
             {
                 case RegexUnopExprType.Star:
-                    return this.solver.Context.MkStar(expression.Expr.Accept(this, parameter));
+                    return this.solver.Context.MkStar(e);
                 default:
-                    throw new ZenException("Regex negation not supported in solver.");
+                    Contract.Assert(expression.OpType == RegexUnopExprType.Negation);
+                    return this.solver.Context.MkComplement(e);
             }
         }
 

@@ -195,7 +195,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestRegexMatch5()
         {
-            var r = Regex.Union(Regex.Epsilon<byte>(), Regex.All<byte>());
+            var r = Regex.Union(Regex.Epsilon<byte>(), Regex.Dot<byte>());
 
             CheckIsMatch(r, new byte[] { });
             CheckIsMatch(r, new byte[] { 1 });
@@ -238,6 +238,38 @@ namespace ZenLib.Tests
             CheckIsNotMatch(r, new byte[] { 1, 2, 1 });
             CheckIsNotMatch(r, new byte[] { 3, 2 });
             CheckIsNotMatch(r, new byte[] { 2, 2 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch8()
+        {
+            var r = Regex.All<byte>();
+
+            CheckIsMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 1 });
+            CheckIsMatch(r, new byte[] { 2 });
+            CheckIsMatch(r, new byte[] { 1, 2 });
+            CheckIsMatch(r, new byte[] { 1, 1, 2 });
+            CheckIsMatch(r, new byte[] { 1, 2, 1 });
+            CheckIsMatch(r, new byte[] { 3, 2 });
+            CheckIsMatch(r, new byte[] { 2, 2 });
+        }
+
+        /// <summary>
+        /// Test that derivatives and regex matching are working.
+        /// </summary>
+        [TestMethod]
+        public void TestRegexMatch9()
+        {
+            var r = Regex.Opt<byte>(Regex.Char<byte>(1));
+
+            CheckIsMatch(r, new byte[] { });
+            CheckIsMatch(r, new byte[] { 1 });
+            CheckIsNotMatch(r, new byte[] { 2 });
+            CheckIsNotMatch(r, new byte[] { 1, 2 });
         }
 
         /// <summary>

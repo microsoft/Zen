@@ -95,6 +95,7 @@ namespace ZenLib.Tests
             CheckEqual(Set.Empty<UInt10>().Add(new UInt10(4)), Set.Empty<UInt10>().Add(new UInt10(4)));
             CheckEqual(header.WithField("DstIp", Ip.Create(99)), header.WithField("DstIp", Ip.Create(99)));
             CheckEqual(list1.AddFront(byte1), list1.AddFront(byte1));
+            CheckEqual(seq1.MatchesRegex(Regex.Char<byte>(1)), seq1.MatchesRegex(Regex.Char<byte>(1)));
 
             list1.Case(Constant(1), (hd, tl) => 2).Unroll();
             If(b, list1, list2).Case(Constant(1), (hd, tl) => 2).Unroll();

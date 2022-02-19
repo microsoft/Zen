@@ -149,12 +149,30 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The 'Dot' regular expression for any single character.
+        /// </summary>
+        /// <returns>A regular expression that accepts any single character.</returns>
+        public static Regex<T> Dot<T>()
+        {
+            return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
+        }
+
+        /// <summary>
+        /// The 'Optional' regular expression.
+        /// </summary>
+        /// <returns>A regular expression matches zero or one occurance of another.</returns>
+        public static Regex<T> Opt<T>(Regex<T> expr)
+        {
+            return Regex.Union(Regex.Epsilon<T>(), expr);
+        }
+
+        /// <summary>
         /// The 'All' regular expression.
         /// </summary>
         /// <returns>A regular expression that accepts all strings.</returns>
         public static Regex<T> All<T>()
         {
-            return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
+            return Regex.Negation(Regex.Empty<T>());
         }
 
         /// <summary>
