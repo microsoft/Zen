@@ -32,7 +32,7 @@ namespace ZenLib.ModelChecking
             ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
             TParam parameter)
         {
-            return visitor.VisitSymbolicDict(this, parameter);
+            return visitor.Visit(this, parameter);
         }
 
         /// <summary>

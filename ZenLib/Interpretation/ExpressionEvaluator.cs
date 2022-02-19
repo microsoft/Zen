@@ -58,7 +58,7 @@ namespace ZenLib.Interpretation
             return result;
         }
 
-        public object VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             if (parameter.ArbitraryAssignment == null)
                 return ReflectionUtilities.GetDefaultValue<T>();
@@ -67,17 +67,17 @@ namespace ZenLib.Interpretation
             return value;
         }
 
-        public object VisitZenAndExpr(ZenAndExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit(ZenAndExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return (bool)Evaluate(expression.Expr1, parameter) && (bool)Evaluate(expression.Expr2, parameter);
         }
 
-        public object VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
-        public object VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -164,18 +164,18 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var x = ReflectionUtilities.ToLong(Evaluate(expression.Expr, parameter));
             return ReflectionUtilities.Specialize<T>(~x);
         }
 
-        public object VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
 
-        public object VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var fieldNames = new List<string>();
             var parameters = new List<object>();
@@ -196,18 +196,18 @@ namespace ZenLib.Interpretation
             return ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());
         }
 
-        public object VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return ImmutableList<T>.Empty;
         }
 
-        public object VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = (T1)Evaluate(expression.Expr, parameter);
             return ReflectionUtilities.GetFieldOrProperty<T1, T2>(e, expression.FieldName);
         }
 
-        public object VisitZenIfExpr<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (bool)Evaluate(expression.GuardExpr, parameter);
 
@@ -231,7 +231,7 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenEqualityExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -246,7 +246,7 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -297,14 +297,14 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (ImmutableList<T>)Evaluate(expression.Expr, parameter);
             var e2 = (T)Evaluate(expression.Element, parameter);
             return e1.Insert(0, e2);
         }
 
-        public object VisitZenListCaseExpr<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = (ImmutableList<T>)Evaluate(expression.ListExpr, parameter);
 
@@ -320,29 +320,29 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenNotExpr(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return !(bool)Evaluate(expression.Expr, parameter);
         }
 
-        public object VisitZenOrExpr(ZenOrExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit(ZenOrExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return (bool)Evaluate(expression.Expr1, parameter) || (bool)Evaluate(expression.Expr2, parameter);
         }
 
-        public object VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (T1)Evaluate(expression.Expr, parameter);
             var e2 = (T2)Evaluate(expression.FieldValue, parameter);
             return ReflectionUtilities.WithField<T1>(e1, expression.FieldName, e2);
         }
 
-        public object VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return ImmutableDictionary<TKey, TValue>.Empty;
         }
 
-        public object VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
@@ -350,21 +350,21 @@ namespace ZenLib.Interpretation
             return e1.SetItem(e2, e3);
         }
 
-        public object VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             return e1.Remove(e2);
         }
 
-        public object VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             return CommonUtilities.DictionaryGet(e1, e2);
         }
 
-        public object VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (ImmutableDictionary<TKey, SetUnit>)Evaluate(expression.DictExpr1, parameter);
             var e2 = (ImmutableDictionary<TKey, SetUnit>)Evaluate(expression.DictExpr2, parameter);
@@ -379,38 +379,38 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return new Seq<T>();
         }
 
-        public object VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr1, parameter);
             var e2 = (Seq<T>)Evaluate(expression.SeqExpr2, parameter);
             return e1.Concat(e2);
         }
 
-        public object VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (T)Evaluate(expression.ValueExpr, parameter);
             return new Seq<T>(e1);
         }
 
-        public object VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             return new BigInteger(e.Length());
         }
 
-        public object VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqAtExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             var e2 = (BigInteger)Evaluate(expression.IndexExpr, parameter);
             return e1.AtBigInteger(e2);
         }
 
-        public object VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
@@ -427,7 +427,7 @@ namespace ZenLib.Interpretation
             }
         }
 
-        public object VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
@@ -435,7 +435,7 @@ namespace ZenLib.Interpretation
             return e1.IndexOfBigInteger(e2, e3);
         }
 
-        public object VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             var e2 = (BigInteger)Evaluate(expression.OffsetExpr, parameter);
@@ -443,7 +443,7 @@ namespace ZenLib.Interpretation
             return e1.SliceBigInteger(e2, e3);
         }
 
-        public object VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
             var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
@@ -451,7 +451,7 @@ namespace ZenLib.Interpretation
             return e1.ReplaceFirst(e2, e3);
         }
 
-        public object VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = Evaluate(expression.SourceExpr, parameter);
 

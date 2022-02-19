@@ -12,41 +12,41 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Visit the symbolic boolean type.
         /// </summary>
-        TReturn VisitSymbolicBool(SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic bitvec type.
         /// </summary>
-        TReturn VisitSymbolicBitvec(SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic integer type.
         /// </summary>
-        TReturn VisitSymbolicInteger(SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic string type.
         /// </summary>
-        TReturn VisitSymbolicString(SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic class type.
         /// </summary>
-        TReturn VisitSymbolicObject(SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic dict type.
         /// </summary>
-        TReturn VisitSymbolicDict(SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic list type.
         /// </summary>
-        TReturn VisitSymbolicList(SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic list type.
         /// </summary>
-        TReturn VisitSymbolicSeq(SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
+        TReturn Visit(SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> v, TParam parameter);
     }
 }

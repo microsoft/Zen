@@ -90,7 +90,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitZenSeqLengthExpr(this, parameter);
+            return visitor.Visit(this, parameter);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenAndExpr(ZenAndExpr expression, TParam parameter);
+        TReturn Visit(ZenAndExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit an OrExpr.
@@ -25,7 +25,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenOrExpr(ZenOrExpr expression, TParam parameter);
+        TReturn Visit(ZenOrExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a NotExpr.
@@ -33,7 +33,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenNotExpr(ZenNotExpr expression, TParam parameter);
+        TReturn Visit(ZenNotExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit an IfExpr.
@@ -41,7 +41,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenIfExpr<T>(ZenIfExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenIfExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ConstantExpr.
@@ -49,7 +49,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenConstantExpr<T>(ZenConstantExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenConstantExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a BitwiseAndExpr.
@@ -57,7 +57,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenIntegerBinopExpr<T>(ZenIntegerBinopExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenIntegerBinopExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a BitwiseNotExpr.
@@ -65,7 +65,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenBitwiseNotExpr<T>(ZenBitwiseNotExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenBitwiseNotExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListEmptyExpr.
@@ -73,7 +73,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenListEmptyExpr<T>(ZenListEmptyExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenListEmptyExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictEmptyExpr.
@@ -81,7 +81,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenDictEmptyExpr<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListAddFrontExpr.
@@ -89,7 +89,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenListAddFrontExpr<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictSetExpr.
@@ -97,7 +97,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenDictSetExpr<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictDeleteExpr.
@@ -105,7 +105,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenDictDeleteExpr<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictGetExpr.
@@ -113,7 +113,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenDictGetExpr<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictCombineExpr.
@@ -121,7 +121,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenDictCombineExpr<TKey>(ZenDictCombineExpr<TKey> expression, TParam parameter);
+        TReturn Visit<TKey>(ZenDictCombineExpr<TKey> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListCaseExpr.
@@ -129,7 +129,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenListCaseExpr<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
+        TReturn Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
 
         /// <summary>
         /// Visit a SeqEmptyExpr.
@@ -137,7 +137,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqEmptyExpr<T>(ZenSeqEmptyExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqEmptyExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqUnitExpr.
@@ -145,7 +145,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqUnitExpr<T>(ZenSeqUnitExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqUnitExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqConcatExpr.
@@ -153,7 +153,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqConcatExpr<T>(ZenSeqConcatExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqConcatExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqLengthExpr.
@@ -161,7 +161,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqLengthExpr<T>(ZenSeqLengthExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqLengthExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqAtExpr.
@@ -169,7 +169,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqAtExpr<T>(ZenSeqAtExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqAtExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqContainsExpr.
@@ -177,7 +177,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqContainsExpr<T>(ZenSeqContainsExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqContainsExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqIndexOfExpr.
@@ -185,7 +185,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqIndexOfExpr<T>(ZenSeqIndexOfExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqIndexOfExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqSliceExpr.
@@ -193,7 +193,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqSliceExpr<T>(ZenSeqSliceExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqSliceExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ZenSeqReplaceFirstExpr.
@@ -201,7 +201,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenSeqReplaceFirstExpr<T>(ZenSeqReplaceFirstExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenSeqReplaceFirstExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a GetFieldExpr.
@@ -209,7 +209,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenGetFieldExpr<T1, T2>(ZenGetFieldExpr<T1, T2> expression, TParam parameter);
+        TReturn Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, TParam parameter);
 
         /// <summary>
         /// Visit a WithFieldExpr.
@@ -217,7 +217,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenWithFieldExpr<T1, T2>(ZenWithFieldExpr<T1, T2> expression, TParam parameter);
+        TReturn Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, TParam parameter);
 
         /// <summary>
         /// Visit a CreateObjectExpr.
@@ -225,7 +225,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenCreateObjectExpr<TObject>(ZenCreateObjectExpr<TObject> expression, TParam parameter);
+        TReturn Visit<TObject>(ZenCreateObjectExpr<TObject> expression, TParam parameter);
 
         /// <summary>
         /// Visit a EqualityExpr.
@@ -233,7 +233,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenEqualityExpr<T>(ZenEqualityExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenEqualityExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a LeqExpr.
@@ -241,7 +241,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenComparisonExpr<T>(ZenIntegerComparisonExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenIntegerComparisonExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit an ArgumentExpr.
@@ -249,7 +249,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenArgumentExpr<T>(ZenArgumentExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenArgumentExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit an ArbitraryExpr.
@@ -257,7 +257,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenArbitraryExpr<T>(ZenArbitraryExpr<T> expression, TParam parameter);
+        TReturn Visit<T>(ZenArbitraryExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a CastExpr.
@@ -265,6 +265,6 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn VisitZenCastExpr<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, TParam parameter);
     }
 }
