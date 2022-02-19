@@ -246,8 +246,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqTakeSmaller()
         {
-            RandomBytes(x => CheckValid<FSeq<int>>(l =>
-                l.Take(x).Length() <= l.Length()));
+            RandomBytes(x => CheckValid<FSeq<int>>(l => l.Take(x).Length() <= l.Length()));
         }
 
         /// <summary>

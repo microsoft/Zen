@@ -13,7 +13,6 @@ namespace ZenLib
     /// <typeparam name="TParam">The parameter type.</typeparam>
     /// <typeparam name="TReturn">The return type.</typeparam>
     internal interface IRegexExprVisitor<T, TParam, TReturn>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Visit a RegexEmptyExpr.

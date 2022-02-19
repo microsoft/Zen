@@ -11,7 +11,6 @@ namespace ZenLib
     /// Class representing a Regex single char expression.
     /// </summary>
     internal sealed class RegexRangeExpr<T> : Regex<T>
-        where T : IComparable<T>
     {
         /// <summary>
         /// Static creation function for hash consing.

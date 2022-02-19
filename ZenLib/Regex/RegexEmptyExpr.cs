@@ -11,7 +11,6 @@ namespace ZenLib
     /// Class representing a Regex empty expression.
     /// </summary>
     internal sealed class RegexEmptyExpr<T> : Regex<T>
-        where T : IComparable<T>
     {
         /// <summary>
         /// The empty Regex instance.

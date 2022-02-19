@@ -13,7 +13,7 @@ namespace ZenLib
     /// A deterministic automaton with respect to a character type T.
     /// </summary>
     /// <typeparam name="T">The type of characters for the automaton.</typeparam>
-    public class Automaton<T> where T : IComparable<T>
+    public class Automaton<T>
     {
         /// <summary>
         /// The initial state of the automaton.

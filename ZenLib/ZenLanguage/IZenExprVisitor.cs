@@ -204,6 +204,14 @@ namespace ZenLib
         TReturn Visit<T>(ZenSeqReplaceFirstExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ZenSeqRegexExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<T>(ZenSeqRegexExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a GetFieldExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

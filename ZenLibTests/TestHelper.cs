@@ -22,7 +22,7 @@ namespace ZenLib.Tests
         /// <summary>
         /// Number of random inputs to try per test.
         /// </summary>
-        private static int numRandomTests = 12;
+        private static int numRandomTests = 8;
 
         /// <summary>
         /// Deterministic random number generator.

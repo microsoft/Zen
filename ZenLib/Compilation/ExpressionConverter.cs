@@ -839,5 +839,15 @@ namespace ZenLib.Compilation
                 }
             });
         }
+
+        public Expression Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return LookupOrCompute(expression, () =>
+            {
+                var e = expression.SeqExpr.Accept(this, parameter);
+                var m = typeof(Seq<T>).GetMethod("MatchesRegex");
+                return Expression.Call(e, m, new Expression[] { Expression.Constant(expression.Regex) });
+            });
+        }
     }
 }

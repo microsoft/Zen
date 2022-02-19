@@ -10,7 +10,6 @@ namespace ZenLib
     /// A class to compute character equivalence classes.
     /// </summary>
     internal class RegexCharacterClassVisitor<T> : IRegexExprVisitor<T, Unit, Set<CharRange<T>>>
-        where T : IComparable<T>
     {
         public Set<CharRange<T>> Compute(Regex<T> regex)
         {

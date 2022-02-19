@@ -4,16 +4,14 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
 
     /// <summary>
     /// A regex object parameterized over a C# type.
     /// </summary>
     /// <typeparam name="T">The type of characters for the regex.</typeparam>
-    public abstract class Regex<T> where T : IComparable<T>
+    public abstract class Regex<T>
     {
         /// <summary>
         /// The next unique id.
@@ -145,25 +143,43 @@ namespace ZenLib
         /// The 'Empty' regular expression.
         /// </summary>
         /// <returns>A regular expression that accepts no strings.</returns>
-        public static Regex<T> Empty<T>() where T : IComparable<T>
+        public static Regex<T> Empty<T>()
         {
             return RegexEmptyExpr<T>.Instance;
+        }
+
+        /// <summary>
+        /// The 'Dot' regular expression for any single character.
+        /// </summary>
+        /// <returns>A regular expression that accepts any single character.</returns>
+        public static Regex<T> Dot<T>()
+        {
+            return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
+        }
+
+        /// <summary>
+        /// The 'Optional' regular expression.
+        /// </summary>
+        /// <returns>A regular expression matches zero or one occurance of another.</returns>
+        public static Regex<T> Opt<T>(Regex<T> expr)
+        {
+            return Regex.Union(Regex.Epsilon<T>(), expr);
         }
 
         /// <summary>
         /// The 'All' regular expression.
         /// </summary>
         /// <returns>A regular expression that accepts all strings.</returns>
-        public static Regex<T> All<T>() where T : IComparable<T>
+        public static Regex<T> All<T>()
         {
-            return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
+            return Regex.Negation(Regex.Empty<T>());
         }
 
         /// <summary>
         /// The 'Epsilon' regular expression.
         /// </summary>
         /// <returns>A regular expression that accepts a single empty string.</returns>
-        public static Regex<T> Epsilon<T>() where T : IComparable<T>
+        public static Regex<T> Epsilon<T>()
         {
             return RegexEpsilonExpr<T>.Instance;
         }
@@ -174,7 +190,7 @@ namespace ZenLib
         /// <param name="low">The low character value.</param>
         /// <param name="high">The high character value.</param>
         /// <returns>A regular expression that accepts a single character.</returns>
-        public static Regex<T> Range<T>(T low, T high) where T : IComparable<T>
+        public static Regex<T> Range<T>(T low, T high)
         {
             return RegexRangeExpr<T>.Create(low, high);
         }
@@ -184,7 +200,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The character value.</param>
         /// <returns>A regular expression that accepts a single character.</returns>
-        public static Regex<T> Char<T>(T value) where T : IComparable<T>
+        public static Regex<T> Char<T>(T value)
         {
             return RegexRangeExpr<T>.Create(value, value);
         }
@@ -195,7 +211,7 @@ namespace ZenLib
         /// <param name="expr1">The first Regex expr.</param>
         /// <param name="expr2">The second Regex expr.</param>
         /// <returns>A regular expression that accepts the union of two others.</returns>
-        public static Regex<T> Union<T>(Regex<T> expr1, Regex<T> expr2) where T : IComparable<T>
+        public static Regex<T> Union<T>(Regex<T> expr1, Regex<T> expr2)
         {
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Union);
         }
@@ -206,7 +222,7 @@ namespace ZenLib
         /// <param name="expr1">The first Regex expr.</param>
         /// <param name="expr2">The second Regex expr.</param>
         /// <returns>A regular expression that accepts the intersection of two others.</returns>
-        public static Regex<T> Intersect<T>(Regex<T> expr1, Regex<T> expr2) where T : IComparable<T>
+        public static Regex<T> Intersect<T>(Regex<T> expr1, Regex<T> expr2)
         {
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Intersection);
         }
@@ -217,7 +233,7 @@ namespace ZenLib
         /// <param name="expr1">The first Regex expr.</param>
         /// <param name="expr2">The second Regex expr.</param>
         /// <returns>A regular expression that accepts the concatenation two others.</returns>
-        public static Regex<T> Concat<T>(Regex<T> expr1, Regex<T> expr2) where T : IComparable<T>
+        public static Regex<T> Concat<T>(Regex<T> expr1, Regex<T> expr2)
         {
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Concatenation);
         }
@@ -227,7 +243,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The Regex expr.</param>
         /// <returns>A regular expression that accepts zero or more iterations of another.</returns>
-        public static Regex<T> Star<T>(Regex<T> expr) where T : IComparable<T>
+        public static Regex<T> Star<T>(Regex<T> expr)
         {
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Star);
         }
@@ -237,7 +253,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The Regex expr.</param>
         /// <returns>A regular expression that accepts any strings another doesn't.</returns>
-        public static Regex<T> Negation<T>(Regex<T> expr) where T : IComparable<T>
+        public static Regex<T> Negation<T>(Regex<T> expr)
         {
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Negation);
         }
