@@ -14,7 +14,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to help generate a symbolic input.
     /// </summary>
-    internal class SymbolicInputGenerator : ITypeVisitor<object, DepthConfiguration>
+    internal class SymbolicInputGenerator : ITypeVisitor<object, ZenDepthConfiguration>
     {
         /// <summary>
         /// The method for creating the empty list at runtime.
@@ -51,35 +51,35 @@ namespace ZenLib.Generation
         /// </summary>
         internal List<object> ArbitraryExpressions { get; } = new List<object>();
 
-        public object VisitBool(DepthConfiguration parameter)
+        public object VisitBool(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<bool>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitByte(DepthConfiguration parameter)
+        public object VisitByte(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<byte>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitInt(DepthConfiguration parameter)
+        public object VisitInt(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<int>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitBigInteger(DepthConfiguration parameter)
+        public object VisitBigInteger(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<BigInteger>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitList(Type listType, Type elementType, DepthConfiguration config)
+        public object VisitList(Type listType, Type elementType, ZenDepthConfiguration config)
         {
             if (!config.ExhaustiveDepth)
             {
@@ -104,7 +104,7 @@ namespace ZenLib.Generation
             return list;
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, DepthConfiguration parameter)
+        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, ZenDepthConfiguration parameter)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
@@ -112,7 +112,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitSeq(Type sequenceType, Type innerType, DepthConfiguration parameter)
+        public object VisitSeq(Type sequenceType, Type innerType, ZenDepthConfiguration parameter)
         {
             var method = arbitrarySeqMethod.MakeGenericMethod(innerType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);
@@ -120,7 +120,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object ApplyToList(Type innerType, DepthConfiguration config, int size)
+        public object ApplyToList(Type innerType, ZenDepthConfiguration config, int size)
         {
             var method = listMethod.MakeGenericMethod(innerType);
 
@@ -137,14 +137,14 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { finalArgs });
         }
 
-        public object VisitLong(DepthConfiguration parameter)
+        public object VisitLong(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<long>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, DepthConfiguration config)
+        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, ZenDepthConfiguration config)
         {
             var asList = fields.ToArray();
 
@@ -162,7 +162,7 @@ namespace ZenLib.Generation
             return method.Invoke(null, new object[] { args });
         }
 
-        private DepthConfiguration UpdateDepthConfiguration(DepthConfiguration config, ZenSizeAttribute attribute)
+        private ZenDepthConfiguration UpdateDepthConfiguration(ZenDepthConfiguration config, ZenSizeAttribute attribute)
         {
             if (attribute == null)
             {
@@ -174,7 +174,7 @@ namespace ZenLib.Generation
                 config.ExhaustiveDepth :
                 attribute.EnumerationType == EnumerationType.Exhaustive;
 
-            return new DepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustive };
+            return new ZenDepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustive };
         }
 
         private ZenSizeAttribute GetSizeAttribute(Type type, string fieldName)
@@ -189,35 +189,35 @@ namespace ZenLib.Generation
             return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
         }
 
-        public object VisitShort(DepthConfiguration parameter)
+        public object VisitShort(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<short>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUint(DepthConfiguration parameter)
+        public object VisitUint(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<uint>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUlong(DepthConfiguration parameter)
+        public object VisitUlong(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<ulong>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitUshort(DepthConfiguration parameter)
+        public object VisitUshort(ZenDepthConfiguration parameter)
         {
             var e = new ZenArbitraryExpr<ushort>();
             this.ArbitraryExpressions.Add(e);
             return e;
         }
 
-        public object VisitFixedInteger(Type intType, DepthConfiguration parameter)
+        public object VisitFixedInteger(Type intType, ZenDepthConfiguration parameter)
         {
             var c = typeof(ZenArbitraryExpr<>).MakeGenericType(intType).GetConstructor(new Type[] { });
             var e = c.Invoke(CommonUtilities.EmptyArray);
@@ -225,7 +225,7 @@ namespace ZenLib.Generation
             return e;
         }
 
-        public object VisitString(DepthConfiguration parameter)
+        public object VisitString(ZenDepthConfiguration parameter)
         {
             var v = (Zen<Seq<byte>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<byte>), parameter);
             return ZenCastExpr<Seq<byte>, string>.Create(v);

@@ -1,4 +1,4 @@
-﻿// <copyright file="DepthConfiguration.cs" company="Microsoft">
+﻿// <copyright file="ZenDepthConfiguration.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -7,7 +7,7 @@ namespace ZenLib
     /// <summary>
     /// A generation configuration.
     /// </summary>
-    internal class DepthConfiguration
+    internal class ZenDepthConfiguration
     {
         /// <summary>
         /// The depth at which to generate objects.

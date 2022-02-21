@@ -1,10 +1,9 @@
-﻿// <copyright file="Interpreter.cs" company="Microsoft">
+﻿// <copyright file="ExpressionEvaluator.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib.Interpretation
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -17,6 +16,11 @@ namespace ZenLib.Interpretation
     /// </summary>
     internal sealed class ExpressionEvaluator : IZenExprVisitor<ExpressionEvaluatorEnvironment, object>
     {
+        /// <summary>
+        /// Evaluate method reference.
+        /// </summary>
+        private static MethodInfo evaluateMethod = typeof(ExpressionEvaluator).GetMethod("Evaluate");
+
         /// <summary>
         /// Whether to track covered branches.
         /// </summary>
@@ -184,11 +188,8 @@ namespace ZenLib.Interpretation
                 var type = fieldValuePair.Value.GetType();
                 var innerType = type.BaseType.GetGenericArgumentsCached()[0];
                 var field = fieldValuePair.Key;
-                var evaluateMethod = typeof(ExpressionEvaluator)
-                    .GetMethod("Evaluate", BindingFlags.Public | BindingFlags.Instance)
-                    .MakeGenericMethod(innerType);
-
-                var valueResult = evaluateMethod.Invoke(this, new object[] { fieldValuePair.Value, parameter });
+                var method = evaluateMethod.MakeGenericMethod(innerType);
+                var valueResult = method.Invoke(this, new object[] { fieldValuePair.Value, parameter });
                 fieldNames.Add(field);
                 parameters.Add(valueResult);
             }

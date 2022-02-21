@@ -17,6 +17,11 @@ namespace ZenLib.ModelChecking
         : IZenExprVisitor<SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>
     {
         /// <summary>
+        /// Evaluate symbolic method reference.
+        /// </summary>
+        private static MethodInfo evaluateMethod = typeof(SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>).GetMethodCached("Evaluate");
+
+        /// <summary>
         /// Gets the solver.
         /// </summary>
         public ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Solver { get; }
@@ -141,10 +146,8 @@ namespace ZenLib.ModelChecking
                 try
                 {
                     var innerType = expr.GetType().BaseType.GetGenericArgumentsCached()[0];
-                    var evaluateMethod = typeof(SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
-                        .GetMethodCached("Evaluate")
-                        .MakeGenericMethod(innerType);
-                    var result = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)evaluateMethod.Invoke(this, new object[] { expr, parameter });
+                    var method = evaluateMethod.MakeGenericMethod(innerType);
+                    var result = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)method.Invoke(this, new object[] { expr, parameter });
                     this.Cache[expression] = result;
                     return result;
                 }
@@ -278,10 +281,8 @@ namespace ZenLib.ModelChecking
                 {
                     var field = fieldValuePair.Key;
                     var innerType = fieldValuePair.Value.GetType().BaseType.GetGenericArgumentsCached()[0];
-                    var evaluateMethod = typeof(SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)
-                        .GetMethodCached("Evaluate")
-                        .MakeGenericMethod(innerType);
-                    var fieldValue = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)evaluateMethod.Invoke(this, new object[] { fieldValuePair.Value, parameter });
+                    var method = evaluateMethod.MakeGenericMethod(innerType);
+                    var fieldValue = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)method.Invoke(this, new object[] { fieldValuePair.Value, parameter });
                     fields = fields.Add(field, fieldValue);
                 }
 

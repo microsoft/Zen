@@ -329,7 +329,7 @@ namespace ZenLib
 
         internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator, int depth, bool exhaustiveDepth)
         {
-            var parameter = new DepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustiveDepth };
+            var parameter = new ZenDepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustiveDepth };
             return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T), parameter);
         }
 
