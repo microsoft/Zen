@@ -49,7 +49,7 @@ namespace ZenLib.Solver
             return byte.Parse(parameter.ToString());
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
             {
@@ -103,8 +103,8 @@ namespace ZenLib.Solver
 
         private object CreateEmptyDictionary(Type keyType, Type valueType)
         {
-            var m = typeof(ImmutableDictionary).GetMethod("Create", new Type[] { }).MakeGenericMethod(keyType, valueType);
-            return m.Invoke(null, CommonUtilities.EmptyArray);
+            var c = typeof(Map<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+            return c.Invoke(CommonUtilities.EmptyArray);
         }
 
         private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
@@ -121,7 +121,7 @@ namespace ZenLib.Solver
                 return m.Invoke(dict, new object[] { key, value });
             } */
 
-            var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
+            var m = typeof(Map<,>).MakeGenericType(keyType, valueType).GetMethod("Set", new Type[] { keyType, valueType });
             return m.Invoke(dict, new object[] { key, value });
         }
 

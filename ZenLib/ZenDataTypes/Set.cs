@@ -72,7 +72,7 @@ namespace ZenLib
         /// <returns>The union of the two sets.</returns>
         public Set<T> Union(Set<T> other)
         {
-            return new Set<T>(new Map<T, SetUnit>(CommonUtilities.DictionaryUnion(this.Values.Values, other.Values.Values)));
+            return new Set<T>(CommonUtilities.DictionaryUnion(this.Values, other.Values));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace ZenLib
         /// <returns>The intersection of the two sets.</returns>
         public Set<T> Intersect(Set<T> other)
         {
-            return new Set<T>(new Map<T, SetUnit>(CommonUtilities.DictionaryIntersect(this.Values.Values, other.Values.Values)));
+            return new Set<T>(CommonUtilities.DictionaryIntersect(this.Values, other.Values));
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr1);
             CommonUtilities.ValidateNotNull(setExpr2);
 
-            var map = Create<Map<T, SetUnit>>(("Values", Zen.Union(setExpr1.Values().Values(), setExpr2.Values().Values())));
+            var map = Create<Map<T, SetUnit>>(("Values", Zen.Union(setExpr1.Values(), setExpr2.Values())));
             return Create<Set<T>>(("Values", map));
         }
 
@@ -256,7 +256,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr1);
             CommonUtilities.ValidateNotNull(setExpr2);
 
-            var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values().Values(), setExpr2.Values().Values())));
+            var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values(), setExpr2.Values())));
             return Create<Set<T>>(("Values", map));
         }
 

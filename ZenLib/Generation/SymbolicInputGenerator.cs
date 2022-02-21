@@ -104,7 +104,7 @@ namespace ZenLib.Generation
             return list;
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, ZenDepthConfiguration parameter)
+        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, ZenDepthConfiguration parameter)
         {
             var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, CommonUtilities.EmptyArray);

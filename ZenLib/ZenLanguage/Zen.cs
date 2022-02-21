@@ -525,7 +525,7 @@ namespace ZenLib
             if (type == ReflectionUtilities.BoolType ||
                 type == ReflectionUtilities.StringType ||
                 ReflectionUtilities.IsIntegerType(type) ||
-                ReflectionUtilities.IsIDictType(type) ||
+                ReflectionUtilities.IsMapType(type) ||
                 ReflectionUtilities.IsSeqType(type))
             {
                 return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
@@ -1236,7 +1236,7 @@ namespace ZenLib
         /// The Zen value for an empty dictionary.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> EmptyDict<TKey, TValue>()
+        internal static Zen<Map<TKey, TValue>> EmptyDict<TKey, TValue>()
         {
             return ZenDictEmptyExpr<TKey, TValue>.Instance;
         }
@@ -1245,9 +1245,9 @@ namespace ZenLib
         /// The union of two zen dictionaries.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, SetUnit>> Union<TKey>(
-            Zen<IDictionary<TKey, SetUnit>> d1,
-            Zen<IDictionary<TKey, SetUnit>> d2)
+        internal static Zen<Map<TKey, SetUnit>> Union<TKey>(
+            Zen<Map<TKey, SetUnit>> d1,
+            Zen<Map<TKey, SetUnit>> d2)
         {
             return ZenDictCombineExpr<TKey>.Create(d1, d2, ZenDictCombineExpr<TKey>.CombineType.Union);
         }
@@ -1256,9 +1256,9 @@ namespace ZenLib
         /// The intersection of two zen dictionaries.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, SetUnit>> Intersect<TKey>(
-            Zen<IDictionary<TKey, SetUnit>> d1,
-            Zen<IDictionary<TKey, SetUnit>> d2)
+        internal static Zen<Map<TKey, SetUnit>> Intersect<TKey>(
+            Zen<Map<TKey, SetUnit>> d1,
+            Zen<Map<TKey, SetUnit>> d2)
         {
             return ZenDictCombineExpr<TKey>.Create(d1, d2, ZenDictCombineExpr<TKey>.CombineType.Intersect);
         }
@@ -1267,9 +1267,9 @@ namespace ZenLib
         /// The Zen value for an empty dict.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> ArbitraryDict<TKey, TValue>()
+        internal static Zen<Map<TKey, TValue>> ArbitraryDict<TKey, TValue>()
         {
-            return new ZenArbitraryExpr<IDictionary<TKey, TValue>>();
+            return new ZenArbitraryExpr<Map<TKey, TValue>>();
         }
 
         /// <summary>
@@ -1288,7 +1288,7 @@ namespace ZenLib
         /// <param name="keyExpr">The key expression.</param>
         /// <param name="valueExpr">The value expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> DictSet<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        internal static Zen<Map<TKey, TValue>> DictSet<TKey, TValue>(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
             return ZenDictSetExpr<TKey, TValue>.Create(dictExpr, keyExpr, valueExpr);
         }
@@ -1299,7 +1299,7 @@ namespace ZenLib
         /// <param name="dictExpr">The dictionary expression.</param>
         /// <param name="keyExpr">The key expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> DictDelete<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        internal static Zen<Map<TKey, TValue>> DictDelete<TKey, TValue>(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
         {
             return ZenDictDeleteExpr<TKey, TValue>.Create(dictExpr, keyExpr);
         }
@@ -1310,7 +1310,7 @@ namespace ZenLib
         /// <param name="dictExpr">The dictionary expression.</param>
         /// <param name="keyExpr">The key expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Option<TValue>> DictGet<TKey, TValue>(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        internal static Zen<Option<TValue>> DictGet<TKey, TValue>(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
         {
             return ZenDictGetExpr<TKey, TValue>.Create(dictExpr, keyExpr);
         }

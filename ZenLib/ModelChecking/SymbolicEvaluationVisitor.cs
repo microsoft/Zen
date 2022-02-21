@@ -113,7 +113,7 @@ namespace ZenLib.ModelChecking
                 this.ArbitraryVariables[expression] = variable;
                 return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
             }
-            else if (ReflectionUtilities.IsIDictType(type))
+            else if (ReflectionUtilities.IsMapType(type))
             {
                 var (variable, expr) = this.Solver.CreateDictVar(expression);
                 this.Variables.Add(variable);

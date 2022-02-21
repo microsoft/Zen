@@ -194,7 +194,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return Create<Map<TKey, TValue>>(("Values", DictSet(mapExpr.Values(), keyExpr, valueExpr)));
+            return Create<Map<TKey, TValue>>(("Values", DictSet(mapExpr, keyExpr, valueExpr)));
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return Create<Map<TKey, TValue>>(("Values", DictDelete(mapExpr.Values(), keyExpr)));
+            return Create<Map<TKey, TValue>>(("Values", DictDelete(mapExpr, keyExpr)));
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return DictGet(mapExpr.Values(), keyExpr);
+            return DictGet(mapExpr, keyExpr);
         }
 
         /// <summary>

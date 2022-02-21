@@ -11,25 +11,25 @@ namespace ZenLib
     /// <summary>
     /// Class representing a dictionary set expression.
     /// </summary>
-    internal sealed class ZenDictSetExpr<TKey, TValue> : Zen<IDictionary<TKey, TValue>>
+    internal sealed class ZenDictSetExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IDictionary<TKey, TValue>>, Zen<TKey>, Zen<TValue>), Zen<IDictionary<TKey, TValue>>> createFunc = (v) =>
+        private static Func<(Zen<Map<TKey, TValue>>, Zen<TKey>, Zen<TValue>), Zen<Map<TKey, TValue>>> createFunc = (v) =>
             Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenDictSetExpr.
         /// </summary>
-        private static HashConsTable<(long, long, long), Zen<IDictionary<TKey, TValue>>> hashConsTable =
-            new HashConsTable<(long, long, long), Zen<IDictionary<TKey, TValue>>>();
+        private static HashConsTable<(long, long, long), Zen<Map<TKey, TValue>>> hashConsTable =
+            new HashConsTable<(long, long, long), Zen<Map<TKey, TValue>>>();
 
         /// <summary>
         /// Unroll a ZenDictSetExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<IDictionary<TKey, TValue>> Unroll()
+        public override Zen<Map<TKey, TValue>> Unroll()
         {
             return Create(this.DictExpr.Unroll(), this.KeyExpr.Unroll(), this.ValueExpr.Unroll());
         }
@@ -41,7 +41,7 @@ namespace ZenLib
         /// <param name="key">The key expr.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<IDictionary<TKey, TValue>> Simplify(Zen<IDictionary<TKey, TValue>> dict, Zen<TKey> key, Zen<TValue> value)
+        private static Zen<Map<TKey, TValue>> Simplify(Zen<Map<TKey, TValue>> dict, Zen<TKey> key, Zen<TValue> value)
         {
             if (dict is ZenDictSetExpr<TKey, TValue> e1 && e1.KeyExpr.Equals(key))
             {
@@ -63,7 +63,7 @@ namespace ZenLib
         /// <param name="key">The key expr.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<IDictionary<TKey, TValue>> Create(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> key, Zen<TValue> value)
+        public static Zen<Map<TKey, TValue>> Create(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> key, Zen<TValue> value)
         {
             CommonUtilities.ValidateNotNull(dictExpr);
             CommonUtilities.ValidateNotNull(key);
@@ -80,7 +80,7 @@ namespace ZenLib
         /// <param name="dictExpr">The dictionary expression.</param>
         /// <param name="keyExpr">The key expression to add a value for.</param>
         /// <param name="valueExpr">The expression for the value.</param>
-        private ZenDictSetExpr(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        private ZenDictSetExpr(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
             this.DictExpr = dictExpr;
             this.KeyExpr = keyExpr;
@@ -90,7 +90,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the dictionary expr.
         /// </summary>
-        public Zen<IDictionary<TKey, TValue>> DictExpr { get; }
+        public Zen<Map<TKey, TValue>> DictExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.

@@ -11,25 +11,25 @@ namespace ZenLib
     /// <summary>
     /// Class representing a dictionary union expression.
     /// </summary>
-    internal sealed class ZenDictCombineExpr<TKey> : Zen<IDictionary<TKey, SetUnit>>
+    internal sealed class ZenDictCombineExpr<TKey> : Zen<Map<TKey, SetUnit>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IDictionary<TKey, SetUnit>>, Zen<IDictionary<TKey, SetUnit>>, CombineType), Zen<IDictionary<TKey, SetUnit>>> createFunc = (v) =>
+        private static Func<(Zen<Map<TKey, SetUnit>>, Zen<Map<TKey, SetUnit>>, CombineType), Zen<Map<TKey, SetUnit>>> createFunc = (v) =>
             Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenDictUnionExpr.
         /// </summary>
-        private static HashConsTable<(long, long, int), Zen<IDictionary<TKey, SetUnit>>> hashConsTable =
-            new HashConsTable<(long, long, int), Zen<IDictionary<TKey, SetUnit>>>();
+        private static HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>> hashConsTable =
+            new HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>>();
 
         /// <summary>
         /// Unroll a ZenDictUnionExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<IDictionary<TKey, SetUnit>> Unroll()
+        public override Zen<Map<TKey, SetUnit>> Unroll()
         {
             return Create(this.DictExpr1.Unroll(), this.DictExpr2.Unroll(), this.CombinationType);
         }
@@ -41,9 +41,9 @@ namespace ZenLib
         /// <param name="dict2">The dictionary expr.</param>
         /// <param name="combinationType">The combination type.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<IDictionary<TKey, SetUnit>> Simplify(
-            Zen<IDictionary<TKey, SetUnit>> dict1,
-            Zen<IDictionary<TKey, SetUnit>> dict2,
+        private static Zen<Map<TKey, SetUnit>> Simplify(
+            Zen<Map<TKey, SetUnit>> dict1,
+            Zen<Map<TKey, SetUnit>> dict2,
             CombineType combinationType)
         {
             if (dict1 is ZenDictCombineExpr<TKey> e1 &&
@@ -70,9 +70,9 @@ namespace ZenLib
         /// <param name="dictExpr2">The second dictionary expr.</param>
         /// <param name="combineType">The combination type.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<IDictionary<TKey, SetUnit>> Create(
-            Zen<IDictionary<TKey, SetUnit>> dictExpr1,
-            Zen<IDictionary<TKey, SetUnit>> dictExpr2,
+        public static Zen<Map<TKey, SetUnit>> Create(
+            Zen<Map<TKey, SetUnit>> dictExpr1,
+            Zen<Map<TKey, SetUnit>> dictExpr2,
             CombineType combineType)
         {
             CommonUtilities.ValidateNotNull(dictExpr1);
@@ -90,8 +90,8 @@ namespace ZenLib
         /// <param name="dictExpr2">The second dictionary expression.</param>
         /// <param name="combineType">The combination type.</param>
         private ZenDictCombineExpr(
-            Zen<IDictionary<TKey, SetUnit>> dictExpr1,
-            Zen<IDictionary<TKey, SetUnit>> dictExpr2,
+            Zen<Map<TKey, SetUnit>> dictExpr1,
+            Zen<Map<TKey, SetUnit>> dictExpr2,
             CombineType combineType)
         {
             this.DictExpr1 = dictExpr1;
@@ -102,12 +102,12 @@ namespace ZenLib
         /// <summary>
         /// Gets the first dictionary expr.
         /// </summary>
-        public Zen<IDictionary<TKey, SetUnit>> DictExpr1 { get; }
+        public Zen<Map<TKey, SetUnit>> DictExpr1 { get; }
 
         /// <summary>
         /// Gets the second dictionary expr.
         /// </summary>
-        public Zen<IDictionary<TKey, SetUnit>> DictExpr2 { get; }
+        public Zen<Map<TKey, SetUnit>> DictExpr2 { get; }
 
         /// <summary>
         /// Gets the combination type.

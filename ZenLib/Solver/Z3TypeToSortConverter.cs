@@ -64,7 +64,7 @@ namespace ZenLib.Solver
             return this.solver.ByteSort;
         }
 
-        public Sort VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public Sort VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             var keySort = this.GetSortForType(keyType);
             var valueSort = this.GetSortForType(valueType);

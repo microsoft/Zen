@@ -89,24 +89,19 @@ namespace ZenLib
         public readonly static Type SeqType = typeof(Seq<>);
 
         /// <summary>
+        /// The type of map values.
+        /// </summary>
+        public readonly static Type MapType = typeof(Map<,>);
+
+        /// <summary>
         /// Type of an IList.
         /// </summary>
         public readonly static Type IListType = typeof(IList<>);
 
         /// <summary>
-        /// Type of an IList.
-        /// </summary>
-        public readonly static Type IDictType = typeof(IDictionary<,>);
-
-        /// <summary>
         /// Type of an List.
         /// </summary>
         public readonly static Type ListType = typeof(List<>);
-
-        /// <summary>
-        /// Type of an List.
-        /// </summary>
-        public readonly static Type ImmutableDictType = typeof(ImmutableDictionary<,>);
 
         /// <summary>
         /// Type of a fixed size integer.
@@ -333,6 +328,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Check if a type is a Map type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsMapType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == MapType;
+        }
+
+        /// <summary>
         /// Check if a type is a Zen type.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -340,18 +345,6 @@ namespace ZenLib
         public static bool IsZenType(Type type)
         {
             return type.IsGenericType && !typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached());
-        }
-
-        /// <summary>
-        /// Check if a type is a Dictionary type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsIDictType(Type type)
-        {
-            return type.IsInterface &&
-                   type.IsGenericType &&
-                   type.GetGenericTypeDefinitionCached() == IDictType;
         }
 
         /// <summary>
@@ -654,13 +647,13 @@ namespace ZenLib
                 return c.Invoke(CommonUtilities.EmptyArray);
             }
 
-            if (IsIDictType(type))
+            if (IsMapType(type))
             {
                 var typeParameters = type.GetGenericArgumentsCached();
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
-                var f = ImmutableDictType.MakeGenericType(keyType, valueType).GetFieldCached("Empty");
-                return f.GetValue(null);
+                var c = MapType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
             }
 
             if (IsIListType(type))
@@ -726,12 +719,12 @@ namespace ZenLib
                 return visitor.VisitSeq(type, t, parameter);
             }
 
-            if (IsIDictType(type))
+            if (IsMapType(type))
             {
                 var typeParameters = type.GetGenericArgumentsCached();
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
-                return visitor.VisitDictionary(type, keyType, valueType, parameter);
+                return visitor.VisitMap(type, keyType, valueType, parameter);
             }
 
             if (IsIListType(type))
@@ -805,12 +798,12 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The list value.</param>
         /// <returns>The Zen value representing the list.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(IDictionary<TKey, TValue> value)
+        internal static Zen<Map<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(Map<TKey, TValue> value)
         {
-            Zen<IDictionary<TKey, TValue>> dict = ZenDictEmptyExpr<TKey, TValue>.Instance;
-            foreach (var elt in value)
+            Zen<Map<TKey, TValue>> dict = ZenDictEmptyExpr<TKey, TValue>.Instance;
+            foreach (var elt in value.Values)
             {
-                ReportIfNullConversionError(elt, "element", typeof(IDictionary<TKey, TValue>));
+                ReportIfNullConversionError(elt, "element", typeof(Map<TKey, TValue>));
                 dict = ZenDictSetExpr<TKey, TValue>.Create(dict, elt.Key, elt.Value);
             }
 
@@ -871,7 +864,7 @@ namespace ZenLib
                     return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
                 }
 
-                if (type.IsGenericType && typeArgs.Length == 2 && IDictType.MakeGenericType(typeArgs[0], typeArgs[1]).IsAssignableFrom(type))
+                if (IsMapType(type))
                 {
                     var keyType = typeArgs[0];
                     var valueType = typeArgs[1];
