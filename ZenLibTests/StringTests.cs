@@ -418,7 +418,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStringEqualityCompositeException2()
         {
-            CheckAgreement<IDictionary<string, string>, IDictionary<string, string>>((l1, l2) => l1 == l2);
+            CheckAgreement<Map<string, string>, Map<string, string>>((l1, l2) => l1 == l2);
         }
 
         /// <summary>

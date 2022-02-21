@@ -39,7 +39,7 @@ namespace ZenLib.Tests
             CheckAgreement<FString>(x => x == new FString("hello"));
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
 
-            CheckAgreement<IDictionary<int, int>>(x =>
+            CheckAgreement<FMap<int, int>>(x =>
             {
                 var d = new FMap<int, int>();
                 d.Set(1, 2);

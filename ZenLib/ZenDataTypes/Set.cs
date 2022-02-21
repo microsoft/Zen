@@ -241,8 +241,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr1);
             CommonUtilities.ValidateNotNull(setExpr2);
 
-            var map = Create<Map<T, SetUnit>>(("Values", Zen.Union(setExpr1.Values(), setExpr2.Values())));
-            return Create<Set<T>>(("Values", map));
+            return Create<Set<T>>(("Values", Zen.Union(setExpr1.Values(), setExpr2.Values())));
         }
 
         /// <summary>
@@ -256,8 +255,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr1);
             CommonUtilities.ValidateNotNull(setExpr2);
 
-            var map = Create<Map<T, SetUnit>>(("Values", Zen.Intersect(setExpr1.Values(), setExpr2.Values())));
-            return Create<Set<T>>(("Values", map));
+            return Create<Set<T>>(("Values", Zen.Intersect(setExpr1.Values(), setExpr2.Values())));
         }
 
         /// <summary>

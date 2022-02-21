@@ -77,7 +77,12 @@ namespace ZenLib
         /// <returns></returns>
         public Option<TValue> Get(TKey key)
         {
-            return CommonUtilities.DictionaryGet(this.Values, key);
+            if (this.Values.TryGetValue(key, out var value))
+            {
+                return Option.Some(value);
+            }
+
+            return Option.None<TValue>();
         }
 
         /// <summary>
@@ -162,7 +167,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Map<TKey, TValue>> Empty<TKey, TValue>()
         {
-            return Create<Map<TKey, TValue>>(("Values", EmptyDict<TKey, TValue>()));
+            return EmptyDict<TKey, TValue>();
         }
     }
 
@@ -171,16 +176,6 @@ namespace ZenLib
     /// </summary>
     public static class MapExtensions
     {
-        /// <summary>
-        /// The underlying IDictionary.
-        /// </summary>
-        /// <param name="mapExpr">The map expr.</param>
-        /// <returns>Zen value.</returns>
-        internal static Zen<IDictionary<TKey, TValue>> Values<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr)
-        {
-            return mapExpr.GetField<Map<TKey, TValue>, IDictionary<TKey, TValue>>("Values");
-        }
-
         /// <summary>
         /// Add a value to a Zen map.
         /// </summary>
@@ -194,7 +189,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return Create<Map<TKey, TValue>>(("Values", DictSet(mapExpr, keyExpr, valueExpr)));
+            return DictSet(mapExpr, keyExpr, valueExpr);
         }
 
         /// <summary>
@@ -208,7 +203,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return Create<Map<TKey, TValue>>(("Values", DictDelete(mapExpr, keyExpr)));
+            return DictDelete(mapExpr, keyExpr);
         }
 
         /// <summary>

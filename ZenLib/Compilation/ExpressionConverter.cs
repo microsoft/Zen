@@ -579,7 +579,7 @@ namespace ZenLib.Compilation
             var key = Convert(expression.KeyExpr, parameter);
             var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
             var method = typeof(Map<TKey, TValue>).GetMethodCached("Get");
-            return Expression.Call(null, method, mapExpr, key);
+            return Expression.Call(mapExpr, method, key);
         }
 
         public Expression Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)

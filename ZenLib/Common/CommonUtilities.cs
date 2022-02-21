@@ -102,24 +102,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Gets a value from a dictionary if the key exists.
-        /// </summary>
-        /// <typeparam name="TKey">The dictionary key type.</typeparam>
-        /// <typeparam name="TValue">The dictionary value type.</typeparam>
-        /// <param name="dictionary">The dictionary.</param>
-        /// <param name="key">The key to lookup.</param>
-        /// <returns></returns>
-        public static Option<TValue> DictionaryGet<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            if (dictionary.TryGetValue(key, out var value))
-            {
-                return Option.Some(value);
-            }
-
-            return Option.None<TValue>();
-        }
-
-        /// <summary>
         /// Unions two dictionaries.
         /// </summary>
         /// <param name="dict1">A dictionary.</param>
