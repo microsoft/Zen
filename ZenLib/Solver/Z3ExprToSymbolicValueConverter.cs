@@ -45,7 +45,7 @@ namespace ZenLib.Solver
             return new SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (BitVecExpr)parameter);
         }
 
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             return new SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this.solver, (ArrayExpr)parameter);
         }

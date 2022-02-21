@@ -113,7 +113,7 @@ namespace ZenLib.ModelChecking
                 this.ArbitraryVariables[expression] = variable;
                 return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, expr);
             }
-            else if (ReflectionUtilities.IsIDictType(type))
+            else if (ReflectionUtilities.IsMapType(type))
             {
                 var (variable, expr) = this.Solver.CreateDictVar(expression);
                 this.Variables.Add(variable);
@@ -425,7 +425,7 @@ namespace ZenLib.ModelChecking
                 else
                 {
                     // split the symbolic list
-                    var (hd, tl) = CommonUtilities.SplitHead(values);
+                    var (hd, tl) = CommonUtilities.SplitHeadHelper(values);
                     var tlImmutable = (ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>>)tl;
 
                     // push the guard into the tail of the list
@@ -436,7 +436,7 @@ namespace ZenLib.ModelChecking
 
                     // execute the cons case with placeholder values to get a new Zen value.
                     var arg1 = new ZenArgumentExpr<TList>();
-                    var arg2 = new ZenArgumentExpr<IList<TList>>();
+                    var arg2 = new ZenArgumentExpr<FSeq<TList>>();
                     var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
                     var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(parameter.ArgumentsToExpr, args);
                     var newExpression = expression.ConsCase(arg1, arg2);

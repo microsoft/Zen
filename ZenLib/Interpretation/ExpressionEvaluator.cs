@@ -197,11 +197,6 @@ namespace ZenLib.Interpretation
             return ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());
         }
 
-        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return ImmutableList<T>.Empty;
-        }
-
         public object Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = (T1)Evaluate(expression.Expr, parameter);
@@ -236,15 +231,7 @@ namespace ZenLib.Interpretation
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
-
-            if (ReflectionUtilities.IsIDictType(typeof(T)))
-            {
-                return CommonUtilities.DictionaryEquals((dynamic)e1, (dynamic)e2);
-            }
-            else
-            {
-                return ((T)e1).Equals((T)e2);
-            }
+            return ((T)e1).Equals((T)e2);
         }
 
         public object Visit<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
@@ -298,18 +285,23 @@ namespace ZenLib.Interpretation
             }
         }
 
+        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return new FSeq<T>();
+        }
+
         public object Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableList<T>)Evaluate(expression.Expr, parameter);
+            var e1 = (FSeq<T>)Evaluate(expression.Expr, parameter);
             var e2 = (T)Evaluate(expression.Element, parameter);
-            return e1.Insert(0, e2);
+            return e1.AddFront(e2);
         }
 
         public object Visit<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (ImmutableList<T>)Evaluate(expression.ListExpr, parameter);
+            var e = (FSeq<T>)Evaluate(expression.ListExpr, parameter);
 
-            if (e.Count == 0)
+            if (e.Count() == 0)
             {
                 return Evaluate(expression.EmptyCase, parameter);
             }
@@ -340,35 +332,35 @@ namespace ZenLib.Interpretation
 
         public object Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return ImmutableDictionary<TKey, TValue>.Empty;
+            return new Map<TKey, TValue>();
         }
 
         public object Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             var e3 = (TValue)Evaluate(expression.ValueExpr, parameter);
-            return e1.SetItem(e2, e3);
+            return e1.Set(e2, e3);
         }
 
         public object Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
-            return e1.Remove(e2);
+            return e1.Delete(e2);
         }
 
         public object Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableDictionary<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
-            return CommonUtilities.DictionaryGet(e1, e2);
+            return e1.Get(e2);
         }
 
         public object Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableDictionary<TKey, SetUnit>)Evaluate(expression.DictExpr1, parameter);
-            var e2 = (ImmutableDictionary<TKey, SetUnit>)Evaluate(expression.DictExpr2, parameter);
+            var e1 = (Map<TKey, SetUnit>)Evaluate(expression.DictExpr1, parameter);
+            var e2 = (Map<TKey, SetUnit>)Evaluate(expression.DictExpr2, parameter);
 
             switch (expression.CombinationType)
             {

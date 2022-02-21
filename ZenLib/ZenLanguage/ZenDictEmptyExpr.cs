@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// Class representing an empty dictionary expression.
     /// </summary>
-    internal sealed class ZenDictEmptyExpr<TKey, TValue> : Zen<IDictionary<TKey, TValue>>
+    internal sealed class ZenDictEmptyExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
         /// <summary>
         /// The empty dictionary instance.
@@ -21,7 +21,7 @@ namespace ZenLib
         /// Unroll the expression.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
-        public override Zen<IDictionary<TKey, TValue>> Unroll()
+        public override Zen<Map<TKey, TValue>> Unroll()
         {
             return this;
         }

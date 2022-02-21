@@ -4,13 +4,12 @@
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Class representing an empty list expression.
     /// </summary>
-    internal sealed class ZenListEmptyExpr<T> : Zen<IList<T>>
+    internal sealed class ZenListEmptyExpr<T> : Zen<FSeq<T>>
     {
         /// <summary>
         /// The empty list instance.
@@ -21,7 +20,7 @@ namespace ZenLib
         /// Unroll the expression.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
-        public override Zen<IList<T>> Unroll()
+        public override Zen<FSeq<T>> Unroll()
         {
             return this;
         }

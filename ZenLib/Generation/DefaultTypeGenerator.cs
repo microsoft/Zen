@@ -62,7 +62,7 @@ namespace ZenLib.Generation
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
-        public object VisitDictionary(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);

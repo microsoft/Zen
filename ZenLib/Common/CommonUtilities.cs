@@ -7,10 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Diagnostics.Contracts;
-    using System.Globalization;
     using System.Linq;
-    using System.Text;
     using System.Threading;
 
     /// <summary>
@@ -97,49 +94,22 @@ namespace ZenLib
         /// </summary>
         /// <param name="list">The list.</param>
         /// <returns>The head and the rest of the list.</returns>
-        public static (T, IList<T>) SplitHead<T>(ImmutableList<T> list)
+        public static (T, FSeq<T>) SplitHead<T>(FSeq<T> list)
+        {
+            var (hd, tl) = SplitHeadHelper(list.Values);
+            return (hd, new FSeq<T>(tl));
+        }
+
+        /// <summary>
+        /// Split a list to peel off the first element.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        /// <returns>The head and the rest of the list.</returns>
+        public static (T, ImmutableList<T>) SplitHeadHelper<T>(ImmutableList<T> list)
         {
             var hd = list[0];
             var tl = list.Count == 1 ? ImmutableList<T>.Empty : list.GetRange(1, list.Count - 1);
             return (hd, tl);
-        }
-
-        /// <summary>
-        /// Gets a value from a dictionary if the key exists.
-        /// </summary>
-        /// <typeparam name="TKey">The dictionary key type.</typeparam>
-        /// <typeparam name="TValue">The dictionary value type.</typeparam>
-        /// <param name="dictionary">The dictionary.</param>
-        /// <param name="key">The key to lookup.</param>
-        /// <returns></returns>
-        public static Option<TValue> DictionaryGet<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            if (dictionary.TryGetValue(key, out var value))
-            {
-                return Option.Some(value);
-            }
-
-            return Option.None<TValue>();
-        }
-
-        /// <summary>
-        /// Checks if two dictionaries are equal.
-        /// </summary>
-        /// <typeparam name="TKey">The dictionary key type.</typeparam>
-        /// <typeparam name="TValue">The dictionary value type.</typeparam>
-        /// <param name="dictionary1">The first dictionary.</param>
-        /// <param name="dictionary2">The second dictionary.</param>
-        /// <returns></returns>
-        public static bool DictionaryEquals<TKey, TValue>(IDictionary<TKey, TValue> dictionary1, IDictionary<TKey, TValue> dictionary2)
-        {
-            if (dictionary1.Count != dictionary2.Count)
-            {
-                return false;
-            }
-
-            var pairs1 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary1);
-            var pairs2 = new HashSet<KeyValuePair<TKey, TValue>>(dictionary2);
-            return pairs1.SetEquals(pairs2);
         }
 
         /// <summary>
@@ -148,9 +118,9 @@ namespace ZenLib
         /// <param name="dict1">A dictionary.</param>
         /// <param name="dict2">A dictionary.</param>
         /// <returns>The union of the two dictionaries.</returns>
-        public static ImmutableDictionary<T, SetUnit> DictionaryUnion<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
+        public static Map<T, SetUnit> DictionaryUnion<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
         {
-            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Union(dict2));
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Union(dict2.Values)));
         }
 
         /// <summary>
@@ -159,9 +129,9 @@ namespace ZenLib
         /// <param name="dict1">A dictionary.</param>
         /// <param name="dict2">A dictionary.</param>
         /// <returns>The intersection of the two dictionaries.</returns>
-        public static ImmutableDictionary<T, SetUnit> DictionaryIntersect<T>(IDictionary<T, SetUnit> dict1, IDictionary<T, SetUnit> dict2)
+        public static Map<T, SetUnit> DictionaryIntersect<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
         {
-            return ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Intersect(dict2));
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Intersect(dict2.Values)));
         }
 
         /// <summary>

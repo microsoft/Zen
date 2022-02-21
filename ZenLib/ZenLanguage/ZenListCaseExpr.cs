@@ -30,7 +30,7 @@ namespace ZenLib
         /// <param name="consCase">The cons case.</param>
         /// <param name="unroll">Whether to unroll the expr.</param>
         /// <returns></returns>
-        private static Zen<TResult> Simplify(Zen<IList<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> consCase, bool unroll)
+        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> consCase, bool unroll)
         {
             if (e is ZenListEmptyExpr<T> l1)
             {
@@ -42,7 +42,7 @@ namespace ZenLib
                 return consCase(l2.Element, l2.Expr);
             }
 
-            if (unroll && e is ZenIfExpr<IList<T>> l3)
+            if (unroll && e is ZenIfExpr<FSeq<T>> l3)
             {
                 var tbranch = Create(l3.TrueExpr, emptyCase, consCase);
                 var fbranch = Create(l3.FalseExpr, emptyCase, consCase);
@@ -61,9 +61,9 @@ namespace ZenLib
         /// <param name="unroll">Whether to unroll the expr.</param>
         /// <returns>The new expr.</returns>
         public static Zen<TResult> Create(
-            Zen<IList<T>> listExpr,
+            Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons,
+            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons,
             bool unroll = false)
         {
             CommonUtilities.ValidateNotNull(listExpr);
@@ -80,9 +80,9 @@ namespace ZenLib
         /// <param name="empty">The empty case.</param>
         /// <param name="cons">The cons case.</param>
         private ZenListCaseExpr(
-            Zen<IList<T>> listExpr,
+            Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> cons)
+            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
             this.ListExpr = listExpr;
             this.EmptyCase = empty;
@@ -92,7 +92,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the list expr.
         /// </summary>
-        public Zen<IList<T>> ListExpr { get; }
+        public Zen<FSeq<T>> ListExpr { get; }
 
         /// <summary>
         /// Gets the list expr.
@@ -102,7 +102,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the element to add.
         /// </summary>
-        public Func<Zen<T>, Zen<IList<T>>, Zen<TResult>> ConsCase { get; }
+        public Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
 
         /// <summary>
         /// Convert the expression to a string.

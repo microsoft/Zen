@@ -19,7 +19,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
         /// </summary>
-        public IList<T> Values { get; set; } = ImmutableList<T>.Empty;
+        public ImmutableList<T> Values { get; set; } = ImmutableList<T>.Empty;
 
         /// <summary>
         /// Creates a new instance of the <see cref="FSeq{T}"/> class.
@@ -32,6 +32,24 @@ namespace ZenLib
         internal FSeq(ImmutableList<T> list)
         {
             this.Values = list;
+        }
+
+        /// <summary>
+        /// Checks if the sequence is empty.
+        /// </summary>
+        /// <returns>True if the sequence contains no elements..</returns>
+        public bool IsEmpty()
+        {
+            return this.Values.Count == 0;
+        }
+
+        /// <summary>
+        /// Gets the count of elements in the sequence.
+        /// </summary>
+        /// <returns>An integer count.</returns>
+        public int Count()
+        {
+            return this.Values.Count;
         }
 
         /// <summary>
@@ -64,9 +82,9 @@ namespace ZenLib
         /// Convert a collection of items to a sequence.
         /// </summary>
         /// <param name="values">The items to add to the sequence.</param>
-        public static FSeq<T> FromArray<T>(params T[] values)
+        public static FSeq<T> FromRange<T>(IEnumerable<T> values)
         {
-            return new FSeq<T> { Values = values.ToList() };
+            return new FSeq<T> { Values = ImmutableList.CreateRange(values) };
         }
 
         /// <summary>
@@ -75,17 +93,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Empty<T>()
         {
-            return Zen.Create<FSeq<T>>(("Values", ZenListEmptyExpr<T>.Instance));
-        }
-
-        /// <summary>
-        /// The Zen value for a sequence from a list.
-        /// </summary>
-        /// <param name="listExpr">The list expr.</param>
-        /// <returns>Zen value.</returns>
-        internal static Zen<FSeq<T>> Create<T>(Zen<IList<T>> listExpr)
-        {
-            return Zen.Create<FSeq<T>>(("Values", listExpr));
+            return ZenListEmptyExpr<T>.Instance;
         }
 
         /// <summary>
@@ -109,19 +117,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(elements);
 
-            return FSeq.Create(Zen.List(elements.ToArray()));
-        }
-
-        /// <summary>
-        /// The Zen expression for whether an option has a value.
-        /// </summary>
-        /// <param name="expr">The expression.</param>
-        /// <returns>Zen value.</returns>
-        internal static Zen<IList<T>> Values<T>(this Zen<FSeq<T>> expr)
-        {
-            CommonUtilities.ValidateNotNull(expr);
-
-            return expr.GetField<FSeq<T>, IList<T>>("Values");
+            return Zen.List(elements.ToArray());
         }
 
         /// <summary>
@@ -151,7 +147,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(seqExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return FSeq.Create(ZenListAddFrontExpr<T>.Create(seqExpr.Values(), valueExpr));
+            return ZenListAddFrontExpr<T>.Create(seqExpr, valueExpr);
         }
 
         /// <summary>
@@ -170,7 +166,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(empty);
             CommonUtilities.ValidateNotNull(cons);
 
-            return ZenListCaseExpr<T, TResult>.Create(seqExpr.Values(), empty, (hd, tl) => cons(hd, FSeq.Create(tl)));
+            return ZenListCaseExpr<T, TResult>.Create(seqExpr, empty, (hd, tl) => cons(hd, tl));
         }
 
         /// <summary>

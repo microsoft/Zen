@@ -82,7 +82,7 @@ namespace ZenLib
         /// Visit the dictionary type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitDictionary(Type dictionaryType, Type keyType, Type valueType, TParam parameter);
+        T VisitMap(Type dictionaryType, Type keyType, Type valueType, TParam parameter);
 
         /// <summary>
         /// Visit the sequence type.

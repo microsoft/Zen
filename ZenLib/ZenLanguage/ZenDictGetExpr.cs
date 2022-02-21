@@ -16,7 +16,7 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IDictionary<TKey, TValue>>, Zen<TKey>), Zen<Option<TValue>>> createFunc = (v) =>
+        private static Func<(Zen<Map<TKey, TValue>>, Zen<TKey>), Zen<Option<TValue>>> createFunc = (v) =>
             Simplify(v.Item1, v.Item2);
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace ZenLib
         /// <param name="dict">The dictionary expr.</param>
         /// <param name="key">The key expr.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<Option<TValue>> Simplify(Zen<IDictionary<TKey, TValue>> dict, Zen<TKey> key)
+        private static Zen<Option<TValue>> Simplify(Zen<Map<TKey, TValue>> dict, Zen<TKey> key)
         {
             if (dict is ZenDictEmptyExpr<TKey, TValue>)
             {
@@ -66,7 +66,7 @@ namespace ZenLib
         /// <param name="dictExpr">The dictionary expr.</param>
         /// <param name="key">The key expr.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<Option<TValue>> Create(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> key)
+        public static Zen<Option<TValue>> Create(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> key)
         {
             CommonUtilities.ValidateNotNull(dictExpr);
             CommonUtilities.ValidateNotNull(key);
@@ -81,7 +81,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="dictExpr">The dictionary expression.</param>
         /// <param name="keyExpr">The key expression to add a value for.</param>
-        private ZenDictGetExpr(Zen<IDictionary<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        private ZenDictGetExpr(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
         {
             this.DictExpr = dictExpr;
             this.KeyExpr = keyExpr;
@@ -90,7 +90,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the dictionary expr.
         /// </summary>
-        public Zen<IDictionary<TKey, TValue>> DictExpr { get; }
+        public Zen<Map<TKey, TValue>> DictExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.

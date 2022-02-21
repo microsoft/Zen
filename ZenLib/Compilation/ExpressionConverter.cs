@@ -347,23 +347,6 @@ namespace ZenLib.Compilation
                 return Expression.Call(e1, typeof(T).GetMethod("Equals", new Type[] { typeof(object) }), e2);
             }
 
-            if (ReflectionUtilities.IsIDictType(typeof(T)))
-            {
-                var typeArgs = typeof(T).GetGenericArgumentsCached();
-                var keyType = typeArgs[0];
-                var valueType = typeArgs[1];
-
-                var method = typeof(CommonUtilities)
-                    .GetMethodCached("DictionaryEquals")
-                    .MakeGenericMethod(keyType, valueType);
-
-                var dictType = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType);
-                var immutableDictExpr1 = Expression.Convert(e1, dictType);
-                var immutableDictExpr2 = Expression.Convert(e2, dictType);
-
-                return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
-            }
-
             return Expression.Equal(e1, e2);
         }
 
@@ -395,38 +378,39 @@ namespace ZenLib.Compilation
 
         public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var method = typeof(ImmutableList<T>).GetMethodCached("Insert");
             var list = Convert(expression.Expr, parameter);
-            var immutableListExpr = Expression.Convert(list, typeof(ImmutableList<T>));
             var element = Convert(expression.Element, parameter);
-            return Expression.Call(immutableListExpr, method, Expression.Constant(0), element);
+            var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
+            var method = typeof(FSeq<T>).GetMethodCached("AddFront");
+            return Expression.Call(fseqExpr, method, element);
         }
 
         public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var fieldInfo = typeof(ImmutableList<T>).GetFieldCached("Empty");
-            return Expression.Field(null, fieldInfo);
+            var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
+            return Expression.New(c);
         }
 
         public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
-            var immutableListType = typeof(ImmutableList<TList>);
+            var fseqType = typeof(FSeq<TList>);
 
             // compile the list expression
             var listExpr = Convert(expression.ListExpr, parameter);
-            var immutableListExpr = Expression.Convert(listExpr, typeof(ImmutableList<TList>));
+            var fseqExpr = Expression.Convert(listExpr, typeof(FSeq<TList>));
 
-            var listVariable = FreshVariable(immutableListType);
-            this.Variables.Add(listVariable);
-            this.BlockExpressions.Add(Expression.Assign(listVariable, immutableListExpr));
+            var fseqVariable = FreshVariable(fseqType);
+            this.Variables.Add(fseqVariable);
+            this.BlockExpressions.Add(Expression.Assign(fseqVariable, fseqExpr));
 
             // check if list is empty, if so return the empty case
-            var isEmptyExpr = Expression.PropertyOrField(listVariable, "IsEmpty");
+            var isEmptyMethod = typeof(FSeq<TList>).GetMethodCached("IsEmpty");
+            var isEmptyExpr = Expression.Call(fseqVariable, isEmptyMethod);
 
             // call SplitHead to get the tuple result.
             var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
-            var splitExpr = Expression.Call(splitMethod, listVariable);
-            var splitVariable = FreshVariable(typeof(ValueTuple<TList, IList<TList>>));
+            var splitExpr = Expression.Call(splitMethod, fseqVariable);
+            var splitVariable = FreshVariable(typeof(ValueTuple<TList, FSeq<TList>>));
 
             // extract the head and tail
             var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
@@ -438,7 +422,7 @@ namespace ZenLib.Compilation
             // run the cons lambda
             var runMethod = typeof(Interpreter)
                 .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(TList), typeof(IList<TList>), typeof(TResult));
+                .MakeGenericMethod(typeof(TList), typeof(FSeq<TList>), typeof(TResult));
 
             // create the bound arguments by constructing the immutable list
             var dictType = typeof(ImmutableDictionary<long, object>);
@@ -468,7 +452,7 @@ namespace ZenLib.Compilation
 
                 var argHd = new ZenArgumentExpr<TList>();
                 newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
-                var argTl = new ZenArgumentExpr<IList<TList>>();
+                var argTl = new ZenArgumentExpr<FSeq<TList>>();
                 newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
 
                 var zenConsExpr = expression.ConsCase(argHd, argTl);
@@ -567,38 +551,36 @@ namespace ZenLib.Compilation
 
         public Expression Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var fieldInfo = typeof(ImmutableDictionary<TKey, TValue>).GetFieldCached("Empty");
-            return Expression.Field(null, fieldInfo);
+            var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
+            return Expression.New(c);
         }
 
         public Expression Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("SetItem");
             var dict = Convert(expression.DictExpr, parameter);
-            var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
             var key = Convert(expression.KeyExpr, parameter);
             var value = Convert(expression.ValueExpr, parameter);
-            return Expression.Call(immutableDictExpr, method, key, value);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Set");
+            return Expression.Call(mapExpr, method, key, value);
         }
 
         public Expression Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var method = typeof(ImmutableDictionary<TKey, TValue>).GetMethodCached("Remove");
             var dict = Convert(expression.DictExpr, parameter);
-            var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
             var key = Convert(expression.KeyExpr, parameter);
-            return Expression.Call(immutableDictExpr, method, key);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Delete");
+            return Expression.Call(mapExpr, method, key);
         }
 
         public Expression Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var method = typeof(CommonUtilities)
-                .GetMethodCached("DictionaryGet")
-                .MakeGenericMethod(typeof(TKey), typeof(TValue));
             var dict = Convert(expression.DictExpr, parameter);
-            var immutableDictExpr = Expression.Convert(dict, typeof(ImmutableDictionary<TKey, TValue>));
             var key = Convert(expression.KeyExpr, parameter);
-            return Expression.Call(null, method, immutableDictExpr, key);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Get");
+            return Expression.Call(mapExpr, method, key);
         }
 
         public Expression Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
@@ -617,9 +599,9 @@ namespace ZenLib.Compilation
 
             var dict1 = Convert(expression.DictExpr1, parameter);
             var dict2 = Convert(expression.DictExpr2, parameter);
-            var immutableDictExpr1 = Expression.Convert(dict1, typeof(ImmutableDictionary<TKey, SetUnit>));
-            var immutableDictExpr2 = Expression.Convert(dict2, typeof(ImmutableDictionary<TKey, SetUnit>));
-            return Expression.Call(null, method, immutableDictExpr1, immutableDictExpr2);
+            var mapExpr1 = Expression.Convert(dict1, typeof(Map<TKey, SetUnit>));
+            var mapExpr2 = Expression.Convert(dict2, typeof(Map<TKey, SetUnit>));
+            return Expression.Call(null, method, mapExpr1, mapExpr2);
         }
 
         public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
