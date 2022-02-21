@@ -94,7 +94,18 @@ namespace ZenLib
         /// </summary>
         /// <param name="list">The list.</param>
         /// <returns>The head and the rest of the list.</returns>
-        public static (T, IList<T>) SplitHead<T>(ImmutableList<T> list)
+        public static (T, FSeq<T>) SplitHead<T>(FSeq<T> list)
+        {
+            var (hd, tl) = SplitHeadHelper(list.Values);
+            return (hd, new FSeq<T>(tl));
+        }
+
+        /// <summary>
+        /// Split a list to peel off the first element.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        /// <returns>The head and the rest of the list.</returns>
+        public static (T, ImmutableList<T>) SplitHeadHelper<T>(ImmutableList<T> list)
         {
             var hd = list[0];
             var tl = list.Count == 1 ? ImmutableList<T>.Empty : list.GetRange(1, list.Count - 1);

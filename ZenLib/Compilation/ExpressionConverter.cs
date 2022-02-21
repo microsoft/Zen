@@ -378,38 +378,39 @@ namespace ZenLib.Compilation
 
         public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var method = typeof(ImmutableList<T>).GetMethodCached("Insert");
             var list = Convert(expression.Expr, parameter);
-            var immutableListExpr = Expression.Convert(list, typeof(ImmutableList<T>));
             var element = Convert(expression.Element, parameter);
-            return Expression.Call(immutableListExpr, method, Expression.Constant(0), element);
+            var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
+            var method = typeof(FSeq<T>).GetMethodCached("AddFront");
+            return Expression.Call(fseqExpr, method, element);
         }
 
         public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var fieldInfo = typeof(ImmutableList<T>).GetFieldCached("Empty");
-            return Expression.Field(null, fieldInfo);
+            var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
+            return Expression.New(c);
         }
 
         public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
-            var immutableListType = typeof(ImmutableList<TList>);
+            var fseqType = typeof(FSeq<TList>);
 
             // compile the list expression
             var listExpr = Convert(expression.ListExpr, parameter);
-            var immutableListExpr = Expression.Convert(listExpr, typeof(ImmutableList<TList>));
+            var fseqExpr = Expression.Convert(listExpr, typeof(FSeq<TList>));
 
-            var listVariable = FreshVariable(immutableListType);
-            this.Variables.Add(listVariable);
-            this.BlockExpressions.Add(Expression.Assign(listVariable, immutableListExpr));
+            var fseqVariable = FreshVariable(fseqType);
+            this.Variables.Add(fseqVariable);
+            this.BlockExpressions.Add(Expression.Assign(fseqVariable, fseqExpr));
 
             // check if list is empty, if so return the empty case
-            var isEmptyExpr = Expression.PropertyOrField(listVariable, "IsEmpty");
+            var isEmptyMethod = typeof(FSeq<TList>).GetMethodCached("IsEmpty");
+            var isEmptyExpr = Expression.Call(fseqVariable, isEmptyMethod);
 
             // call SplitHead to get the tuple result.
             var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
-            var splitExpr = Expression.Call(splitMethod, listVariable);
-            var splitVariable = FreshVariable(typeof(ValueTuple<TList, IList<TList>>));
+            var splitExpr = Expression.Call(splitMethod, fseqVariable);
+            var splitVariable = FreshVariable(typeof(ValueTuple<TList, FSeq<TList>>));
 
             // extract the head and tail
             var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
@@ -421,7 +422,7 @@ namespace ZenLib.Compilation
             // run the cons lambda
             var runMethod = typeof(Interpreter)
                 .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(TList), typeof(IList<TList>), typeof(TResult));
+                .MakeGenericMethod(typeof(TList), typeof(FSeq<TList>), typeof(TResult));
 
             // create the bound arguments by constructing the immutable list
             var dictType = typeof(ImmutableDictionary<long, object>);
@@ -451,7 +452,7 @@ namespace ZenLib.Compilation
 
                 var argHd = new ZenArgumentExpr<TList>();
                 newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
-                var argTl = new ZenArgumentExpr<IList<TList>>();
+                var argTl = new ZenArgumentExpr<FSeq<TList>>();
                 newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
 
                 var zenConsExpr = expression.ConsCase(argHd, argTl);

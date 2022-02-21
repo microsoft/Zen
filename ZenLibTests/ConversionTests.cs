@@ -34,8 +34,8 @@ namespace ZenLib.Tests
             CheckAgreement<Option<int>>(x => x == Option.Some(3));
             CheckAgreement<Pair<int, int>>(x => x == new Pair<int, int> { Item1 = 1, Item2 = 2 });
             CheckAgreement<(int, int)>(x => x == (1, 2));
-            CheckAgreement<IList<int>>(x => x == new List<int>() { 1, 2, 3 });
-            CheckAgreement<IList<IList<int>>>(x => x == new List<IList<int>>() { new List<int>() { 1 } });
+            CheckAgreement<FSeq<int>>(x => x == FSeq.FromRange(new List<int>() { 1, 2, 3 }));
+            CheckAgreement<FSeq<FSeq<int>>>(x => x == FSeq.FromRange(new List<FSeq<int>>() { FSeq.FromRange(new List<int>() { 1 }) }));
             CheckAgreement<FString>(x => x == new FString("hello"));
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
 
@@ -66,7 +66,7 @@ namespace ZenLib.Tests
             CheckEqual(Option.Some(8));
             CheckEqual(new Pair<int, int> { Item1 = 9, Item2 = 10 });
             CheckEqual(new FString("hello"));
-            CheckEqualLists(new List<int>() { 1, 2, 3 });
+            CheckEqualLists(FSeq.FromRange(new List<int>() { 1, 2, 3 }));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConvertConcreteListField()
         {
-            var o = new NestedClass { Field1 = new List<int>() };
+            var o = new NestedClass { Field1 = FSeq.FromRange(new List<int>()) };
             var _ = Constant(o);
         }
 
@@ -139,7 +139,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConvertNullListValue()
         {
-            IList<Object1> o = new List<Object1> { { null } };
+            FSeq<Object1> o = FSeq.FromRange(new List<Object1> { { null } });
             var _ = Constant(o);
         }
 
@@ -169,16 +169,16 @@ namespace ZenLib.Tests
         /// Check we convert a list correctly.
         /// </summary>
         /// <param name="value">The value.</param>
-        private void CheckEqualLists<T>(IList<T> value)
+        private void CheckEqualLists<T>(FSeq<T> value)
         {
-            var f = new ZenFunction<IList<T>>(() => Lift(value));
+            var f = new ZenFunction<FSeq<T>>(() => Lift(value));
             var result = f.Evaluate();
 
-            Assert.AreEqual(value.Count, result.Count);
+            Assert.AreEqual(value.Count(), result.Count());
 
-            for (int i = 0; i < value.Count; i++)
+            for (int i = 0; i < value.Count(); i++)
             {
-                Assert.AreEqual(value[i], result[i]);
+                Assert.AreEqual(value.Values[i], result.Values[i]);
             }
         }
 
@@ -187,7 +187,7 @@ namespace ZenLib.Tests
         /// </summary>
         internal class NestedClass
         {
-            public IList<int> Field1 { get; set; }
+            public FSeq<int> Field1 { get; set; }
         }
     }
 }

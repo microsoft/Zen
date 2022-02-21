@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -96,21 +97,21 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolveLists()
         {
-            var a = Arbitrary<IList<int>>();
-            var b = Arbitrary<IList<int>>();
+            var a = Arbitrary<FSeq<int>>();
+            var b = Arbitrary<FSeq<int>>();
 
-            var expr = And(a == new List<int> { 1, 2 }, b == new List<int> { 3 });
+            var expr = And(a == FSeq.FromRange(new List<int> { 1, 2 }), b == FSeq.FromRange(new List<int> { 3 }));
             var solution = expr.Solve();
 
             var asol = solution.Get(a);
             var bsol = solution.Get(b);
 
-            Assert.AreEqual(2, asol.Count);
-            Assert.AreEqual(1, bsol.Count);
+            Assert.AreEqual(2, asol.Count());
+            Assert.AreEqual(1, bsol.Count());
 
-            Assert.AreEqual(1, asol[0]);
-            Assert.AreEqual(2, asol[1]);
-            Assert.AreEqual(3, bsol[0]);
+            Assert.AreEqual(1, asol.Values[0]);
+            Assert.AreEqual(2, asol.Values[1]);
+            Assert.AreEqual(3, bsol.Values[0]);
         }
 
         /// <summary>
@@ -245,7 +246,7 @@ namespace ZenLib.Tests
 
             var assignment = new Dictionary<object, object>
             {
-                { a, new FSeq<int> { Values = new List<int> { 3, 2, 1 } } },
+                { a, new FSeq<int> { Values = ImmutableList.CreateRange(new List<int> { 3, 2, 1 }) } },
             };
 
             var l = expr.Evaluate(assignment);

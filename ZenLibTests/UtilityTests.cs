@@ -68,7 +68,7 @@ namespace ZenLib.Tests
         public void TestSplitHead()
         {
             var list = ImmutableList<int>.Empty.Add(1).Add(2);
-            var (hd, tl) = CommonUtilities.SplitHead(list);
+            var (hd, tl) = CommonUtilities.SplitHeadHelper(list);
             Assert.AreEqual(1, hd);
             Assert.AreEqual(1, tl.Count);
         }
@@ -81,7 +81,7 @@ namespace ZenLib.Tests
         public void TestSplitHeadEmpty()
         {
             var list = ImmutableList<int>.Empty;
-            var _ = CommonUtilities.SplitHead(list);
+            var _ = CommonUtilities.SplitHeadHelper(list);
         }
 
         /// <summary>

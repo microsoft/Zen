@@ -510,7 +510,7 @@ namespace ZenLib
             return EqHelper<T>(expr1, expr2);
         }
 
-        private static Zen<bool> EqLists<T>(Zen<IList<T>> expr1, Zen<IList<T>> expr2)
+        private static Zen<bool> EqLists<T>(Zen<FSeq<T>> expr1, Zen<FSeq<T>> expr2)
         {
             return ZenListCaseExpr<T, bool>.Create(
                 expr1,
@@ -531,7 +531,7 @@ namespace ZenLib
                 return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
             }
 
-            if (ReflectionUtilities.IsIListType(type))
+            if (ReflectionUtilities.IsFSeqType(type))
             {
                 var innerType = type.GetGenericArgumentsCached()[0];
                 var method = eqListsMethod.MakeGenericMethod(innerType);
@@ -1227,7 +1227,7 @@ namespace ZenLib
         /// The Zen value for an empty List.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<IList<T>> EmptyList<T>()
+        internal static Zen<FSeq<T>> EmptyList<T>()
         {
             return ZenListEmptyExpr<T>.Instance;
         }
@@ -1320,13 +1320,13 @@ namespace ZenLib
         /// </summary>
         /// <param name="elements">Zen elements.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<IList<T>> List<T>(params Zen<T>[] elements)
+        internal static Zen<FSeq<T>> List<T>(params Zen<T>[] elements)
         {
             CommonUtilities.ValidateNotNull(elements);
 
             Zen<T>[] copy = new Zen<T>[elements.Length];
-            System.Array.Copy(elements, copy, elements.Length);
-            System.Array.Reverse(copy);
+            Array.Copy(elements, copy, elements.Length);
+            Array.Reverse(copy);
             var list = EmptyList<T>();
             foreach (var element in copy)
             {

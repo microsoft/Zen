@@ -11,12 +11,12 @@ namespace ZenLib
     /// <summary>
     /// Class representing a list add expression.
     /// </summary>
-    internal sealed class ZenListAddFrontExpr<T> : Zen<IList<T>>
+    internal sealed class ZenListAddFrontExpr<T> : Zen<FSeq<T>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<IList<T>>, Zen<T>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
+        private static Func<(Zen<FSeq<T>>, Zen<T>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenListAddFrontExpr.
@@ -27,7 +27,7 @@ namespace ZenLib
         /// Unroll a ZenListAddFrontExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<IList<T>> Unroll()
+        public override Zen<FSeq<T>> Unroll()
         {
             return Create(this.Expr.Unroll(), this.Element.Unroll());
         }
@@ -38,7 +38,7 @@ namespace ZenLib
         /// <param name="expr">The list expr.</param>
         /// <param name="element">The element expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenListAddFrontExpr<T> Create(Zen<IList<T>> expr, Zen<T> element)
+        public static ZenListAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<T> element)
         {
             CommonUtilities.ValidateNotNull(expr);
             CommonUtilities.ValidateNotNull(element);
@@ -53,7 +53,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The list expression.</param>
         /// <param name="element">The expression for the element to add.</param>
-        private ZenListAddFrontExpr(Zen<IList<T>> expr, Zen<T> element)
+        private ZenListAddFrontExpr(Zen<FSeq<T>> expr, Zen<T> element)
         {
             this.Expr = expr;
             this.Element = element;
@@ -62,7 +62,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the list expr.
         /// </summary>
-        public Zen<IList<T>> Expr { get; }
+        public Zen<FSeq<T>> Expr { get; }
 
         /// <summary>
         /// Gets the element to add.
@@ -76,7 +76,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"({this.Element} :: {this.Expr})";
+            return $"Cons({this.Element}, {this.Expr})";
         }
 
         /// <summary>

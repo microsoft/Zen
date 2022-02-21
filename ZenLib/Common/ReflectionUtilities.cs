@@ -94,14 +94,9 @@ namespace ZenLib
         public readonly static Type MapType = typeof(Map<,>);
 
         /// <summary>
-        /// Type of an IList.
+        /// The type of fseq values.
         /// </summary>
-        public readonly static Type IListType = typeof(IList<>);
-
-        /// <summary>
-        /// Type of an List.
-        /// </summary>
-        public readonly static Type ListType = typeof(List<>);
+        public readonly static Type FSeqType = typeof(FSeq<>);
 
         /// <summary>
         /// Type of a fixed size integer.
@@ -306,18 +301,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Check if a type is an IList type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsIListType(Type type)
-        {
-            return type.IsInterface &&
-                   type.IsGenericType &&
-                   type.GetGenericTypeDefinitionCached() == IListType;
-        }
-
-        /// <summary>
         /// Check if a type is a Seq type.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -335,6 +318,16 @@ namespace ZenLib
         public static bool IsMapType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == MapType;
+        }
+
+        /// <summary>
+        /// Check if a type is a FSeq type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsFSeqType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == FSeqType;
         }
 
         /// <summary>
@@ -656,10 +649,9 @@ namespace ZenLib
                 return c.Invoke(CommonUtilities.EmptyArray);
             }
 
-            if (IsIListType(type))
+            if (IsFSeqType(type))
             {
-                var innerType = type.GetGenericArgumentsCached()[0];
-                var c = ListType.MakeGenericType(innerType).GetConstructor(new Type[] { });
+                var c = type.GetConstructor(new Type[] { });
                 return c.Invoke(CommonUtilities.EmptyArray);
             }
 
@@ -727,7 +719,7 @@ namespace ZenLib
                 return visitor.VisitMap(type, keyType, valueType, parameter);
             }
 
-            if (IsIListType(type))
+            if (IsFSeqType(type))
             {
                 var t = type.GetGenericArgumentsCached()[0];
                 return visitor.VisitList(type, t, parameter);
@@ -781,12 +773,12 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The list value.</param>
         /// <returns>The Zen value representing the list.</returns>
-        internal static Zen<IList<T>> CreateZenListConstant<T>(IList<T> value)
+        internal static Zen<FSeq<T>> CreateZenListConstant<T>(FSeq<T> value)
         {
-            Zen<IList<T>> list = ZenListEmptyExpr<T>.Instance;
-            foreach (var elt in value.Reverse())
+            Zen<FSeq<T>> list = ZenListEmptyExpr<T>.Instance;
+            foreach (var elt in value.Values.Reverse())
             {
-                ReportIfNullConversionError(elt, "element", typeof(IList<T>));
+                ReportIfNullConversionError(elt, "element", typeof(FSeq<T>));
                 list = ZenListAddFrontExpr<T>.Create(list, elt);
             }
 
@@ -858,7 +850,7 @@ namespace ZenLib
                     return CreateZenSeqConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
                 }
 
-                if (type.IsGenericType && typeArgs.Length == 1 && IListType.MakeGenericType(typeArgs[0]).IsAssignableFrom(type))
+                if (IsFSeqType(type))
                 {
                     var innerType = typeArgs[0];
                     return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });

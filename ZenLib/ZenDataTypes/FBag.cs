@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -51,7 +52,7 @@ namespace ZenLib
         /// <param name="values">The items to add to the bag.</param>
         public static FBag<T> FromArray<T>(params T[] values)
         {
-            return new FBag<T> { Values = new FSeq<Option<T>> { Values = values.Select(Option.Some).ToList() } };
+            return new FBag<T> { Values = new FSeq<Option<T>> { Values = ImmutableList.CreateRange(values.Select(Option.Some)) } };
         }
 
         /// <summary>

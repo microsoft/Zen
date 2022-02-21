@@ -28,17 +28,17 @@ namespace ZenLib.Tests
         {
             // work around unused field warning.
             ObjectAttribute o1;
-            o1.Field1 = new List<int>();
-            o1.Field2 = new List<int>();
-            o1.Field3 = new List<int>();
+            o1.Field1 = new FSeq<int>();
+            o1.Field2 = new FSeq<int>();
+            o1.Field3 = new FSeq<int>();
 
             var o = Symbolic<ObjectAttribute>(depth: 3, exhaustiveDepth: true);
 
-            var s1 = o.GetField<ObjectAttribute, IList<int>>("Field1").ToString();
-            var s2 = o.GetField<ObjectAttribute, IList<int>>("Field2").ToString();
-            var s3 = o.GetField<ObjectAttribute, IList<int>>("Field3").ToString();
+            var s1 = o.GetField<ObjectAttribute, FSeq<int>>("Field1").ToString();
+            var s2 = o.GetField<ObjectAttribute, FSeq<int>>("Field2").ToString();
+            var s3 = o.GetField<ObjectAttribute, FSeq<int>>("Field3").ToString();
 
-            Assert.AreEqual(11, s1.Split("::").Length);
+            Assert.AreEqual(11, s1.Split("Cons").Length);
             Assert.AreEqual(6, s2.Split("Eq").Length);
             Assert.AreEqual(4, s3.Split("Eq").Length);
         }
@@ -46,13 +46,13 @@ namespace ZenLib.Tests
         private struct ObjectAttribute
         {
             [ZenSize(depth: 10, EnumerationType.FixedSize)]
-            public IList<int> Field1;
+            public FSeq<int> Field1;
 
             [ZenSize(depth: 5, EnumerationType.Exhaustive)]
-            public IList<int> Field2;
+            public FSeq<int> Field2;
 
             [ZenSize(depth: -1, EnumerationType.User)]
-            public IList<int> Field3;
+            public FSeq<int> Field3;
         }
     }
 }

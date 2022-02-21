@@ -45,8 +45,8 @@ namespace ZenLib.Tests
             Assert.AreEqual(o.Field1, 0);
             Assert.AreEqual(o.Field2, 0);
 
-            var l = ReflectionUtilities.GetDefaultValue<IList<int>>();
-            Assert.AreEqual(0, l.Count);
+            var l = ReflectionUtilities.GetDefaultValue<FSeq<int>>();
+            Assert.AreEqual(0, l.Count());
 
             var m = ReflectionUtilities.GetDefaultValue<Map<byte, byte>>();
             Assert.AreEqual(0, m.Count());

@@ -4,7 +4,6 @@
 
 namespace ZenLib.Interpretation
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -198,11 +197,6 @@ namespace ZenLib.Interpretation
             return ReflectionUtilities.CreateInstance<TObject>(fieldNames.ToArray(), parameters.ToArray());
         }
 
-        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return ImmutableList<T>.Empty;
-        }
-
         public object Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e = (T1)Evaluate(expression.Expr, parameter);
@@ -291,18 +285,23 @@ namespace ZenLib.Interpretation
             }
         }
 
+        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            return new FSeq<T>();
+        }
+
         public object Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ImmutableList<T>)Evaluate(expression.Expr, parameter);
+            var e1 = (FSeq<T>)Evaluate(expression.Expr, parameter);
             var e2 = (T)Evaluate(expression.Element, parameter);
-            return e1.Insert(0, e2);
+            return e1.AddFront(e2);
         }
 
         public object Visit<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (ImmutableList<T>)Evaluate(expression.ListExpr, parameter);
+            var e = (FSeq<T>)Evaluate(expression.ListExpr, parameter);
 
-            if (e.Count == 0)
+            if (e.Count() == 0)
             {
                 return Evaluate(expression.EmptyCase, parameter);
             }

@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         public void TestSeqToArray()
         {
             var a1 = new int[] { 1, 2, 3, 4 };
-            var s = FSeq.FromArray(a1);
+            var s = FSeq.FromRange(a1);
             var a2 = s.Values.ToArray();
             Assert.AreEqual(a1.Length, a2.Length);
 

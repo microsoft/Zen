@@ -387,7 +387,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStringEqualityCompositeException1()
         {
-            CheckAgreement<IList<string>, IList<string>>((l1, l2) => l1 == l2);
+            CheckAgreement<FSeq<string>, FSeq<string>>((l1, l2) => l1 == l2);
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStringEqualityCompositeException3()
         {
-            CheckAgreement<Option<IList<string>>, Option<IList<string>>>((l1, l2) => l1 == l2);
+            CheckAgreement<Option<FSeq<string>>, Option<FSeq<string>>>((l1, l2) => l1 == l2);
         }
 
         /// <summary>
@@ -438,7 +438,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStringEqualityCompositeException4()
         {
-            CheckAgreement<(string, IList<string>), (string, IList<string>)>((l1, l2) => l1 == l2);
+            CheckAgreement<(string, FSeq<string>), (string, FSeq<string>)>((l1, l2) => l1 == l2);
         }
 
         /// <summary>
