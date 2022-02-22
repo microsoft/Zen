@@ -13,20 +13,6 @@ namespace ZenLib
     public class RegexParser
     {
         /// <summary>
-        /// All valid characters.
-        /// </summary>
-        private static ISet<string> characters = new HashSet<string>
-        {
-            "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":",
-            ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~",
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-            "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-        };
-
-        /// <summary>
         /// Special characters.
         /// </summary>
         private static ISet<string> specialCharacters = new HashSet<string>
@@ -40,6 +26,15 @@ namespace ZenLib
         private static ISet<string> unaryOperationCharacters = new HashSet<string>
         {
             "*", "+", "?",
+        };
+
+        /// <summary>
+        /// Hexadecimal characters.
+        /// </summary>
+        private static ISet<string> hexCharacters = new HashSet<string>
+        {
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a",
+            "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F",
         };
 
         /// <summary>
@@ -74,12 +69,24 @@ namespace ZenLib
         /// <returns>The Zen regex value.</returns>
         public Regex<byte> Parse()
         {
-            return ParseRegex();
+            var ret = ParseRegex();
+            Console.WriteLine(ret);
+
+            if (symbol != string.Empty)
+            {
+                var remaining = inputString.Substring(currentIndex, inputString.Length - currentIndex - 1);
+                throw new ZenException($"Unable to parse trailing: {remaining}");
+            }
+
+            return ret;
         }
 
+        /// <summary>
+        /// Parse a regex from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseRegex()
         {
-            Console.WriteLine($"Parse Regex: {symbol}");
             var r = ParseTerm();
             while (symbol == "|")
             {
@@ -90,11 +97,14 @@ namespace ZenLib
             return r;
         }
 
+        /// <summary>
+        /// Parse a regex term (part of a union) from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseTerm()
         {
-            Console.WriteLine($"Parse Term: {symbol}");
             var r = ParseFactor();
-            while (IsCharacter() || symbol == "." || symbol == "(" || symbol == "[" || symbol == "\\")
+            while (IsNonSpecialCharacter() || symbol == "." || symbol == "(" || symbol == "[" || symbol == "\\")
             {
                 r = Regex.Concat(r, ParseFactor());
             }
@@ -102,33 +112,39 @@ namespace ZenLib
             return r;
         }
 
+        /// <summary>
+        /// Parse a factor (part of a concatentation) from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseFactor()
         {
-            Console.WriteLine($"Parse Factor: {symbol}");
             var r = ParseAtom();
-            if (AcceptUnaryOperation(out var operation))
+            while (Accept(unaryOperationCharacters, out var operation))
             {
                 if (operation == "*")
                 {
-                    return Regex.Star(r);
+                    r = Regex.Star(r);
                 }
                 else if (operation == "+")
                 {
-                    return Regex.Concat(r, Regex.Star(r));
+                    r = Regex.Concat(r, Regex.Star(r));
                 }
                 else
                 {
                     Contract.Assert(operation == "?");
-                    return Regex.Opt(r);
+                    r = Regex.Opt(r);
                 }
             }
 
             return r;
         }
 
+        /// <summary>
+        /// Parse an atom (a base element) from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseAtom()
         {
-            Console.WriteLine($"Parse Atom: {symbol}");
             if (AcceptNonSpecialCharacter(out var character))
             {
                 return Regex.Char((byte)character[0]);
@@ -150,9 +166,10 @@ namespace ZenLib
             }
             else if (Accept("["))
             {
+                var isNegated = Accept("^");
                 var r = ParseCharacterClass();
                 Expect("]");
-                return r;
+                return isNegated ? Regex.Negation(r) : r;
             }
             else
             {
@@ -160,10 +177,14 @@ namespace ZenLib
             }
         }
 
+        /// <summary>
+        /// Parse a character class from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseCharacterClass()
         {
             var r = ParseCharacterRange();
-            while (IsCharacter())
+            while (symbol != "]")
             {
                 r = Regex.Union(r, ParseCharacterRange());
             }
@@ -171,22 +192,44 @@ namespace ZenLib
             return r;
         }
 
+        /// <summary>
+        /// Parse a character range from the current location.
+        /// </summary>
+        /// <returns>A regex.</returns>
         private Regex<byte> ParseCharacterRange()
         {
-            var c1 = ParseCharacter();
+            var c1 = ParseClassCharacter();
+            Console.WriteLine($"got: {(char)c1}");
 
             if (Accept("-"))
             {
-                var c2 = (byte)ExpectNonSpecialCharacter()[0];
-                return Regex.Range(c1, c2);
+                // if the - is the last character, then it is treated as a literal.
+                if (Peek(1) == "]")
+                {
+                    return Regex.Char((byte)'-');
+                }
+                else
+                {
+                    var c2 = ParseClassCharacter();
+                    if (c2 < c1)
+                    {
+                        throw new ZenException($"Invalid character range given.");
+                    }
+
+                    return Regex.Range(c1, c2);
+                }
             }
 
             return Regex.Char(c1);
         }
 
-        private byte ParseCharacter()
+        /// <summary>
+        /// Parse a character or escaped sequence from the current location.
+        /// </summary>
+        /// <returns>A character value.</returns>
+        private byte ParseClassCharacter()
         {
-            if (AcceptNonSpecialCharacter(out var character))
+            if (AcceptClassCharacter(out var character))
             {
                 return (byte)character[0];
             }
@@ -201,16 +244,28 @@ namespace ZenLib
             }
         }
 
-        private bool IsCharacter()
+        /// <summary>
+        /// Determine if the current symbol is a character.
+        /// </summary>
+        /// <returns>True or false.</returns>
+        private bool IsNonSpecialCharacter()
         {
-            return characters.Contains(symbol) && !specialCharacters.Contains(symbol);
+            return symbol != "" && !specialCharacters.Contains(symbol);
         }
 
-        private bool IsUnaryOperation()
+        /// <summary>
+        /// Determine if the current symbol is a class character.
+        /// </summary>
+        /// <returns>True or false.</returns>
+        private bool IsClassCharacter()
         {
-            return unaryOperationCharacters.Contains(symbol);
+            return symbol != "" && symbol != "\\" && symbol != "]";
         }
 
+        /// <summary>
+        /// Consume a symbol and expect it to match the one provided.
+        /// </summary>
+        /// <param name="s">The expected symbol.</param>
         private void Expect(string s)
         {
             if (!Accept(s))
@@ -219,26 +274,22 @@ namespace ZenLib
             }
         }
 
-        private string ExpectNonSpecialCharacter()
-        {
-            if (!AcceptNonSpecialCharacter(out var character))
-            {
-                throw new ZenException($"Unexpected symbol {symbol}, expected non-special character");
-            }
-
-            return character;
-        }
-
+        /// <summary>
+        /// Consume a symbol and expect it to be any valid character.
+        /// </summary>
+        /// <returns>The symbol consumed.</returns>
         private string ExpectAnyCharacter()
         {
-            if (!AcceptAnyCharacter(out var character))
-            {
-                throw new ZenException($"Unexpected symbol {symbol}, expected character");
-            }
-
+            var character = symbol;
+            NextSymbol();
             return character;
         }
 
+        /// <summary>
+        /// Check if the next symbol matches the one tested and if so advance.
+        /// </summary>
+        /// <param name="s">The symbol tested.</param>
+        /// <returns>True if there was a match.</returns>
         private bool Accept(string s)
         {
             if (symbol == s)
@@ -250,19 +301,13 @@ namespace ZenLib
             return false;
         }
 
-        private bool AcceptNonSpecialCharacter(out string character)
-        {
-            character = symbol;
-            if (IsCharacter())
-            {
-                NextSymbol();
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool AcceptAnyCharacter(out string character)
+        /// <summary>
+        /// Check if the next symbol matches one of the set provided, and if so advance.
+        /// </summary>
+        /// <param name="characters">The characters to test against.</param>
+        /// <param name="character">The character matched.</param>
+        /// <returns>True if there was a match.</returns>
+        private bool Accept(ISet<string> characters, out string character)
         {
             character = symbol;
             if (characters.Contains(symbol))
@@ -274,10 +319,15 @@ namespace ZenLib
             return false;
         }
 
-        private bool AcceptUnaryOperation(out string character)
+        /// <summary>
+        /// Check if the current symbol matches a class character and if so, advance.
+        /// </summary>
+        /// <param name="character">The symbol matched.</param>
+        /// <returns>True if there was a match.</returns>
+        private bool AcceptClassCharacter(out string character)
         {
             character = symbol;
-            if (IsUnaryOperation())
+            if (IsClassCharacter())
             {
                 NextSymbol();
                 return true;
@@ -286,6 +336,27 @@ namespace ZenLib
             return false;
         }
 
+        /// <summary>
+        /// Check if the current symbol matches a non-special character and if so advance.
+        /// </summary>
+        /// <param name="character">The symbol matched.</param>
+        /// <returns>True if there was a match.</returns>
+        private bool AcceptNonSpecialCharacter(out string character)
+        {
+            character = symbol;
+            if (IsNonSpecialCharacter())
+            {
+                NextSymbol();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Advance to the next symbol, which will be the empty
+        /// string where there are no more symbols to consume.
+        /// </summary>
         private void NextSymbol()
         {
             currentIndex++;
@@ -297,6 +368,21 @@ namespace ZenLib
             {
                 this.symbol = inputString.Substring(currentIndex, 1);
             }
+        }
+
+        /// <summary>
+        /// Peek a given number of symbols ahead.
+        /// </summary>
+        /// <param name="count">The number of symbols ahead to peek.</param>
+        /// <returns>The sequence of symbols ahead, or empty if exceeds the length of the string.</returns>
+        private string Peek(int count)
+        {
+            if (currentIndex + count >= inputString.Length)
+            {
+                return string.Empty;
+            }
+
+            return inputString.Substring(currentIndex, count);
         }
     }
 }

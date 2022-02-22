@@ -319,6 +319,10 @@ namespace ZenLib.Tests
         [DataRow("[0-9a-z]", true)]
         [DataRow("\\l", true)]
         [DataRow("\\(\\)", true)]
+        [DataRow("[^a-zA-Z]", true)]
+        [DataRow("[a\\]", false)]
+        [DataRow("[9-0]", false)]
+        [DataRow("[a-", false)]
         public void TestRegexParsing(string input, bool expected)
         {
             var p = new RegexParser(input);
@@ -368,8 +372,21 @@ namespace ZenLib.Tests
         [DataRow("[abc]+", "", false)]
         [DataRow("[abc]+", "ccba", true)]
         [DataRow("[abc]+", "aabd", false)]
+        [DataRow(@"\(\)", "()", true)]
         [DataRow("\\(\\)", "()", true)]
+        [DataRow(@"\n", "n", true)]
         [DataRow("\n", "\n", true)]
+        [DataRow("[ab\\+]", "+", true)]
+        [DataRow("[ab\\+]", "\\+", false)]
+        [DataRow("\\\\", "\\", true)]
+        [DataRow("[^a-zA-Z]", "g", false)]
+        [DataRow("[^a-zA-Z]", "2", true)]
+        [DataRow("abcd\\||bc", "bc", true)]
+        [DataRow("abcd\\||bc", "abcd", false)]
+        [DataRow("abcd\\||bc", "abcd|", true)]
+        [DataRow("[a-]+", "---", true)]
+        [DataRow("[a*]+", "a*a", true)]
+        [DataRow("[*-\\\\]+", "\\\\", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var p = new RegexParser(regex);
