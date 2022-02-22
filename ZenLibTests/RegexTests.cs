@@ -396,7 +396,7 @@ namespace ZenLib.Tests
             var p = new RegexParser(regex);
             var r = p.Parse();
             var a = r.ToAutomaton();
-            var bytes = input.ToCharArray().Select(c => (byte)c)
+            var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));
             Assert.AreEqual(expected, a.IsMatch(bytes));
         }
