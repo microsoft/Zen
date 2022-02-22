@@ -7,6 +7,7 @@ namespace ZenLib.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -291,6 +292,92 @@ namespace ZenLib.Tests
             CheckIsMatch(r4, new uint[] { 10, 20, 30, 100 });
             CheckIsMatch(r5, new long[] { 10, 20, 30, 100 });
             CheckIsMatch(r6, new ulong[] { 10, 20, 30, 100 });
+        }
+
+        /// <summary>
+        /// Test that Regex parsing is working.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abc", true)]
+        [DataRow(".bc", true)]
+        [DataRow("(ab", false)]
+        [DataRow("(abc)", true)]
+        [DataRow("[abc]", true)]
+        [DataRow("[abc", false)]
+        [DataRow("[abc)", false)]
+        [DataRow("a+", true)]
+        [DataRow("(ab)*", true)]
+        [DataRow("a|b", true)]
+        [DataRow("ab|c", true)]
+        [DataRow("(a|b)?", true)]
+        [DataRow("a|", false)]
+        [DataRow("?", false)]
+        [DataRow("*", false)]
+        [DataRow("(abcd*)**", true)]
+        [DataRow("[abc]+", true)]
+        [DataRow("[a[bc]]", false)]
+        [DataRow("[0-9a-z]", true)]
+        [DataRow("\\l", true)]
+        [DataRow("\\(\\)", true)]
+        public void TestRegexParsing(string input, bool expected)
+        {
+            var p = new RegexParser(input);
+
+            try
+            {
+                p.Parse();
+                Assert.IsTrue(expected);
+            }
+            catch (ZenException e)
+            {
+                Console.WriteLine(e.Message);
+                Assert.IsFalse(expected);
+            }
+        }
+
+        /// <summary>
+        /// Test that Regex parsing produces the right AST.
+        /// </summary>
+        [TestMethod]
+        [DataRow("abc", "abc", true)]
+        [DataRow("abc", "ab", false)]
+        [DataRow("abc", "abcd", false)]
+        [DataRow(".bc", "xbc", true)]
+        [DataRow("(abc)", "abc", true)]
+        [DataRow("(abc)", "abcd", false)]
+        [DataRow("[abc]", "a", true)]
+        [DataRow("[abc]", "b", true)]
+        [DataRow("[abc]", "c", true)]
+        [DataRow("[abc]", "ab", false)]
+        [DataRow("[0-9a-z]", "1", true)]
+        [DataRow("[0-9a-z]", "g", true)]
+        [DataRow("[0-9a-z]", "\n", false)]
+        [DataRow("[0-9a-z]", "A", false)]
+        [DataRow("[0-9a-z]", "01", false)]
+        [DataRow("ab|c", "ab", true)]
+        [DataRow("ab|c", "c", true)]
+        [DataRow("ab|c", "a", false)]
+        [DataRow("(a|b)?", "", true)]
+        [DataRow("(a|b)?", "a", true)]
+        [DataRow("(a|b)?", "b", true)]
+        [DataRow("(a|b)?", "ab", false)]
+        [DataRow("(a|b)+", "", false)]
+        [DataRow("(a|b)+", "a", true)]
+        [DataRow("(a|b)+", "aa", true)]
+        [DataRow("(a|b)+", "abba", true)]
+        [DataRow("[abc]+", "", false)]
+        [DataRow("[abc]+", "ccba", true)]
+        [DataRow("[abc]+", "aabd", false)]
+        [DataRow("\\(\\)", "()", true)]
+        [DataRow("\n", "\n", true)]
+        public void TestRegexParsingAst(string regex, string input, bool expected)
+        {
+            var p = new RegexParser(regex);
+            var r = p.Parse();
+            var bytes = input.ToCharArray().Select(c => (byte)c);
+            Console.WriteLine($"Regex: {r}");
+            Console.WriteLine($"Input: {string.Join(",", bytes)}");
+            Assert.AreEqual(expected, r.IsMatch(bytes));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

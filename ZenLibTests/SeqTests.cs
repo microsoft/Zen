@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -584,6 +585,24 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenConstraint<Seq<uint>>(s => s.MatchesRegex(c5)).Find().Value.MatchesRegex(c5));
             Assert.IsTrue(new ZenConstraint<Seq<long>>(s => s.MatchesRegex(c6)).Find().Value.MatchesRegex(c6));
             Assert.IsTrue(new ZenConstraint<Seq<ulong>>(s => s.MatchesRegex(c7)).Find().Value.MatchesRegex(c7));
+        }
+
+        /// <summary>
+        /// Test seq with update and regex.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindUpdateRegex()
+        {
+            var r = Regex.Concat(Regex.Star(Regex.Char<byte>(1)), Regex.Char<byte>(2));
+            var zf = new ZenFunction<Seq<byte>, Seq<byte>>(s =>
+            {
+                return If(s.MatchesRegex(r), s.Concat(Seq.Unit<byte>(3)), Seq.Empty<byte>());
+            });
+
+            var result = zf.Find((s1, s2) => s2.Contains(Seq.Unit<byte>(3)));
+            Assert.IsTrue(result.HasValue);
+            Assert.IsTrue(result.Value.ToList().Count >= 2);
+            Assert.IsTrue(result.Value.ToList().Last() == (byte)2);
         }
 
         /// <summary>

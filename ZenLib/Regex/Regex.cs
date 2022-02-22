@@ -8,7 +8,7 @@ namespace ZenLib
     using System.Threading;
 
     /// <summary>
-    /// A regex object parameterized over a C# type.
+    /// A regex object parameterized over a C# character type.
     /// </summary>
     /// <typeparam name="T">The type of characters for the regex.</typeparam>
     public abstract class Regex<T>

@@ -1,11 +1,9 @@
-﻿// <copyright file="RegexToAutomatonConverter.cs" company="Microsoft">
+﻿// <copyright file="RegexDerivativeVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System;
-
     /// <summary>
     /// A class to compute a regex derivative.
     /// </summary>
