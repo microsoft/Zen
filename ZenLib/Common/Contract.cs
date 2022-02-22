@@ -13,11 +13,12 @@ namespace ZenLib
         /// Validate that an argument is true.
         /// </summary>
         /// <param name="obj">The argument.</param>
-        public static void Assert(bool obj)
+        /// <param name="msg">An optional message parameter.</param>
+        public static void Assert(bool obj, string msg = "Assertion failed")
         {
             if (!obj)
             {
-                throw new ZenException("Assertion failed");
+                throw new ZenException(msg);
             }
         }
     }

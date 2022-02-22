@@ -362,6 +362,17 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test string matchesregex.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegex()
+        {
+            var r = Regex.ParseUnicode("[a-z]+");
+            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
+            Console.WriteLine(s);
+        }
+
+        /// <summary>
         /// Test endswith implies contains.
         /// </summary>
         [TestMethod]

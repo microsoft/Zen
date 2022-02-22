@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using Microsoft.Z3;
 
     /// <summary>
@@ -41,26 +42,36 @@ namespace ZenLib.Solver
             }
             else
             {
-                throw new ZenException($"Range regex currently not supported.");
-                // var low = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
-                // var high = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.High));
-                // return this.solver.Context.MkRange(low, high);
+                Contract.Assert(typeof(T) == typeof(UInt18), "Regex range only supported for unicode (UInt18)");
+                var charLow = this.solver.Context.CharFromBV(GetConstant(expression.CharacterRange.Low));
+                var charHigh = this.solver.Context.CharFromBV(GetConstant(expression.CharacterRange.High));
+                var seqLow = this.solver.Context.MkUnit(charLow);
+                var seqHigh = this.solver.Context.MkUnit(charHigh);
+                return this.solver.Context.MkRange(seqLow, seqHigh);
             }
         }
 
-        private Expr GetConstant(object obj)
+        private BitVecExpr GetConstant(object obj)
         {
             var type = typeof(T);
-            var value = obj.ToString();
 
             if (type == ReflectionUtilities.ByteType)
-                return this.solver.Context.MkBV(value, 8);
+                return this.solver.Context.MkBV(obj.ToString(), 8);
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
-                return this.solver.Context.MkBV(value, 16);
+                return this.solver.Context.MkBV(obj.ToString(), 16);
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
-                return this.solver.Context.MkBV(value, 32);
-            Contract.Assert(type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType);
-            return this.solver.Context.MkBV(value, 64);
+                return this.solver.Context.MkBV(obj.ToString(), 32);
+            if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
+                return this.solver.Context.MkBV(obj.ToString(), 64);
+
+            Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
+            dynamic value = obj;
+            var bits = new bool[value.Size];
+            for (int i = 0; i < bits.Length; i++)
+            {
+                bits[i] = value.GetBit(i);
+            }
+            return this.solver.Context.MkBV(bits);
         }
 
         public ReExpr Visit(RegexUnopExpr<T> expression, Sort parameter)

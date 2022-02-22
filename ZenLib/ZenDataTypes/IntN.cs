@@ -476,7 +476,19 @@ namespace ZenLib
         /// <param name="value">Whether to set true or false.</param>
         public void SetBit(int position, bool value)
         {
+            Contract.Assert(position >= 0 && position < this.Size, "Position out of range");
             SetBit(this.Bytes, this.Size, position, value);
+        }
+
+        /// <summary>
+        /// Gets whether the bit is set at a given position.
+        /// </summary>
+        /// <param name="position">The position.</param>
+        /// <returns>True or false.</returns>
+        public bool GetBit(int position)
+        {
+            Contract.Assert(position >= 0 && position < this.Size, "Position out of range");
+            return GetBit(this.Bytes, this.Size, position);
         }
 
         /// <summary>

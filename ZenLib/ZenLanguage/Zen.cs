@@ -5,7 +5,6 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -805,6 +804,20 @@ namespace ZenLib
         public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub)
         {
             return IndexOf(str, sub, new BigInteger(0));
+        }
+
+        /// <summary>
+        /// Determines if the string matches a regular expression.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="regex">The unicode regular expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> MatchesRegex(this Zen<string> str, Regex<UInt18> regex)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(regex);
+
+            return Cast<string, Seq<UInt18>>(str).MatchesRegex(regex);
         }
 
         /// <summary>
