@@ -387,14 +387,18 @@ namespace ZenLib.Tests
         [DataRow("[a-]+", "---", true)]
         [DataRow("[a*]+", "a*a", true)]
         [DataRow("[*-\\\\]+", "\\\\", true)]
+        [DataRow("(a|b|c|d)", "a", true)]
+        [DataRow("(a|b|c|d)", "b", true)]
+        [DataRow("(a|b|c|d)", "c", true)]
+        [DataRow("(a|b|c|d)", "d", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var p = new RegexParser(regex);
             var r = p.Parse();
-            var bytes = input.ToCharArray().Select(c => (byte)c);
-            Console.WriteLine($"Regex: {r}");
-            Console.WriteLine($"Input: {string.Join(",", bytes)}");
+            var a = r.ToAutomaton();
+            var bytes = input.ToCharArray().Select(c => (byte)c)
             Assert.AreEqual(expected, r.IsMatch(bytes));
+            Assert.AreEqual(expected, a.IsMatch(bytes));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
