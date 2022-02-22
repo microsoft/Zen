@@ -37,6 +37,7 @@ namespace ZenLib
         /// </summary>
         public CharRange()
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             Low = min;
             High = max;
         }
@@ -48,6 +49,7 @@ namespace ZenLib
         /// <param name="high">The high value of the range.</param>
         public CharRange(T low, T high)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             Low = low;
             High = high;
         }

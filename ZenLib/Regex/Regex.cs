@@ -145,6 +145,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts no strings.</returns>
         public static Regex<T> Empty<T>()
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexEmptyExpr<T>.Instance;
         }
 
@@ -154,6 +155,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts any single character.</returns>
         public static Regex<T> Dot<T>()
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return Regex.Range<T>(ReflectionUtilities.MinValue<T>(), ReflectionUtilities.MaxValue<T>());
         }
 
@@ -163,6 +165,7 @@ namespace ZenLib
         /// <returns>A regular expression matches zero or one occurance of another.</returns>
         public static Regex<T> Opt<T>(Regex<T> expr)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return Regex.Union(Regex.Epsilon<T>(), expr);
         }
 
@@ -172,6 +175,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts all strings.</returns>
         public static Regex<T> All<T>()
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return Regex.Negation(Regex.Empty<T>());
         }
 
@@ -181,6 +185,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts a single empty string.</returns>
         public static Regex<T> Epsilon<T>()
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexEpsilonExpr<T>.Instance;
         }
 
@@ -192,6 +197,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts a single character.</returns>
         public static Regex<T> Range<T>(T low, T high)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexRangeExpr<T>.Create(low, high);
         }
 
@@ -202,6 +208,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts a single character.</returns>
         public static Regex<T> Char<T>(T value)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexRangeExpr<T>.Create(value, value);
         }
 
@@ -213,6 +220,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts the union of two others.</returns>
         public static Regex<T> Union<T>(Regex<T> expr1, Regex<T> expr2)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Union);
         }
 
@@ -224,6 +232,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts the intersection of two others.</returns>
         public static Regex<T> Intersect<T>(Regex<T> expr1, Regex<T> expr2)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Intersection);
         }
 
@@ -235,6 +244,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts the concatenation two others.</returns>
         public static Regex<T> Concat<T>(Regex<T> expr1, Regex<T> expr2)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexBinopExpr<T>.Create(expr1, expr2, RegexBinopExprType.Concatenation);
         }
 
@@ -245,6 +255,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts zero or more iterations of another.</returns>
         public static Regex<T> Star<T>(Regex<T> expr)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Star);
         }
 
@@ -255,6 +266,7 @@ namespace ZenLib
         /// <returns>A regular expression that accepts any strings another doesn't.</returns>
         public static Regex<T> Negation<T>(Regex<T> expr)
         {
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Negation);
         }
     }

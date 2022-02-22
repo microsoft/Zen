@@ -187,7 +187,19 @@ namespace ZenLib
         {
             if (!ReflectionUtilities.IsIntegerType(type))
             {
-                throw new ZenException($"Invalid non-integer type {type} used as integer.");
+                throw new ZenException($"Invalid non-integer type {type} used.");
+            }
+        }
+
+        /// <summary>
+        /// Validate that a type is an integer type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static void ValidateIsFiniteIntegerType(Type type)
+        {
+            if (!ReflectionUtilities.IsFiniteIntegerType(type))
+            {
+                throw new ZenException($"Invalid non-finite-integer type {type} used.");
             }
         }
 

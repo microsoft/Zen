@@ -84,6 +84,71 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the character range implementation is working.
+        /// </summary>
+        [TestMethod]
+        public void TestCharRangeWithFixedSizeIntegers()
+        {
+            var r1 = new CharRange<UInt9>();
+            var r2 = new CharRange<UInt9>(new UInt9(10), new UInt9(20));
+            var r3 = new CharRange<Int9>();
+            var r4 = new CharRange<Int9>(new Int9(-5), new Int9(5));
+
+            Assert.IsTrue(r1.Contains(new UInt9(0)));
+            Assert.IsTrue(r1.Contains(new UInt9(1)));
+            Assert.IsTrue(r1.Contains(new UInt9(510)));
+            Assert.IsTrue(r1.Contains(new UInt9(511)));
+
+            Assert.IsTrue(r2.Contains(new UInt9(10)));
+            Assert.IsTrue(r2.Contains(new UInt9(11)));
+            Assert.IsTrue(r2.Contains(new UInt9(19)));
+            Assert.IsTrue(r2.Contains(new UInt9(20)));
+            Assert.IsFalse(r2.Contains(new UInt9(9)));
+            Assert.IsFalse(r2.Contains(new UInt9(21)));
+            Assert.IsFalse(r2.Contains(new UInt9(511)));
+
+            Assert.IsTrue(r3.Contains(new Int9(0)));
+            Assert.IsTrue(r3.Contains(new Int9(-1)));
+            Assert.IsTrue(r3.Contains(new Int9(1)));
+            Assert.IsTrue(r3.Contains(new Int9(-5)));
+            Assert.IsTrue(r3.Contains(new Int9(5)));
+            Assert.IsTrue(r3.Contains(new Int9(-6)));
+            Assert.IsTrue(r3.Contains(new Int9(6)));
+            Assert.IsTrue(r3.Contains(new Int9(-256)));
+            Assert.IsTrue(r3.Contains(new Int9(255)));
+
+            Assert.IsTrue(r4.Contains(new Int9(0)));
+            Assert.IsTrue(r4.Contains(new Int9(-1)));
+            Assert.IsTrue(r4.Contains(new Int9(1)));
+            Assert.IsTrue(r4.Contains(new Int9(-5)));
+            Assert.IsTrue(r4.Contains(new Int9(5)));
+            Assert.IsFalse(r4.Contains(new Int9(-6)));
+            Assert.IsFalse(r4.Contains(new Int9(6)));
+            Assert.IsFalse(r4.Contains(new Int9(-256)));
+            Assert.IsFalse(r4.Contains(new Int9(255)));
+        }
+
+        /// <summary>
+        /// Test that the character range only works with finite integers.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCharRangeWithInvalidType1()
+        {
+            new CharRange<System.Numerics.BigInteger>();
+        }
+
+        /// <summary>
+        /// Test that the character range only works with finite integers.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCharRangeWithInvalidType2()
+        {
+            new CharRange<TestHelper.Object2>();
+        }
+
+        /// <summary>
         /// Test that Regex simplifications are working.
         /// </summary>
         [TestMethod]

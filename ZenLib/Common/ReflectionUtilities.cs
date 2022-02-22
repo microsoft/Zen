@@ -6,7 +6,6 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -267,7 +266,17 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsIntegerType(Type type)
         {
-            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsBigIntegerType(type) || IsFixedIntegerType(type);
+            return IsFiniteIntegerType(type) || IsBigIntegerType(type);
+        }
+
+        /// <summary>
+        /// Check if a type is a kind of finite integer.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>True or false.</returns>
+        public static bool IsFiniteIntegerType(Type type)
+        {
+            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsFixedIntegerType(type);
         }
 
         /// <summary>
@@ -1040,8 +1049,14 @@ namespace ZenLib
                 return (T)(object)uint.MinValue;
             if (type == LongType)
                 return (T)(object)long.MinValue;
-            Contract.Assert(type == UlongType);
-            return (T)(object)ulong.MinValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MinValue;
+
+            Contract.Assert(IsFixedIntegerType(type));
+            var c = type.GetConstructor(new Type[] { typeof(long) });
+            dynamic obj = (T)c.Invoke(new object[] { 0L });
+            obj.SetBit(0, obj.Signed);
+            return obj;
         }
 
         /// <summary>
@@ -1066,8 +1081,19 @@ namespace ZenLib
                 return (T)(object)uint.MaxValue;
             if (type == LongType)
                 return (T)(object)long.MaxValue;
-            Contract.Assert(type == UlongType);
-            return (T)(object)ulong.MaxValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MaxValue;
+
+            Contract.Assert(IsFixedIntegerType(type));
+            var c = type.GetConstructor(new Type[] { typeof(long) });
+            dynamic obj = (T)c.Invoke(new object[] { 0L });
+            obj.SetBit(0, !obj.Signed);
+            for (int i = 1; i < obj.Size; i++)
+            {
+                obj.SetBit(i, true);
+            }
+
+            return obj;
         }
 
         public static byte Add(byte x, int i)
@@ -1103,6 +1129,13 @@ namespace ZenLib
         public static ulong Add(ulong x, int i)
         {
             return (ulong)(x + (ulong)i);
+        }
+
+        public static T Add<T, TSign>(IntN<T, TSign> x, int i)
+        {
+            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
+            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
+            return x.Add(instance);
         }
     }
 }
