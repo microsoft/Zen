@@ -1137,5 +1137,47 @@ namespace ZenLib
             var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
             return x.Add(instance);
         }
+
+        public static byte Subtract(byte x, int i)
+        {
+            return (byte)(x - i);
+        }
+
+        public static short Subtract(short x, int i)
+        {
+            return (short)(x - i);
+        }
+
+        public static ushort Subtract(ushort x, int i)
+        {
+            return (ushort)(x - i);
+        }
+
+        public static int Subtract(int x, int i)
+        {
+            return (int)(x - i);
+        }
+
+        public static uint Subtract(uint x, int i)
+        {
+            return (uint)(x - i);
+        }
+
+        public static long Subtract(long x, int i)
+        {
+            return (long)(x - i);
+        }
+
+        public static ulong Subtract(ulong x, int i)
+        {
+            return (ulong)(x - (ulong)i);
+        }
+
+        public static T Subtract<T, TSign>(IntN<T, TSign> x, int i)
+        {
+            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
+            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
+            return x.Subtract(instance);
+        }
     }
 }

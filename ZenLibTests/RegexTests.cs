@@ -126,6 +126,26 @@ namespace ZenLib.Tests
             Assert.IsFalse(r4.Contains(new Int9(6)));
             Assert.IsFalse(r4.Contains(new Int9(-256)));
             Assert.IsFalse(r4.Contains(new Int9(255)));
+
+            var rs1 = r2.Complement();
+            Assert.AreEqual(2, rs1.Length);
+            Assert.AreEqual(new UInt9(0), rs1[0].Low);
+            Assert.AreEqual(new UInt9(9), rs1[0].High);
+            Assert.AreEqual(new UInt9(21), rs1[1].Low);
+            Assert.AreEqual(new UInt9(511), rs1[1].High);
+
+            var rs2 = r1.Complement();
+            Assert.AreEqual(0, rs2.Length);
+
+            var rs3 = r4.Complement();
+            Assert.AreEqual(2, rs3.Length);
+            Assert.AreEqual(new Int9(-256), rs3[0].Low);
+            Assert.AreEqual(new Int9(-6), rs3[0].High);
+            Assert.AreEqual(new Int9(6), rs3[1].Low);
+            Assert.AreEqual(new Int9(255), rs3[1].High);
+
+            var rs4 = r3.Complement();
+            Assert.AreEqual(0, rs4.Length);
         }
 
         /// <summary>
