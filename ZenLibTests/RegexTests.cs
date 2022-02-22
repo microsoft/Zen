@@ -410,11 +410,9 @@ namespace ZenLib.Tests
         [DataRow("[a-", false)]
         public void TestRegexParsing(string input, bool expected)
         {
-            var p = new RegexParser(input);
-
             try
             {
-                p.Parse();
+                Regex.ParseAscii(input);
                 Assert.IsTrue(expected);
             }
             catch (ZenException e)
@@ -478,12 +476,17 @@ namespace ZenLib.Tests
         [DataRow("(a|b|c|d)", "d", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
-            var p = new RegexParser(regex);
-            var r = p.Parse();
+            var r = Regex.ParseAscii(regex);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));
             Assert.AreEqual(expected, a.IsMatch(bytes));
+
+            var r2 = Regex.ParseUnicode(regex);
+            var a2 = r2.ToAutomaton();
+            var bytes2 = input.ToCharArray().Select(c => new UInt18(c));
+            Assert.AreEqual(expected, r2.IsMatch(bytes2));
+            Assert.AreEqual(expected, a2.IsMatch(bytes2));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

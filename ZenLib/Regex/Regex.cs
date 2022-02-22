@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -139,6 +140,36 @@ namespace ZenLib
     /// </summary>
     public static class Regex
     {
+        /// <summary>
+        /// Function to parse an ascii char.
+        /// </summary>
+        private static Func<char, byte> parseAsciiChar = (char c) => (byte)c;
+
+        /// <summary>
+        /// Function to parse an Unicode char.
+        /// </summary>
+        private static Func<char, UInt18> parseUnicodeChar = (char c) => new UInt18(c);
+
+        /// <summary>
+        /// Parse a regex from an ascii string describing the pattern.
+        /// </summary>
+        /// <param name="regex">The regex pattern.</param>
+        /// <returns>A regex recognizing bytes.</returns>
+        public static Regex<byte> ParseAscii(string regex)
+        {
+            return new RegexParser<byte>(regex, parseAsciiChar).Parse();
+        }
+
+        /// <summary>
+        /// Parse a regex from a unicode string describing the pattern.
+        /// </summary>
+        /// <param name="regex">The regex pattern.</param>
+        /// <returns>A regex recognizing bytes.</returns>
+        public static Regex<UInt18> ParseUnicode(string regex)
+        {
+            return new RegexParser<UInt18>(regex, parseUnicodeChar).Parse();
+        }
+
         /// <summary>
         /// The 'Empty' regular expression.
         /// </summary>
