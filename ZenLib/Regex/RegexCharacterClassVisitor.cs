@@ -1,11 +1,9 @@
-﻿// <copyright file="RegexToAutomatonConverter.cs" company="Microsoft">
+﻿// <copyright file="RegexCharacterClassVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System;
-
     /// <summary>
     /// A class to compute character equivalence classes.
     /// </summary>

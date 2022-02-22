@@ -1,4 +1,4 @@
-﻿// <copyright file="RegexUnnopExpr.cs" company="Microsoft">
+﻿// <copyright file="RegexUnopExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
