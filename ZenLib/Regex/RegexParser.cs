@@ -70,7 +70,6 @@ namespace ZenLib
         public Regex<byte> Parse()
         {
             var ret = ParseRegex();
-            Console.WriteLine(ret);
 
             if (symbol != string.Empty)
             {
@@ -199,7 +198,6 @@ namespace ZenLib
         private Regex<byte> ParseCharacterRange()
         {
             var c1 = ParseClassCharacter();
-            Console.WriteLine($"got: {(char)c1}");
 
             if (Accept("-"))
             {

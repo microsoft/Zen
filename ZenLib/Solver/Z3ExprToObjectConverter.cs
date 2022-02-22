@@ -171,7 +171,7 @@ namespace ZenLib.Solver
 
         public object VisitString(Expr parameter)
         {
-            var result = (Seq<byte>)Convert(parameter, ReflectionUtilities.ByteSequenceType);
+            var result = (Seq<UInt18>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
             return Seq.AsString(result);
         }
 

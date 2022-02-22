@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -624,7 +625,7 @@ namespace ZenLib.ModelChecking
             }
             else
             {
-                Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
+                Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
 
                 var e = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)Evaluate(expression.SourceExpr, parameter);
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, e.Value);

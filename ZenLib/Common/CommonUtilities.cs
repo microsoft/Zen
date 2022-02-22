@@ -154,12 +154,12 @@ namespace ZenLib
         /// <param name="targetType">The target type.</param>
         public static void ValidateIsSafeCast(Type sourceType, Type targetType)
         {
-            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.ByteSequenceType)
+            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.UnicodeSequenceType)
             {
                 return;
             }
 
-            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.ByteSequenceType)
+            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.UnicodeSequenceType)
             {
                 return;
             }

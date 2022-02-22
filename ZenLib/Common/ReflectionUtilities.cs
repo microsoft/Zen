@@ -25,7 +25,7 @@ namespace ZenLib
         /// <summary>
         /// The type of byte sequences values.
         /// </summary>
-        public readonly static Type ByteSequenceType = typeof(Seq<byte>);
+        public readonly static Type UnicodeSequenceType = typeof(Seq<UInt18>);
 
         /// <summary>
         /// The type of finite string values.
@@ -849,8 +849,8 @@ namespace ZenLib
 
                 if (type == StringType)
                 {
-                    var asSeq = (Zen<Seq<byte>>)CreateZenConstant(Seq.FromString((string)(object)value));
-                    return ZenCastExpr<Seq<byte>, string>.Create(asSeq);
+                    var asSeq = (Zen<Seq<UInt18>>)CreateZenConstant(Seq.FromString((string)(object)value));
+                    return ZenCastExpr<Seq<UInt18>, string>.Create(asSeq);
                 }
 
                 if (IsSeqType(type))

@@ -39,6 +39,8 @@ namespace ZenLib.Solver
 
         internal Sort StringSort;
 
+        internal Sort CharSort;
+
         internal Dictionary<Sort, DatatypeSort> OptionSorts;
 
         internal Z3TypeToSortConverter TypeToSortConverter;
@@ -68,6 +70,7 @@ namespace ZenLib.Solver
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
+            this.CharSort = this.Context.MkBitVecSort(18);
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);

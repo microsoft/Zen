@@ -702,7 +702,7 @@ namespace ZenLib.Compilation
             }
             else
             {
-                Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
+                Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
                 var m = typeof(Seq).GetMethod("AsString");
                 return Expression.Call(null, m, new Expression[] { e });
             }

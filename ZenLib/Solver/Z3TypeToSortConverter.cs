@@ -122,7 +122,7 @@ namespace ZenLib.Solver
 
         public Sort VisitString(Unit parameter)
         {
-            return this.solver.Context.MkSeqSort(this.solver.ByteSort);
+            return this.solver.Context.MkSeqSort(this.solver.CharSort);
         }
 
         public Sort VisitUint(Unit parameter)

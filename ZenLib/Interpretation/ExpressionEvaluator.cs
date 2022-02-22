@@ -454,8 +454,8 @@ namespace ZenLib.Interpretation
             }
             else
             {
-                Contract.Assert(typeof(TKey) == ReflectionUtilities.ByteSequenceType);
-                return Seq.AsString((Seq<byte>)e);
+                Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
+                return Seq.AsString((Seq<UInt18>)e);
             }
         }
 

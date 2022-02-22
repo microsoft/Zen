@@ -390,24 +390,26 @@ namespace ZenLib
     {
         /// <summary>
         /// Create a byte sequence from a string.
-        /// The bytes correspond to the ASCII values.
+        /// The bytes correspond to the Unicode values.
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        public static Seq<byte> FromString(string s)
+        public static Seq<UInt18> FromString(string s)
         {
-            return new Seq<byte>(ImmutableList.CreateRange(Encoding.ASCII.GetBytes(s)));
+            var codePoints = s.ToCharArray().Select(c => new UInt18(c));
+            return new Seq<UInt18>(ImmutableList.CreateRange(codePoints));
         }
 
         /// <summary>
         /// Create a string from a byte sequence.
-        /// The bytes correspond to the ASCII values.
+        /// The bytes correspond to the Unicode values.
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        public static string AsString(this Seq<byte> seq)
+        public static string AsString(this Seq<UInt18> seq)
         {
-            return Encoding.ASCII.GetString(seq.Values.ToArray());
+            var chars = seq.Values.Select(v => (char)v.ToLong()).ToArray();
+            return new string(chars);
         }
 
         /// <summary>

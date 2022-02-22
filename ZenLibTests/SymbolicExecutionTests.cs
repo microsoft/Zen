@@ -174,7 +174,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringAt()
         {
-            var f = new ZenFunction<string, bool, Option<byte>>((s, b) => s.At(If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
+            var f = new ZenFunction<string, bool, Option<UInt18>>((s, b) => s.At(If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
             Assert.AreEqual(2, f.GenerateInputs().Count());
         }
 
