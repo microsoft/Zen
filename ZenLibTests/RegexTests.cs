@@ -484,7 +484,7 @@ namespace ZenLib.Tests
 
             var r2 = Regex.ParseUnicode(regex);
             var a2 = r2.ToAutomaton();
-            var bytes2 = input.ToCharArray().Select(c => new UInt18(c));
+            var bytes2 = input.ToCharArray();
             Assert.AreEqual(expected, r2.IsMatch(bytes2));
             Assert.AreEqual(expected, a2.IsMatch(bytes2));
         }

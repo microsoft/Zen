@@ -263,14 +263,14 @@ namespace ZenLib
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The value at the index.</returns>
-        public Option<T> At(int index)
+        public Seq<T> At(int index)
         {
             if (index >= this.Values.Count || index < 0)
             {
-                return Option.None<T>();
+                return new Seq<T>();
             }
 
-            return Option.Some(this.Values[index]);
+            return new Seq<T>(this.Values[index]);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The value at the index.</returns>
-        internal Option<T> AtBigInteger(BigInteger index)
+        internal Seq<T> AtBigInteger(BigInteger index)
         {
             return At(int.Parse(index.ToString()));
         }
@@ -394,10 +394,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        public static Seq<UInt18> FromString(string s)
+        public static Seq<char> FromString(string s)
         {
-            var codePoints = s.ToCharArray().Select(c => new UInt18(c));
-            return new Seq<UInt18>(ImmutableList.CreateRange(codePoints));
+            return new Seq<char>(ImmutableList.CreateRange(s.ToCharArray()));
         }
 
         /// <summary>
@@ -406,10 +405,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        public static string AsString(this Seq<UInt18> seq)
+        public static string AsString(this Seq<char> seq)
         {
-            var chars = seq.Values.Select(v => (char)v.ToLong()).ToArray();
-            return new string(chars);
+            return new string(seq.Values.ToArray());
         }
 
         /// <summary>
@@ -465,7 +463,7 @@ namespace ZenLib
         /// <param name="seqExpr">The sequence expr.</param>
         /// <param name="indexExpr">The index expr.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
+        public static Zen<Seq<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
         {
             CommonUtilities.ValidateNotNull(seqExpr);
             CommonUtilities.ValidateNotNull(indexExpr);

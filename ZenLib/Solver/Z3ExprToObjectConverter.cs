@@ -49,6 +49,11 @@ namespace ZenLib.Solver
             return byte.Parse(parameter.ToString());
         }
 
+        public object VisitChar(Expr parameter)
+        {
+            return char.Parse(parameter.ToString());
+        }
+
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
@@ -171,7 +176,7 @@ namespace ZenLib.Solver
 
         public object VisitString(Expr parameter)
         {
-            var result = (Seq<UInt18>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
+            var result = (Seq<char>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
             return Seq.AsString(result);
         }
 
@@ -202,6 +207,10 @@ namespace ZenLib.Solver
                 var value = Convert(parameter.Args[0], innerType);
                 var c = sequenceType.GetConstructor(new Type[] { innerType });
                 return c.Invoke(new object[] { value });
+            }
+            else if (parameter.IsString)
+            {
+                return Seq.FromString(CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString()));
             }
             else
             {

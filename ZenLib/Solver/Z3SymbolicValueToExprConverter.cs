@@ -14,11 +14,11 @@ namespace ZenLib.Solver
     /// Convert a symbolic value to a Z3 expression.
     /// </summary>
     internal class Z3SymbolicValueToExprConverter :
-        ISymbolicValueVisitor<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, Type>
+        ISymbolicValueVisitor<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, Expr, Type>
     {
         private SolverZ3 solver;
 
-        public Expr ConvertSymbolicValue(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> value, Type type)
+        public Expr ConvertSymbolicValue(SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> value, Type type)
         {
             return value.Accept(this, type);
         }
@@ -28,33 +28,38 @@ namespace ZenLib.Solver
             this.solver = solver;
         }
 
-        public Expr Visit(SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicBitvec<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }
 
-        public Expr Visit(SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicChar<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }
 
-        public Expr Visit(SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }
 
-        public Expr Visit(SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
+        {
+            return v.Value;
+        }
+
+        public Expr Visit(SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }
 
         [ExcludeFromCodeCoverage]
-        public Expr Visit(SymbolicList<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicList<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             throw new ZenException("Invalid use of list in map or set type.");
         }
 
-        public Expr Visit(SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             var fieldTypes = ReflectionUtilities.GetAllFieldAndPropertyTypes(v.ObjectType);
             var fields = v.Fields.ToArray();
@@ -72,12 +77,12 @@ namespace ZenLib.Solver
             return ret;
         }
 
-        public Expr Visit(SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicString<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }
 
-        public Expr Visit(SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> v, Type parameter)
+        public Expr Visit(SymbolicSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> v, Type parameter)
         {
             return v.Value;
         }

@@ -42,21 +42,23 @@ namespace ZenLib.Solver
             }
             else
             {
-                Contract.Assert(typeof(T) == typeof(UInt18), "Regex range only supported for unicode (UInt18)");
-                var charLow = this.solver.Context.CharFromBV(GetConstant(expression.CharacterRange.Low));
-                var charHigh = this.solver.Context.CharFromBV(GetConstant(expression.CharacterRange.High));
+                Contract.Assert(typeof(T) == typeof(char), "Regex range only supported for unicode (char)");
+                var charLow = GetConstant(expression.CharacterRange.Low);
+                var charHigh = GetConstant(expression.CharacterRange.High);
                 var seqLow = this.solver.Context.MkUnit(charLow);
                 var seqHigh = this.solver.Context.MkUnit(charHigh);
                 return this.solver.Context.MkRange(seqLow, seqHigh);
             }
         }
 
-        private BitVecExpr GetConstant(object obj)
+        private Expr GetConstant(object obj)
         {
             var type = typeof(T);
 
             if (type == ReflectionUtilities.ByteType)
                 return this.solver.Context.MkBV(obj.ToString(), 8);
+            if (type == ReflectionUtilities.CharType)
+                return this.solver.CreateCharConst((char)obj);
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
                 return this.solver.Context.MkBV(obj.ToString(), 16);
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)

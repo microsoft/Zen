@@ -45,6 +45,11 @@ namespace ZenLib.Generation
             return ZenConstantExpr<byte>.Create(0);
         }
 
+        public object VisitChar(Unit parameter)
+        {
+            return ZenConstantExpr<char>.Create((char)0);
+        }
+
         public object VisitInt(Unit parameter)
         {
             return ZenConstantExpr<int>.Create(0);
@@ -122,8 +127,8 @@ namespace ZenLib.Generation
 
         public object VisitString(Unit parameter)
         {
-            var v = (Zen<Seq<UInt18>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<UInt18>), parameter);
-            return ZenCastExpr<Seq<UInt18>, string>.Create(v);
+            var v = (Zen<Seq<char>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<UInt18>), parameter);
+            return ZenCastExpr<Seq<char>, string>.Create(v);
         }
     }
 }

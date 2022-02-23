@@ -11,23 +11,23 @@ namespace ZenLib
     /// <summary>
     /// Class representing a sequence at expression.
     /// </summary>
-    internal sealed class ZenSeqAtExpr<T> : Zen<Option<T>>
+    internal sealed class ZenSeqAtExpr<T> : Zen<Seq<T>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<BigInteger>), Zen<Option<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2);
+        private static Func<(Zen<Seq<T>>, Zen<BigInteger>), Zen<Seq<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenSeqAtExpr.
         /// </summary>
-        private static HashConsTable<(long, long), Zen<Option<T>>> hashConsTable = new HashConsTable<(long, long), Zen<Option<T>>>();
+        private static HashConsTable<(long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long), Zen<Seq<T>>>();
 
         /// <summary>
         /// Unroll a ZenSeqAtExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<Option<T>> Unroll()
+        public override Zen<Seq<T>> Unroll()
         {
             return Create(this.SeqExpr.Unroll(), this.IndexExpr.Unroll());
         }
@@ -38,7 +38,7 @@ namespace ZenLib
         /// <param name="e1">The seq expr.</param>
         /// <param name="e2">The index expr.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<Option<T>> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2)
+        public static Zen<Seq<T>> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2)
         {
             return new ZenSeqAtExpr<T>(e1, e2);
         }
@@ -49,7 +49,7 @@ namespace ZenLib
         /// <param name="expr1">The seq expr.</param>
         /// <param name="expr2">The index expr.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<Option<T>> Create(Zen<Seq<T>> expr1, Zen<BigInteger> expr2)
+        public static Zen<Seq<T>> Create(Zen<Seq<T>> expr1, Zen<BigInteger> expr2)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);

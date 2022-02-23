@@ -7,7 +7,9 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Threading;
 
     /// <summary>
@@ -195,9 +197,9 @@ namespace ZenLib
         /// Validate that a type is an integer type.
         /// </summary>
         /// <param name="type"></param>
-        public static void ValidateIsFiniteIntegerType(Type type)
+        public static void ValidateIsCharType(Type type)
         {
-            if (!ReflectionUtilities.IsFiniteIntegerType(type))
+            if (!ReflectionUtilities.IsFiniteIntegerType(type) && type != ReflectionUtilities.CharType)
             {
                 throw new ZenException($"Invalid non-finite-integer type {type} used.");
             }
@@ -216,6 +218,91 @@ namespace ZenLib
                     throw new ZenException($"Invalid string literal with backslash character: {s}");
                 }
             }
+        }
+
+        /* /// <summary>
+        /// Convert a C# string to a Z3 string.
+        /// </summary>
+        /// <param name="s">The C# string.</param>
+        /// <returns>The Z3 string.</returns>
+        public static string ConvertCSharpStringToZ3(string s)
+        {
+            var sb = new StringBuilder();
+            foreach (char c in s)
+            {
+                sb.Append("\\x");
+                var hex = GetHex(c);
+                sb.Append(hex);
+            }
+
+            return sb.ToString();
+        }
+
+        private static string GetHex(char c)
+        {
+            Contract.Assert(c <= 255);
+            var lo = c & 0x000F;
+            var hi = c >> 4;
+            return new string(new char[] { GetHex(hi), GetHex(lo) });
+        }
+
+        private static char GetHex(int x)
+        {
+            Contract.Assert(x <= 15);
+            if (x < 10)
+            {
+                return (char)(48 + x);
+            }
+
+            return (char)(55 + x);
+        } */
+
+        /// <summary>
+        /// Unescape a Z3 string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>An unescaped string.</returns>
+        public static string ConvertZ3StringToCSharp(string s)
+        {
+            // strip outer quotation marks
+            s = s.Substring(1, s.Length - 2);
+
+            var sb = new StringBuilder(s.Length);
+            for (int i = 0; i < s.Length; i++)
+            {
+                // strip double quotation marks
+                if ((s[i] == '\"') && (s[i + 1] == '\"'))
+                {
+                    sb.Append('\"');
+                    i++;
+                    continue;
+                }
+
+                // unescape characters if needed
+                if (s[i] == '\\' && i + 1 < s.Length && s[i + 1] == 'x')
+                {
+                    switch (s[i + 1])
+                    {
+                        // Z3 escape characters
+                        case 'f': sb.Append('\f'); i++; continue;
+                        case 'n': sb.Append('\n'); i++; continue;
+                        case 'r': sb.Append('\r'); i++; continue;
+                        case 'v': sb.Append('\v'); i++; continue;
+                        case '\\': sb.Append('\\'); i++; continue;
+                        case 'x':
+                            var v = s[i + 2].ToString() + s[i + 3].ToString();
+                            var u = (char)ushort.Parse(v, NumberStyles.AllowHexSpecifier);
+                            sb.Append(u.ToString());
+                            i = i + 3;
+                            continue;
+                    }
+                }
+
+                // otherwise copy the character literal
+                sb.Append(s[i]);
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

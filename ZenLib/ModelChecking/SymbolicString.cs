@@ -10,26 +10,26 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic string value.
     /// </summary>
-    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
+    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
     {
-        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TSeq value) : base(solver)
+        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, TSeq value) : base(solver)
         {
             this.Value = value;
         }
 
         public TSeq Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> other)
         {
-            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
+            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
+            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.Visit(this, parameter);

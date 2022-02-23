@@ -125,7 +125,10 @@ namespace ZenLib.Interpretation
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 + (BigInteger)e2;
                     else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                         return ((dynamic)e1).Add((dynamic)e2);
+                    }
 
                 case Op.Subtraction:
                     if (type == ReflectionUtilities.ByteType)
@@ -145,7 +148,10 @@ namespace ZenLib.Interpretation
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 - (BigInteger)e2;
                     else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                         return ((dynamic)e1).Subtract((dynamic)e2);
+                    }
 
                 default:
                     Contract.Assert(expression.Operation == Op.Multiplication);
@@ -164,7 +170,10 @@ namespace ZenLib.Interpretation
                     else if (type == ReflectionUtilities.UlongType)
                         return (ulong)e1 * (ulong)e2;
                     else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsBigIntegerType(type));
                         return (BigInteger)e1 * (BigInteger)e2;
+                    }
             }
         }
 
@@ -260,7 +269,10 @@ namespace ZenLib.Interpretation
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 >= (BigInteger)e2;
                     else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                         return ((dynamic)e1) >= ((dynamic)e2);
+                    }
 
                 default:
                     Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
@@ -281,7 +293,10 @@ namespace ZenLib.Interpretation
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 <= (BigInteger)e2;
                     else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                         return ((dynamic)e1) <= ((dynamic)e2);
+                    }
             }
         }
 
@@ -455,7 +470,7 @@ namespace ZenLib.Interpretation
             else
             {
                 Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-                return Seq.AsString((Seq<UInt18>)e);
+                return Seq.AsString((Seq<char>)e);
             }
         }
 

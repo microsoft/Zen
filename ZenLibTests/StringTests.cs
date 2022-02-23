@@ -267,7 +267,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.Char(idx));
+            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.At(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -338,7 +338,7 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<string, bool>(s =>
             {
-                var c = s.Char(new BigInteger(3));
+                var c = s.At(new BigInteger(3));
                 var s2 = s.Slice(new BigInteger(5), new BigInteger(2));
                 return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == new BigInteger(10));
             });
@@ -354,11 +354,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtIsSubstring()
         {
-            CheckValid<string>(s => s.Char(new BigInteger(0)) == s.Slice(new BigInteger(0), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(1)) == s.Slice(new BigInteger(1), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(2)) == s.Slice(new BigInteger(2), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(3)) == s.Slice(new BigInteger(3), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(4)) == s.Slice(new BigInteger(4), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(0)) == s.Slice(new BigInteger(0), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(1)) == s.Slice(new BigInteger(1), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(2)) == s.Slice(new BigInteger(2), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(3)) == s.Slice(new BigInteger(3), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(4)) == s.Slice(new BigInteger(4), new BigInteger(1)));
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMatchesRegex()
         {
-            var r = Regex.ParseUnicode("[a-z]+");
+            var r = Regex.ParseUnicode("[a-z][a-z]+");
             var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
             Console.WriteLine(s);
         }
