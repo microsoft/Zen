@@ -410,11 +410,56 @@ namespace ZenLib.Tests
         /// Test string matchesregex.
         /// </summary>
         [TestMethod]
-        public void TestMatchesRegex()
+        [DataRow("[a-z][a-z]+")]
+        [DataRow("c(a|b)")]
+        [DataRow("a+b+")]
+        [DataRow("abc")]
+        [DataRow(".bc")]
+        [DataRow("(abc)")]
+        [DataRow("[abc]")]
+        [DataRow("[0-9a-z]")]
+        [DataRow("ab|c")]
+        [DataRow("(a|b)?")]
+        [DataRow("(a|b)+")]
+        [DataRow("[abc]+")]
+        [DataRow("\\(\\)")]
+        [DataRow(@"\n")]
+        [DataRow("\n")]
+        [DataRow("[ab\\+]")]
+        [DataRow("\\\\")]
+        [DataRow("[^a-zA-Z]")]
+        [DataRow("abcd\\||bc")]
+        [DataRow("[a-]+")]
+        [DataRow("[a*]+")]
+        [DataRow("[*-\\\\]+")]
+        [DataRow("(a|b|c|d)")]
+        public void TestMatchesRegex(string regex)
         {
-            var r = Regex.ParseUnicode("[a-z][a-z]+");
+            var r = Regex.ParseUnicode(regex);
+            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find().Value;
+            Assert.IsTrue(r.IsMatch(s));
+        }
+
+        /// <summary>
+        /// Test string matchesregex for empty regex.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegexEmpty1()
+        {
+            var r = Regex.Empty<char>();
             var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
-            Console.WriteLine(s);
+            Assert.IsFalse(s.HasValue);
+        }
+
+        /// <summary>
+        /// Test string matchesregex for empty regex.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegexEmpty2()
+        {
+            var r = Regex.Empty<byte>();
+            var s = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+            Assert.IsFalse(s.HasValue);
         }
 
         /// <summary>

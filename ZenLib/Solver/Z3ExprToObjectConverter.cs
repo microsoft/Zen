@@ -51,7 +51,7 @@ namespace ZenLib.Solver
 
         public object VisitChar(Expr parameter)
         {
-            return char.Parse(parameter.ToString());
+            return (char)int.Parse(parameter.Args[0].ToString());
         }
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
@@ -211,6 +211,13 @@ namespace ZenLib.Solver
             else if (parameter.IsString)
             {
                 return Seq.FromString(CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString()));
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "str.++")
+            {
+                Console.WriteLine(parameter);
+                var str1 = CommonUtilities.ConvertToString(Convert(parameter.Args[0], sequenceType));
+                var str2 = CommonUtilities.ConvertToString(Convert(parameter.Args[1], sequenceType));
+                return str1 + str2;
             }
             else
             {
