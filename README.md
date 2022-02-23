@@ -212,7 +212,7 @@ The test generation approach uses [symbolic execution](https://en.wikipedia.org/
 
 Zen currently supports a subset of .NET types and also introduces some of its own data types summarized below.
 
-| Type   | Description          | Supported by Z3 backend | Supported by BDD backend | Supported by `StateSetTransformers`
+| .NET Type   | Description          | Supported by Z3 backend | Supported by BDD backend | Supported by `StateSetTransformers`
 | ------ | -------------------- | ----------------------- | ------------------------ | ------------|
 | `bool`   | {true, false}        | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `byte`   | 8-bit value          | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
@@ -225,19 +225,19 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `ulong`  | 64-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `Int1`, `Int2`, ..., `IntN` | N-bit signed value| :heavy_check_mark:      | :heavy_check_mark:  | :heavy_check_mark: |
 | `UInt1`, `UInt2`, ..., `UIntN` | N-bit unsigned value| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: |
-| `string`     | arbitrary length string | :heavy_check_mark:           | :x:                 | :x:  |
-| `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
-| `Pair<T1, T2>`, `Pair<T1, T2, T3>`, ...  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
-| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
-| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
-| `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
-| `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :x: | :x:  |
+| `Pair<T1, ...>`  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
+| `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
-| `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
+| `string`     | arbitrary length string | :heavy_check_mark:           | :x:                 | :x:  |
+| `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
+| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
+| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
+| `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
+| `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :x: | :x:  |
 
 
 ### Primitive types
