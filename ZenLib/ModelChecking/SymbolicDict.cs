@@ -10,26 +10,26 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic dictionary value.
     /// </summary>
-    internal class SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>
+    internal class SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
     {
-        public SymbolicDict(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> solver, TArray value) : base(solver)
+        public SymbolicDict(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, TArray value) : base(solver)
         {
             this.Value = value;
         }
 
         public TArray Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> other)
         {
-            var o = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>)other;
+            var o = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray>(this.Solver, value);
+            return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.Visit(this, parameter);

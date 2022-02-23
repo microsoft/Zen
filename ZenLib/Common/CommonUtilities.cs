@@ -8,6 +8,7 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Text;
     using System.Threading;
 
     /// <summary>
@@ -154,12 +155,12 @@ namespace ZenLib
         /// <param name="targetType">The target type.</param>
         public static void ValidateIsSafeCast(Type sourceType, Type targetType)
         {
-            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.ByteSequenceType)
+            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.UnicodeSequenceType)
             {
                 return;
             }
 
-            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.ByteSequenceType)
+            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.UnicodeSequenceType)
             {
                 return;
             }
@@ -187,7 +188,19 @@ namespace ZenLib
         {
             if (!ReflectionUtilities.IsIntegerType(type))
             {
-                throw new ZenException($"Invalid non-integer type {type} used as integer.");
+                throw new ZenException($"Invalid non-integer type {type} used.");
+            }
+        }
+
+        /// <summary>
+        /// Validate that a type is an integer type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static void ValidateIsCharType(Type type)
+        {
+            if (!ReflectionUtilities.IsFiniteIntegerType(type) && type != ReflectionUtilities.CharType)
+            {
+                throw new ZenException($"Invalid non-finite-integer type {type} used.");
             }
         }
 
@@ -204,6 +217,56 @@ namespace ZenLib
                     throw new ZenException($"Invalid string literal with backslash character: {s}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Unescape a Z3 string.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns>An unescaped string.</returns>
+        public static string ConvertZ3StringToCSharp(string s)
+        {
+            // strip outer quotation marks
+            s = s.Substring(1, s.Length - 2);
+
+            var sb = new StringBuilder(s.Length);
+            for (int i = 0; i < s.Length; i++)
+            {
+                var isLast = i + 1 == s.Length;
+
+                // strip double quotation marks
+                if (!isLast && s[i] == '\"' && s[i + 1] == '\"')
+                {
+                    sb.Append('\"');
+                    i++;
+                    continue;
+                }
+
+                // unescape characters if needed
+                if (!isLast && s[i] == '\\' && s[i + 1] == 'u')
+                {
+                    i += 2;
+                    Contract.Assert(s[i++] == '{');
+                    var start = i;
+                    while (s[i] != '}')
+                        i++;
+                    Contract.Assert(i - start <= 5);
+                    var hex = new char[5];
+                    for (int j = 0; j < 5; j++)
+                        hex[j] = '0';
+                    for (int j = start; j < i; j++)
+                        hex[5 - (i - j)] = s[j];
+                    var str = new string(hex);
+                    var asChar = (char)Convert.ToInt32(str, 16);
+                    sb.Append(asChar);
+                    continue;
+                }
+
+                // otherwise copy the character literal
+                sb.Append(s[i]);
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

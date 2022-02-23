@@ -133,6 +133,7 @@ namespace ZenLib.Tests
             var manager = new StateSetTransformerManager(0);
             Assert.IsTrue(new ZenFunction<bool, bool>(b => true).StateSet(manager).IsFull());
             Assert.IsTrue(new ZenFunction<byte, bool>(b => true).StateSet(manager).IsFull());
+            Assert.IsTrue(new ZenFunction<char, bool>(b => true).StateSet(manager).IsFull());
             Assert.IsTrue(new ZenFunction<short, bool>(b => true).StateSet(manager).IsFull());
             Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).StateSet(manager).IsFull());
             Assert.IsTrue(new ZenFunction<int, bool>(b => true).StateSet(manager).IsFull());

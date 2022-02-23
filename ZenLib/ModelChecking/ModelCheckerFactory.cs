@@ -44,7 +44,7 @@ namespace ZenLib.ModelChecking
             var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             solver.Init();
-            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit, Unit>(solver);
+            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit, Unit, BitVector<CBDDNode>>(solver);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A model checker.</returns>
         private static IModelChecker CreateModelCheckerZ3()
         {
-            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(new SolverZ3());
+            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr>(new SolverZ3());
         }
     }
 }

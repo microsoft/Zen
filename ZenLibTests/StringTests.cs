@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
     using static ZenLib.Zen;
@@ -19,6 +20,65 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class StringTests
     {
+        /// <summary>
+        /// Convert a C# string to a Z3 string.
+        /// </summary>
+        /// <param name="s">The C# string.</param>
+        /// <returns>The Z3 string.</returns>
+        private static string ConvertCSharpStringToZ3(string s)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < s.Length; i++)
+            {
+                sb.Append(string.Format(@"\u{0:x4}", (int)s[i]));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        [DataRow("")]
+        [DataRow("AaBb")]
+        [DataRow("\t")]
+        [DataRow("\r")]
+        [DataRow("\n")]
+        [DataRow("\a")]
+        [DataRow("\b")]
+        [DataRow("\v")]
+        [DataRow("\f")]
+        [DataRow("\t")]
+        [DataRow("\"")]
+        [DataRow("\\")]
+        [DataRow("\\x5C\\x6E")]
+        [DataRow("endline\n")]
+        [DataRow("\x01\\x01")]
+        public void TestStringConversions(string s)
+        {
+            var context = new Context();
+            var toz3 = ConvertCSharpStringToZ3(s);
+            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+            Assert.AreEqual(s, tocs);
+        }
+
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversionsRandom()
+        {
+            for (int i = 0; i < 300; i++)
+            {
+                string s = RandomString();
+                var context = new Context();
+                var toz3 = ConvertCSharpStringToZ3(s);
+                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+                Assert.AreEqual(s, tocs);
+            }
+        }
+
         /// <summary>
         /// Test concatenation with empty string.
         /// </summary>
@@ -78,6 +138,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(sub =>
             {
+                Console.WriteLine($"Got sub: {sub}");
                 CheckAgreement<string>(s => s.Contains(sub));
             });
         }
@@ -267,7 +328,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.Char(idx));
+            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.At(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -338,7 +399,7 @@ namespace ZenLib.Tests
         {
             var f = new ZenFunction<string, bool>(s =>
             {
-                var c = s.Char(new BigInteger(3));
+                var c = s.At(new BigInteger(3));
                 var s2 = s.Slice(new BigInteger(5), new BigInteger(2));
                 return And(s.StartsWith("a"), c == "b", s2 == "cd", s.Length() == new BigInteger(10));
             });
@@ -354,11 +415,74 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtIsSubstring()
         {
-            CheckValid<string>(s => s.Char(new BigInteger(0)) == s.Slice(new BigInteger(0), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(1)) == s.Slice(new BigInteger(1), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(2)) == s.Slice(new BigInteger(2), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(3)) == s.Slice(new BigInteger(3), new BigInteger(1)));
-            CheckValid<string>(s => s.Char(new BigInteger(4)) == s.Slice(new BigInteger(4), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(0)) == s.Slice(new BigInteger(0), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(1)) == s.Slice(new BigInteger(1), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(2)) == s.Slice(new BigInteger(2), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(3)) == s.Slice(new BigInteger(3), new BigInteger(1)));
+            CheckValid<string>(s => s.At(new BigInteger(4)) == s.Slice(new BigInteger(4), new BigInteger(1)));
+        }
+
+        /// <summary>
+        /// Test string matchesregex.
+        /// </summary>
+        [TestMethod]
+        [DataRow("[a-z][a-z]+")]
+        [DataRow("c(a|b)")]
+        [DataRow("a+b+")]
+        [DataRow("abc")]
+        [DataRow(".bc")]
+        [DataRow("(abc)")]
+        [DataRow("[abc]")]
+        [DataRow("[0-9a-z]")]
+        [DataRow("ab|c")]
+        [DataRow("(a|b)?")]
+        [DataRow("(a|b)+")]
+        [DataRow("[abc]+")]
+        [DataRow("\\(\\)")]
+        [DataRow(@"\n")]
+        [DataRow("\n")]
+        [DataRow("[ab\\+]")]
+        [DataRow("\\\\")]
+        [DataRow("[^a-zA-Z]")]
+        [DataRow("abcd\\||bc")]
+        [DataRow("[a-]+")]
+        [DataRow("[a*]+")]
+        [DataRow("[*-\\\\]+")]
+        [DataRow("(a|b|c|d)")]
+        [DataRow("a\t")]
+        [DataRow(" ")]
+        [DataRow("[ab ]")]
+        [DataRow("s s")]
+        [DataRow("\\u058")]
+        [DataRow(".*a.*")]
+        public void TestMatchesRegex(string regex)
+        {
+            var r = Regex.ParseUnicode(regex);
+            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find().Value;
+            Console.WriteLine(s);
+            Assert.IsTrue(r.IsMatch(s));
+        }
+
+        /// <summary>
+        /// Test string matchesregex for empty regex.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegexEmpty1()
+        {
+            var r = Regex.Empty<char>();
+            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
+            Assert.IsFalse(s.HasValue);
+        }
+
+        /// <summary>
+        /// Test string matchesregex for empty regex.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegexEmpty2()
+        {
+            var r = Regex.Empty<byte>();
+            var s = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+            Assert.IsFalse(s.HasValue);
         }
 
         /// <summary>

@@ -64,6 +64,11 @@ namespace ZenLib.Solver
             return this.solver.ByteSort;
         }
 
+        public Sort VisitChar(Unit parameter)
+        {
+            return this.solver.CharSort;
+        }
+
         public Sort VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
             var keySort = this.GetSortForType(keyType);
@@ -122,7 +127,7 @@ namespace ZenLib.Solver
 
         public Sort VisitString(Unit parameter)
         {
-            return this.solver.Context.MkSeqSort(this.solver.ByteSort);
+            return this.solver.StringSort;
         }
 
         public Sort VisitUint(Unit parameter)

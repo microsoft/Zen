@@ -40,9 +40,9 @@ namespace ZenLib.Tests
             CheckValid<Seq<int>>(s => s.IndexOf(Seq.Empty<int>()) == BigInteger.Zero, runBdds: false);
             CheckValid<Seq<int>, Seq<int>, Seq<int>>((s1, s2, s3) => s1.Concat(s2).Concat(s3) == s1.Concat(s2.Concat(s3)), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => s1.Length() + s2.Length() == s1.Concat(s2).Length(), runBdds: false);
-            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(s == Seq.Empty<int>(), s.At(i).IsNone()), runBdds: false);
-            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(And(i >= BigInteger.Zero, i < s.Length()), s.At(i).IsSome()), runBdds: false);
-            CheckValid<Seq<int>, int>((s, x) => Implies(s == Seq.Unit(x), s.At(BigInteger.Zero).Value() == x), runBdds: false);
+            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(s == Seq.Empty<int>(), s.At(i) == Seq.Empty<int>()), runBdds: false);
+            CheckValid<Seq<int>, BigInteger>((s, i) => Implies(And(i >= BigInteger.Zero, i < s.Length()), s.At(i) != Seq.Empty<int>()), runBdds: false);
+            // CheckValid<Seq<int>, int>((s, x) => Implies(s == Seq.Unit(x), s.At(BigInteger.Zero).Value() == x), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.StartsWith(s2), s1.Contains(s2)), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(s1.EndsWith(s2), s1.Contains(s2)), runBdds: false);
             CheckValid<Seq<int>, BigInteger, BigInteger>((s, o, l) => Implies(l < BigInteger.Zero, s.Slice(o, l) == Seq.Empty<int>()), runBdds: false);
@@ -99,26 +99,26 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqAt()
         {
-            var zf = new ZenFunction<Seq<int>, BigInteger, Option<int>>((s, i) => s.At(i));
+            var zf = new ZenFunction<Seq<int>, BigInteger, Seq<int>>((s, i) => s.At(i));
 
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty, new BigInteger(1)));
-            Assert.AreEqual(Option.Some(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
-            Assert.AreEqual(Option.Some(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(new Seq<int>(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(new Seq<int>(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
 
             zf.Compile();
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty, new BigInteger(1)));
-            Assert.AreEqual(Option.Some(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
-            Assert.AreEqual(Option.Some(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
-            Assert.AreEqual(Option.None<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(new Seq<int>(1), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(new Seq<int>(2), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(new Seq<int>(), zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
 
-            Assert.AreEqual(Option.None<int>(), empty.At(1));
-            Assert.AreEqual(Option.Some(1), empty.Concat(one).Concat(two).At(0));
-            Assert.AreEqual(Option.Some(2), empty.Concat(one).Concat(two).At(1));
-            Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(2));
-            Assert.AreEqual(Option.None<int>(), empty.Concat(one).Concat(two).At(-1));
+            Assert.AreEqual(new Seq<int>(), empty.At(1));
+            Assert.AreEqual(new Seq<int>(1), empty.Concat(one).Concat(two).At(0));
+            Assert.AreEqual(new Seq<int>(2), empty.Concat(one).Concat(two).At(1));
+            Assert.AreEqual(new Seq<int>(), empty.Concat(one).Concat(two).At(2));
+            Assert.AreEqual(new Seq<int>(), empty.Concat(one).Concat(two).At(-1));
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test seq evaluation with replacefirst.
+        /// Test seq evaluation with matchesregex.
         /// </summary>
         [TestMethod]
         public void TestSeqRegex()
@@ -350,6 +350,43 @@ namespace ZenLib.Tests
             Assert.AreEqual(false, new Seq<byte>(1).MatchesRegex(r));
             Assert.AreEqual(true, new Seq<byte>(1).Concat(new Seq<byte>(2)).MatchesRegex(r));
             Assert.AreEqual(false, new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3)).MatchesRegex(r));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with matchesregex and fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqRegexFixedIntegers()
+        {
+            var r = Regex.Concat(Regex.Char(new UInt9(1)), Regex.Char(new UInt9(2)));
+            var zf = new ZenConstraint<Seq<UInt9>>(s => s.MatchesRegex(r));
+
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>(new UInt9(1))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2)))));
+
+            zf.Compile();
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>(new UInt9(1))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2)))));
+
+            Assert.AreEqual(false, new Seq<UInt9>().MatchesRegex(r));
+            Assert.AreEqual(false, new Seq<UInt9>(new UInt9(1)).MatchesRegex(r));
+            Assert.AreEqual(true, new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2))).MatchesRegex(r));
+
+            var s = zf.Find();
+            Assert.IsTrue(r.IsMatch(s.Value.Values));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with matchesregex and fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqRegexFixedIntegersFind()
+        {
+            var r = Regex.Concat(Regex.Char(new UInt9(1)), Regex.Char(new UInt9(2)));
+            var s = new ZenConstraint<Seq<UInt9>>(s => s.MatchesRegex(r)).Find();
+            Assert.IsTrue(r.IsMatch(s.Value.Values));
         }
 
         /// <summary>
@@ -401,11 +438,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqFindAt()
         {
-            var result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Option.Some(10)).Find();
-            Assert.AreEqual(10, result.Value.At(2).Value);
+            var result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == new Seq<int>(10)).Find();
+            Assert.AreEqual(new Seq<int>(10), result.Value.At(2));
 
-            result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Option.None<int>()).Find();
-            Assert.IsTrue(result.Value.Length() < 3 || result.Value.At(2).IsNone());
+            result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Seq.Empty<int>()).Find();
+            Assert.IsTrue(result.Value.Length() < 3 || result.Value.At(2) == new Seq<int>());
         }
 
         /// <summary>
@@ -482,8 +519,8 @@ namespace ZenLib.Tests
                          s.ReplaceFirst(new Seq<int>(3), new Seq<int>(4)) == Seq.Unit<int>(5).Concat(Seq.Unit<int>(4))))).Find();
 
             Console.WriteLine(result);
-            Assert.AreEqual(Option.Some(5), result.Value.At(0));
-            Assert.AreEqual(Option.Some(3), result.Value.At(1));
+            Assert.AreEqual(new Seq<int>(5), result.Value.At(0));
+            Assert.AreEqual(new Seq<int>(3), result.Value.At(1));
         }
 
         /// <summary>
@@ -495,11 +532,11 @@ namespace ZenLib.Tests
             var result = new ZenConstraint<Seq<Pair<int, int>>>(s =>
             {
                 var elt2 = s.At(new BigInteger(2));
-                return And(elt2.IsSome(), elt2.Value().Item1() == 4);
+                return elt2 == new Seq<Pair<int, int>>(new Pair<int, int> { Item1 = 4, Item2 = 2 });
             }).Find();
 
-            Assert.IsTrue(result.Value.At(2).HasValue);
-            Assert.AreEqual(4, result.Value.At(2).Value.Item1);
+            Assert.IsTrue(result.Value.At(2).Values.Count > 0);
+            Assert.AreEqual(4, result.Value.At(2).Values[0].Item1);
         }
 
         /// <summary>

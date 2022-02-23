@@ -263,14 +263,14 @@ namespace ZenLib
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The value at the index.</returns>
-        public Option<T> At(int index)
+        public Seq<T> At(int index)
         {
             if (index >= this.Values.Count || index < 0)
             {
-                return Option.None<T>();
+                return new Seq<T>();
             }
 
-            return Option.Some(this.Values[index]);
+            return new Seq<T>(this.Values[index]);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The value at the index.</returns>
-        internal Option<T> AtBigInteger(BigInteger index)
+        internal Seq<T> AtBigInteger(BigInteger index)
         {
             return At(int.Parse(index.ToString()));
         }
@@ -390,24 +390,24 @@ namespace ZenLib
     {
         /// <summary>
         /// Create a byte sequence from a string.
-        /// The bytes correspond to the ASCII values.
+        /// The bytes correspond to the Unicode values.
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        public static Seq<byte> FromString(string s)
+        public static Seq<char> FromString(string s)
         {
-            return new Seq<byte>(ImmutableList.CreateRange(Encoding.ASCII.GetBytes(s)));
+            return new Seq<char>(ImmutableList.CreateRange(s.ToCharArray()));
         }
 
         /// <summary>
         /// Create a string from a byte sequence.
-        /// The bytes correspond to the ASCII values.
+        /// The bytes correspond to the Unicode values.
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        public static string AsString(this Seq<byte> seq)
+        public static string AsString(this Seq<char> seq)
         {
-            return Encoding.ASCII.GetString(seq.Values.ToArray());
+            return new string(seq.Values.ToArray());
         }
 
         /// <summary>
@@ -463,7 +463,7 @@ namespace ZenLib
         /// <param name="seqExpr">The sequence expr.</param>
         /// <param name="indexExpr">The index expr.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
+        public static Zen<Seq<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
         {
             CommonUtilities.ValidateNotNull(seqExpr);
             CommonUtilities.ValidateNotNull(indexExpr);

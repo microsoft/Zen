@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// A parser for a subset of C# regex expressions.
     /// </summary>
-    public class RegexParser
+    public class RegexParser<T>
     {
         /// <summary>
         /// Special characters.
@@ -29,15 +29,6 @@ namespace ZenLib
         };
 
         /// <summary>
-        /// Hexadecimal characters.
-        /// </summary>
-        private static ISet<string> hexCharacters = new HashSet<string>
-        {
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a",
-            "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F",
-        };
-
-        /// <summary>
         /// The input string to match.
         /// </summary>
         private string inputString;
@@ -48,18 +39,25 @@ namespace ZenLib
         private string symbol;
 
         /// <summary>
+        /// Converter from a character to a base value.
+        /// </summary>
+        private Func<char, T> characterConverter;
+
+        /// <summary>
         /// The current index into the input string.
         /// </summary>
         private int currentIndex;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="RegexParser"/> class.
+        /// Creates a new instance of the <see cref="RegexParser{T}"/> class.
         /// </summary>
         /// <param name="inputString">The input string to parse.</param>
-        public RegexParser(string inputString)
+        /// <param name="characterConverter">A character converter.</param>
+        public RegexParser(string inputString, Func<char, T> characterConverter)
         {
             this.inputString = inputString;
             this.currentIndex = -1;
+            this.characterConverter = characterConverter;
             NextSymbol();
         }
 
@@ -67,10 +65,9 @@ namespace ZenLib
         /// Parse the regex.
         /// </summary>
         /// <returns>The Zen regex value.</returns>
-        public Regex<byte> Parse()
+        public Regex<T> Parse()
         {
             var ret = ParseRegex();
-            Console.WriteLine(ret);
 
             if (symbol != string.Empty)
             {
@@ -85,7 +82,7 @@ namespace ZenLib
         /// Parse a regex from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseRegex()
+        private Regex<T> ParseRegex()
         {
             var r = ParseTerm();
             while (symbol == "|")
@@ -101,7 +98,7 @@ namespace ZenLib
         /// Parse a regex term (part of a union) from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseTerm()
+        private Regex<T> ParseTerm()
         {
             var r = ParseFactor();
             while (IsNonSpecialCharacter() || symbol == "." || symbol == "(" || symbol == "[" || symbol == "\\")
@@ -116,7 +113,7 @@ namespace ZenLib
         /// Parse a factor (part of a concatentation) from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseFactor()
+        private Regex<T> ParseFactor()
         {
             var r = ParseAtom();
             while (Accept(unaryOperationCharacters, out var operation))
@@ -143,20 +140,20 @@ namespace ZenLib
         /// Parse an atom (a base element) from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseAtom()
+        private Regex<T> ParseAtom()
         {
             if (AcceptNonSpecialCharacter(out var character))
             {
-                return Regex.Char((byte)character[0]);
+                return Regex.Char(this.characterConverter(character[0]));
             }
             else if (Accept("\\"))
             {
                 character = ExpectAnyCharacter();
-                return Regex.Char((byte)character[0]);
+                return Regex.Char(this.characterConverter(character[0]));
             }
             else if (Accept("."))
             {
-                return Regex.Dot<byte>();
+                return Regex.Dot<T>();
             }
             else if (Accept("("))
             {
@@ -181,7 +178,7 @@ namespace ZenLib
         /// Parse a character class from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseCharacterClass()
+        private Regex<T> ParseCharacterClass()
         {
             var r = ParseCharacterRange();
             while (symbol != "]")
@@ -196,22 +193,21 @@ namespace ZenLib
         /// Parse a character range from the current location.
         /// </summary>
         /// <returns>A regex.</returns>
-        private Regex<byte> ParseCharacterRange()
+        private Regex<T> ParseCharacterRange()
         {
             var c1 = ParseClassCharacter();
-            Console.WriteLine($"got: {(char)c1}");
 
             if (Accept("-"))
             {
                 // if the - is the last character, then it is treated as a literal.
                 if (Peek(1) == "]")
                 {
-                    return Regex.Char((byte)'-');
+                    return Regex.Char(this.characterConverter('-'));
                 }
                 else
                 {
                     var c2 = ParseClassCharacter();
-                    if (c2 < c1)
+                    if (((dynamic)c2).CompareTo((dynamic)c1) < 0)
                     {
                         throw new ZenException($"Invalid character range given.");
                     }
@@ -227,16 +223,16 @@ namespace ZenLib
         /// Parse a character or escaped sequence from the current location.
         /// </summary>
         /// <returns>A character value.</returns>
-        private byte ParseClassCharacter()
+        private T ParseClassCharacter()
         {
             if (AcceptClassCharacter(out var character))
             {
-                return (byte)character[0];
+                return this.characterConverter(character[0]);
             }
             else if (Accept("\\"))
             {
                 character = ExpectAnyCharacter();
-                return (byte)character[0];
+                return this.characterConverter(character[0]);
             }
             else
             {

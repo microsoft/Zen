@@ -18,7 +18,8 @@ namespace ZenLib.Solver
     /// <typeparam name="TInteger">The integer type.</typeparam>
     /// <typeparam name="TSeq">The sequence type.</typeparam>
     /// <typeparam name="TArray">The array type.</typeparam>
-    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray>
+    /// <typeparam name="TChar">The character type.</typeparam>
+    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar>
     {
         /// <summary>
         /// The false expression.
@@ -51,6 +52,19 @@ namespace ZenLib.Solver
         /// </summary>
         /// <returns></returns>
         TBitvec CreateByteConst(byte b);
+
+        /// <summary>
+        /// Create a new char expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TChar) CreateCharVar(object e);
+
+        /// <summary>
+        /// Create a char constant.
+        /// </summary>
+        /// <returns></returns>
+        TChar CreateCharConst(char c);
 
         /// <summary>
         /// Create a new short expression.
@@ -257,7 +271,7 @@ namespace ZenLib.Solver
         /// <param name="valueExpr">The value expression.</param>
         /// <param name="type">The type of the sequence.</param>
         /// <returns></returns>
-        TSeq SeqUnit(SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> valueExpr, Type type);
+        TSeq SeqUnit(SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> valueExpr, Type type);
 
         /// <summary>
         /// The 'Concat' of two expressions.
@@ -266,15 +280,6 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TSeq SeqConcat(TSeq x, TSeq y);
-
-        /// <summary>
-        /// The sequence 'At' operation.
-        /// </summary>
-        /// <param name="x">The seq expression.</param>
-        /// <param name="seqInnerType">The seq inner type.</param>
-        /// <param name="y">The index expression.</param>
-        /// <returns></returns>
-        SymbolicObject<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> SeqGet(TSeq x, Type seqInnerType, TInteger y);
 
         /// <summary>
         /// The 'PrefixOf' of two expressions.
@@ -367,7 +372,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> valueExpr, Type keyType, Type valueType);
+        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> valueExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of setting a key to a value for an array.
@@ -377,7 +382,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, Type keyType, Type valueType);
+        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of getting a value for a key from an array.
@@ -387,7 +392,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> keyExpr, Type keyType, Type valueType);
+        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of unioning two arrays.
@@ -436,6 +441,14 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool Eq(TArray x, TArray y);
+
+        /// <summary>
+        /// The 'Equal' of two characters.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TChar x, TChar y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -531,6 +544,15 @@ namespace ZenLib.Solver
         TArray Ite(TBool g, TArray t, TArray f);
 
         /// <summary>
+        /// The 'Ite' of a guard and two characters.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TChar Ite(TBool g, TChar t, TChar f);
+
+        /// <summary>
         /// Check whether a boolean expression is satisfiable.
         /// </summary>
         /// <param name="x">The expression.</param>
@@ -552,6 +574,6 @@ namespace ZenLib.Solver
         /// <param name="e"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray> ConvertExprToSymbolicValue(object e, Type type);
+        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> ConvertExprToSymbolicValue(object e, Type type);
     }
 }

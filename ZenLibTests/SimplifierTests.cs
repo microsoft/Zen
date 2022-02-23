@@ -320,20 +320,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test hash consing of substring.
-        /// </summary>
-        [TestMethod]
-        public void TestAtHashCons()
-        {
-            var s = Arbitrary<string>();
-            var e1 = s.Char(new BigInteger(0));
-            var e2 = s.Char(new BigInteger(0));
-            var e3 = s.Char(new BigInteger(1));
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-        }
-
-        /// <summary>
         /// Test hash consing of length.
         /// </summary>
         [TestMethod]

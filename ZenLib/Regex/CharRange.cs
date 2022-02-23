@@ -37,6 +37,7 @@ namespace ZenLib
         /// </summary>
         public CharRange()
         {
+            CommonUtilities.ValidateIsCharType(typeof(T));
             Low = min;
             High = max;
         }
@@ -48,6 +49,7 @@ namespace ZenLib
         /// <param name="high">The high value of the range.</param>
         public CharRange(T low, T high)
         {
+            CommonUtilities.ValidateIsCharType(typeof(T));
             Low = low;
             High = high;
         }
@@ -92,10 +94,10 @@ namespace ZenLib
 
             if (this.High.Equals(max))
             {
-                return new CharRange<T>[] { new CharRange<T>(min, ReflectionUtilities.Add((dynamic)this.Low, -1)) };
+                return new CharRange<T>[] { new CharRange<T>(min, ReflectionUtilities.Subtract((dynamic)this.Low, 1)) };
             }
 
-            var r1 = new CharRange<T>(min, ReflectionUtilities.Add((dynamic)this.Low, -1));
+            var r1 = new CharRange<T>(min, ReflectionUtilities.Subtract((dynamic)this.Low, 1));
             var r2 = new CharRange<T>(ReflectionUtilities.Add((dynamic)this.High, 1), max);
             return new CharRange<T>[] { r1, r2 };
         }

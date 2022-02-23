@@ -1,31 +1,32 @@
-﻿// <copyright file="SymbolicInteger.cs" company="Microsoft">
+﻿// <copyright file="SymbolicChar.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
 
     /// <summary>
-    /// Representation of a symbolic integer value.
+    /// Representation of a symbolic char value.
     /// </summary>
-    internal class SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
     {
-        public SymbolicInteger(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, TInt value) : base(solver)
+        public SymbolicChar(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, TChar value) : base(solver)
         {
             this.Value = value;
         }
 
-        public TInt Value { get; }
+        public TChar Value { get; }
 
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> other)
         {
-            var o = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
+            var o = (SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, value);
+            return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
@@ -42,7 +43,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symint>";
+            return "<symchar>";
         }
     }
 }

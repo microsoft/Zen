@@ -25,6 +25,12 @@ namespace ZenLib
         T VisitByte(TParam parameter);
 
         /// <summary>
+        /// Visit the char type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitChar(TParam parameter);
+
+        /// <summary>
         /// Visit the short type.
         /// </summary>
         /// <returns>A value.</returns>

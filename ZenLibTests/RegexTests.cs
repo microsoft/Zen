@@ -84,6 +84,91 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the character range implementation is working.
+        /// </summary>
+        [TestMethod]
+        public void TestCharRangeWithFixedSizeIntegers()
+        {
+            var r1 = new CharRange<UInt9>();
+            var r2 = new CharRange<UInt9>(new UInt9(10), new UInt9(20));
+            var r3 = new CharRange<Int9>();
+            var r4 = new CharRange<Int9>(new Int9(-5), new Int9(5));
+
+            Assert.IsTrue(r1.Contains(new UInt9(0)));
+            Assert.IsTrue(r1.Contains(new UInt9(1)));
+            Assert.IsTrue(r1.Contains(new UInt9(510)));
+            Assert.IsTrue(r1.Contains(new UInt9(511)));
+
+            Assert.IsTrue(r2.Contains(new UInt9(10)));
+            Assert.IsTrue(r2.Contains(new UInt9(11)));
+            Assert.IsTrue(r2.Contains(new UInt9(19)));
+            Assert.IsTrue(r2.Contains(new UInt9(20)));
+            Assert.IsFalse(r2.Contains(new UInt9(9)));
+            Assert.IsFalse(r2.Contains(new UInt9(21)));
+            Assert.IsFalse(r2.Contains(new UInt9(511)));
+
+            Assert.IsTrue(r3.Contains(new Int9(0)));
+            Assert.IsTrue(r3.Contains(new Int9(-1)));
+            Assert.IsTrue(r3.Contains(new Int9(1)));
+            Assert.IsTrue(r3.Contains(new Int9(-5)));
+            Assert.IsTrue(r3.Contains(new Int9(5)));
+            Assert.IsTrue(r3.Contains(new Int9(-6)));
+            Assert.IsTrue(r3.Contains(new Int9(6)));
+            Assert.IsTrue(r3.Contains(new Int9(-256)));
+            Assert.IsTrue(r3.Contains(new Int9(255)));
+
+            Assert.IsTrue(r4.Contains(new Int9(0)));
+            Assert.IsTrue(r4.Contains(new Int9(-1)));
+            Assert.IsTrue(r4.Contains(new Int9(1)));
+            Assert.IsTrue(r4.Contains(new Int9(-5)));
+            Assert.IsTrue(r4.Contains(new Int9(5)));
+            Assert.IsFalse(r4.Contains(new Int9(-6)));
+            Assert.IsFalse(r4.Contains(new Int9(6)));
+            Assert.IsFalse(r4.Contains(new Int9(-256)));
+            Assert.IsFalse(r4.Contains(new Int9(255)));
+
+            var rs1 = r2.Complement();
+            Assert.AreEqual(2, rs1.Length);
+            Assert.AreEqual(new UInt9(0), rs1[0].Low);
+            Assert.AreEqual(new UInt9(9), rs1[0].High);
+            Assert.AreEqual(new UInt9(21), rs1[1].Low);
+            Assert.AreEqual(new UInt9(511), rs1[1].High);
+
+            var rs2 = r1.Complement();
+            Assert.AreEqual(0, rs2.Length);
+
+            var rs3 = r4.Complement();
+            Assert.AreEqual(2, rs3.Length);
+            Assert.AreEqual(new Int9(-256), rs3[0].Low);
+            Assert.AreEqual(new Int9(-6), rs3[0].High);
+            Assert.AreEqual(new Int9(6), rs3[1].Low);
+            Assert.AreEqual(new Int9(255), rs3[1].High);
+
+            var rs4 = r3.Complement();
+            Assert.AreEqual(0, rs4.Length);
+        }
+
+        /// <summary>
+        /// Test that the character range only works with finite integers.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCharRangeWithInvalidType1()
+        {
+            new CharRange<System.Numerics.BigInteger>();
+        }
+
+        /// <summary>
+        /// Test that the character range only works with finite integers.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCharRangeWithInvalidType2()
+        {
+            new CharRange<TestHelper.Object2>();
+        }
+
+        /// <summary>
         /// Test that Regex simplifications are working.
         /// </summary>
         [TestMethod]
@@ -323,13 +408,15 @@ namespace ZenLib.Tests
         [DataRow("[a\\]", false)]
         [DataRow("[9-0]", false)]
         [DataRow("[a-", false)]
+        [DataRow(" ", true)]
+        [DataRow("s ", true)]
+        [DataRow("s s", true)]
+        [DataRow("[ab ]", true)]
         public void TestRegexParsing(string input, bool expected)
         {
-            var p = new RegexParser(input);
-
             try
             {
-                p.Parse();
+                Regex.ParseAscii(input);
                 Assert.IsTrue(expected);
             }
             catch (ZenException e)
@@ -391,14 +478,23 @@ namespace ZenLib.Tests
         [DataRow("(a|b|c|d)", "b", true)]
         [DataRow("(a|b|c|d)", "c", true)]
         [DataRow("(a|b|c|d)", "d", true)]
+        [DataRow(" ", " ", true)]
+        [DataRow("s ", "s ", true)]
+        [DataRow("s s", "s s", true)]
+        [DataRow("[ab ]", " ", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
-            var p = new RegexParser(regex);
-            var r = p.Parse();
+            var r = Regex.ParseAscii(regex);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));
             Assert.AreEqual(expected, a.IsMatch(bytes));
+
+            var r2 = Regex.ParseUnicode(regex);
+            var a2 = r2.ToAutomaton();
+            var bytes2 = input.ToCharArray();
+            Assert.AreEqual(expected, r2.IsMatch(bytes2));
+            Assert.AreEqual(expected, a2.IsMatch(bytes2));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

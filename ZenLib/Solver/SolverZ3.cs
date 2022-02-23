@@ -6,7 +6,6 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.Z3;
@@ -15,7 +14,7 @@ namespace ZenLib.Solver
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr>
     {
         internal Context Context;
 
@@ -28,6 +27,8 @@ namespace ZenLib.Solver
         internal Sort BoolSort;
 
         internal Sort ByteSort;
+
+        internal Sort CharSort;
 
         internal Sort ShortSort;
 
@@ -63,11 +64,13 @@ namespace ZenLib.Solver
             this.Solver.Parameters = this.Params;
             this.BoolSort = this.Context.MkBoolSort();
             this.ByteSort = this.Context.MkBitVecSort(8);
+            this.CharSort = this.Context.CharSort;
             this.ShortSort = this.Context.MkBitVecSort(16);
             this.IntSort = this.Context.MkBitVecSort(32);
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
+            this.CharSort = this.Context.CharSort;
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
@@ -120,6 +123,17 @@ namespace ZenLib.Solver
         {
             var v = this.Context.MkConst(FreshSymbol(), this.ByteSort);
             return (v, (BitVecExpr)v);
+        }
+
+        public (Expr, Expr) CreateCharVar(object e)
+        {
+            var v = this.Context.MkConst(FreshSymbol(), this.CharSort);
+            return (v, v);
+        }
+
+        public Expr CreateCharConst(char c)
+        {
+            return this.Context.CharFromBV(this.Context.MkBV(c, 18));
         }
 
         public BitVecExpr CreateShortConst(short s)
@@ -240,6 +254,11 @@ namespace ZenLib.Solver
             return this.Context.MkEq(x, y);
         }
 
+        public BoolExpr Eq(Expr x, Expr y)
+        {
+            return this.Context.MkEq(x, y);
+        }
+
         public BoolExpr False()
         {
             return this.Context.MkFalse();
@@ -278,6 +297,11 @@ namespace ZenLib.Solver
         public ArrayExpr Ite(BoolExpr g, ArrayExpr t, ArrayExpr f)
         {
             return (ArrayExpr)this.Context.MkITE(g, t, f);
+        }
+
+        public Expr Ite(BoolExpr g, Expr t, Expr f)
+        {
+            return this.Context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)
@@ -380,7 +404,6 @@ namespace ZenLib.Solver
             return this.Context.MkExtract(x, y, z);
         }
 
-        [ExcludeFromCodeCoverage] // not used yet
         public SeqExpr SeqAt(SeqExpr x, IntExpr y)
         {
             return this.Context.MkAt(x, y);
@@ -423,8 +446,8 @@ namespace ZenLib.Solver
 
         public ArrayExpr DictSet(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> valueExpr,
             Type keyType,
             Type valueType)
         {
@@ -445,7 +468,7 @@ namespace ZenLib.Solver
         }
 
         public SeqExpr SeqUnit(
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> valueExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> valueExpr,
             Type type)
         {
             var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, type);
@@ -454,7 +477,7 @@ namespace ZenLib.Solver
 
         public ArrayExpr DictDelete(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
             Type keyType,
             Type valueType)
         {
@@ -475,7 +498,7 @@ namespace ZenLib.Solver
 
         public (BoolExpr, object) DictGet(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
             Type keyType,
             Type valueType)
         {
@@ -515,37 +538,13 @@ namespace ZenLib.Solver
             return this.Context.MkEmptySeq(seqSort);
         }
 
-        public SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> SeqGet(SeqExpr x, Type seqInnerType, IntExpr y)
-        {
-            var sort = this.TypeToSortConverter.GetSortForType(seqInnerType);
-            var result = this.Context.MkAt(x, y);
-            var resultIsEmpty = this.Context.MkEq(result, this.SeqEmpty(seqInnerType));
-
-            // create fresh variables to represent that flag and value for an option result
-            var freshVariable = this.Context.MkConst(FreshSymbol(), sort);
-            var freshSequence = this.Context.MkUnit(freshVariable);
-            var freshFlag = (BoolExpr)this.Context.MkConst(FreshSymbol(), this.BoolSort);
-
-            // ensure the values for the fresh flag and value are constrained appropriately
-            this.Solver.Assert(this.Context.MkEq(resultIsEmpty, this.Context.MkNot(freshFlag)));
-            this.Solver.Assert(this.Context.MkImplies(this.Context.MkNot(resultIsEmpty), this.Context.MkEq(freshSequence, result)));
-
-            // build the resulting symbolic object
-            var fields = ImmutableSortedDictionary<string, SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>>.Empty;
-            fields = fields.Add("HasValue", new SymbolicBool<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(this, freshFlag));
-            fields = fields.Add("Value", this.ExprToSymbolicValueConverter.ConvertExpr(freshVariable, seqInnerType));
-
-            var objectType = typeof(Option<>).MakeGenericType(seqInnerType);
-            return new SymbolicObject<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr>(objectType, this, fields);
-        }
-
         public object Get(Model m, Expr v, Type type)
         {
             var e = m.Evaluate(v, true);
             return this.ExprToObjectConverter.Convert(e, type);
         }
 
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr> ConvertExprToSymbolicValue(object e, Type type)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> ConvertExprToSymbolicValue(object e, Type type)
         {
             return this.ExprToSymbolicValueConverter.ConvertExpr((Expr)e, type);
         }

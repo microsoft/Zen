@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a fixed bit size integer.
     /// </summary>
-    public abstract class IntN<T, TSign> : IEquatable<IntN<T, TSign>>
+    public abstract class IntN<T, TSign> : IEquatable<IntN<T, TSign>>, IComparable<IntN<T, TSign>>
     {
         /// <summary>
         /// Gets the number of bits for the integer.
@@ -89,6 +89,27 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Compare this integer to another.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns>An integer.</returns>
+        public int CompareTo(IntN<T, TSign> other)
+        {
+            if (this.Equals(other))
+            {
+                return 0;
+            }
+            else if (this.LessThanOrEqual(other))
+            {
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        /// <summary>
         /// Less than or equal to for fixed bit size integers.
         /// </summary>
         /// <param name="left">The first integer.</param>
@@ -112,12 +133,12 @@ namespace ZenLib
             var ln = GetBit(this.Bytes, this.Size, 0);
             var rn = GetBit(other.Bytes, other.Size, 0);
 
-            if (ln && !rn)
+            if (this.Signed && ln && !rn)
             {
                 return true;
             }
 
-            if (!ln && rn)
+            if (this.Signed && !ln && rn)
             {
                 return false;
             }
@@ -413,7 +434,7 @@ namespace ZenLib
 
             var bytes = this.Bytes;
 
-            bool negated = GetBit(this.Bytes, this.Size, 0);
+            bool negated = this.Signed && GetBit(this.Bytes, this.Size, 0);
 
             if (negated)
             {
@@ -446,6 +467,30 @@ namespace ZenLib
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Sets a bit at a given position.
+        /// </summary>
+        /// <param name="position">The position.</param>
+        /// <param name="value">Whether to set true or false.</param>
+        public void SetBit(int position, bool value)
+        {
+            Contract.Assert(position >= 0);
+            Contract.Assert(position < this.Size);
+            SetBit(this.Bytes, this.Size, position, value);
+        }
+
+        /// <summary>
+        /// Gets whether the bit is set at a given position.
+        /// </summary>
+        /// <param name="position">The position.</param>
+        /// <returns>True or false.</returns>
+        public bool GetBit(int position)
+        {
+            Contract.Assert(position >= 0);
+            Contract.Assert(position < this.Size);
+            return GetBit(this.Bytes, this.Size, position);
         }
 
         /// <summary>

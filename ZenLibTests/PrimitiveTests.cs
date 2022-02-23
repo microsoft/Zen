@@ -206,6 +206,7 @@ namespace ZenLib.Tests
         {
             RandomBytes(x => CheckAgreement<byte>(i => i == x));
             RandomBytes(x => CheckAgreement<byte>(i => x == i));
+            RandomBytes(x => CheckAgreement<char>(i => (char)x == i));
             RandomBytes(x => CheckAgreement<short>(i => i == (short)x));
             RandomBytes(x => CheckAgreement<short>(i => (short)x == i));
             RandomBytes(x => CheckAgreement<ushort>(i => i == (ushort)x));
@@ -229,6 +230,35 @@ namespace ZenLib.Tests
         public void TestBooleanInequality()
         {
             RandomBytes(x => CheckAgreement<bool>(b => b != (x % 2 == 0)));
+        }
+
+        /// <summary>
+        /// Test char inequality.
+        /// </summary>
+        [TestMethod]
+        public void TestCharInequality()
+        {
+            RandomBytes(x => CheckAgreement<char>(c => c != 'x'));
+        }
+
+        /// <summary>
+        /// Test char ite.
+        /// </summary>
+        [TestMethod]
+        public void TestCharIte1()
+        {
+            var res = new ZenConstraint<char, bool>((c, b) => If(c == 'a', b, Not(b))).Find();
+            Assert.IsTrue(res.Value.Item1 == 'a' || !res.Value.Item2);
+        }
+
+        /// <summary>
+        /// Test char ite.
+        /// </summary>
+        [TestMethod]
+        public void TestCharIte2()
+        {
+            var res = new ZenFunction<char, char>(c => If<char>(c == 'a', 'b', 'c')).Find((c1, c2) => c2 == 'b');
+            Assert.IsTrue(res.Value == 'a');
         }
 
         /// <summary>
@@ -439,25 +469,6 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => 4UL - i == x));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i - new BigInteger(4) == new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(4) - i == new BigInteger(x)));
-        }
-
-        /// <summary>
-        /// Test integer minus with constants.
-        /// </summary>
-        [TestMethod]
-        public void TestDefaultValues()
-        {
-            Assert.IsTrue(new ZenFunction<Option<bool>>(() => Option.Null<bool>()).Assert(v => v.Value() == false));
-            Assert.IsTrue(new ZenFunction<Option<byte>>(() => Option.Null<byte>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<short>>(() => Option.Null<short>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<ushort>>(() => Option.Null<ushort>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<int>>(() => Option.Null<int>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<uint>>(() => Option.Null<uint>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<long>>(() => Option.Null<long>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<ulong>>(() => Option.Null<ulong>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<BigInteger>>(() => Option.Null<BigInteger>()).Assert(v => v.Value() == new BigInteger(0)));
-            Assert.IsTrue(new ZenFunction<Option<FSeq<bool>>>(() => Option.Null<FSeq<bool>>()).Assert(v => v.Value().IsEmpty()));
-            Assert.IsTrue(new ZenFunction<Option<FMap<bool, bool>>>(() => Option.Null<FMap<bool, bool>>()).Assert(v => v.Value().Get(true).IsSome() == false));
         }
 
         /// <summary>

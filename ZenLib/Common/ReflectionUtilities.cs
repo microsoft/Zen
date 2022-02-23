@@ -6,7 +6,6 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -26,7 +25,7 @@ namespace ZenLib
         /// <summary>
         /// The type of byte sequences values.
         /// </summary>
-        public readonly static Type ByteSequenceType = typeof(Seq<byte>);
+        public readonly static Type UnicodeSequenceType = typeof(Seq<char>);
 
         /// <summary>
         /// The type of finite string values.
@@ -47,6 +46,11 @@ namespace ZenLib
         /// The type of byte values.
         /// </summary>
         public readonly static Type ByteType = typeof(byte);
+
+        /// <summary>
+        /// The type of char values.
+        /// </summary>
+        public readonly static Type CharType = typeof(char);
 
         /// <summary>
         /// The type of short values.
@@ -267,7 +271,17 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsIntegerType(Type type)
         {
-            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsBigIntegerType(type) || IsFixedIntegerType(type);
+            return IsFiniteIntegerType(type) || IsBigIntegerType(type);
+        }
+
+        /// <summary>
+        /// Check if a type is a kind of finite integer.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>True or false.</returns>
+        public static bool IsFiniteIntegerType(Type type)
+        {
+            return IsUnsignedIntegerType(type) || IsSignedIntegerType(type) || IsFixedIntegerType(type);
         }
 
         /// <summary>
@@ -277,7 +291,19 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsUnsignedIntegerType(Type type)
         {
-            return (type == ByteType || type == UshortType || type == UintType || type == UlongType);
+            if (type == ByteType || type == UshortType || type == UintType || type == UlongType)
+            {
+                return true;
+            }
+            else if (IsFixedIntegerType(type))
+            {
+                var signed = type.BaseType.GetGenericArgumentsCached()[1];
+                return signed == typeof(Unsigned);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -287,7 +313,19 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsSignedIntegerType(Type type)
         {
-            return (type == ShortType || type == IntType || type == LongType);
+            if (type == ShortType || type == IntType || type == LongType)
+            {
+                return true;
+            }
+            else if (IsFixedIntegerType(type))
+            {
+                var signed = type.BaseType.GetGenericTypeDefinitionCached().GetGenericArgumentsCached()[1];
+                return signed == typeof(Signed);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -614,6 +652,8 @@ namespace ZenLib
                 return false;
             if (type == ByteType)
                 return (byte)0;
+            if (type == CharType)
+                return (char)0;
             if (type == ShortType)
                 return (short)0;
             if (type == UshortType)
@@ -686,6 +726,8 @@ namespace ZenLib
                 return visitor.VisitBool(parameter);
             if (type == ByteType)
                 return visitor.VisitByte(parameter);
+            if (type == CharType)
+                return visitor.VisitChar(parameter);
             if (type == ShortType)
                 return visitor.VisitShort(parameter);
             if (type == UshortType)
@@ -829,8 +871,8 @@ namespace ZenLib
             {
                 var type = typeof(T);
 
-                if (value is bool || value is byte || value is short || value is ushort || value is int ||
-                    value is uint || value is long || value is ulong || value is BigInteger ||
+                if (value is bool || value is byte || value is char || value is short || value is ushort ||
+                    value is int  || value is uint || value is long || value is ulong || value is BigInteger ||
                     IsFixedIntegerType(type))
                 {
                     return ZenConstantExpr<T>.Create((dynamic)value);
@@ -840,8 +882,8 @@ namespace ZenLib
 
                 if (type == StringType)
                 {
-                    var asSeq = (Zen<Seq<byte>>)CreateZenConstant(Seq.FromString((string)(object)value));
-                    return ZenCastExpr<Seq<byte>, string>.Create(asSeq);
+                    var asSeq = (Zen<Seq<char>>)CreateZenConstant(Seq.FromString((string)(object)value));
+                    return ZenCastExpr<Seq<char>, string>.Create(asSeq);
                 }
 
                 if (IsSeqType(type))
@@ -965,7 +1007,7 @@ namespace ZenLib
                 return (Zen<T>)(object)ZenConstantExpr<uint>.Create((uint)value);
             if (type == LongType)
                 return (Zen<T>)(object)ZenConstantExpr<long>.Create(value);
-
+            Contract.Assert(type == UlongType);
             return (Zen<T>)(object)ZenConstantExpr<ulong>.Create((ulong)value);
         }
 
@@ -991,6 +1033,7 @@ namespace ZenLib
                 return (uint)value;
             if (type == LongType)
                 return (long)value;
+            Contract.Assert(type == UlongType);
             return (ulong)value;
         }
 
@@ -1015,6 +1058,7 @@ namespace ZenLib
                 return (uint)value;
             if (type == LongType)
                 return (long)value;
+            Contract.Assert(type == UlongType);
             return (long)(ulong)value;
         }
 
@@ -1030,6 +1074,8 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MinValue;
+            if (type == CharType)
+                return (T)(object)char.MinValue;
             if (type == ShortType)
                 return (T)(object)short.MinValue;
             if (type == UshortType)
@@ -1040,8 +1086,14 @@ namespace ZenLib
                 return (T)(object)uint.MinValue;
             if (type == LongType)
                 return (T)(object)long.MinValue;
-            Contract.Assert(type == UlongType);
-            return (T)(object)ulong.MinValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MinValue;
+
+            Contract.Assert(IsFixedIntegerType(type));
+            var c = type.GetConstructor(new Type[] { typeof(long) });
+            dynamic obj = (T)c.Invoke(new object[] { 0L });
+            obj.SetBit(0, obj.Signed);
+            return obj;
         }
 
         /// <summary>
@@ -1056,6 +1108,8 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MaxValue;
+            if (type == CharType)
+                return (T)(object)char.MaxValue;
             if (type == ShortType)
                 return (T)(object)short.MaxValue;
             if (type == UshortType)
@@ -1066,13 +1120,29 @@ namespace ZenLib
                 return (T)(object)uint.MaxValue;
             if (type == LongType)
                 return (T)(object)long.MaxValue;
-            Contract.Assert(type == UlongType);
-            return (T)(object)ulong.MaxValue;
+            if (type == UlongType)
+                return (T)(object)ulong.MaxValue;
+
+            Contract.Assert(IsFixedIntegerType(type));
+            var c = type.GetConstructor(new Type[] { typeof(long) });
+            dynamic obj = (T)c.Invoke(new object[] { 0L });
+            obj.SetBit(0, !obj.Signed);
+            for (int i = 1; i < obj.Size; i++)
+            {
+                obj.SetBit(i, true);
+            }
+
+            return obj;
         }
 
         public static byte Add(byte x, int i)
         {
             return (byte)(x + i);
+        }
+
+        public static char Add(char x, int i)
+        {
+            return (char)(x + i);
         }
 
         public static short Add(short x, int i)
@@ -1103,6 +1173,60 @@ namespace ZenLib
         public static ulong Add(ulong x, int i)
         {
             return (ulong)(x + (ulong)i);
+        }
+
+        public static T Add<T, TSign>(IntN<T, TSign> x, int i)
+        {
+            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
+            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
+            return x.Add(instance);
+        }
+
+        public static byte Subtract(byte x, int i)
+        {
+            return (byte)(x - i);
+        }
+
+        public static char Subtract(char x, int i)
+        {
+            return (char)(x - i);
+        }
+
+        public static short Subtract(short x, int i)
+        {
+            return (short)(x - i);
+        }
+
+        public static ushort Subtract(ushort x, int i)
+        {
+            return (ushort)(x - i);
+        }
+
+        public static int Subtract(int x, int i)
+        {
+            return (int)(x - i);
+        }
+
+        public static uint Subtract(uint x, int i)
+        {
+            return (uint)(x - i);
+        }
+
+        public static long Subtract(long x, int i)
+        {
+            return (long)(x - i);
+        }
+
+        public static ulong Subtract(ulong x, int i)
+        {
+            return (ulong)(x - (ulong)i);
+        }
+
+        public static T Subtract<T, TSign>(IntN<T, TSign> x, int i)
+        {
+            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
+            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
+            return x.Subtract(instance);
         }
     }
 }

@@ -41,12 +41,35 @@ namespace ZenLib.Solver
 
         public object VisitBool(Expr parameter)
         {
-            return bool.Parse(parameter.ToString());
+            if (parameter.IsEq)
+            {
+                var left = (char)Convert(parameter.Args[0], typeof(char));
+                var right = (char)Convert(parameter.Args[1], typeof(char));
+                return left == right;
+            }
+            else
+            {
+                return bool.Parse(parameter.ToString());
+            }
         }
 
         public object VisitByte(Expr parameter)
         {
             return byte.Parse(parameter.ToString());
+        }
+
+        public object VisitChar(Expr parameter)
+        {
+            if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char")
+            {
+                return (char)parameter.FuncDecl.Parameters[0].Int;
+            }
+            else
+            {
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "char.from_bv");
+                return (char)int.Parse(parameter.Args[0].ToString());
+            }
         }
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
@@ -171,7 +194,7 @@ namespace ZenLib.Solver
 
         public object VisitString(Expr parameter)
         {
-            var result = (Seq<byte>)Convert(parameter, ReflectionUtilities.ByteSequenceType);
+            var result = (Seq<char>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
             return Seq.AsString(result);
         }
 
@@ -202,6 +225,16 @@ namespace ZenLib.Solver
                 var value = Convert(parameter.Args[0], innerType);
                 var c = sequenceType.GetConstructor(new Type[] { innerType });
                 return c.Invoke(new object[] { value });
+            }
+            else if (parameter.IsString)
+            {
+                return Seq.FromString(CommonUtilities.ConvertZ3StringToCSharp(parameter.ToString()));
+            }
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "str.++")
+            {
+                var s1 = (Seq<char>)Convert(parameter.Args[0], sequenceType);
+                var s2 = (Seq<char>)Convert(parameter.Args[1], sequenceType);
+                return s1.Concat(s2);
             }
             else
             {
