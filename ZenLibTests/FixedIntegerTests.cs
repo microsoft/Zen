@@ -598,6 +598,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test solving fixed integers with other constraints.
+        /// </summary>
+        [TestMethod]
+        public void TestSolve()
+        {
+            var zf = new ZenConstraint<bool, int, UInt9>((b, x, y) =>
+            {
+                var c1 = If(b, y < new UInt9(10), x == 3);
+                var c2 = Implies(Not(b), (y & new UInt9(1)) == new UInt9(1));
+                return And(c1, c2);
+            });
+
+            Assert.AreEqual(4L, zf.Find().Value.Item3.ToLong());
+        }
+
+        /// <summary>
         /// Test solving with option.
         /// </summary>
         [TestMethod]

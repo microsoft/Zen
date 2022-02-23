@@ -30,7 +30,7 @@ var l = Zen.Symbolic<FSeq<int>>(depth: 10, exhaustiveDepth: false);
 // build constraints on these variables
 var c1 = Zen.Or(b, i <= 10);
 var c2 = Zen.Or(Zen.Not(b), o == Option.Some(1UL));
-var c3 = Zen.Or(s.Contains("hello"), Zen.Not(o.HasValue()));
+var c3 = Zen.Or(s.Contains("hello"), o.IsNone());
 var c4 = l.Where(x => x <= i).Length() == 5;
 var c5 = l.All(x => Zen.And(x >= 0, x <= 100));
 var expr = Zen.And(c1, c2, c3, c4, c5);
@@ -47,12 +47,12 @@ System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
 
 The output of this example produces the following values:
 
-```
+```csharp
 b: True
-i: 20
-s: !0!hello!1!
+i: 68
+s: hello
 o: Some(1)
-l: [37,5,21,6,21,21,6,6,6,21]
+l: [69,69,69,5,69,69,5,5,5,5]
 ```
 
 Since `Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
@@ -113,7 +113,7 @@ for (int i = 0; i < 1000000; i++)
 Console.WriteLine($"compiled function time: {watch.ElapsedMilliseconds}ms");
 ```
 
-```
+```text
 interpreted function time: 4601ms
 compilation time: 4ms
 compiled function time: 2ms
@@ -139,30 +139,6 @@ var inputs = function.FindAll((x, y, result) => Zen.And(x <= 0, result == 11)).T
 ```
 
 Each input in `inputs` will be unique so there will be no duplicates.
-
-Zen also supports richer data types such as sequences (`FSeq`). For example, we can write an implementation for the insertion sort algorithm using recursion:
-
-```csharp
-Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
-{
-    return expr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
-}
-
-Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
-{
-    return list.Case(
-        empty: FSeq.Create(elt),
-        cons: (hd, tl) => Zen.If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
-}
-```
-
-We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
-
-```csharp
-var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
-var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
-// input = None
-```
 
 Input search uses [bounded model checking](https://en.wikipedia.org/wiki/Model_checking#:~:text=Bounded%20model%20checking%20algorithms%20unroll,as%20an%20instance%20of%20SAT.) to perform verification. For data structures like lists, it finds examples up to a given input size *k*, which is an optional parameter to the function.
 
@@ -240,6 +216,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | ------ | -------------------- | ----------------------- | ------------------------ | ------------|
 | `bool`   | {true, false}        | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `byte`   | 8-bit value          | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `char`   | 16-bit value         | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `short`  | 16-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `ushort` | 16-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `int`    | 32-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
@@ -255,6 +232,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
+| `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :x: | :x:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
@@ -264,13 +242,21 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 
 ### Primitive types
 
-Zen supports the following primitive types: `bool, byte, short, ushort, int, uint, long, ulong`. It does not support `char`, though you can typically achieve the same effect by casting to `ushort`.
+Zen supports the following primitive types: `bool, byte, char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic.
 
-### String types
+##### Example
 
-Zen supports the `string` type for reasoning about unbounded strings. However, string theories are generally incomplete in SMT solvers so there may be problems that they can not solve. 
-
-For this reason, Zen also includes a library-defined `FString` type for reasoning about strings with bounded size. The is done by treating a string as a list of characters `FSeq<ushort>`. You can see the implementation of this class [here](https://github.com/microsoft/Zen/blob/master/ZenLib/DataTypes/FiniteString.cs).
+```csharp
+var x = Symbolic<int>();
+var y = Symbolic<int>();
+var c1 = (~x & y) == 1;
+var c2 = And(x + y > 0, x + y < 100);
+var solution = And(c1, c2).Solve();
+```
+```csharp
+x: -20
+y: 105
+```
 
 ### Integer types
 
@@ -288,15 +274,23 @@ public class Int65 : IntN<Int65, Signed>
     public Int65(long value) : base(value) { } 
 }
 ```
-The library should take care of the rest. Or equivalently, for unsigned integer semantics.
+The library should take care of the rest. Or equivalently, for unsigned integer semantics use `Unsigned`.
+
+
+##### Example
 
 ```csharp
-public class UInt65 : IntN<UInt65, Unsigned> 
-{ 
-    public override int Size { get { return 65; } } 
-    public UInt65(byte[] bytes) : base(bytes) { } 
-    public UInt65(long value) : base(value) { } 
-}
+var b = Symbolic<bool>();
+var x = Symbolic<BigInteger>();
+var y = Symbolic<UInt9>();
+var c1 = If(b, y < new UInt9(10), x == new BigInteger(3));
+var c2 = Implies(Not(b), (y & new UInt9(1)) == new UInt9(1));
+var solution = And(c1, c2).Solve();
+```
+```csharp
+b: True
+x: 0
+y: 4
 ```
 
 ### Options, Tuples
@@ -311,13 +305,104 @@ Zen supports a number of high-level data types that are finite (bounded) in size
 - `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is usually preferred to use `FBag<T>` if possible compared to `FSeq<T>` as it will frequently scale better.
 - `FMap<T1, T2>` type to emulate finite maps from keys to values.
 
+##### Example
+
+As an example, we can write an implementation for the insertion sort algorithm using recursion:
+
+```csharp
+Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
+{
+    return expr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
+}
+
+Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
+{
+    return list.Case(
+        empty: FSeq.Create(elt),
+        cons: (hd, tl) => Zen.If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
+}
+```
+
+We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
+
+```csharp
+var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
+var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
+// input = None
+```
+
 ### Unbounded Sets and Maps
 
 Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain sequences or other maps/sets. For instance primitive types (bool, integers, string, BigInteger) as well as classes/structs are allowed.
 
+```csharp
+var s  = Symbolic<string>();
+var s1 = Symbolic<Set<string>>();
+var s2 = Symbolic<Set<string>>();
+var s3 = Symbolic<Set<string>>();
+var s4 = Symbolic<Set<string>>();
+
+var c1 = s1.Contains("a");
+var c2 = s1.Intersect(s2).Contains("b");
+var c3 = Implies(s == "c", s3.Add(s) == s2);
+var c4 = s4 == s1.Union(s2);
+var solution = And(c1, c2, c3, c4).Solve();
+```
+```csharp
+s:  a
+s1: {b, a}
+s2: {b}
+s3: {}
+s4: {b, a}
+```
+
 ### Unbounded sequences
 
-Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<byte>` for ascii strings. As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` instead, which will model a finite sequence up to a given depth.
+Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<char>` for unicode strings.
+
+As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth.
+
+Sequences also support matching against regular expressions.
+
+##### Example
+
+```csharp
+var r = Regex.Star(Regex.Char(1));
+
+var s1 = Symbolic<Seq<int>>();
+var s2 = Symbolic<Seq<int>>();
+
+var c1 = s1.MatchesRegex(r);
+var c2 = s1 != Seq.Empty<int>();
+var c3 = Not(s2.MatchesRegex(r));
+var c4 = s1.Length() == s2.Length();
+var solution = And(c1, c2, c3, c4).Solve();
+```
+```csharp
+s1: [1]
+s2: [0]
+```
+
+### String types
+
+Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does not support anchors like `$` and `^` or any metacharacters like `\w,\s,\d,\D` or backreferences `\1`.
+
+##### Example
+
+```csharp
+var r1 = Regex.ParseUnicode("[0-9a-z]+");
+var r2 = Regex.ParseUnicode("(0.)*");
+
+var s = Symbolic<string>();
+
+var c1 = s.MatchesRegex(Regex.Intersect(r1, r2));
+var c2 = s.Contains("a0b0c");
+var c3 = s.Length() == new BigInteger(10);
+var solution = And(c1, c2, c3).Solve();
+```
+```csharp
+s: "020z0a0b0c"
+```
 
 
 ### Custom classes and structs

@@ -291,7 +291,19 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsUnsignedIntegerType(Type type)
         {
-            return (type == ByteType || type == UshortType || type == UintType || type == UlongType);
+            if (type == ByteType || type == UshortType || type == UintType || type == UlongType)
+            {
+                return true;
+            }
+            else if (IsFixedIntegerType(type))
+            {
+                var signed = type.BaseType.GetGenericArgumentsCached()[1];
+                return signed == typeof(Unsigned);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -301,7 +313,19 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool IsSignedIntegerType(Type type)
         {
-            return (type == ShortType || type == IntType || type == LongType);
+            if (type == ShortType || type == IntType || type == LongType)
+            {
+                return true;
+            }
+            else if (IsFixedIntegerType(type))
+            {
+                var signed = type.BaseType.GetGenericTypeDefinitionCached().GetGenericArgumentsCached()[1];
+                return signed == typeof(Signed);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

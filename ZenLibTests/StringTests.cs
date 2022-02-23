@@ -454,10 +454,12 @@ namespace ZenLib.Tests
         [DataRow("[ab ]")]
         [DataRow("s s")]
         [DataRow("\\u058")]
+        [DataRow(".*a.*")]
         public void TestMatchesRegex(string regex)
         {
             var r = Regex.ParseUnicode(regex);
             var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find().Value;
+            Console.WriteLine(s);
             Assert.IsTrue(r.IsMatch(s));
         }
 
