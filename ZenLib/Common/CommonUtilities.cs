@@ -220,22 +220,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Convert a C# string to a Z3 string.
-        /// </summary>
-        /// <param name="s">The C# string.</param>
-        /// <returns>The Z3 string.</returns>
-        public static string ConvertCSharpStringToZ3(string s)
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i < s.Length; i++)
-            {
-                sb.Append(string.Format(@"\u{0:x4}", (int)s[i]));
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
         /// Unescape a Z3 string.
         /// </summary>
         /// <param name="s">The string.</param>

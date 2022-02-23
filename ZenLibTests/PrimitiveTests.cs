@@ -242,6 +242,26 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test char ite.
+        /// </summary>
+        [TestMethod]
+        public void TestCharIte1()
+        {
+            var res = new ZenConstraint<char, bool>((c, b) => If(c == 'a', b, Not(b))).Find();
+            Assert.IsTrue(res.Value.Item1 == 'a' || !res.Value.Item2);
+        }
+
+        /// <summary>
+        /// Test char ite.
+        /// </summary>
+        [TestMethod]
+        public void TestCharIte2()
+        {
+            var res = new ZenFunction<char, char>(c => If<char>(c == 'a', 'b', 'c')).Find((c1, c2) => c2 == 'b');
+            Assert.IsTrue(res.Value == 'a');
+        }
+
+        /// <summary>
         /// Test integer inequality.
         /// </summary>
         [TestMethod]

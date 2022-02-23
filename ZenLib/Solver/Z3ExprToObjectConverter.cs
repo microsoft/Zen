@@ -41,7 +41,16 @@ namespace ZenLib.Solver
 
         public object VisitBool(Expr parameter)
         {
-            return bool.Parse(parameter.ToString());
+            if (parameter.IsEq)
+            {
+                var left = (char)Convert(parameter.Args[0], typeof(char));
+                var right = (char)Convert(parameter.Args[1], typeof(char));
+                return left == right;
+            }
+            else
+            {
+                return bool.Parse(parameter.ToString());
+            }
         }
 
         public object VisitByte(Expr parameter)

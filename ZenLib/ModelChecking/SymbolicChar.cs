@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
 

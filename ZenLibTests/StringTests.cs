@@ -21,6 +21,22 @@ namespace ZenLib.Tests
     public class StringTests
     {
         /// <summary>
+        /// Convert a C# string to a Z3 string.
+        /// </summary>
+        /// <param name="s">The C# string.</param>
+        /// <returns>The Z3 string.</returns>
+        private static string ConvertCSharpStringToZ3(string s)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < s.Length; i++)
+            {
+                sb.Append(string.Format(@"\u{0:x4}", (int)s[i]));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Test string conversions.
         /// </summary>
         [TestMethod]
@@ -42,7 +58,7 @@ namespace ZenLib.Tests
         public void TestStringConversions(string s)
         {
             var context = new Context();
-            var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+            var toz3 = ConvertCSharpStringToZ3(s);
             var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
             Assert.AreEqual(s, tocs);
         }
@@ -57,7 +73,7 @@ namespace ZenLib.Tests
             {
                 string s = RandomString();
                 var context = new Context();
-                var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+                var toz3 = ConvertCSharpStringToZ3(s);
                 var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
                 Assert.AreEqual(s, tocs);
             }

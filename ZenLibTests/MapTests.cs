@@ -328,6 +328,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the map works with chars.
+        /// </summary>
+        [TestMethod]
+        public void TestMapChars()
+        {
+            var res = new ZenConstraint<Map<char, int>>(d => d.Get('a') == Option.Create<int>(1)).Find();
+            Assert.AreEqual(1, res.Value.Get('a').Value);
+        }
+
+        /// <summary>
         /// Test that the map works with nested objects.
         /// </summary>
         [TestMethod]

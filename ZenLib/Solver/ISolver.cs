@@ -141,12 +141,6 @@ namespace ZenLib.Solver
         (TVariable, TSeq) CreateSeqVar(object e);
 
         /// <summary>
-        /// Create a string constant.
-        /// </summary>
-        /// <returns></returns>
-        TSeq CreateStringConst(string s);
-
-        /// <summary>
         /// Create a new dictionary expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>

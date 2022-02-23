@@ -208,11 +208,6 @@ namespace ZenLib.Solver
             return (v, (SeqExpr)v);
         }
 
-        public SeqExpr CreateStringConst(string s)
-        {
-            return this.Context.MkString(CommonUtilities.ConvertCSharpStringToZ3(s));
-        }
-
         public (Expr, ArrayExpr) CreateDictVar(object e)
         {
             var dictType = e.GetType().GetGenericArgumentsCached()[0];
@@ -306,7 +301,7 @@ namespace ZenLib.Solver
 
         public Expr Ite(BoolExpr g, Expr t, Expr f)
         {
-            return (ArrayExpr)this.Context.MkITE(g, t, f);
+            return this.Context.MkITE(g, t, f);
         }
 
         public BoolExpr LessThanOrEqual(BitVecExpr x, BitVecExpr y)

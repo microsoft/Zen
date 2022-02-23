@@ -47,6 +47,7 @@ namespace ZenLib.Tests
         {
             CheckDefault<bool>(false);
             CheckDefault<byte>((byte)0);
+            CheckDefault<char>((char)0);
             CheckDefault<short>((short)0);
             CheckDefault<ushort>((ushort)0);
             CheckDefault<int>(0);

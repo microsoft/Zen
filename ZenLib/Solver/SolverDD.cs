@@ -697,11 +697,5 @@ namespace ZenLib.Solver
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
-
-        [ExcludeFromCodeCoverage]
-        public Unit CreateStringConst(string s)
-        {
-            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
-        }
     }
 }

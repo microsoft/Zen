@@ -303,6 +303,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the set works with chars.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWithChar()
+        {
+            var res = new ZenConstraint<Set<char>, bool>((c, b) => If(c.Contains('a'), b, c.Contains('b'))).Find();
+            Assert.IsTrue(res.Value.Item1.Contains('a') || res.Value.Item1.Contains('b'));
+        }
+
+        /// <summary>
         /// Test that the set works with options.
         /// </summary>
         [TestMethod]
