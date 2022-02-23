@@ -449,6 +449,11 @@ namespace ZenLib.Tests
         [DataRow("[a*]+")]
         [DataRow("[*-\\\\]+")]
         [DataRow("(a|b|c|d)")]
+        [DataRow("a\t")]
+        [DataRow(" ")]
+        [DataRow("[ab ]")]
+        [DataRow("s s")]
+        [DataRow("\\u058")]
         public void TestMatchesRegex(string regex)
         {
             var r = Regex.ParseUnicode(regex);

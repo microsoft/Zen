@@ -408,6 +408,10 @@ namespace ZenLib.Tests
         [DataRow("[a\\]", false)]
         [DataRow("[9-0]", false)]
         [DataRow("[a-", false)]
+        [DataRow(" ", true)]
+        [DataRow("s ", true)]
+        [DataRow("s s", true)]
+        [DataRow("[ab ]", true)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
@@ -474,6 +478,10 @@ namespace ZenLib.Tests
         [DataRow("(a|b|c|d)", "b", true)]
         [DataRow("(a|b|c|d)", "c", true)]
         [DataRow("(a|b|c|d)", "d", true)]
+        [DataRow(" ", " ", true)]
+        [DataRow("s ", "s ", true)]
+        [DataRow("s s", "s s", true)]
+        [DataRow("[ab ]", " ", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
