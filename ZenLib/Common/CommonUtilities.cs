@@ -7,7 +7,6 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Globalization;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -220,7 +219,7 @@ namespace ZenLib
             }
         }
 
-        /* /// <summary>
+        /// <summary>
         /// Convert a C# string to a Z3 string.
         /// </summary>
         /// <param name="s">The C# string.</param>
@@ -228,34 +227,13 @@ namespace ZenLib
         public static string ConvertCSharpStringToZ3(string s)
         {
             var sb = new StringBuilder();
-            foreach (char c in s)
+            for (int i = 0; i < s.Length; i++)
             {
-                sb.Append("\\x");
-                var hex = GetHex(c);
-                sb.Append(hex);
+                sb.Append(string.Format(@"\u{0:x4}", (int)s[i]));
             }
 
             return sb.ToString();
         }
-
-        private static string GetHex(char c)
-        {
-            Contract.Assert(c <= 255);
-            var lo = c & 0x000F;
-            var hi = c >> 4;
-            return new string(new char[] { GetHex(hi), GetHex(lo) });
-        }
-
-        private static char GetHex(int x)
-        {
-            Contract.Assert(x <= 15);
-            if (x < 10)
-            {
-                return (char)(48 + x);
-            }
-
-            return (char)(55 + x);
-        } */
 
         /// <summary>
         /// Unescape a Z3 string.
@@ -270,8 +248,10 @@ namespace ZenLib
             var sb = new StringBuilder(s.Length);
             for (int i = 0; i < s.Length; i++)
             {
+                var isLast = i + 1 == s.Length;
+
                 // strip double quotation marks
-                if ((s[i] == '\"') && (s[i + 1] == '\"'))
+                if (!isLast && s[i] == '\"' && s[i + 1] == '\"')
                 {
                     sb.Append('\"');
                     i++;
@@ -279,23 +259,23 @@ namespace ZenLib
                 }
 
                 // unescape characters if needed
-                if (s[i] == '\\' && i + 1 < s.Length && s[i + 1] == 'x')
+                if (!isLast && s[i] == '\\' && s[i + 1] == 'u')
                 {
-                    switch (s[i + 1])
-                    {
-                        // Z3 escape characters
-                        case 'f': sb.Append('\f'); i++; continue;
-                        case 'n': sb.Append('\n'); i++; continue;
-                        case 'r': sb.Append('\r'); i++; continue;
-                        case 'v': sb.Append('\v'); i++; continue;
-                        case '\\': sb.Append('\\'); i++; continue;
-                        case 'x':
-                            var v = s[i + 2].ToString() + s[i + 3].ToString();
-                            var u = (char)ushort.Parse(v, NumberStyles.AllowHexSpecifier);
-                            sb.Append(u.ToString());
-                            i = i + 3;
-                            continue;
-                    }
+                    i += 2;
+                    Contract.Assert(s[i++] == '{');
+                    var start = i;
+                    while (s[i] != '}')
+                        i++;
+                    Contract.Assert(i - start <= 5);
+                    var hex = new char[5];
+                    for (int j = 0; j < 5; j++)
+                        hex[j] = '0';
+                    for (int j = start; j < i; j++)
+                        hex[5 - (i - j)] = s[j];
+                    var str = new string(hex);
+                    var asChar = (char)Convert.ToInt32(str, 16);
+                    sb.Append(asChar);
+                    continue;
                 }
 
                 // otherwise copy the character literal

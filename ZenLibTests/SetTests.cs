@@ -233,7 +233,7 @@ namespace ZenLib.Tests
         /// Test that the set works with strings.
         /// </summary>
         [TestMethod]
-        public void TestSetStrings()
+        public void TestSetStrings1()
         {
             var f = new ZenFunction<Set<string>, bool>(d => true);
             var sat = f.Find((d, allowed) =>
@@ -248,6 +248,16 @@ namespace ZenLib.Tests
             Assert.IsTrue(sat.Value.Contains("k1"));
             Assert.IsTrue(sat.Value.Contains("k2"));
             Assert.IsTrue(sat.Value.Contains("k3"));
+        }
+
+        /// <summary>
+        /// Test that the set works with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestSetStrings2()
+        {
+            var result = new ZenConstraint<Set<string>>(s => If(s.Contains("hello"), s.Contains("hi"), s.Contains("hey"))).Find();
+            Assert.IsTrue(result.Value.Contains("hi") || result.Value.Contains("hello"));
         }
 
         /// <summary>

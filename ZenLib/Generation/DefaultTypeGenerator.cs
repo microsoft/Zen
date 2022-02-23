@@ -127,8 +127,7 @@ namespace ZenLib.Generation
 
         public object VisitString(Unit parameter)
         {
-            var v = (Zen<Seq<char>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<UInt18>), parameter);
-            return ZenCastExpr<Seq<char>, string>.Create(v);
+            return ZenConstantExpr<string>.Create(string.Empty);
         }
     }
 }

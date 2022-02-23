@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
     using static ZenLib.Zen;
@@ -19,6 +20,49 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class StringTests
     {
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        [DataRow("")]
+        [DataRow("AaBb")]
+        [DataRow("\t")]
+        [DataRow("\r")]
+        [DataRow("\n")]
+        [DataRow("\a")]
+        [DataRow("\b")]
+        [DataRow("\v")]
+        [DataRow("\f")]
+        [DataRow("\t")]
+        [DataRow("\"")]
+        [DataRow("\\")]
+        [DataRow("\\x5C\\x6E")]
+        [DataRow("endline\n")]
+        [DataRow("\x01\\x01")]
+        public void TestStringConversions(string s)
+        {
+            var context = new Context();
+            var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+            var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+            Assert.AreEqual(s, tocs);
+        }
+
+        /// <summary>
+        /// Test string conversions.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversionsRandom()
+        {
+            for (int i = 0; i < 300; i++)
+            {
+                string s = RandomString();
+                var context = new Context();
+                var toz3 = CommonUtilities.ConvertCSharpStringToZ3(s);
+                var tocs = CommonUtilities.ConvertZ3StringToCSharp(context.MkString(toz3).ToString());
+                Assert.AreEqual(s, tocs);
+            }
+        }
+
         /// <summary>
         /// Test concatenation with empty string.
         /// </summary>
@@ -78,6 +122,7 @@ namespace ZenLib.Tests
         {
             RandomStrings(sub =>
             {
+                Console.WriteLine($"Got sub: {sub}");
                 CheckAgreement<string>(s => s.Contains(sub));
             });
         }

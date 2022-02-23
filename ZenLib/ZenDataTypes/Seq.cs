@@ -175,6 +175,9 @@ namespace ZenLib
         /// <returns>True if the other sequence is a subsequence of this one.</returns>
         public bool Contains(Seq<T> other)
         {
+            Console.WriteLine(this);
+            Console.WriteLine(other);
+
             if (other.Length() == 0)
             {
                 return true;

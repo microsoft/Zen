@@ -8,6 +8,7 @@ namespace ZenLib.Solver
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -220,7 +221,7 @@ namespace ZenLib.Solver
 
         public SeqExpr CreateStringConst(string s)
         {
-            return this.Context.MkString(s);
+            return this.Context.MkString(CommonUtilities.ConvertCSharpStringToZ3(s));
         }
 
         public (Expr, ArrayExpr) CreateDictVar(object e)
