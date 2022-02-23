@@ -259,6 +259,11 @@ namespace ZenLib.Solver
             return this.Context.MkEq(x, y);
         }
 
+        public BoolExpr Eq(Expr x, Expr y)
+        {
+            return this.Context.MkEq(x, y);
+        }
+
         public BoolExpr False()
         {
             return this.Context.MkFalse();

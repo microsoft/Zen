@@ -4,6 +4,7 @@
 
 namespace ZenLib.Solver
 {
+    using System;
     using Microsoft.Z3;
 
     /// <summary>
@@ -70,7 +71,7 @@ namespace ZenLib.Solver
             var bits = new bool[value.Size];
             for (int i = 0; i < bits.Length; i++)
             {
-                bits[i] = value.GetBit(i);
+                bits[bits.Length - i - 1] = value.GetBit(i);
             }
             return this.solver.Context.MkBV(bits);
         }

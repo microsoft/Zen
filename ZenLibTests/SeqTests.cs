@@ -326,7 +326,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test seq evaluation with replacefirst.
+        /// Test seq evaluation with matchesregex.
         /// </summary>
         [TestMethod]
         public void TestSeqRegex()
@@ -350,6 +350,43 @@ namespace ZenLib.Tests
             Assert.AreEqual(false, new Seq<byte>(1).MatchesRegex(r));
             Assert.AreEqual(true, new Seq<byte>(1).Concat(new Seq<byte>(2)).MatchesRegex(r));
             Assert.AreEqual(false, new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3)).MatchesRegex(r));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with matchesregex and fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqRegexFixedIntegers()
+        {
+            var r = Regex.Concat(Regex.Char(new UInt9(1)), Regex.Char(new UInt9(2)));
+            var zf = new ZenConstraint<Seq<UInt9>>(s => s.MatchesRegex(r));
+
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>(new UInt9(1))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2)))));
+
+            zf.Compile();
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>()));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<UInt9>(new UInt9(1))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2)))));
+
+            Assert.AreEqual(false, new Seq<UInt9>().MatchesRegex(r));
+            Assert.AreEqual(false, new Seq<UInt9>(new UInt9(1)).MatchesRegex(r));
+            Assert.AreEqual(true, new Seq<UInt9>(new UInt9(1)).Concat(new Seq<UInt9>(new UInt9(2))).MatchesRegex(r));
+
+            var s = zf.Find();
+            Assert.IsTrue(r.IsMatch(s.Value.Values));
+        }
+
+        /// <summary>
+        /// Test seq evaluation with matchesregex and fixed integers.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqRegexFixedIntegersFind()
+        {
+            var r = Regex.Concat(Regex.Char(new UInt9(1)), Regex.Char(new UInt9(2)));
+            var s = new ZenConstraint<Seq<UInt9>>(s => s.MatchesRegex(r)).Find();
+            Assert.IsTrue(r.IsMatch(s.Value.Values));
         }
 
         /// <summary>

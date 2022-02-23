@@ -449,6 +449,14 @@ namespace ZenLib.Solver
         TBool Eq(TArray x, TArray y);
 
         /// <summary>
+        /// The 'Equal' of two characters.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TChar x, TChar y);
+
+        /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>

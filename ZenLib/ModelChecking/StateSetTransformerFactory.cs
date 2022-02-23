@@ -95,10 +95,10 @@ namespace ZenLib.ModelChecking
             solver.Init();
 
             // get the decision diagram representing the equality.
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>(arguments);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>(solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>(arguments);
             var symbolicValue = symbolicEvaluator.Evaluate(newExpression, env);
-            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>)symbolicValue;
+            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 
             // forces all arbitrary expressions to get evaluated even if not used in the invariant.
@@ -208,10 +208,10 @@ namespace ZenLib.ModelChecking
             solver.Init();
 
             // get the decision diagram representing the equality.
-            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>(arguments);
+            var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>(solver);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>(arguments);
             var symbolicValue = symbolicEvaluator.Evaluate(expression, env);
-            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit>)symbolicValue;
+            var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, BitVector<BDDNode>>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 
             // forces all arbitrary expressions to get evaluated even if not used in the invariant.
@@ -278,6 +278,13 @@ namespace ZenLib.ModelChecking
             if (zenExpr is Zen<byte>)
             {
                 var (v, _) = solver.CreateByteVar(zenExpr);
+                zenExprToVariable[zenExpr] = v;
+                return;
+            }
+
+            if (zenExpr is Zen<char>)
+            {
+                var (v, _) = solver.CreateCharVar(zenExpr);
                 zenExprToVariable[zenExpr] = v;
                 return;
             }

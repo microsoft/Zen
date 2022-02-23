@@ -15,7 +15,7 @@ namespace ZenLib.Solver
     /// Implementation of a solver using decision diagrams.
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
-    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit>
+    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>>
         where T : IDDNode
     {
         /// <summary>
@@ -58,6 +58,7 @@ namespace ZenLib.Solver
             foreach (var dependentVariableSet in this.interleavingDependencies)
             {
                 var objsByte = new List<object>();
+                var objsChar = new List<object>();
                 var objsShort = new List<object>();
                 var objsUshort = new List<object>();
                 var objsInt = new List<object>();
@@ -78,6 +79,11 @@ namespace ZenLib.Solver
                     if (type == typeof(ZenArbitraryExpr<byte>))
                     {
                         objsByte.Add(arbitraryVariable);
+                    }
+
+                    if (type == typeof(ZenArbitraryExpr<char>))
+                    {
+                        objsChar.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<short>))
@@ -131,6 +137,13 @@ namespace ZenLib.Solver
                 {
                     this.ExistingAssignment[objsByte[i]] = bytevars[i];
                     this.Variables.Add(bytevars[i]);
+                }
+
+                var charvars = this.Manager.CreateInterleavedInt16(objsChar.Count);
+                for (int i = 0; i < charvars.Length; i++)
+                {
+                    this.ExistingAssignment[objsChar[i]] = charvars[i];
+                    this.Variables.Add(charvars[i]);
                 }
 
                 var shortvars = this.Manager.CreateInterleavedInt16(objsShort.Count);
@@ -271,34 +284,28 @@ namespace ZenLib.Solver
 
         public (Variable<T>, DD) CreateBoolVar(object e)
         {
-            if (this.ExistingAssignment.TryGetValue(e, out var variable))
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
             {
-                var varbool = (VarBool<T>)variable;
-                return (variable, varbool.Id());
-            }
-            else
-            {
-                var varbool = this.Manager.CreateBool();
+                variable = this.Manager.CreateBool();
                 this.Variables.Add(variable);
-                this.ExistingAssignment[e] = varbool;
-                return (varbool, varbool.Id());
+                this.ExistingAssignment[e] = variable;
             }
+
+            var varbool = (VarBool<T>)variable;
+            return (variable, varbool.Id());
         }
 
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateByteVar(object e)
         {
-            if (this.ExistingAssignment.TryGetValue(e, out var variable))
-            {
-                return (variable, this.Manager.CreateBitvector(variable));
-            }
-            else
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
             {
                 variable = this.Manager.CreateInt8();
                 this.Variables.Add(variable);
                 this.ExistingAssignment[e] = variable;
-                return (variable, this.Manager.CreateBitvector(variable));
             }
+
+            return (variable, this.Manager.CreateBitvector(variable));
         }
 
         public BitVector<T> CreateByteConst(byte b)
@@ -306,30 +313,34 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(b);
         }
 
-        public (Variable<T>, Unit) CreateCharVar(object e)
+        public (Variable<T>, BitVector<T>) CreateCharVar(object e)
         {
-            throw new NotImplementedException();
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
+            {
+                variable = this.Manager.CreateInt16();
+                this.Variables.Add(variable);
+                this.ExistingAssignment[e] = variable;
+            }
+
+            return (variable, this.Manager.CreateBitvector(variable));
         }
 
-        public Unit CreateCharConst(char c)
+        public BitVector<T> CreateCharConst(char c)
         {
-            throw new NotImplementedException();
+            return this.Manager.CreateBitvector((ushort)c);
         }
 
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateShortVar(object e)
         {
-            if (this.ExistingAssignment.TryGetValue(e, out var variable))
-            {
-                return (variable, this.Manager.CreateBitvector(variable));
-            }
-            else
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
             {
                 variable = this.Manager.CreateInt16();
                 this.Variables.Add(variable);
                 this.ExistingAssignment[e] = variable;
-                return (variable, this.Manager.CreateBitvector(variable));
             }
+
+            return (variable, this.Manager.CreateBitvector(variable));
         }
 
         public BitVector<T> CreateShortConst(short s)
@@ -340,17 +351,14 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateIntVar(object e)
         {
-            if (this.ExistingAssignment.TryGetValue(e, out var variable))
-            {
-                return (variable, this.Manager.CreateBitvector(variable));
-            }
-            else
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
             {
                 variable = this.Manager.CreateInt32();
                 this.Variables.Add(variable);
                 this.ExistingAssignment[e] = variable;
-                return (variable, this.Manager.CreateBitvector(variable));
             }
+
+            return (variable, this.Manager.CreateBitvector(variable));
         }
 
         public BitVector<T> CreateIntConst(int i)
@@ -361,17 +369,14 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateLongVar(object e)
         {
-            if (this.ExistingAssignment.TryGetValue(e, out var variable))
-            {
-                return (variable, this.Manager.CreateBitvector(variable));
-            }
-            else
+            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
             {
                 variable = this.Manager.CreateInt64();
                 this.Variables.Add(variable);
                 this.ExistingAssignment[e] = variable;
-                return (variable, this.Manager.CreateBitvector(variable));
             }
+
+            return (variable, this.Manager.CreateBitvector(variable));
         }
 
         public BitVector<T> CreateLongConst(long l)
@@ -432,8 +437,13 @@ namespace ZenLib.Solver
             }
             else if (v is VarInt16<T> v16)
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(short) || type == typeof(ushort), "Internal type mismatch");
-                return type == typeof(short) ? m.Get(v16) : (object)(ushort)m.Get(v16);
+                Contract.Assert(type == typeof(short) || type == typeof(ushort) || type == typeof(char), "Internal type mismatch");
+                var value = m.Get(v16);
+                if (type == typeof(short))
+                    return value;
+                if (type == typeof(ushort))
+                    return (ushort)value;
+                return (char)value;
             }
             else if (v is VarInt32<T> v32)
             {
@@ -628,26 +638,26 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public Unit DictSet(
             Unit arrayExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type keyType, Type valueType)
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr,
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> valueExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
+        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
+        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
+        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> ConvertExprToSymbolicValue(object e, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
@@ -677,7 +687,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type type)
+        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> valueExpr, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }

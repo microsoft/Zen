@@ -476,7 +476,8 @@ namespace ZenLib
         /// <param name="value">Whether to set true or false.</param>
         public void SetBit(int position, bool value)
         {
-            Contract.Assert(position >= 0 && position < this.Size, "Position out of range");
+            Contract.Assert(position >= 0);
+            Contract.Assert(position < this.Size);
             SetBit(this.Bytes, this.Size, position, value);
         }
 
@@ -487,7 +488,8 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool GetBit(int position)
         {
-            Contract.Assert(position >= 0 && position < this.Size, "Position out of range");
+            Contract.Assert(position >= 0);
+            Contract.Assert(position < this.Size);
             return GetBit(this.Bytes, this.Size, position);
         }
 

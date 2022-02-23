@@ -51,7 +51,16 @@ namespace ZenLib.Solver
 
         public object VisitChar(Expr parameter)
         {
-            return (char)int.Parse(parameter.Args[0].ToString());
+            if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char")
+            {
+                return (char)parameter.FuncDecl.Parameters[0].Int;
+            }
+            else
+            {
+                Contract.Assert(parameter.IsApp);
+                Contract.Assert(parameter.FuncDecl.Name.ToString() == "char.from_bv");
+                return (char)int.Parse(parameter.Args[0].ToString());
+            }
         }
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
@@ -220,7 +229,6 @@ namespace ZenLib.Solver
             }
             else
             {
-                Console.WriteLine(parameter);
                 Contract.Assert(parameter.IsApp);
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "seq.++");
 

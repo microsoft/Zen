@@ -325,7 +325,6 @@ namespace ZenLib.Tests
             {
                 var f = new ZenFunction<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
-                Console.WriteLine(result);
                 if (result.HasValue)
                 {
                     Assert.IsTrue(f.Evaluate(result.Value));

@@ -336,6 +336,11 @@ namespace ZenLib.ModelChecking
             {
                 return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
             }
+            else if (e1 is SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> c1 &&
+                     e2 is SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> c2)
+            {
+                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, this.Solver.Eq(c1.Value, c2.Value));
+            }
             else if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> s1 &&
                      e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> s2)
             {

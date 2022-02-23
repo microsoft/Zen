@@ -522,6 +522,7 @@ namespace ZenLib
             var type = typeof(T);
 
             if (type == ReflectionUtilities.BoolType ||
+                type == ReflectionUtilities.CharType ||
                 type == ReflectionUtilities.StringType ||
                 ReflectionUtilities.IsIntegerType(type) ||
                 ReflectionUtilities.IsMapType(type) ||
