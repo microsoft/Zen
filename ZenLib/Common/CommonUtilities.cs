@@ -351,20 +351,5 @@ namespace ZenLib
             var integer = (dynamic)c.Invoke(constructorArgs);
             return integer.Size;
         }
-
-        /// <summary>
-        /// Convert an object, which may be a Seq, to a string.
-        /// </summary>
-        /// <param name="o">The object.</param>
-        /// <returns></returns>
-        public static string ConvertToString(object o)
-        {
-            if (o is Seq<char> s)
-            {
-                return Seq.AsString(s);
-            }
-
-            return (string)o;
-        }
     }
 }

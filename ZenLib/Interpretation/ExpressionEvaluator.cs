@@ -470,7 +470,7 @@ namespace ZenLib.Interpretation
             else
             {
                 Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-                return CommonUtilities.ConvertToString(e);
+                return Seq.AsString((Seq<char>)e);
             }
         }
 

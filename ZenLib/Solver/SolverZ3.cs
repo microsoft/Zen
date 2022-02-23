@@ -6,9 +6,7 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Numerics;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
@@ -72,7 +70,7 @@ namespace ZenLib.Solver
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
-            this.CharSort = this.Context.MkBitVecSort(18);
+            this.CharSort = this.Context.CharSort;
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
@@ -204,19 +202,10 @@ namespace ZenLib.Solver
         {
             var seqType = e.GetType().GetGenericArgumentsCached()[0];
             var innerType = seqType.GetGenericArgumentsCached()[0];
-
-            if (innerType == typeof(char))
-            {
-                var v = this.Context.MkConst(FreshSymbol(), this.StringSort);
-                return (v, (SeqExpr)v);
-            }
-            else
-            {
-                var innerSort = this.TypeToSortConverter.GetSortForType(innerType);
-                var seqSort = this.Context.MkSeqSort(innerSort);
-                var v = this.Context.MkConst(FreshSymbol(), seqSort);
-                return (v, (SeqExpr)v);
-            }
+            var innerSort = this.TypeToSortConverter.GetSortForType(innerType);
+            var seqSort = this.Context.MkSeqSort(innerSort);
+            var v = this.Context.MkConst(FreshSymbol(), seqSort);
+            return (v, (SeqExpr)v);
         }
 
         public SeqExpr CreateStringConst(string s)

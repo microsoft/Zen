@@ -858,9 +858,8 @@ namespace ZenLib
 
                 if (type == StringType)
                 {
-                    return ZenConstantExpr<string>.Create((string)(object)value);
-                    // var asSeq = (Zen<Seq<char>>)CreateZenConstant(Seq.FromString((string)(object)value));
-                    // return ZenCastExpr<Seq<char>, string>.Create(asSeq);
+                    var asSeq = (Zen<Seq<char>>)CreateZenConstant(Seq.FromString((string)(object)value));
+                    return ZenCastExpr<Seq<char>, string>.Create(asSeq);
                 }
 
                 if (IsSeqType(type))

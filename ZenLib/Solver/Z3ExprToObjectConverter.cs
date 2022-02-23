@@ -214,13 +214,13 @@ namespace ZenLib.Solver
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "str.++")
             {
-                Console.WriteLine(parameter);
-                var str1 = CommonUtilities.ConvertToString(Convert(parameter.Args[0], sequenceType));
-                var str2 = CommonUtilities.ConvertToString(Convert(parameter.Args[1], sequenceType));
-                return str1 + str2;
+                var s1 = (Seq<char>)Convert(parameter.Args[0], sequenceType);
+                var s2 = (Seq<char>)Convert(parameter.Args[1], sequenceType);
+                return s1.Concat(s2);
             }
             else
             {
+                Console.WriteLine(parameter);
                 Contract.Assert(parameter.IsApp);
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "seq.++");
 

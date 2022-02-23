@@ -127,7 +127,7 @@ namespace ZenLib.Generation
 
         public object VisitString(Unit parameter)
         {
-            return ZenConstantExpr<string>.Create(string.Empty);
+            return Zen.Cast<Seq<char>, string>(Seq.Empty<char>());
         }
     }
 }

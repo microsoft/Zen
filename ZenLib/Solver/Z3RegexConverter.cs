@@ -4,7 +4,6 @@
 
 namespace ZenLib.Solver
 {
-    using System;
     using Microsoft.Z3;
 
     /// <summary>
@@ -21,37 +20,23 @@ namespace ZenLib.Solver
 
         public ReExpr Visit(RegexEmptyExpr<T> expression, Sort parameter)
         {
-            var seqSort = (typeof(T) == typeof(char)) ?
-                (SeqSort)this.solver.StringSort :
-                this.solver.Context.MkSeqSort(parameter);
-
+            var seqSort = this.solver.Context.MkSeqSort(parameter);
             var regexSort = this.solver.Context.MkReSort(seqSort);
             return this.solver.Context.MkEmptyRe(regexSort);
         }
 
         public ReExpr Visit(RegexEpsilonExpr<T> expression, Sort parameter)
         {
-            if (typeof(T) == typeof(char))
-            {
-                var empty = this.solver.Context.MkString(string.Empty);
-                return this.solver.Context.MkToRe(empty);
-            }
-            else
-            {
-                var seqSort = this.solver.Context.MkSeqSort(parameter);
-                var seq = this.solver.Context.MkEmptySeq(seqSort);
-                return this.solver.Context.MkToRe(seq);
-            }
+            var seqSort = this.solver.Context.MkSeqSort(parameter);
+            var seq = this.solver.Context.MkEmptySeq(seqSort);
+            return this.solver.Context.MkToRe(seq);
         }
 
         public ReExpr Visit(RegexRangeExpr<T> expression, Sort parameter)
         {
             if (expression.CharacterRange.Low.Equals(expression.CharacterRange.High))
             {
-                var low = (typeof(T) == typeof(char)) ?
-                    this.solver.Context.MkString(expression.CharacterRange.Low.ToString()) :
-                    this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
-
+                var low = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
                 return this.solver.Context.MkToRe(low);
             }
             else
