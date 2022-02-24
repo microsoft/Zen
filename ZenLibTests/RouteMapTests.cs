@@ -29,18 +29,9 @@ namespace ZenLib.Tests
 
             var timer = System.Diagnostics.Stopwatch.StartNew();
             var function = new ZenFunction<Route, Pair<Option<Route>, int>>(r => routeMap.ProcessProvenance(r));
-            Console.WriteLine($"time build: {timer.ElapsedMilliseconds}");
-
             var result = function.Find((route, outputRoute) => outputRoute.Item2() == 3);
-            Console.WriteLine($"time find: {timer.ElapsedMilliseconds}");
-
             var input = result.Value;
-            Console.WriteLine($"Found input satisfying conditions: {input}");
-
             var output = function.Evaluate(input);
-            Console.WriteLine($"The resulting route is: {output}");
-
-            Console.WriteLine($"time evaluate: {timer.ElapsedMilliseconds}");
         }
 
         /// <summary>

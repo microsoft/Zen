@@ -472,6 +472,32 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Determines if the sequence is empty.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> IsEmpty<T>(this Zen<Seq<T>> seqExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+
+            return seqExpr.Length() == BigInteger.Zero;
+        }
+
+        /// <summary>
+        /// Containment for two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The sequence.</param>
+        /// <param name="valueExpr">The value.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> Contains<T>(this Zen<Seq<T>> seqExpr, Zen<T> valueExpr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(valueExpr);
+
+            return seqExpr.Contains(Seq.Unit(valueExpr));
+        }
+
+        /// <summary>
         /// Containment for two Zen sequences.
         /// </summary>
         /// <param name="seqExpr">The sequence.</param>
