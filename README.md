@@ -5,13 +5,34 @@
 # Introduction 
 Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
 
+# Table of contents
+1. [Installation](#installation)
+2. [Overview of Zen](#overview-of-zen)
+    1. [Computing with Zen Expressions](#computing-with-zen-expressions)
+    2. [Executing a Function](#executing-a-function)
+    3. [Searching for Inputs](#searching-for-inputs)
+    4. [Computing with Sets](#computing-with-sets)
+    5. [Generating Test Inputs](#generating-test-inputs)
+3. [Supported Data Types](#supported-data-types)
+    1. [Primitive Types](#primitive-types)
+    2. [Integer Types](#integer-types)
+    3. [Options and Tuples](#options-tuples)
+    4. [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
+    5. [Unbounded Sets, Maps](#unbounded-sets-and-maps)
+    6. [Strings, Sequences, and Regexes](#strings-and-sequences)
+    7. [Custom Classes and Structs](#custom-classes-and-structs)
+4. [Solver Backends](#solver-backends)
+5. [Example: Network ACLs](#example-network-acls)
+6. [Implementation Details](#implementation)
+7. [Contributing](#contributing)
+
+<a name="installation"></a>
 # Installation
 Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
 
-# Getting Started
-This page gives a high-level overview of the features in Zen. To see more detailed documentation, check out the [wiki](https://github.com/microsoft/Zen/wiki) page.
-
-To import the Zen library, add the following lines to your source file:
+<a name="overview-of-zen"></a>
+# Overview of Zen
+This page gives a high-level overview of the features in Zen. To see more detailed documentation, check out the [wiki](https://github.com/microsoft/Zen/wiki) page. To import the Zen library, add the following lines to your source file:
 
 ```csharp
 using ZenLib;
@@ -55,6 +76,8 @@ o: Some(1)
 l: [69,69,69,5,69,69,5,5,5,5]
 ```
 
+<a name="computing-with-zen-expressions"></a>
+### Computing with Zen Expressions
 Since `Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
 
 ```csharp
@@ -74,6 +97,7 @@ var function = new ZenFunction<int, int, int>(MultiplyAndAdd);
 
 Given a `ZenFunction` we can leverage the library to perform several additional tasks.
 
+<a name="executing-a-function"></a>
 ### Executing a function
 
 Zen can execute the function we have built on a given collection of inputs. The simplest way to do so is to call the `Evaluate` method on the `ZenFunction`:
@@ -119,6 +143,7 @@ compilation time: 4ms
 compiled function time: 2ms
 ```
 
+<a name="searching-for-inputs"></a>
 ### Searching for inputs
 
 A powerful feature Zen supports is the ability to find function inputs that lead to some (un)desirable outcome. For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
@@ -142,6 +167,7 @@ Each input in `inputs` will be unique so there will be no duplicates.
 
 Input search uses [bounded model checking](https://en.wikipedia.org/wiki/Model_checking#:~:text=Bounded%20model%20checking%20algorithms%20unroll,as%20an%20instance%20of%20SAT.) to perform verification. For data structures like lists, it finds examples up to a given input size *k*, which is an optional parameter to the function.
 
+<a name="computing-with-sets"></a>
 ### Computing with sets
 
 While the `Find` function provides a way to find a single input to a function, Zen also provides an additional API for reasoning about sets of inputs and outputs to functions. 
@@ -178,6 +204,8 @@ Option<uint> example = inputSet.Element(); // example.Value = 0
 
 Internally, transformers leverage [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) to represent, possibly very large, sets of objects efficiently.
 
+
+<a name="generating-test-inputs"></a>
 ### Generating test inputs
 
 As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
@@ -208,6 +236,8 @@ In this case, we get the following output, which includes all permutations of re
 
 The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path.
 
+
+<a name="supported-data-types"></a>
 # Supported data types
 
 Zen currently supports a subset of .NET types and also introduces some of its own data types summarized below.
@@ -240,6 +270,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :x: | :x:  |
 
 
+<a name="primitive-types"></a>
 ### Primitive types
 
 Zen supports the following primitive types: `bool, byte, char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic.
@@ -258,6 +289,7 @@ x: -20
 y: 105
 ```
 
+<a name="integer-types"></a>
 ### Integer types
 
 Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers. Zen also supports other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer).
@@ -293,10 +325,12 @@ x: 0
 y: 4
 ```
 
+<a name="options-and-tuples"></a>
 ### Options, Tuples
 
 Zen offers `Pair<T1, T2, ...>`, types as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 
+<a name="finite-sequences-bags-maps"></a>
 ### Finite Sequences, Bags, Maps
 
 Zen supports a number of high-level data types that are finite (bounded) in size (the default size is 5 but can be changed). These include:
@@ -331,6 +365,8 @@ var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
 // input = None
 ```
 
+
+<a name="unbounded-sets-maps"></a>
 ### Unbounded Sets and Maps
 
 Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain sequences or other maps/sets. For instance primitive types (bool, integers, string, BigInteger) as well as classes/structs are allowed.
@@ -356,7 +392,8 @@ s3: {}
 s4: {b, a}
 ```
 
-### Unbounded sequences
+<a name="strings-and-sequences"></a>
+### Sequences, Strings, and Regular Expressions
 
 Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<char>` for unicode strings.
 
@@ -383,8 +420,6 @@ s1: [1]
 s2: [0]
 ```
 
-### String types
-
 Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does not support anchors like `$` and `^` or any metacharacters like `\w,\s,\d,\D` or backreferences `\1`.
 
 ##### Example
@@ -404,7 +439,7 @@ var solution = And(c1, c2, c3).Solve();
 s: "020z0a0b0c"
 ```
 
-
+<a name="custom-classes-and-structs"></a>
 ### Custom classes and structs
 
 Zen supports custom `class` and `struct` types with some limitations. It will attempt to model all public fields and properties. For these types to work, either (1) the class/struct must also have a default constructor and all properties must be allowed to be set, or (2) there must be a constructor with matching parameter names and types for all the public fields. For example, the following are examples that are and are not allowed:
@@ -448,11 +483,13 @@ public class Point
 
 ```
 
+<a name="solver-backends"></a>
 # Solver backends
 
 Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
 
-# Example: Network access control lists
+<a name="example-network-acls"></a>
+# Example: Network ACLs
 
 As a more complete example, the following shows how to use Zen to encode and then verify a simplified network access control list that allows or blocks packets. ACLs generally consist of an ordered collection of match-action rules that apply in sequence with the first applicable rule determining the fate of the packet. We can model an ACL with Zen:
 
@@ -526,9 +563,11 @@ public class AclLine
 }
 ```
 
-# Implementation
+<a name="implementation"></a>
+# Implementation Details
 Zen builds an abstract syntax tree (AST) for a given user function and then leverages C#'s reflection capabilities to interpret, compile, and symbolically evaluate the AST.
 
+<a name="contributing"></a>
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
