@@ -339,8 +339,6 @@ namespace ZenLib.Tests
                     Permitted = parity,
                 };
 
-                Console.WriteLine($"{line.DstIp}, {line.SrcIp}, {line.Permitted}");
-
                 lines.Add(line);
             }
 

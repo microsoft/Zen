@@ -118,8 +118,6 @@ namespace ZenLib.Tests
             var sol = (b2 == b3).Solve();
             var r1 = sol.Get(b1);
             var r2 = sol.Get(b3);
-            Console.WriteLine(r1);
-            Console.WriteLine(r2);
         }
 
         /// <summary>

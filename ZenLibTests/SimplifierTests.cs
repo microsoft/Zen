@@ -573,8 +573,6 @@ namespace ZenLib.Tests
         {
             var x = Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(0)));
             var y = Create<Object2>(("Field2", Constant(0)), ("Field1", Constant(0)));
-            Console.WriteLine(x.Id);
-            Console.WriteLine(y.Id);
             Assert.AreEqual(x, y);
         }
     }

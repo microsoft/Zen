@@ -176,37 +176,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that solve works as expected for strings.
-        /// </summary>
-        [TestMethod]
-        public void TestSolveMany()
-        {
-            // create symbolic variables of different types
-            var b = Arbitrary<bool>();
-            var i = Arbitrary<int>();
-            var s = Arbitrary<string>();
-            var o = Arbitrary<Option<ulong>>();
-            var l = Arbitrary<FSeq<int>>(depth: 10, exhaustiveDepth: false);
-
-            // build constraints on these variables
-            var c1 = Or(b, i <= 10);
-            var c2 = Or(Not(b), o == Option.Some(1UL));
-            var c3 = Or(s.Contains("hello"), Not(o.IsSome()));
-            var c4 = l.Where(x => x <= i).Length() == 5;
-            var c5 = l.All(x => And(x >= 0, x <= 100));
-            var expr = And(c1, c2, c3, c4, c5);
-
-            // solve the constraints to get a solution
-            var solution = expr.Solve();
-
-            System.Console.WriteLine("b: " + solution.Get(b));
-            System.Console.WriteLine("i: " + solution.Get(i));
-            System.Console.WriteLine("s: " + solution.Get(s));
-            System.Console.WriteLine("o: " + solution.Get(o));
-            System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
-        }
-
-        /// <summary>
         /// Test that evaluate works as expected for booleans.
         /// </summary>
         [TestMethod]

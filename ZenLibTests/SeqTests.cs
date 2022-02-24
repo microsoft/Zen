@@ -36,7 +36,6 @@ namespace ZenLib.Tests
         {
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(Not(s1.Contains(s2)), s1.IndexOf(s2) < BigInteger.Zero), runBdds: false);
             CheckValid<Seq<int>, int>((s, x) => Implies(s.Contains(Seq.Unit(x)), s.IndexOf(Seq.Unit(x)) >= BigInteger.Zero), runBdds: false);
-            Console.WriteLine(new Seq<int>().IndexOf(new Seq<int>()));
             CheckValid<Seq<int>>(s => s.IndexOf(Seq.Empty<int>()) == BigInteger.Zero, runBdds: false);
             CheckValid<Seq<int>, Seq<int>, Seq<int>>((s1, s2, s3) => s1.Concat(s2).Concat(s3) == s1.Concat(s2.Concat(s3)), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => s1.Length() + s2.Length() == s1.Concat(s2).Length(), runBdds: false);
@@ -518,7 +517,6 @@ namespace ZenLib.Tests
                      And(s.Contains(new Seq<int>(3)),
                          s.ReplaceFirst(new Seq<int>(3), new Seq<int>(4)) == Seq.Unit<int>(5).Concat(Seq.Unit<int>(4))))).Find();
 
-            Console.WriteLine(result);
             Assert.AreEqual(new Seq<int>(5), result.Value.At(0));
             Assert.AreEqual(new Seq<int>(3), result.Value.At(1));
         }
@@ -547,7 +545,6 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Set<string>>(s => s.Contains("ab" + "bc")).Find();
 
-            Console.WriteLine(result);
             Assert.IsTrue(result.Value.Contains("abbc"));
         }
 

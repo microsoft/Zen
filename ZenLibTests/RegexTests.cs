@@ -421,7 +421,6 @@ namespace ZenLib.Tests
             }
             catch (ZenException e)
             {
-                Console.WriteLine(e.Message);
                 Assert.IsFalse(expected);
             }
         }
