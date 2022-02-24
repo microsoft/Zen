@@ -419,7 +419,7 @@ namespace ZenLib.Tests
                 Regex.ParseAscii(input);
                 Assert.IsTrue(expected);
             }
-            catch (ZenException e)
+            catch (ZenException)
             {
                 Assert.IsFalse(expected);
             }
@@ -489,7 +489,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(expected, r.IsMatch(bytes));
             Assert.AreEqual(expected, a.IsMatch(bytes));
 
-            var r2 = Regex.ParseUnicode(regex);
+            var r2 = Regex.Parse(regex);
             var a2 = r2.ToAutomaton();
             var bytes2 = input.ToCharArray();
             Assert.AreEqual(expected, r2.IsMatch(bytes2));

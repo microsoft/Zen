@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// A parser for a subset of C# regex expressions.
     /// </summary>
-    public class RegexParser<T>
+    internal class RegexParser<T>
     {
         /// <summary>
         /// Special characters.

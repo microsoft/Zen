@@ -34,6 +34,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqEquations()
         {
+            CheckValid<Seq<int>>(s => s.IsEmpty() == (s.Length() == BigInteger.Zero), runBdds: false);
             CheckValid<Seq<int>, Seq<int>>((s1, s2) => Implies(Not(s1.Contains(s2)), s1.IndexOf(s2) < BigInteger.Zero), runBdds: false);
             CheckValid<Seq<int>, int>((s, x) => Implies(s.Contains(Seq.Unit(x)), s.IndexOf(Seq.Unit(x)) >= BigInteger.Zero), runBdds: false);
             CheckValid<Seq<int>>(s => s.IndexOf(Seq.Empty<int>()) == BigInteger.Zero, runBdds: false);
@@ -514,7 +515,7 @@ namespace ZenLib.Tests
         {
             var result = new ZenConstraint<Seq<int>>(
                 s => And(s.Length() == new BigInteger(2),
-                     And(s.Contains(new Seq<int>(3)),
+                     And(s.Contains(3),
                          s.ReplaceFirst(new Seq<int>(3), new Seq<int>(4)) == Seq.Unit<int>(5).Concat(Seq.Unit<int>(4))))).Find();
 
             Assert.AreEqual(new Seq<int>(5), result.Value.At(0));

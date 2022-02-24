@@ -456,7 +456,7 @@ namespace ZenLib.Tests
         [DataRow(".*a.*")]
         public void TestMatchesRegex(string regex)
         {
-            var r = Regex.ParseUnicode(regex);
+            var r = Regex.Parse(regex);
             var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find().Value;
             Assert.IsTrue(r.IsMatch(s));
         }

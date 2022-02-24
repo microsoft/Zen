@@ -165,7 +165,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="regex">The regex pattern.</param>
         /// <returns>A regex recognizing bytes.</returns>
-        public static Regex<char> ParseUnicode(string regex)
+        public static Regex<char> Parse(string regex)
         {
             return new RegexParser<char>(regex, parseUnicodeChar).Parse();
         }

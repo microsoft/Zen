@@ -14,7 +14,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a simple finite sequence.
     /// </summary>
-    public class FSeq<T>
+    public class FSeq<T> : IEquatable<FSeq<T>>
     {
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
@@ -70,6 +70,76 @@ namespace ZenLib
         public override string ToString()
         {
             return $"[{string.Join(",", this.Values)}]";
+        }
+
+        /// <summary>
+        /// Equality for sequences.
+        /// </summary>
+        /// <param name="obj">The other object.</param>
+        /// <returns>True or false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is FSeq<T> o && Equals(o);
+        }
+
+        /// <summary>
+        /// Equality for sequences.
+        /// </summary>
+        /// <param name="other">The other sequences.</param>
+        /// <returns>True or false.</returns>
+        public bool Equals(FSeq<T> other)
+        {
+            if (this.Values.Count != other.Values.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < this.Values.Count; i++)
+            {
+                if (!this.Values[i].Equals(other.Values[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Hashcode for sequences.
+        /// </summary>
+        /// <returns>An integer.</returns>
+        public override int GetHashCode()
+        {
+            var hash = 1291433875;
+            foreach (var element in this.Values)
+            {
+                hash += element.GetHashCode();
+            }
+
+            return hash;
+        }
+
+        /// <summary>
+        /// Equality for sequences.
+        /// </summary>
+        /// <param name="left">The left sequence.</param>
+        /// <param name="right">The right sequence.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator ==(FSeq<T> left, FSeq<T> right)
+        {
+            return EqualityComparer<FSeq<T>>.Default.Equals(left, right);
+        }
+
+        /// <summary>
+        /// Inequality for sequences.
+        /// </summary>
+        /// <param name="left">The left sequence.</param>
+        /// <param name="right">The right sequence.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator !=(FSeq<T> left, FSeq<T> right)
+        {
+            return !(left == right);
         }
     }
 
