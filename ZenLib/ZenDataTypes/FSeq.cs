@@ -128,7 +128,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool operator ==(FSeq<T> left, FSeq<T> right)
         {
-            return EqualityComparer<FSeq<T>>.Default.Equals(left, right);
+            return left.Equals(right);
         }
 
         /// <summary>

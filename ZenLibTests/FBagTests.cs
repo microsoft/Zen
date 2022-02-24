@@ -107,6 +107,40 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test bag evaluation with any.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAnyEvaluation()
+        {
+            var zf = new ZenFunction<FBag<int>, bool>(b => b.Any(i => i == 1));
+
+            Assert.AreEqual(b1.Any(i => i == 1), zf.Evaluate(b1));
+            Assert.AreEqual(b3.Any(i => i == 1), zf.Evaluate(b3));
+
+            zf.Compile();
+            Assert.AreEqual(b1.Any(i => i == 1), zf.Evaluate(b1));
+            Assert.AreEqual(b3.Any(i => i == 1), zf.Evaluate(b3));
+        }
+
+        /// <summary>
+        /// Test bag evaluation with all.
+        /// </summary>
+        [TestMethod]
+        public void TestBagAllEvaluation()
+        {
+            var zf = new ZenFunction<FBag<int>, bool>(b => b.All(i => i < 3));
+
+            Assert.AreEqual(b1.All(i => i < 3), zf.Evaluate(b1));
+            Assert.AreEqual(b2.All(i => i < 3), zf.Evaluate(b2));
+            Assert.AreEqual(b3.All(i => i < 3), zf.Evaluate(b3));
+
+            zf.Compile();
+            Assert.AreEqual(b1.All(i => i < 3), zf.Evaluate(b1));
+            Assert.AreEqual(b2.All(i => i < 3), zf.Evaluate(b2));
+            Assert.AreEqual(b3.All(i => i < 3), zf.Evaluate(b3));
+        }
+
+        /// <summary>
         /// Test bag evaluation with size.
         /// </summary>
         [TestMethod]

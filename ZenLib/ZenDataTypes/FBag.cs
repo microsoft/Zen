@@ -239,7 +239,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public static bool operator ==(FBag<T> left, FBag<T> right)
         {
-            return EqualityComparer<FBag<T>>.Default.Equals(left, right);
+            return left.Equals(right);
         }
 
         /// <summary>

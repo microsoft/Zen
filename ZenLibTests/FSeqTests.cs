@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -361,6 +362,24 @@ namespace ZenLib.Tests
             var zfNested = new ZenFunction<FSeq<FSeq<byte>>, bool>(l => l.Any(x => x.Length() == 4));
             var example2 = zfNested.Find((l, b) => b, depth: 3);
             Assert.IsFalse(example2.HasValue);
+        }
+
+        /// <summary>
+        /// Test equality and hashcode for FSeq.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqEqualsHashCode()
+        {
+            var s1 = FSeq.FromRange(new List<int> { 1, 1, 2, 3, 5 });
+            var s2 = FSeq.FromRange(new List<int> { 1, 2, 3, 5 });
+            var s3 = new FSeq<int>().AddFront(5).AddFront(3).AddFront(2).AddFront(1).AddFront(1);
+            var s4 = FSeq.FromRange(new List<int> { 1, 2, 3, 6 });
+
+            Assert.IsTrue(s1 == s3);
+            Assert.IsTrue(s1 != s2);
+            Assert.IsTrue(s2 != s4);
+            Assert.IsFalse(s1.Equals(0));
+            Assert.IsTrue(s1.GetHashCode() == s3.GetHashCode());
         }
     }
 }
