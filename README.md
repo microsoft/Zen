@@ -390,8 +390,8 @@ Zen supports the `string` type for reasoning about unbounded strings. As mention
 ##### Example
 
 ```csharp
-var r1 = Regex.ParseUnicode("[0-9a-z]+");
-var r2 = Regex.ParseUnicode("(0.)*");
+var r1 = Regex.Parse("[0-9a-z]+");
+var r2 = Regex.Parse("(0.)*");
 
 var s = Symbolic<string>();
 
