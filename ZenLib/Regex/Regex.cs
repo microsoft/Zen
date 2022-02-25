@@ -300,5 +300,42 @@ namespace ZenLib
             CommonUtilities.ValidateIsCharType(typeof(T));
             return RegexUnopExpr<T>.Create(expr, RegexUnopExprType.Negation);
         }
+
+        /// <summary>
+        /// The 'Repeat' regular expression.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <param name="times">The number of times to repeat it.</param>
+        /// <returns>A regular expression matches zero or one occurance of another.</returns>
+        public static Regex<T> Repeat<T>(Regex<T> expr, int times)
+        {
+            return Repeat(expr, times, times);
+        }
+
+        /// <summary>
+        /// The 'Repeat' regular expression.
+        /// </summary>
+        /// <param name="expr">The Regex expr.</param>
+        /// <param name="lo">The minimum number of times to match it.</param>
+        /// <param name="hi">The maximum number of times to match it.</param>
+        /// <returns>A regular expression repeated betwen lo and hi number of times.</returns>
+        public static Regex<T> Repeat<T>(Regex<T> expr, int lo, int hi)
+        {
+            CommonUtilities.ValidateIsTrue(lo >= 0, "Repeat lower bound must be non-negative");
+            CommonUtilities.ValidateIsTrue(hi >= lo, "Repeat upper bound must not be less than lower bound.");
+
+            var r = Regex.Epsilon<T>();
+            for (int i = 0; i < lo; i++)
+            {
+                r = Regex.Concat(r, expr);
+            }
+
+            for (int i = lo; i < hi; i++)
+            {
+                r = Regex.Concat(r, Regex.Opt<T>(expr));
+            }
+
+            return r;
+        }
     }
 }
