@@ -804,6 +804,20 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Determines if the string matches a regular expression.
+        /// </summary>
+        /// <param name="str">The string Zen expression.</param>
+        /// <param name="regex">The unicode regular expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> MatchesRegex(this Zen<string> str, string regex)
+        {
+            CommonUtilities.ValidateNotNull(str);
+            CommonUtilities.ValidateNotNull(regex);
+
+            return str.MatchesRegex(Regex.Parse(regex));
+        }
+
+        /// <summary>
         /// Cast one value to another.
         /// </summary>
         /// <param name="expr">Source Zen expressions.</param>

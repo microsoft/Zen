@@ -25,7 +25,15 @@ namespace ZenLib
         /// </summary>
         private static ISet<string> unaryOperationCharacters = new HashSet<string>
         {
-            "*", "+", "?",
+            "*", "+", "?", "{",
+        };
+
+        /// <summary>
+        /// Digit characters.
+        /// </summary>
+        private static ISet<string> digitCharacters = new HashSet<string>
+        {
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
         };
 
         /// <summary>
@@ -126,6 +134,29 @@ namespace ZenLib
                 {
                     r = Regex.Concat(r, Regex.Star(r));
                 }
+                else if (operation == "{")
+                {
+                    var lo = ParseInteger();
+
+                    if (Accept(","))
+                    {
+                        if (Accept("}"))
+                        {
+                            r = Regex.Concat(Regex.Repeat(r, lo), Regex.Star(r));
+                        }
+                        else
+                        {
+                            var hi = ParseInteger();
+                            r = Regex.Repeat(r, lo, hi);
+                            Expect("}");
+                        }
+                    }
+                    else
+                    {
+                        r = Regex.Repeat(r, lo);
+                        Expect("}");
+                    }
+                }
                 else
                 {
                     Contract.Assert(operation == "?");
@@ -134,6 +165,21 @@ namespace ZenLib
             }
 
             return r;
+        }
+
+        /// <summary>
+        /// Parse a positive integer.
+        /// </summary>
+        /// <returns>The integer.</returns>
+        private int ParseInteger()
+        {
+            var d = Expect(digitCharacters);
+            while (Accept(digitCharacters, out var digit))
+            {
+                d += digit;
+            }
+
+            return int.Parse(d);
         }
 
         /// <summary>
@@ -268,6 +314,21 @@ namespace ZenLib
             {
                 throw new ZenException($"Unexpected symbol {symbol}, expected: {s}");
             }
+        }
+
+        /// <summary>
+        /// Consume a symbol and expect it to match the one provided.
+        /// </summary>
+        /// <param name="characters">The characters to test against.</param>
+        /// <returns>True if there was a match.</returns>
+        private string Expect(ISet<string> characters)
+        {
+            if (!Accept(characters, out var character))
+            {
+                throw new ZenException($"Unexpected symbol {symbol}");
+            }
+
+            return character;
         }
 
         /// <summary>

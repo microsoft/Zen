@@ -412,6 +412,13 @@ namespace ZenLib.Tests
         [DataRow("s ", true)]
         [DataRow("s s", true)]
         [DataRow("[ab ]", true)]
+        [DataRow("a{3}", true)]
+        [DataRow("a{3,}", true)]
+        [DataRow("a{2,3}", true)]
+        [DataRow("a{3,2}", false)]
+        [DataRow("a{-1}", false)]
+        [DataRow("a{2,b}", false)]
+        [DataRow("a{b}", false)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
@@ -481,9 +488,23 @@ namespace ZenLib.Tests
         [DataRow("s ", "s ", true)]
         [DataRow("s s", "s s", true)]
         [DataRow("[ab ]", " ", true)]
+        [DataRow("a{3}", "aa", false)]
+        [DataRow("a{3}", "aaa", true)]
+        [DataRow("a{2,}", "", false)]
+        [DataRow("a{2,}", "a", false)]
+        [DataRow("a{2,}", "aa", true)]
+        [DataRow("a{2,}", "aaa", true)]
+        [DataRow("(ab){1,2}", "", false)]
+        [DataRow("(ab){1,2}", "ab", true)]
+        [DataRow("(ab){1,2}", "abab", true)]
+        [DataRow("(ab){1,2}", "ababab", false)]
+        [DataRow("(ab){1,2}", "bb", false)]
+        [DataRow("a{2}{3}", "aaaaaa", true)]
+        [DataRow("a{2}{3}", "aa", false)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
+            Console.WriteLine(r);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));
