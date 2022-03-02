@@ -262,7 +262,6 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
-| `string`     | arbitrary length string | :heavy_check_mark:           | :x:                 | :x:  |
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |

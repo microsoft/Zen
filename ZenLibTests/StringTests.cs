@@ -457,7 +457,7 @@ namespace ZenLib.Tests
         public void TestMatchesRegex(string regex)
         {
             var r = Regex.Parse(regex);
-            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find().Value;
+            var s = new ZenConstraint<string>(s => s.MatchesRegex(regex)).Find().Value;
             Assert.IsTrue(r.IsMatch(s));
         }
 
