@@ -171,6 +171,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Parse a regex from a string describing the pattern.
+        /// </summary>
+        /// <param name="regex">The regex pattern.</param>
+        /// <param name="characterConverter">The character converter.</param>
+        /// <returns>A regex recognizing bytes.</returns>
+        public static Regex<T> Parse<T>(string regex, Func<char, T> characterConverter)
+        {
+            return new RegexParser<T>(regex, characterConverter).Parse();
+        }
+
+        /// <summary>
         /// The 'Empty' regular expression.
         /// </summary>
         /// <returns>A regular expression that accepts no strings.</returns>

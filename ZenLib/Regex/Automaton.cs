@@ -18,22 +18,22 @@ namespace ZenLib
         /// <summary>
         /// The initial state of the automaton.
         /// </summary>
-        internal Regex<T> InitialState { get; }
+        public Regex<T> InitialState { get; }
 
         /// <summary>
         /// The states of the automaton.
         /// </summary>
-        internal ISet<Regex<T>> States { get; } = new HashSet<Regex<T>>();
+        public ISet<Regex<T>> States { get; } = new HashSet<Regex<T>>();
 
         /// <summary>
         /// The final states of the automaton.
         /// </summary>
-        internal ISet<Regex<T>> FinalStates { get; } = new HashSet<Regex<T>>();
+        public ISet<Regex<T>> FinalStates { get; } = new HashSet<Regex<T>>();
 
         /// <summary>
         /// The transitions of the automaton.
         /// </summary>
-        internal Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>> Transitions { get; } = new Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>>();
+        public Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>> Transitions { get; } = new Dictionary<Regex<T>, Dictionary<CharRange<T>, Regex<T>>>();
 
         /// <summary>
         /// Creates a new instance of the <see cref="Automaton{T}"/> class.

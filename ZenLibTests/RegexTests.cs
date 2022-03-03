@@ -380,6 +380,31 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that automaton emptiness works.
+        /// </summary>
+        [TestMethod]
+        public void TestAutomatonEmptiness1()
+        {
+            var r1 = Regex.Concat(Regex.Star(Regex.Dot<int>()), Regex.Char(1));
+            var r2 = Regex.Concat(Regex.Star(Regex.Dot<int>()), Regex.Char(2));
+            var a = Regex.Intersect(r1, r2).ToAutomaton();
+            Console.WriteLine(a);
+            Assert.IsTrue(a.FinalStates.Count == 0);
+        }
+
+        /// <summary>
+        /// Test that automaton emptiness works.
+        /// </summary>
+        [TestMethod]
+        public void TestAutomatonEmptiness2()
+        {
+            var r1 = Regex.Char<int>(1);
+            var r2 = Regex.Char<int>(2);
+            var a = Regex.Intersect(r1, r2).ToAutomaton();
+            Assert.IsTrue(a.FinalStates.Count == 0);
+        }
+
+        /// <summary>
         /// Test that Regex parsing is working.
         /// </summary>
         [TestMethod]
