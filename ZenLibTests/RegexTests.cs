@@ -185,6 +185,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Star(Regex.Star(r)), Regex.Star(r));
             Assert.AreEqual(Regex.Star(Regex.Epsilon<int>()), Regex.Epsilon<int>());
             Assert.AreEqual(Regex.Star(Regex.Empty<int>()), Regex.Epsilon<int>());
+            Assert.AreEqual(Regex.Star(Regex.Dot<int>()), Regex.Negation(Regex.Empty<int>()));
             Assert.AreEqual(Regex.Negation(Regex.Negation(r)), r);
             Assert.AreEqual(Regex.Negation(range), Regex.Empty<byte>());
             // concat simplifications
@@ -207,6 +208,8 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Union(Regex.Empty<int>(), r), r);
             Assert.AreEqual(Regex.Union(r, Regex.Negation(Regex.Empty<int>())), Regex.Negation(Regex.Empty<int>()));
             Assert.AreEqual(Regex.Union(Regex.Negation(Regex.Empty<int>()), r), Regex.Negation(Regex.Empty<int>()));
+            Assert.AreEqual(Regex.Union(Regex.Dot<int>(), Regex.Char(1)), Regex.Dot<int>());
+            Assert.AreEqual(Regex.Union(Regex.Char(1), Regex.Dot<int>()), Regex.Dot<int>());
             Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
             Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
         }
@@ -446,6 +449,8 @@ namespace ZenLib.Tests
         [DataRow("a{b}", false)]
         [DataRow("a{10}", true)]
         [DataRow("a{10d}", false)]
+        [DataRow("", true)]
+        [DataRow("\\e", true)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
@@ -529,6 +534,12 @@ namespace ZenLib.Tests
         [DataRow("a{2}{3}", "aaaaaa", true)]
         [DataRow("a{2}{3}", "aa", false)]
         [DataRow("a{10}", "aaaaaaaaaa", true)]
+        [DataRow("", "a", false)]
+        [DataRow("", "", true)]
+        [DataRow("\\e", "", true)]
+        [DataRow("\\e", "e", false)]
+        [DataRow("(\\e|a)b", "b", true)]
+        [DataRow("(\\e|a)b", "ab", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);

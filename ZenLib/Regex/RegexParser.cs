@@ -75,6 +75,11 @@ namespace ZenLib
         /// <returns>The Zen regex value.</returns>
         public Regex<T> Parse()
         {
+            if (symbol == string.Empty)
+            {
+                return Regex.Epsilon<T>();
+            }
+
             var ret = ParseRegex();
 
             if (symbol != string.Empty)
@@ -194,8 +199,15 @@ namespace ZenLib
             }
             else if (Accept("\\"))
             {
-                character = ExpectAnyCharacter();
-                return Regex.Char(this.characterConverter(character[0]));
+                if (Accept("e"))
+                {
+                    return Regex.Epsilon<T>();
+                }
+                else
+                {
+                    character = ExpectAnyCharacter();
+                    return Regex.Char(this.characterConverter(character[0]));
+                }
             }
             else if (Accept("."))
             {

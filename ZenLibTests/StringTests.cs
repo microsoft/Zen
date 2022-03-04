@@ -476,6 +476,16 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test string matchesregex.
+        /// </summary>
+        [TestMethod]
+        public void TestNegationDot()
+        {
+            var example = new ZenConstraint<string>(s => Not(s.MatchesRegex(".*"))).Find();
+            Assert.IsFalse(example.HasValue);
+        }
+
+        /// <summary>
         /// Test string matchesregex for empty regex.
         /// </summary>
         [TestMethod]
