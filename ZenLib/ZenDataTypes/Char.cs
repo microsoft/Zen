@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace ZenLib
 {
     /// <summary>
@@ -29,8 +31,8 @@ namespace ZenLib
         /// <param name="value">The char value as an int.</param>
         public Char(int value)
         {
-            CommonUtilities.ValidateIsTrue(value < 0, "character value can not be negative.");
-            CommonUtilities.ValidateIsTrue(value > 0x2ffff, "character value out of range.");
+            CommonUtilities.ValidateIsTrue(value >= 0, "character value can not be negative.");
+            CommonUtilities.ValidateIsTrue(value <= 0x2ffff, "character value out of range.");
             this.value = new UInt18(value);
         }
 
@@ -41,7 +43,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is Char c && value.Equals(c);
+            return obj is Char c && this.value.Equals(c.value);
         }
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace ZenLib
         /// <returns>An integer.</returns>
         public override int GetHashCode()
         {
-            return value.GetHashCode();
+            return this.value.GetHashCode();
         }
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace ZenLib
         /// <returns>A string that is either a single character or a surrogate pair.</returns>
         public override string ToString()
         {
-            return char.ConvertFromUtf32((int)value.ToLong());
+            return char.ConvertFromUtf32((int)this.value.ToLong());
         }
     }
 }
