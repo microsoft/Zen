@@ -444,6 +444,8 @@ namespace ZenLib.Tests
         [DataRow("a{-1}", false)]
         [DataRow("a{2,b}", false)]
         [DataRow("a{b}", false)]
+        [DataRow("a{10}", true)]
+        [DataRow("a{10d}", false)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
@@ -526,10 +528,10 @@ namespace ZenLib.Tests
         [DataRow("(ab){1,2}", "bb", false)]
         [DataRow("a{2}{3}", "aaaaaa", true)]
         [DataRow("a{2}{3}", "aa", false)]
+        [DataRow("a{10}", "aaaaaaaaaa", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
-            Console.WriteLine(r);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));
@@ -540,6 +542,12 @@ namespace ZenLib.Tests
             var bytes2 = input.ToCharArray().Select(c => new ZenLib.Char(c));
             Assert.AreEqual(expected, r2.IsMatch(bytes2));
             Assert.AreEqual(expected, a2.IsMatch(bytes2));
+
+            var r3 = Regex.Parse(regex, c => c);
+            var a3 = r3.ToAutomaton();
+            var bytes3 = input.ToCharArray();
+            Assert.AreEqual(expected, r3.IsMatch(bytes3));
+            Assert.AreEqual(expected, a3.IsMatch(bytes3));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

@@ -1074,6 +1074,8 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MinValue;
+            if (type == typeof(char))
+                return (T)(object)char.MinValue;
             if (type == CharType)
                 return (T)(object)Char.MinValue;
             if (type == ShortType)
@@ -1108,6 +1110,8 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MaxValue;
+            if (type == typeof(char))
+                return (T)(object)char.MaxValue;
             if (type == CharType)
                 return (T)(object)Char.MaxValue;
             if (type == ShortType)
@@ -1138,6 +1142,11 @@ namespace ZenLib
         public static byte Add(byte x, int i)
         {
             return (byte)(x + i);
+        }
+
+        public static char Add(char x, int i)
+        {
+            return (char)(x + i);
         }
 
         public static Char Add(Char x, int i)
@@ -1185,6 +1194,11 @@ namespace ZenLib
         public static byte Subtract(byte x, int i)
         {
             return (byte)(x - i);
+        }
+
+        public static char Subtract(char x, int i)
+        {
+            return (char)(x - i);
         }
 
         public static Char Subtract(Char x, int i)

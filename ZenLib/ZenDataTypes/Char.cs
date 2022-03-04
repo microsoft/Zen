@@ -81,7 +81,14 @@ namespace ZenLib
         /// <returns>A string that is either a single character or a surrogate pair.</returns>
         public override string ToString()
         {
-            return char.ConvertFromUtf32((int)this.Value.ToLong());
+            var intVal = (int)this.Value.ToLong();
+
+            if (intVal <= 0xffff)
+            {
+                return ((char)intVal).ToString();
+            }
+
+            return char.ConvertFromUtf32(intVal);
         }
 
         /// <summary>
