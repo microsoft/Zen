@@ -99,7 +99,44 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestValidCharacter()
         {
+            new ZenLib.Char(0);
             new ZenLib.Char(0x2ffff);
+        }
+
+        /// <summary>
+        /// Test that conversions from strings and sequences works.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversions1()
+        {
+            var s1 = "abcd";
+            var s2 = Seq.AsString(Seq.FromString2(s1));
+            Assert.AreEqual(s1, s2);
+        }
+
+        /// <summary>
+        /// Test that conversions from strings and sequences works.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversions2()
+        {
+            var s1 = char.ConvertFromUtf32(0x2ffff);
+            var s2 = Seq.AsString(Seq.FromString2(s1));
+            Assert.AreEqual(s1, s2);
+        }
+
+        /// <summary>
+        /// Test that conversions from strings and sequences works.
+        /// </summary>
+        [TestMethod]
+        public void TestStringConversions3()
+        {
+            for (int i = 0x10000; i < 0x2ffff; i++)
+            {
+                var s1 = char.ConvertFromUtf32(i) + char.ConvertFromUtf32(i - 1);
+                var s2 = Seq.AsString(Seq.FromString2(s1));
+                Assert.AreEqual(s1, s2);
+            }
         }
     }
 }
