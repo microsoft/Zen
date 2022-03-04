@@ -64,7 +64,7 @@ namespace ZenLib.Solver
         /// Create a char constant.
         /// </summary>
         /// <returns></returns>
-        TChar CreateCharConst(char c);
+        TChar CreateCharConst(ZenLib.Char c);
 
         /// <summary>
         /// Create a new short expression.

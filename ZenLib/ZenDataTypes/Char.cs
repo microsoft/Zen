@@ -9,12 +9,22 @@ namespace ZenLib
     /// <summary>
     /// A unicode character that is compatible with SMT-LIB.
     /// </summary>
-    public sealed class Char
+    public sealed class Char : IEquatable<Char>, IComparable<Char>
     {
+        /// <summary>
+        /// The minimum char value.
+        /// </summary>
+        public static readonly Char MinValue = new Char(0);
+
+        /// <summary>
+        /// The maximum char value.
+        /// </summary>
+        public static readonly Char MaxValue = new Char(0x2ffff);
+
         /// <summary>
         /// The underlying value of the character supporting up to 0x2ffff.
         /// </summary>
-        private UInt18 value;
+        internal UInt18 Value;
 
         /// <summary>
         /// Convert a C# char to a Char.
@@ -33,7 +43,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateIsTrue(value >= 0, "character value can not be negative.");
             CommonUtilities.ValidateIsTrue(value <= 0x2ffff, "character value out of range.");
-            this.value = new UInt18(value);
+            this.Value = new UInt18(value);
         }
 
         /// <summary>
@@ -43,7 +53,17 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is Char c && this.value.Equals(c.value);
+            return obj is Char c && this.Equals(c);
+        }
+
+        /// <summary>
+        /// Equality for chars.
+        /// </summary>
+        /// <param name="other">The other char.</param>
+        /// <returns>True or false.</returns>
+        public bool Equals(Char other)
+        {
+            return this.Value.Equals(other.Value);
         }
 
         /// <summary>
@@ -52,7 +72,7 @@ namespace ZenLib
         /// <returns>An integer.</returns>
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            return this.Value.GetHashCode();
         }
 
         /// <summary>
@@ -61,7 +81,39 @@ namespace ZenLib
         /// <returns>A string that is either a single character or a surrogate pair.</returns>
         public override string ToString()
         {
-            return char.ConvertFromUtf32((int)this.value.ToLong());
+            return char.ConvertFromUtf32((int)this.Value.ToLong());
+        }
+
+        /// <summary>
+        /// Compare this character to another.
+        /// </summary>
+        /// <param name="other">The other character.</param>
+        /// <returns>An int representing the result.</returns>
+        public int CompareTo(Char other)
+        {
+            return this.Value.CompareTo(other.Value);
+        }
+
+        /// <summary>
+        /// Equality for chars.
+        /// </summary>
+        /// <param name="left">The left char.</param>
+        /// <param name="right">The right char.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator ==(Char left, Char right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Inequality for chars.
+        /// </summary>
+        /// <param name="left">The left char.</param>
+        /// <param name="right">The right char.</param>
+        /// <returns>True or false.</returns>
+        public static bool operator !=(Char left, Char right)
+        {
+            return !(left == right);
         }
     }
 }

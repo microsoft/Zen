@@ -333,7 +333,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMapChars()
         {
-            var res = new ZenConstraint<Map<char, int>>(d => d.Get('a') == Option.Create<int>(1)).Find();
+            var res = new ZenConstraint<Map<ZenLib.Char, int>>(d => d.Get(new ZenLib.Char('a')) == Option.Create<int>(1)).Find();
             Assert.AreEqual(1, res.Value.Get('a').Value);
         }
 

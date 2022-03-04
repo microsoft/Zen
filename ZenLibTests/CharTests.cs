@@ -66,8 +66,8 @@ namespace ZenLib.Tests
             ZenLib.Char c2 = new ZenLib.Char(97);
             ZenLib.Char c3 = char.MaxValue;
 
-            Assert.AreEqual(c1, c2);
-            Assert.AreNotEqual(c1, c3);
+            Assert.IsTrue(c1 == c2);
+            Assert.IsTrue(c1 != c3);
             Assert.AreNotEqual(c1, new object());
             Assert.AreEqual(c1.GetHashCode(), c2.GetHashCode());
             Assert.AreNotEqual(c1.GetHashCode(), c3.GetHashCode());
@@ -110,7 +110,7 @@ namespace ZenLib.Tests
         public void TestStringConversions1()
         {
             var s1 = "abcd";
-            var s2 = Seq.AsString(Seq.FromString2(s1));
+            var s2 = Seq.AsString(Seq.FromString(s1));
             Assert.AreEqual(s1, s2);
         }
 
@@ -121,7 +121,7 @@ namespace ZenLib.Tests
         public void TestStringConversions2()
         {
             var s1 = char.ConvertFromUtf32(0x2ffff);
-            var s2 = Seq.AsString(Seq.FromString2(s1));
+            var s2 = Seq.AsString(Seq.FromString(s1));
             Assert.AreEqual(s1, s2);
         }
 
@@ -134,7 +134,7 @@ namespace ZenLib.Tests
             for (int i = 0x10000; i < 0x2ffff; i++)
             {
                 var s1 = char.ConvertFromUtf32(i) + char.ConvertFromUtf32(i - 1);
-                var s2 = Seq.AsString(Seq.FromString2(s1));
+                var s2 = Seq.AsString(Seq.FromString(s1));
                 Assert.AreEqual(s1, s2);
             }
         }

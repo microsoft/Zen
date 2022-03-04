@@ -244,7 +244,7 @@ namespace ZenLib.ModelChecking
             }
             else if (type == ReflectionUtilities.CharType)
             {
-                var c = this.Solver.CreateCharConst((char)(object)expression.Value);
+                var c = this.Solver.CreateCharConst((ZenLib.Char)(object)expression.Value);
                 return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, c);
             }
             else if (type == ReflectionUtilities.ShortType)

@@ -70,7 +70,6 @@ namespace ZenLib.Solver
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
             this.StringSort = this.Context.StringSort;
-            this.CharSort = this.Context.CharSort;
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
@@ -131,9 +130,9 @@ namespace ZenLib.Solver
             return (v, v);
         }
 
-        public Expr CreateCharConst(char c)
+        public Expr CreateCharConst(ZenLib.Char c)
         {
-            return this.Context.CharFromBV(this.Context.MkBV(c, 18));
+            return this.Context.CharFromBV(this.CreateBitvecConst(c.Value.GetBits()));
         }
 
         public BitVecExpr CreateShortConst(short s)

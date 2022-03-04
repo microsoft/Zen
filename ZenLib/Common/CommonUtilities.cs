@@ -205,21 +205,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Validate that a string literal is well-formed.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        internal static void ValidateStringLiteral(string s)
-        {
-            foreach (var c in s)
-            {
-                if (c > 255)
-                {
-                    throw new ZenException($"Invalid string literal with backslash character: {s}");
-                }
-            }
-        }
-
-        /// <summary>
         /// Unescape a Z3 string.
         /// </summary>
         /// <param name="s">The string.</param>
@@ -257,8 +242,8 @@ namespace ZenLib
                     for (int j = start; j < i; j++)
                         hex[5 - (i - j)] = s[j];
                     var str = new string(hex);
-                    var asChar = (char)Convert.ToInt32(str, 16);
-                    sb.Append(asChar);
+                    var c = new Char(int.Parse(str, System.Globalization.NumberStyles.HexNumber));
+                    sb.Append(c.ToString());
                     continue;
                 }
 

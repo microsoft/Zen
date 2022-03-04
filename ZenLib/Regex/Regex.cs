@@ -148,7 +148,7 @@ namespace ZenLib
         /// <summary>
         /// Function to parse an Unicode char.
         /// </summary>
-        private static Func<char, char> parseUnicodeChar = (char c) => c;
+        private static Func<char, Char> parseUnicodeChar = (char c) => c;
 
         /// <summary>
         /// Parse a regex from an ascii string describing the pattern.
@@ -165,9 +165,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="regex">The regex pattern.</param>
         /// <returns>A regex recognizing bytes.</returns>
-        public static Regex<char> Parse(string regex)
+        public static Regex<Char> Parse(string regex)
         {
-            return new RegexParser<char>(regex, parseUnicodeChar).Parse();
+            return new RegexParser<Char>(regex, parseUnicodeChar).Parse();
         }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace ZenLib.Tests
         {
             Assert.IsTrue(new ZenFunction<Option<bool>>(() => Option.Null<bool>()).Assert(v => v.Value() == false));
             Assert.IsTrue(new ZenFunction<Option<byte>>(() => Option.Null<byte>()).Assert(v => v.Value() == 0));
-            Assert.IsTrue(new ZenFunction<Option<char>>(() => Option.Null<char>()).Assert(v => v.Value() == (char)0));
+            Assert.IsTrue(new ZenFunction<Option<ZenLib.Char>>(() => Option.Null<ZenLib.Char>()).Assert(v => v.Value() == ZenLib.Char.MinValue));
             Assert.IsTrue(new ZenFunction<Option<short>>(() => Option.Null<short>()).Assert(v => v.Value() == 0));
             Assert.IsTrue(new ZenFunction<Option<ushort>>(() => Option.Null<ushort>()).Assert(v => v.Value() == 0));
             Assert.IsTrue(new ZenFunction<Option<int>>(() => Option.Null<int>()).Assert(v => v.Value() == 0));
@@ -47,7 +47,7 @@ namespace ZenLib.Tests
         {
             CheckDefault<bool>(false);
             CheckDefault<byte>((byte)0);
-            CheckDefault<char>((char)0);
+            CheckDefault<ZenLib.Char>(ZenLib.Char.MinValue);
             CheckDefault<short>((short)0);
             CheckDefault<ushort>((ushort)0);
             CheckDefault<int>(0);
