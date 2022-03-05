@@ -63,6 +63,12 @@ namespace ZenLib
                     return e1;
                 }
 
+                // simplify (a + (a + b)) = a + b
+                if (e2 is RegexBinopExpr<T> w && w.OpType == RegexBinopExprType.Intersection && w.Expr1.Equals(e1))
+                {
+                    return e2;
+                }
+
                 // simplify (r & s) & t = r & (s & t)
                 if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Intersection)
                 {
@@ -96,6 +102,12 @@ namespace ZenLib
                     return e1;
                 }
 
+                // simplify (a + (a + b)) = a + b
+                if (e2 is RegexBinopExpr<T> w && w.OpType == RegexBinopExprType.Union && w.Expr1.Equals(e1))
+                {
+                    return e2;
+                }
+
                 // simplify not(\empty) + r = not(\empty)
                 if (e1 is RegexUnopExpr<T> x && x.OpType == RegexUnopExprType.Negation && x.Expr is RegexEmptyExpr<T>)
                 {
@@ -104,6 +116,22 @@ namespace ZenLib
 
                 // simplify r + not(\empty) = not(\empty)
                 if (e2 is RegexUnopExpr<T> y && y.OpType == RegexUnopExprType.Negation && y.Expr is RegexEmptyExpr<T>)
+                {
+                    return e2;
+                }
+
+                // simplify [a-b] + [c-d] = [a-b] where [a-b] contains [c-d]
+                if (e1 is RegexRangeExpr<T> rng1 && e2 is RegexRangeExpr<T> rng2 &&
+                    rng1.CharacterRange.Contains(rng2.CharacterRange.Low) &&
+                    rng1.CharacterRange.Contains(rng2.CharacterRange.High))
+                {
+                    return e1;
+                }
+
+                // simplify [a-b] + [c-d] = [c-d] where [a-b] is contained by [c-d]
+                if (e1 is RegexRangeExpr<T> rng3 && e2 is RegexRangeExpr<T> rng4 &&
+                    rng4.CharacterRange.Contains(rng3.CharacterRange.Low) &&
+                    rng4.CharacterRange.Contains(rng3.CharacterRange.High))
                 {
                     return e2;
                 }

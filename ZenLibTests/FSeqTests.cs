@@ -377,7 +377,8 @@ namespace ZenLib.Tests
 
             Assert.IsTrue(s1 == s3);
             Assert.IsTrue(s1 != s2);
-            Assert.IsTrue(s2 != s4);
+            Assert.IsTrue(s1.Equals((object)s3));
+            Assert.IsTrue(!s2.Equals(s4));
             Assert.IsFalse(s1.Equals(0));
             Assert.IsTrue(s1.GetHashCode() == s3.GetHashCode());
         }

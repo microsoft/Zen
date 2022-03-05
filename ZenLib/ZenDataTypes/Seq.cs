@@ -389,25 +389,32 @@ namespace ZenLib
     public static class Seq
     {
         /// <summary>
-        /// Create a byte sequence from a string.
-        /// The bytes correspond to the Unicode values.
+        /// Create a char sequence from a string.
+        /// The chars correspond to the Unicode values.
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        public static Seq<char> FromString(string s)
+        public static Seq<Char> FromString(string s)
         {
-            return new Seq<char>(ImmutableList.CreateRange(s.ToCharArray()));
+            var result = new Seq<Char>();
+            for (var i = 0; i < s.Length; i += char.IsSurrogatePair(s, i) ? 2 : 1)
+            {
+                var c = new Char(char.ConvertToUtf32(s, i));
+                result = result.Concat(new Seq<Char>(c));
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// Create a string from a byte sequence.
+        /// Create a string from a Char sequence.
         /// The bytes correspond to the Unicode values.
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        public static string AsString(this Seq<char> seq)
+        public static string AsString(this Seq<Char> seq)
         {
-            return new string(seq.Values.ToArray());
+            return string.Join(string.Empty, seq.Values.Select(c => c.ToString()));
         }
 
         /// <summary>

@@ -246,7 +246,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | ------ | -------------------- | ----------------------- | ------------------------ | ------------|
 | `bool`   | {true, false}        | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `byte`   | 8-bit value          | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
-| `char`   | 16-bit value         | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `Char`   | 18-bit unicode character   | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `short`  | 16-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `ushort` | 16-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `int`    | 32-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
@@ -266,13 +266,13 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
-| `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :x: | :x:  |
+| `string` | arbitrary size strings. Implemented as `Seq<Char>` | :heavy_check_mark: | :x: | :x:  |
 
 
 <a name="primitive-types"></a>
 ### Primitive types
 
-Zen supports the following primitive types: `bool, byte, char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic.
+Zen supports the following primitive types: `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic.
 
 ##### Example
 
@@ -394,7 +394,7 @@ s4: {b, a}
 <a name="strings-and-sequences"></a>
 ### Sequences, Strings, and Regular Expressions
 
-Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<char>` for unicode strings.
+Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<Char>` for unicode strings.
 
 As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth.
 
@@ -419,7 +419,7 @@ s1: [1]
 s2: [0]
 ```
 
-Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does not support anchors like `$` and `^` or any metacharacters like `\w,\s,\d,\D` or backreferences `\1`.
+Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<Char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does support anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`.
 
 ##### Example
 

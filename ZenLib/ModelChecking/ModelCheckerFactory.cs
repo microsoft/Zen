@@ -44,7 +44,7 @@ namespace ZenLib.ModelChecking
             var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             solver.Init();
-            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit, Unit, BitVector<CBDDNode>>(solver);
+            return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit, Unit, Unit>(solver);
         }
 
         /// <summary>

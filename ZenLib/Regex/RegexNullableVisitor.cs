@@ -5,6 +5,7 @@
 namespace ZenLib
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// A class to check if a regex is nullable.
@@ -62,6 +63,12 @@ namespace ZenLib
                     Contract.Assert(expression.OpType == RegexUnopExprType.Negation);
                     return Compute(expression.Expr) is RegexEpsilonExpr<T> ? Regex.Empty<T>() : Regex.Epsilon<T>();
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Regex<T> Visit(RegexAnchorExpr<T> expression, Unit parameter)
+        {
+            throw new ZenUnreachableException();
         }
     }
 }

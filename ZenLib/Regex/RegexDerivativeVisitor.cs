@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace ZenLib
 {
     /// <summary>
@@ -78,6 +80,12 @@ namespace ZenLib
                     Contract.Assert(expression.OpType == RegexUnopExprType.Negation);
                     return Regex.Negation(Compute(expression.Expr, parameter));
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Regex<T> Visit(RegexAnchorExpr<T> expression, T parameter)
+        {
+            throw new ZenUnreachableException();
         }
     }
 }

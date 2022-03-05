@@ -25,7 +25,7 @@ namespace ZenLib
         /// <summary>
         /// The type of byte sequences values.
         /// </summary>
-        public readonly static Type UnicodeSequenceType = typeof(Seq<char>);
+        public readonly static Type UnicodeSequenceType = typeof(Seq<Char>);
 
         /// <summary>
         /// The type of finite string values.
@@ -50,7 +50,7 @@ namespace ZenLib
         /// <summary>
         /// The type of char values.
         /// </summary>
-        public readonly static Type CharType = typeof(char);
+        public readonly static Type CharType = typeof(Char);
 
         /// <summary>
         /// The type of short values.
@@ -653,7 +653,7 @@ namespace ZenLib
             if (type == ByteType)
                 return (byte)0;
             if (type == CharType)
-                return (char)0;
+                return Char.MinValue;
             if (type == ShortType)
                 return (short)0;
             if (type == UshortType)
@@ -871,7 +871,7 @@ namespace ZenLib
             {
                 var type = typeof(T);
 
-                if (value is bool || value is byte || value is char || value is short || value is ushort ||
+                if (value is bool || value is byte || value is Char || value is short || value is ushort ||
                     value is int  || value is uint || value is long || value is ulong || value is BigInteger ||
                     IsFixedIntegerType(type))
                 {
@@ -882,8 +882,8 @@ namespace ZenLib
 
                 if (type == StringType)
                 {
-                    var asSeq = (Zen<Seq<char>>)CreateZenConstant(Seq.FromString((string)(object)value));
-                    return ZenCastExpr<Seq<char>, string>.Create(asSeq);
+                    var asSeq = (Zen<Seq<Char>>)CreateZenConstant(Seq.FromString((string)(object)value));
+                    return ZenCastExpr<Seq<Char>, string>.Create(asSeq);
                 }
 
                 if (IsSeqType(type))
@@ -1074,8 +1074,10 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MinValue;
-            if (type == CharType)
+            if (type == typeof(char))
                 return (T)(object)char.MinValue;
+            if (type == CharType)
+                return (T)(object)Char.MinValue;
             if (type == ShortType)
                 return (T)(object)short.MinValue;
             if (type == UshortType)
@@ -1108,8 +1110,10 @@ namespace ZenLib
 
             if (type == ByteType)
                 return (T)(object)byte.MaxValue;
-            if (type == CharType)
+            if (type == typeof(char))
                 return (T)(object)char.MaxValue;
+            if (type == CharType)
+                return (T)(object)Char.MaxValue;
             if (type == ShortType)
                 return (T)(object)short.MaxValue;
             if (type == UshortType)
@@ -1143,6 +1147,11 @@ namespace ZenLib
         public static char Add(char x, int i)
         {
             return (char)(x + i);
+        }
+
+        public static Char Add(Char x, int i)
+        {
+            return new Char((int)Add(x.Value, i).ToLong());
         }
 
         public static short Add(short x, int i)
@@ -1190,6 +1199,11 @@ namespace ZenLib
         public static char Subtract(char x, int i)
         {
             return (char)(x - i);
+        }
+
+        public static Char Subtract(Char x, int i)
+        {
+            return new Char((int)Subtract(x.Value, i).ToLong());
         }
 
         public static short Subtract(short x, int i)

@@ -308,7 +308,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetWithChar()
         {
-            var res = new ZenConstraint<Set<char>, bool>((c, b) => If(c.Contains('a'), b, c.Contains('b'))).Find();
+            var res = new ZenConstraint<Set<ZenLib.Char>, bool>((c, b) => If(c.Contains(new ZenLib.Char('a')), b, c.Contains(new ZenLib.Char('b')))).Find();
             Assert.IsTrue(res.Value.Item1.Contains('a') || res.Value.Item1.Contains('b'));
         }
 

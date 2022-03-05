@@ -49,6 +49,12 @@ namespace ZenLib
                 {
                     return Regex.Epsilon<T>();
                 }
+
+                // simplify .* = \not \empty
+                if (expr is RegexRangeExpr<T> r && r.CharacterRange.IsFull())
+                {
+                    return Regex.Negation(Regex.Empty<T>());
+                }
             }
 
             if (opType == RegexUnopExprType.Negation)

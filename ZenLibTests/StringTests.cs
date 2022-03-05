@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
@@ -454,11 +455,38 @@ namespace ZenLib.Tests
         [DataRow("s s")]
         [DataRow("\\u058")]
         [DataRow(".*a.*")]
+        [DataRow("^8075:[9][4-9][0-9][0-9]$")]
+        [DataRow(".*")]
+        [DataRow("^8220:1234|8220:5678|8220:9012|8220:345$")]
+        [DataRow("^806[8-9]:.*$")]
         public void TestMatchesRegex(string regex)
         {
             var r = Regex.Parse(regex);
-            var s = new ZenConstraint<string>(s => s.MatchesRegex(regex)).Find().Value;
-            Assert.IsTrue(r.IsMatch(s));
+
+            var examples = new ZenConstraint<string>(s => s.MatchesRegex(regex)).FindAll().Take(5);
+
+            foreach (var example in examples)
+            {
+                Console.WriteLine(example);
+                Assert.IsTrue(r.IsMatch(Seq.FromString(example).Values));
+            }
+
+            examples = new ZenConstraint<string>(s => Not(s.MatchesRegex(regex))).FindAll().Take(5);
+
+            foreach (var example in examples)
+            {
+                Assert.IsFalse(r.IsMatch(Seq.FromString(example).Values));
+            }
+        }
+
+        /// <summary>
+        /// Test string matchesregex.
+        /// </summary>
+        [TestMethod]
+        public void TestNegationDot()
+        {
+            var example = new ZenConstraint<string>(s => Not(s.MatchesRegex(".*"))).Find();
+            Assert.IsFalse(example.HasValue);
         }
 
         /// <summary>
@@ -467,7 +495,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMatchesRegexEmpty1()
         {
-            var r = Regex.Empty<char>();
+            var r = Regex.Empty<ZenLib.Char>();
             var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
             Assert.IsFalse(s.HasValue);
         }
@@ -519,17 +547,6 @@ namespace ZenLib.Tests
         public void TestInvalidStringLiteralNull()
         {
             Constant<string>(null);
-        }
-
-        /// <summary>
-        /// Test invalid string literal.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInvalidStringLiteral2()
-        {
-            char c = (char)960; // greek pi
-            Constant(c.ToString());
         }
 
         /// <summary>

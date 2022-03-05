@@ -185,6 +185,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Star(Regex.Star(r)), Regex.Star(r));
             Assert.AreEqual(Regex.Star(Regex.Epsilon<int>()), Regex.Epsilon<int>());
             Assert.AreEqual(Regex.Star(Regex.Empty<int>()), Regex.Epsilon<int>());
+            Assert.AreEqual(Regex.Star(Regex.Dot<int>()), Regex.Negation(Regex.Empty<int>()));
             Assert.AreEqual(Regex.Negation(Regex.Negation(r)), r);
             Assert.AreEqual(Regex.Negation(range), Regex.Empty<byte>());
             // concat simplifications
@@ -201,14 +202,18 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Intersect(r, Regex.Empty<int>()), Regex.Empty<int>());
             Assert.AreEqual(Regex.Intersect(Regex.Negation(Regex.Empty<int>()), r), r);
             Assert.AreEqual(Regex.Intersect(r, Regex.Negation(Regex.Empty<int>())), r);
+            Assert.AreEqual(Regex.Intersect(r, Regex.Intersect(r, s)), Regex.Intersect(r, s));
             // union simplifications
             Assert.AreEqual(Regex.Union(r, r), r);
             Assert.AreEqual(Regex.Union(r, Regex.Empty<int>()), r);
             Assert.AreEqual(Regex.Union(Regex.Empty<int>(), r), r);
             Assert.AreEqual(Regex.Union(r, Regex.Negation(Regex.Empty<int>())), Regex.Negation(Regex.Empty<int>()));
             Assert.AreEqual(Regex.Union(Regex.Negation(Regex.Empty<int>()), r), Regex.Negation(Regex.Empty<int>()));
+            Assert.AreEqual(Regex.Union(Regex.Dot<int>(), Regex.Char(1)), Regex.Dot<int>());
+            Assert.AreEqual(Regex.Union(Regex.Char(1), Regex.Dot<int>()), Regex.Dot<int>());
             Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
             Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
+            Assert.AreEqual(Regex.Union(r, Regex.Union(r, s)), Regex.Union(r, s));
         }
 
         /// <summary>
@@ -444,6 +449,10 @@ namespace ZenLib.Tests
         [DataRow("a{-1}", false)]
         [DataRow("a{2,b}", false)]
         [DataRow("a{b}", false)]
+        [DataRow("a{10}", true)]
+        [DataRow("a{10d}", false)]
+        [DataRow("", true)]
+        [DataRow("\\e", true)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
@@ -463,44 +472,48 @@ namespace ZenLib.Tests
         [TestMethod]
         [DataRow("abc", "abc", true)]
         [DataRow("abc", "ab", false)]
-        [DataRow("abc", "abcd", false)]
-        [DataRow(".bc", "xbc", true)]
+        [DataRow("abc", "abcd", true)]
+        [DataRow("^abc$", "abcd", false)]
+        [DataRow("^abc$", "abc", true)]
+        [DataRow("^.bc", "xbc", true)]
+        [DataRow("^.bc", "xbcd", true)]
+        [DataRow("^.bc", "dxbc", false)]
         [DataRow("(abc)", "abc", true)]
-        [DataRow("(abc)", "abcd", false)]
+        [DataRow("(abc)", "abcd", true)]
         [DataRow("[abc]", "a", true)]
         [DataRow("[abc]", "b", true)]
         [DataRow("[abc]", "c", true)]
-        [DataRow("[abc]", "ab", false)]
+        [DataRow("^[abc]$", "ab", false)]
         [DataRow("[0-9a-z]", "1", true)]
         [DataRow("[0-9a-z]", "g", true)]
         [DataRow("[0-9a-z]", "\n", false)]
         [DataRow("[0-9a-z]", "A", false)]
-        [DataRow("[0-9a-z]", "01", false)]
+        [DataRow("^[0-9a-z]$", "01", false)]
         [DataRow("ab|c", "ab", true)]
         [DataRow("ab|c", "c", true)]
         [DataRow("ab|c", "a", false)]
-        [DataRow("(a|b)?", "", true)]
-        [DataRow("(a|b)?", "a", true)]
-        [DataRow("(a|b)?", "b", true)]
-        [DataRow("(a|b)?", "ab", false)]
-        [DataRow("(a|b)+", "", false)]
-        [DataRow("(a|b)+", "a", true)]
-        [DataRow("(a|b)+", "aa", true)]
-        [DataRow("(a|b)+", "abba", true)]
+        [DataRow("^(a|b)?$", "", true)]
+        [DataRow("^(a|b)?$", "a", true)]
+        [DataRow("^(a|b)?$", "b", true)]
+        [DataRow("^(a|b)?$", "ab", false)]
+        [DataRow("^(a|b)+$", "", false)]
+        [DataRow("^(a|b)+$", "a", true)]
+        [DataRow("^(a|b)+$", "aa", true)]
+        [DataRow("^(a|b)+$", "abba", true)]
         [DataRow("[abc]+", "", false)]
         [DataRow("[abc]+", "ccba", true)]
-        [DataRow("[abc]+", "aabd", false)]
+        [DataRow("[abc]+$", "aabd", false)]
         [DataRow(@"\(\)", "()", true)]
         [DataRow("\\(\\)", "()", true)]
         [DataRow(@"\n", "n", true)]
         [DataRow("\n", "\n", true)]
         [DataRow("[ab\\+]", "+", true)]
-        [DataRow("[ab\\+]", "\\+", false)]
+        [DataRow("^[ab\\+]", "\\+", false)]
         [DataRow("\\\\", "\\", true)]
         [DataRow("[^a-zA-Z]", "g", false)]
         [DataRow("[^a-zA-Z]", "2", true)]
         [DataRow("abcd\\||bc", "bc", true)]
-        [DataRow("abcd\\||bc", "abcd", false)]
+        [DataRow("abcd\\||bc$", "abcd", false)]
         [DataRow("abcd\\||bc", "abcd|", true)]
         [DataRow("[a-]+", "---", true)]
         [DataRow("[a*]+", "a*a", true)]
@@ -522,10 +535,21 @@ namespace ZenLib.Tests
         [DataRow("(ab){1,2}", "", false)]
         [DataRow("(ab){1,2}", "ab", true)]
         [DataRow("(ab){1,2}", "abab", true)]
-        [DataRow("(ab){1,2}", "ababab", false)]
+        [DataRow("^(ab){1,2}$", "ababab", false)]
         [DataRow("(ab){1,2}", "bb", false)]
         [DataRow("a{2}{3}", "aaaaaa", true)]
         [DataRow("a{2}{3}", "aa", false)]
+        [DataRow("a{10}", "aaaaaaaaaa", true)]
+        [DataRow("", "a", false)]
+        [DataRow("", "", true)]
+        [DataRow("^\\e$", "", true)]
+        [DataRow("^\\e$", "e", false)]
+        [DataRow("(\\e|a)b", "b", true)]
+        [DataRow("(\\e|a)b", "ab", true)]
+        [DataRow("(^x|y)", "xz", true)]
+        [DataRow("(^x|y)", "zy", true)]
+        [DataRow("(^x|y)", "zx", false)]
+        // [DataRow("$ab", "ab", false)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
@@ -537,9 +561,15 @@ namespace ZenLib.Tests
 
             var r2 = Regex.Parse(regex);
             var a2 = r2.ToAutomaton();
-            var bytes2 = input.ToCharArray();
+            var bytes2 = input.ToCharArray().Select(c => new ZenLib.Char(c));
             Assert.AreEqual(expected, r2.IsMatch(bytes2));
             Assert.AreEqual(expected, a2.IsMatch(bytes2));
+
+            var r3 = Regex.Parse(regex, c => c);
+            var a3 = r3.ToAutomaton();
+            var bytes3 = input.ToCharArray();
+            Assert.AreEqual(expected, r3.IsMatch(bytes3));
+            Assert.AreEqual(expected, a3.IsMatch(bytes3));
         }
 
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>

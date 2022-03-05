@@ -1577,16 +1577,6 @@ namespace ZenLib.Tests
         /// Exception thrown for ascii strings.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInvalidAscii()
-        {
-            Constant("hello∆");
-        }
-
-        /// <summary>
-        /// Exception thrown for ascii strings.
-        /// </summary>
-        [TestMethod]
         public void TestInvalidAsciiOk()
         {
             Constant("hello");

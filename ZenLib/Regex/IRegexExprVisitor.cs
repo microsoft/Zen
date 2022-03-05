@@ -31,6 +31,14 @@ namespace ZenLib
         TReturn Visit(RegexEpsilonExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a RegexAnchorExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit(RegexAnchorExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a RegexCharExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

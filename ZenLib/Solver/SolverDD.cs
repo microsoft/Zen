@@ -15,7 +15,7 @@ namespace ZenLib.Solver
     /// Implementation of a solver using decision diagrams.
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
-    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>>
+    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit>
         where T : IDDNode
     {
         /// <summary>
@@ -58,7 +58,6 @@ namespace ZenLib.Solver
             foreach (var dependentVariableSet in this.interleavingDependencies)
             {
                 var objsByte = new List<object>();
-                var objsChar = new List<object>();
                 var objsShort = new List<object>();
                 var objsUshort = new List<object>();
                 var objsInt = new List<object>();
@@ -79,11 +78,6 @@ namespace ZenLib.Solver
                     if (type == typeof(ZenArbitraryExpr<byte>))
                     {
                         objsByte.Add(arbitraryVariable);
-                    }
-
-                    if (type == typeof(ZenArbitraryExpr<char>))
-                    {
-                        objsChar.Add(arbitraryVariable);
                     }
 
                     if (type == typeof(ZenArbitraryExpr<short>))
@@ -137,13 +131,6 @@ namespace ZenLib.Solver
                 {
                     this.ExistingAssignment[objsByte[i]] = bytevars[i];
                     this.Variables.Add(bytevars[i]);
-                }
-
-                var charvars = this.Manager.CreateInterleavedInt16(objsChar.Count);
-                for (int i = 0; i < charvars.Length; i++)
-                {
-                    this.ExistingAssignment[objsChar[i]] = charvars[i];
-                    this.Variables.Add(charvars[i]);
                 }
 
                 var shortvars = this.Manager.CreateInterleavedInt16(objsShort.Count);
@@ -313,23 +300,6 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(b);
         }
 
-        public (Variable<T>, BitVector<T>) CreateCharVar(object e)
-        {
-            if (!this.ExistingAssignment.TryGetValue(e, out var variable))
-            {
-                variable = this.Manager.CreateInt16();
-                this.Variables.Add(variable);
-                this.ExistingAssignment[e] = variable;
-            }
-
-            return (variable, this.Manager.CreateBitvector(variable));
-        }
-
-        public BitVector<T> CreateCharConst(char c)
-        {
-            return this.Manager.CreateBitvector((ushort)c);
-        }
-
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateShortVar(object e)
         {
@@ -437,13 +407,11 @@ namespace ZenLib.Solver
             }
             else if (v is VarInt16<T> v16)
             {
-                Contract.Assert(type == typeof(short) || type == typeof(ushort) || type == typeof(char), "Internal type mismatch");
+                Contract.Assert(type == typeof(short) || type == typeof(ushort), "Internal type mismatch");
                 var value = m.Get(v16);
                 if (type == typeof(short))
                     return value;
-                if (type == typeof(ushort))
-                    return (ushort)value;
-                return (char)value;
+                return (ushort)value;
             }
             else if (v is VarInt32<T> v32)
             {
@@ -638,26 +606,26 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public Unit DictSet(
             Unit arrayExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> valueExpr, Type keyType, Type valueType)
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr,
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr, Type keyType, Type valueType)
+        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> keyExpr, Type keyType, Type valueType)
+        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> ConvertExprToSymbolicValue(object e, Type type)
+        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
@@ -687,7 +655,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, BitVector<T>> valueExpr, Type type)
+        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
@@ -696,6 +664,18 @@ namespace ZenLib.Solver
         public DD SeqRegex<T1>(Unit x, Regex<T1> y)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateCharVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit CreateCharConst(ZenLib.Char c)
+        {
+            throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
         }
     }
 }

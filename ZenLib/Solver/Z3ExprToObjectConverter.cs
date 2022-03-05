@@ -43,9 +43,9 @@ namespace ZenLib.Solver
         {
             if (parameter.IsEq)
             {
-                var left = (char)Convert(parameter.Args[0], typeof(char));
-                var right = (char)Convert(parameter.Args[1], typeof(char));
-                return left == right;
+                var left = (ZenLib.Char)Convert(parameter.Args[0], typeof(ZenLib.Char));
+                var right = (ZenLib.Char)Convert(parameter.Args[1], typeof(ZenLib.Char));
+                return left.Equals(right);
             }
             else
             {
@@ -62,13 +62,13 @@ namespace ZenLib.Solver
         {
             if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char")
             {
-                return (char)parameter.FuncDecl.Parameters[0].Int;
+                return new ZenLib.Char(parameter.FuncDecl.Parameters[0].Int);
             }
             else
             {
                 Contract.Assert(parameter.IsApp);
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "char.from_bv");
-                return (char)int.Parse(parameter.Args[0].ToString());
+                return new ZenLib.Char(int.Parse(parameter.Args[0].ToString()));
             }
         }
 
@@ -194,7 +194,7 @@ namespace ZenLib.Solver
 
         public object VisitString(Expr parameter)
         {
-            var result = (Seq<char>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
+            var result = (Seq<ZenLib.Char>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
             return Seq.AsString(result);
         }
 
@@ -232,8 +232,8 @@ namespace ZenLib.Solver
             }
             else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "str.++")
             {
-                var s1 = (Seq<char>)Convert(parameter.Args[0], sequenceType);
-                var s2 = (Seq<char>)Convert(parameter.Args[1], sequenceType);
+                var s1 = (Seq<ZenLib.Char>)Convert(parameter.Args[0], sequenceType);
+                var s2 = (Seq<ZenLib.Char>)Convert(parameter.Args[1], sequenceType);
                 return s1.Concat(s2);
             }
             else

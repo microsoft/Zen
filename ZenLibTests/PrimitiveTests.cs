@@ -204,10 +204,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerEquality()
         {
-            RandomBytes(x => CheckAgreement<byte>(i => i == x));
-            RandomBytes(x => CheckAgreement<byte>(i => x == i));
-            RandomBytes(x => CheckAgreement<char>(i => (char)x == i));
-            RandomBytes(x => CheckAgreement<short>(i => i == (short)x));
+            // RandomBytes(x => CheckAgreement<byte>(i => i == x));
+            // RandomBytes(x => CheckAgreement<byte>(i => x == i));
+            RandomBytes(x => CheckAgreement<Char>(i => new Char(x) == i, runBdds: false));
+            /* RandomBytes(x => CheckAgreement<short>(i => i == (short)x));
             RandomBytes(x => CheckAgreement<short>(i => (short)x == i));
             RandomBytes(x => CheckAgreement<ushort>(i => i == (ushort)x));
             RandomBytes(x => CheckAgreement<ushort>(i => (ushort)x == i));
@@ -220,7 +220,7 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => i == (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x == i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i == new BigInteger(x)));
-            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) == i));
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) == i)); */
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharInequality()
         {
-            RandomBytes(x => CheckAgreement<char>(c => c != 'x'));
+            RandomBytes(x => CheckAgreement<Char>(c => c != new Char('x'), runBdds: false));
         }
 
         /// <summary>
@@ -247,8 +247,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharIte1()
         {
-            var res = new ZenConstraint<char, bool>((c, b) => If(c == 'a', b, Not(b))).Find();
-            Assert.IsTrue(res.Value.Item1 == 'a' || !res.Value.Item2);
+            var res = new ZenConstraint<Char, bool>((c, b) => If(c == new Char('a'), b, Not(b))).Find();
+            Assert.IsTrue(res.Value.Item1.Equals(new Char('a')) || !res.Value.Item2);
         }
 
         /// <summary>
@@ -257,8 +257,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharIte2()
         {
-            var res = new ZenFunction<char, char>(c => If<char>(c == 'a', 'b', 'c')).Find((c1, c2) => c2 == 'b');
-            Assert.IsTrue(res.Value == 'a');
+            var res = new ZenFunction<Char, Char>(c => If<Char>(c == new Char('a'), new Char('b'), new Char('c'))).Find((c1, c2) => c2 == new Char('b'));
+            Assert.IsTrue(res.Value.Equals(new Char('a')));
         }
 
         /// <summary>

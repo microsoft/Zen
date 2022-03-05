@@ -5,6 +5,7 @@
 namespace ZenLib.Solver
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Z3;
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace ZenLib.Solver
             }
             else
             {
-                Contract.Assert(typeof(T) == typeof(char), "Regex range only supported for unicode (char)");
+                Contract.Assert(typeof(T) == typeof(ZenLib.Char), "Regex range only supported for unicode (char)");
                 var charLow = GetConstant(expression.CharacterRange.Low);
                 var charHigh = GetConstant(expression.CharacterRange.High);
                 var seqLow = this.solver.Context.MkUnit(charLow);
@@ -58,7 +59,7 @@ namespace ZenLib.Solver
             if (type == ReflectionUtilities.ByteType)
                 return this.solver.Context.MkBV(obj.ToString(), 8);
             if (type == ReflectionUtilities.CharType)
-                return this.solver.CreateCharConst((char)obj);
+                return this.solver.CreateCharConst((ZenLib.Char)obj);
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
                 return this.solver.Context.MkBV(obj.ToString(), 16);
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
@@ -105,6 +106,12 @@ namespace ZenLib.Solver
                     Contract.Assert(expression.OpType == RegexBinopExprType.Concatenation);
                     return this.solver.Context.MkConcat(l, r);
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        public ReExpr Visit(RegexAnchorExpr<T> expression, Sort parameter)
+        {
+            throw new ZenUnreachableException();
         }
     }
 }

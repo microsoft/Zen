@@ -198,24 +198,9 @@ namespace ZenLib
         /// <param name="type"></param>
         public static void ValidateIsCharType(Type type)
         {
-            if (!ReflectionUtilities.IsFiniteIntegerType(type) && type != ReflectionUtilities.CharType)
+            if (!ReflectionUtilities.IsFiniteIntegerType(type) && type != ReflectionUtilities.CharType && type != typeof(char))
             {
                 throw new ZenException($"Invalid non-finite-integer type {type} used.");
-            }
-        }
-
-        /// <summary>
-        /// Validate that a string literal is well-formed.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        internal static void ValidateStringLiteral(string s)
-        {
-            foreach (var c in s)
-            {
-                if (c > 255)
-                {
-                    throw new ZenException($"Invalid string literal with backslash character: {s}");
-                }
             }
         }
 
@@ -257,8 +242,19 @@ namespace ZenLib
                     for (int j = start; j < i; j++)
                         hex[5 - (i - j)] = s[j];
                     var str = new string(hex);
-                    var asChar = (char)Convert.ToInt32(str, 16);
-                    sb.Append(asChar);
+                    var intVal = int.Parse(str, System.Globalization.NumberStyles.HexNumber);
+
+                    // we need to leave escaped any characters in the range d800-dfff since
+                    // these characters can not be represented in strings as they are part
+                    // of a surrogate pair used for UTF-16 encodings.
+                    if (intVal >= 0xd800 && intVal <= 0xdfff)
+                    {
+                        sb.Append(@"\u{").Append(str).Append("}");
+                        continue;
+                    }
+
+                    var c = new Char(intVal);
+                    sb.Append(c.ToString());
                     continue;
                 }
 
