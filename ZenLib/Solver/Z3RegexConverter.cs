@@ -5,6 +5,7 @@
 namespace ZenLib.Solver
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Z3;
 
     /// <summary>
@@ -105,6 +106,12 @@ namespace ZenLib.Solver
                     Contract.Assert(expression.OpType == RegexBinopExprType.Concatenation);
                     return this.solver.Context.MkConcat(l, r);
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        public ReExpr Visit(RegexAnchorExpr<T> expression, Sort parameter)
+        {
+            throw new ZenUnreachableException();
         }
     }
 }

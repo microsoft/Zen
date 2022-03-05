@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace ZenLib
 {
     /// <summary>
@@ -16,7 +18,7 @@ namespace ZenLib
 
         public Set<CharRange<T>> Visit(RegexBinopExpr<T> expression, Unit parameter)
         {
-            if (expression.OpType == RegexBinopExprType.Concatenation && expression.Expr1.IsNullable())
+            if (expression.OpType == RegexBinopExprType.Concatenation && !expression.Expr1.IsNullable())
             {
                 return Compute(expression.Expr1);
             }
@@ -71,6 +73,12 @@ namespace ZenLib
             }
 
             return result;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Set<CharRange<T>> Visit(RegexAnchorExpr<T> expression, Unit parameter)
+        {
+            throw new ZenUnreachableException();
         }
     }
 }

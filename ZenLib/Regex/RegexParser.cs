@@ -88,7 +88,7 @@ namespace ZenLib
                 throw new ZenException($"Unable to parse trailing: {remaining}");
             }
 
-            return ret;
+            return new RegexRemoveAnchorVisitor<T>().Compute(ret);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace ZenLib
         private Regex<T> ParseTerm()
         {
             var r = ParseFactor();
-            while (IsNonSpecialCharacter() || symbol == "." || symbol == "(" || symbol == "[" || symbol == "\\")
+            while (IsNonSpecialCharacter() || symbol == "$" || symbol == "^" || symbol == "." || symbol == "(" || symbol == "[" || symbol == "\\")
             {
                 r = Regex.Concat(r, ParseFactor());
             }
@@ -209,6 +209,14 @@ namespace ZenLib
                     return Regex.Char(this.characterConverter(character[0]));
                 }
             }
+            else if (Accept("$"))
+            {
+                return RegexAnchorExpr<T>.EndInstance;
+            }
+            else if (Accept("^"))
+            {
+                return RegexAnchorExpr<T>.BeginInstance;
+            }
             else if (Accept("."))
             {
                 return Regex.Dot<T>();
@@ -224,7 +232,8 @@ namespace ZenLib
                 var isNegated = Accept("^");
                 var r = ParseCharacterClass();
                 Expect("]");
-                return isNegated ? Regex.Negation(r) : r;
+
+                return isNegated ? Regex.Intersect(Regex.Negation(r), Regex.Dot<T>()) : r;
             }
             else
             {

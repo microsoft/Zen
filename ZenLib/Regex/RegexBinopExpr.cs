@@ -63,6 +63,12 @@ namespace ZenLib
                     return e1;
                 }
 
+                // simplify (a + (a + b)) = a + b
+                if (e2 is RegexBinopExpr<T> w && w.OpType == RegexBinopExprType.Intersection && w.Expr1.Equals(e1))
+                {
+                    return e2;
+                }
+
                 // simplify (r & s) & t = r & (s & t)
                 if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Intersection)
                 {
@@ -94,6 +100,12 @@ namespace ZenLib
                 if (e2 is RegexEmptyExpr<T>)
                 {
                     return e1;
+                }
+
+                // simplify (a + (a + b)) = a + b
+                if (e2 is RegexBinopExpr<T> w && w.OpType == RegexBinopExprType.Union && w.Expr1.Equals(e1))
+                {
+                    return e2;
                 }
 
                 // simplify not(\empty) + r = not(\empty)
