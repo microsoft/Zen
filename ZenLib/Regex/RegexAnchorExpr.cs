@@ -33,6 +33,7 @@ namespace ZenLib
         /// <summary>
         /// Whether this is a begin anchor.
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public bool IsBegin { get; set; }
 
         /// <summary>

@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace ZenLib
 {
     /// <summary>
@@ -59,10 +61,6 @@ namespace ZenLib
                         var param1 = (Regex.All<T>(), Regex.Epsilon<T>());
                         var param2 = (Regex.Epsilon<T>(), Regex.All<T>());
                         return Regex.Concat(expression.Expr1.Accept(this, param1), expression.Expr2.Accept(this, param2));
-                    }
-                    else if (parameter.Item1.Equals(Regex.All<T>()) && parameter.Item2.Equals(Regex.Epsilon<T>()))
-                    {
-                        return Regex.Concat(expression.Expr1.Accept(this, parameter), expression.Expr2);
                     }
                     else
                     {

@@ -202,6 +202,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Intersect(r, Regex.Empty<int>()), Regex.Empty<int>());
             Assert.AreEqual(Regex.Intersect(Regex.Negation(Regex.Empty<int>()), r), r);
             Assert.AreEqual(Regex.Intersect(r, Regex.Negation(Regex.Empty<int>())), r);
+            Assert.AreEqual(Regex.Intersect(r, Regex.Intersect(r, s)), Regex.Intersect(r, s));
             // union simplifications
             Assert.AreEqual(Regex.Union(r, r), r);
             Assert.AreEqual(Regex.Union(r, Regex.Empty<int>()), r);
@@ -212,6 +213,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Union(Regex.Char(1), Regex.Dot<int>()), Regex.Dot<int>());
             Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
             Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
+            Assert.AreEqual(Regex.Union(r, Regex.Union(r, s)), Regex.Union(r, s));
         }
 
         /// <summary>
@@ -547,9 +549,11 @@ namespace ZenLib.Tests
         [DataRow("(^x|y)", "xz", true)]
         [DataRow("(^x|y)", "zy", true)]
         [DataRow("(^x|y)", "zx", false)]
+        // [DataRow("$ab", "ab", false)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
+            Console.WriteLine(r);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));

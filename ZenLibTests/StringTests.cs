@@ -455,6 +455,10 @@ namespace ZenLib.Tests
         [DataRow("s s")]
         [DataRow("\\u058")]
         [DataRow(".*a.*")]
+        [DataRow("^8075:[9][4-9][0-9][0-9]$")]
+        [DataRow(".*")]
+        [DataRow("^8220:1234|8220:5678|8220:9012|8220:345$")]
+        [DataRow("^806[8-9]:.*$")]
         public void TestMatchesRegex(string regex)
         {
             var r = Regex.Parse(regex);
@@ -463,6 +467,7 @@ namespace ZenLib.Tests
 
             foreach (var example in examples)
             {
+                Console.WriteLine(example);
                 Assert.IsTrue(r.IsMatch(Seq.FromString(example).Values));
             }
 
@@ -470,7 +475,6 @@ namespace ZenLib.Tests
 
             foreach (var example in examples)
             {
-                Console.WriteLine(example);
                 Assert.IsFalse(r.IsMatch(Seq.FromString(example).Values));
             }
         }
