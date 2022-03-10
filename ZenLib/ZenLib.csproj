@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/microsoft/Zen</RepositoryUrl>
     <Description>A library that simplifies building verification tools in .NET</Description>
     <PackageTags>zen zenlib modeling constraint solving verification smt solver binary decision diagrams diagram</PackageTags>
-    <Version>2.1.7</Version>
+    <Version>2.1.8</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -20,11 +20,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-
+	
   <Import Project="..\.stylecop\StyleCop.props" />
 
   <ItemGroup>
-    <PackageReference Include="DecisionDiagrams" Version="1.1.5" />
+    <PackageReference Include="DecisionDiagrams" Version="1.1.8" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Z3" Version="4.8.14" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\DecisionDiagrams\LICENSE">
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

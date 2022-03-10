@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using DecisionDiagrams;
@@ -70,7 +69,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A converted state set.</returns>
         internal StateSet<T> ConvertTo(StateSetMetadata conversionData)
         {
-            if (this.VariableSet.AsIndex.Equals(conversionData.VariableSet.AsIndex))
+            if (this.VariableSet.Id.Equals(conversionData.VariableSet.Id))
             {
                 return this;
             }
