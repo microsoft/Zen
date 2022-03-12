@@ -6,7 +6,6 @@ namespace ZenLib.Solver
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
@@ -17,13 +16,6 @@ namespace ZenLib.Solver
     /// </summary>
     internal class Z3ExprToObjectConverter : ITypeVisitor<object, Expr>
     {
-        private SolverZ3 solver;
-
-        public Z3ExprToObjectConverter(SolverZ3 solver)
-        {
-            this.solver = solver;
-        }
-
         public object Convert(Expr e, Type type)
         {
             if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")

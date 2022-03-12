@@ -76,12 +76,29 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Escape this character using the \uXXXXX notation.
+        /// </summary>
+        /// <returns>The escaped character.</returns>
+        public string Escape()
+        {
+            return @"\u{" + this.Value.ToLong().ToString("X5") + "}";
+        }
+
+        /// <summary>
         /// Convert this char to a UTF-16 string.
         /// </summary>
         /// <returns>A string that is either a single character or a surrogate pair.</returns>
         public override string ToString()
         {
             var intVal = (int)this.Value.ToLong();
+
+            // we need to leave escaped any characters in the range d800-dfff since
+            // these characters can not be represented in strings as they are part
+            // of a surrogate pair used for UTF-16 encodings.
+            if (intVal >= 0xd800 && intVal <= 0xdfff)
+            {
+                return @"\u{" + intVal.ToString("X5") + "}";
+            }
 
             if (intVal <= 0xffff)
             {

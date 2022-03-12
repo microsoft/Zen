@@ -67,6 +67,12 @@ namespace ZenLib.Solver
         TChar CreateCharConst(ZenLib.Char c);
 
         /// <summary>
+        /// Create a char constant.
+        /// </summary>
+        /// <returns></returns>
+        TSeq CreateStringConst(string s);
+
+        /// <summary>
         /// Create a new short expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>

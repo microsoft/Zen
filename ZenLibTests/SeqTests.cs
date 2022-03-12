@@ -76,6 +76,24 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with concat for one element.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqConcatElement()
+        {
+            var zf = new ZenFunction<Seq<int>, int, Seq<int>>((s1, s2) => s1.Add(s2));
+
+            Assert.AreEqual(one, zf.Evaluate(empty, 1));
+            Assert.AreEqual(one.Concat(two), zf.Evaluate(one, 2));
+            Assert.AreEqual(one.Concat(two).Concat(three), zf.Evaluate(one.Concat(two), 3));
+
+            zf.Compile();
+            Assert.AreEqual(one, zf.Evaluate(empty, 1));
+            Assert.AreEqual(one.Concat(two), zf.Evaluate(one, 2));
+            Assert.AreEqual(one.Concat(two).Concat(three), zf.Evaluate(one.Concat(two), 3));
+        }
+
+        /// <summary>
         /// Test seq evaluation with length.
         /// </summary>
         [TestMethod]

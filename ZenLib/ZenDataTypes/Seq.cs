@@ -303,6 +303,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Concatenate this sequence with another.
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <returns>The concatenated sequence.</returns>
+        public Seq<T> Add(T other)
+        {
+            return new Seq<T>(this.Values.Add(other));
+        }
+
+        /// <summary>
         /// Convert the seq to a string.
         /// </summary>
         /// <returns></returns>
@@ -450,6 +460,20 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(seqExpr2);
 
             return ZenSeqConcatExpr<T>.Create(seqExpr1, seqExpr2);
+        }
+
+        /// <summary>
+        /// Concatenate two Zen sequences.
+        /// </summary>
+        /// <param name="seqExpr">The first sequence.</param>
+        /// <param name="expr">The other expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Seq<T>> Add<T>(this Zen<Seq<T>> seqExpr, Zen<T> expr)
+        {
+            CommonUtilities.ValidateNotNull(seqExpr);
+            CommonUtilities.ValidateNotNull(expr);
+
+            return ZenSeqConcatExpr<T>.Create(seqExpr, Seq.Unit(expr));
         }
 
         /// <summary>

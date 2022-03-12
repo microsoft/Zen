@@ -677,5 +677,11 @@ namespace ZenLib.Solver
         {
             throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
         }
+
+        [ExcludeFromCodeCoverage]
+        public Unit CreateStringConst(string s)
+        {
+            throw new ZenException("Decision diagram backend does not support String operations. Use Z3 backend.");
+        }
     }
 }

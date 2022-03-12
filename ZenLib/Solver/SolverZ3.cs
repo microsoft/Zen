@@ -73,7 +73,7 @@ namespace ZenLib.Solver
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
-            this.ExprToObjectConverter = new Z3ExprToObjectConverter(this);
+            this.ExprToObjectConverter = new Z3ExprToObjectConverter();
             this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 
@@ -133,6 +133,11 @@ namespace ZenLib.Solver
         public Expr CreateCharConst(ZenLib.Char c)
         {
             return this.Context.CharFromBV(this.CreateBitvecConst(c.Value.GetBits()));
+        }
+
+        public SeqExpr CreateStringConst(string s)
+        {
+            return this.Context.MkString(s);
         }
 
         public BitVecExpr CreateShortConst(short s)

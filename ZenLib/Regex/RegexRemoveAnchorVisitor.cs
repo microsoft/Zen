@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ZenLib
 {
@@ -21,6 +21,7 @@ namespace ZenLib
             return regex.Accept(this, (Regex.All<T>(), Regex.All<T>()));
         }
 
+        [ExcludeFromCodeCoverage]
         public Regex<T> Visit(RegexEmptyExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return expression;

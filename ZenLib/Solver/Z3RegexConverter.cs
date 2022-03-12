@@ -38,34 +38,31 @@ namespace ZenLib.Solver
         {
             if (expression.CharacterRange.Low.Equals(expression.CharacterRange.High))
             {
-                var low = this.solver.Context.MkUnit(GetConstant(expression.CharacterRange.Low));
-                return this.solver.Context.MkToRe(low);
+                return this.solver.Context.MkToRe((SeqExpr)GetSeqConstant(expression.CharacterRange.Low));
             }
             else
             {
                 Contract.Assert(typeof(T) == typeof(ZenLib.Char), "Regex range only supported for unicode (char)");
-                var charLow = GetConstant(expression.CharacterRange.Low);
-                var charHigh = GetConstant(expression.CharacterRange.High);
-                var seqLow = this.solver.Context.MkUnit(charLow);
-                var seqHigh = this.solver.Context.MkUnit(charHigh);
-                return this.solver.Context.MkRange(seqLow, seqHigh);
+                var charLow = GetSeqConstant(expression.CharacterRange.Low);
+                var charHigh = GetSeqConstant(expression.CharacterRange.High);
+                return this.solver.Context.MkRange((SeqExpr)charLow, (SeqExpr)charHigh);
             }
         }
 
-        private Expr GetConstant(object obj)
+        private Expr GetSeqConstant(object obj)
         {
             var type = typeof(T);
 
             if (type == ReflectionUtilities.ByteType)
-                return this.solver.Context.MkBV(obj.ToString(), 8);
+                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 8));
             if (type == ReflectionUtilities.CharType)
-                return this.solver.CreateCharConst((ZenLib.Char)obj);
+                return this.solver.CreateStringConst(((ZenLib.Char)obj).Escape());
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
-                return this.solver.Context.MkBV(obj.ToString(), 16);
+                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 16));
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
-                return this.solver.Context.MkBV(obj.ToString(), 32);
+                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 32));
             if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
-                return this.solver.Context.MkBV(obj.ToString(), 64);
+                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 64));
 
             Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
             dynamic value = obj;
@@ -74,7 +71,7 @@ namespace ZenLib.Solver
             {
                 bits[bits.Length - i - 1] = value.GetBit(i);
             }
-            return this.solver.Context.MkBV(bits);
+            return this.solver.Context.MkUnit(this.solver.Context.MkBV(bits));
         }
 
         public ReExpr Visit(RegexUnopExpr<T> expression, Sort parameter)

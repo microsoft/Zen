@@ -277,16 +277,17 @@ namespace ZenLib.ModelChecking
                 var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
                 return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, bv);
             }
-            // else if (type == ReflectionUtilities.StringType)
-            // {
-            //     var bv = this.Solver.CreateStringConst((string)(object)expression.Value);
-            //    return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, bv);
-            // }
-            else
+            else if (ReflectionUtilities.IsFixedIntegerType(type))
             {
-                Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                 var bv = this.Solver.CreateBitvecConst(((dynamic)expression.Value).GetBits());
                 return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, bv);
+            }
+            else
+            {
+                Contract.Assert(type == typeof(Seq<ZenLib.Char>));
+                var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<ZenLib.Char>)(object)expression.Value);
+                var s = this.Solver.CreateStringConst(escapedString);
+                return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, s);
             }
         }
 

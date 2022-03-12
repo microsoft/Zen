@@ -205,6 +205,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Escape a Z3 string.
+        /// </summary>
+        /// <returns>The escaped Z3 string.</returns>
+        public static string ConvertCShaprStringToZ3(Seq<Char> s)
+        {
+            return string.Join(string.Empty, s.Values.Select(c => c.Escape()));
+        }
+
+        /// <summary>
         /// Unescape a Z3 string.
         /// </summary>
         /// <param name="s">The string.</param>
@@ -243,16 +252,6 @@ namespace ZenLib
                         hex[5 - (i - j)] = s[j];
                     var str = new string(hex);
                     var intVal = int.Parse(str, System.Globalization.NumberStyles.HexNumber);
-
-                    // we need to leave escaped any characters in the range d800-dfff since
-                    // these characters can not be represented in strings as they are part
-                    // of a surrogate pair used for UTF-16 encodings.
-                    if (intVal >= 0xd800 && intVal <= 0xdfff)
-                    {
-                        sb.Append(@"\u{").Append(str).Append("}");
-                        continue;
-                    }
-
                     var c = new Char(intVal);
                     sb.Append(c.ToString());
                     continue;

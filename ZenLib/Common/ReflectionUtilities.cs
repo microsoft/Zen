@@ -801,6 +801,11 @@ namespace ZenLib
         /// <returns>The Zen value representing the seq.</returns>
         internal static Zen<Seq<T>> CreateZenSeqConstant<T>(Seq<T> value)
         {
+            if (typeof(T) == typeof(Char))
+            {
+                return ZenConstantExpr<Seq<T>>.Create(value);
+            }
+
             Zen<Seq<T>> seq = ZenSeqEmptyExpr<T>.Instance;
             foreach (var elt in value.Values)
             {
