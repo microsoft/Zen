@@ -222,7 +222,7 @@ namespace ZenLib.Tests
         /// Test that casting finite integers works with overflow.
         /// </summary>
         [TestMethod]
-        public void TestFiniteIntegerCastOverflow()
+        public void TestFiniteIntegerCastOverflow1()
         {
             var zf = new ZenFunction<short, byte>(x => Zen.Cast<short, byte>(x));
 
@@ -231,6 +231,40 @@ namespace ZenLib.Tests
                 var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual((short)257, example.Value);
+                Assert.AreEqual((byte)1, zf.Evaluate(257));
+            }
+        }
+
+        /// <summary>
+        /// Test that casting finite integers works with overflow.
+        /// </summary>
+        [TestMethod]
+        public void TestFiniteIntegerCastOverflow2()
+        {
+            var zf = new ZenFunction<int, byte>(x => Zen.Cast<int, byte>(x));
+
+            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
+                Assert.IsTrue(example.HasValue);
+                Assert.AreEqual((int)257, example.Value);
+                Assert.AreEqual((byte)1, zf.Evaluate(257));
+            }
+        }
+
+        /// <summary>
+        /// Test that casting finite integers works with overflow.
+        /// </summary>
+        [TestMethod]
+        public void TestFiniteIntegerCastOverflow3()
+        {
+            var zf = new ZenFunction<long, byte>(x => Zen.Cast<long, byte>(x));
+
+            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
+                Assert.IsTrue(example.HasValue);
+                Assert.AreEqual(257L, example.Value);
                 Assert.AreEqual((byte)1, zf.Evaluate(257));
             }
         }

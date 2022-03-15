@@ -1558,16 +1558,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestInvalidCast2()
-        {
-            Zen.Cast<int, uint>(1);
-        }
-
-        /// <summary>
-        /// Exception thrown for invalid casts.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestInvalidCast3()
         {
             Zen.Cast<string, Seq<byte>>(null);

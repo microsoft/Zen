@@ -1080,8 +1080,6 @@ namespace ZenLib
                 return 8;
             if (type == typeof(char) || type == ShortType || type == UshortType)
                 return 16;
-            if (type == CharType)
-                return 18;
             if (type == IntType || type == UintType)
                 return 32;
             Contract.Assert(type == LongType || type == UlongType);
