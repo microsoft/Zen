@@ -467,10 +467,16 @@ namespace ZenLib.Interpretation
             {
                 return Seq.FromString((string)e);
             }
-            else
+            else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
             {
                 Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
                 return Seq.AsString((Seq<Char>)e);
+            }
+            else
+            {
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
+                return ReflectionUtilities.CastFiniteInteger<TKey, TValue>((TKey)e);
             }
         }
 

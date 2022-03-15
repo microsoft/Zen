@@ -194,6 +194,8 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Concat(Regex.Epsilon<int>(), r), r);
             Assert.AreEqual(Regex.Concat(r, Regex.Epsilon<int>()), r);
             Assert.AreEqual(Regex.Concat(r, Regex.Concat(s, t)), Regex.Concat(Regex.Concat(r, s), t));
+            Assert.AreEqual(Regex.Concat(r, RegexAnchorExpr<int>.BeginInstance), Regex.Empty<int>());
+            Assert.AreEqual(Regex.Concat(RegexAnchorExpr<int>.EndInstance, r), Regex.Empty<int>());
             // intersection simplifications
             Assert.AreEqual(Regex.Intersect(r, r), r);
             Assert.AreEqual(Regex.Intersect(s, r), Regex.Intersect(r, s));
@@ -549,7 +551,8 @@ namespace ZenLib.Tests
         [DataRow("(^x|y)", "xz", true)]
         [DataRow("(^x|y)", "zy", true)]
         [DataRow("(^x|y)", "zx", false)]
-        // [DataRow("$ab", "ab", false)]
+        [DataRow("$ab", "ab", false)]
+        [DataRow("ab^", "ab", false)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);

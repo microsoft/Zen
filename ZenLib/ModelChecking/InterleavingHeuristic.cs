@@ -126,6 +126,11 @@ namespace ZenLib.ModelChecking
             return x.Union(y);
         }
 
+        public InterleavingResult Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            return Evaluate(expression.SourceExpr, parameter);
+        }
+
         public InterleavingResult Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.ListExpr, parameter);
@@ -352,12 +357,6 @@ namespace ZenLib.ModelChecking
         public InterleavingResult Visit<T>(ZenSeqReplaceFirstExpr<T> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid cast used with Decision Diagram backend.");
         }
 
         [ExcludeFromCodeCoverage]

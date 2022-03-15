@@ -378,6 +378,22 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkMul(x, y);
         }
 
+        public BitVecExpr Resize(BitVecExpr x, uint sourceSize, uint targetSize)
+        {
+            if (sourceSize == targetSize)
+            {
+                return x;
+            }
+            else if (sourceSize < targetSize)
+            {
+                return this.Context.MkZeroExt(targetSize - sourceSize, x);
+            }
+            else
+            {
+                return this.Context.MkExtract(targetSize - 1, 0U, x);
+            }
+        }
+
         public SeqExpr SeqConcat(SeqExpr x, SeqExpr y)
         {
             return this.Context.MkConcat(x, y);

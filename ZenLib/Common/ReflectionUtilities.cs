@@ -1068,6 +1068,37 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Gets the size of a finite integer type.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <returns>The bitwidth size of the integer.</returns>
+        public static uint GetFiniteIntegerSize<T>()
+        {
+            var type = typeof(T);
+
+            if (type == ByteType)
+                return 8;
+            if (type == typeof(char) || type == ShortType || type == UshortType)
+                return 16;
+            if (type == CharType)
+                return 18;
+            if (type == IntType || type == UintType)
+                return 32;
+            Contract.Assert(type == LongType || type == UlongType);
+            return 64;
+        }
+
+        /// <summary>
+        /// Cast one finite integer to another finite integer type.
+        /// </summary>
+        /// <param name="x">The source finite integer.</param>
+        /// <returns>The resulting finite integer.</returns>
+        public static TTarget CastFiniteInteger<TSource, TTarget>(TSource x)
+        {
+            return (TTarget)(dynamic)x;
+        }
+
+        /// <summary>
         /// Gets the minimum value for a type.
         /// This is a workaround for lack of integer interfaces.
         /// </summary>

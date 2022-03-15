@@ -265,6 +265,15 @@ namespace ZenLib.Solver
         TInteger Multiply(TInteger x, TInteger y);
 
         /// <summary>
+        /// The 'Resize' of a bitvec expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="sourceSize">The source bitwidth.</param>
+        /// <param name="targetSize">The target bitwidth.</param>
+        /// <returns></returns>
+        TBitvec Resize(TBitvec x, uint sourceSize, uint targetSize);
+
+        /// <summary>
         /// The 'EmptySeq' for a given type.
         /// </summary>
         /// <param name="type">The type of the sequence.</param>

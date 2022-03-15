@@ -819,6 +819,7 @@ namespace ZenLib
         public static Zen<TTarget> Cast<TSource, TTarget>(Zen<TSource> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
+            CommonUtilities.ValidateIsSafeCast(typeof(TSource), typeof(TTarget));
 
             return ZenCastExpr<TSource, TTarget>.Create(expr);
         }

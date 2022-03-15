@@ -169,6 +169,18 @@ namespace ZenLib
                     return e1;
                 }
 
+                // simplify $ . a = \empty
+                if (e1 is RegexAnchorExpr<T> a && !a.IsBegin && e2 is RegexRangeExpr<T>)
+                {
+                    return Regex.Empty<T>();
+                }
+
+                // simplify a . ^ = \empty
+                if (e2 is RegexAnchorExpr<T> b && b.IsBegin && e1 is RegexRangeExpr<T>)
+                {
+                    return Regex.Empty<T>();
+                }
+
                 // simplify (r . s) . t = r . (s . t)
                 if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Concatenation)
                 {

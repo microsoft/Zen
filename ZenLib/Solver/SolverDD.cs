@@ -269,6 +269,26 @@ namespace ZenLib.Solver
             return this.Manager.GreaterOrEqualSigned(x, y);
         }
 
+        public BitVector<T> Resize(BitVector<T> x, uint sourceSize, uint targetSize)
+        {
+            var oldBits = x.GetBits();
+            var newBits = new DD[targetSize];
+
+            for (var i = 1; i <= targetSize; i++)
+            {
+                if (i <= sourceSize)
+                {
+                    newBits[targetSize - i] = oldBits[sourceSize - i];
+                }
+                else
+                {
+                    newBits[targetSize - i] = Manager.False();
+                }
+            }
+
+            return this.Manager.CreateBitvector(newBits);
+        }
+
         public (Variable<T>, DD) CreateBoolVar(object e)
         {
             if (!this.ExistingAssignment.TryGetValue(e, out var variable))

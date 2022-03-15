@@ -697,13 +697,19 @@ namespace ZenLib.Compilation
 
             if (typeof(TKey) == ReflectionUtilities.StringType)
             {
-                var m = typeof(Seq).GetMethod("FromString");
+                var m = typeof(Seq).GetMethodCached("FromString");
+                return Expression.Call(null, m, new Expression[] { e });
+            }
+            else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
+            {
+                var m = typeof(Seq).GetMethodCached("AsString");
                 return Expression.Call(null, m, new Expression[] { e });
             }
             else
             {
-                Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-                var m = typeof(Seq).GetMethod("AsString");
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
+                var m = typeof(ReflectionUtilities).GetMethodCached("CastFiniteInteger").MakeGenericMethod(typeof(TKey), typeof(TValue));
                 return Expression.Call(null, m, new Expression[] { e });
             }
         }

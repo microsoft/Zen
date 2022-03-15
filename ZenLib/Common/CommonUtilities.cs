@@ -165,6 +165,11 @@ namespace ZenLib
                 return;
             }
 
+            if (ReflectionUtilities.IsFiniteIntegerType(sourceType) && ReflectionUtilities.IsFiniteIntegerType(targetType))
+            {
+                return;
+            }
+
             throw new ZenException($"Invalid cast from type {sourceType} to type {targetType}.");
         }
 

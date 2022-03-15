@@ -646,12 +646,22 @@ namespace ZenLib.ModelChecking
                 var e = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)Evaluate(expression.SourceExpr, parameter);
                 return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, e.Value);
             }
-            else
+            else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
             {
-                Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-
                 var e = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)Evaluate(expression.SourceExpr, parameter);
                 return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, e.Value);
+            }
+            else
+            {
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
+
+                var sourceSize = ReflectionUtilities.GetFiniteIntegerSize<TKey>();
+                var targetSize = ReflectionUtilities.GetFiniteIntegerSize<TValue>();
+
+                var e = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)Evaluate(expression.SourceExpr, parameter);
+                var resized = this.Solver.Resize(e.Value, sourceSize, targetSize);
+                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, resized);
             }
         }
 
