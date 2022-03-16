@@ -271,7 +271,7 @@ namespace ZenLib.Solver
         /// <param name="sourceSize">The source bitwidth.</param>
         /// <param name="targetSize">The target bitwidth.</param>
         /// <returns></returns>
-        TBitvec Resize(TBitvec x, uint sourceSize, uint targetSize);
+        TBitvec Resize(TBitvec x, int sourceSize, int targetSize);
 
         /// <summary>
         /// The 'EmptySeq' for a given type.

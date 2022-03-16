@@ -219,6 +219,66 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that we can cast finite integer values..
+        /// </summary>
+        [TestMethod]
+        public void TestCastingFixedIntegers1()
+        {
+            var zf = new ZenFunction<byte, UInt64>(x => Zen.Cast<byte, UInt64>(x));
+            Assert.AreEqual(5L, zf.Evaluate(5).ToLong());
+            zf.Compile();
+            Assert.AreEqual(5L, zf.Evaluate(5).ToLong());
+        }
+
+        /// <summary>
+        /// Test that we can cast finite integer values..
+        /// </summary>
+        [TestMethod]
+        public void TestCastingFixedIntegers2()
+        {
+            var zf = new ZenFunction<UInt16, UInt8>(x => Zen.Cast<UInt16, UInt8>(x));
+            Assert.AreEqual(1, zf.Evaluate(new UInt16(257)).ToLong());
+            zf.Compile();
+            Assert.AreEqual(1, zf.Evaluate(new UInt16(257)).ToLong());
+        }
+
+        /// <summary>
+        /// Test that we can cast finite integer values..
+        /// </summary>
+        [TestMethod]
+        public void TestCastingFixedIntegers3()
+        {
+            var zf = new ZenFunction<UInt16, byte>(x => Zen.Cast<UInt16, byte>(x));
+            Assert.AreEqual((byte)1, zf.Evaluate(new UInt16(257)));
+            zf.Compile();
+            Assert.AreEqual((byte)1, zf.Evaluate(new UInt16(257)));
+        }
+
+        /// <summary>
+        /// Test that we can cast finite integer values..
+        /// </summary>
+        [TestMethod]
+        public void TestCastingFixedIntegers4()
+        {
+            var zf = new ZenFunction<byte, Int3>(x => Zen.Cast<byte, Int3>(x));
+            Assert.AreEqual(-1, zf.Evaluate(7).ToLong());
+            zf.Compile();
+            Assert.AreEqual(-1, zf.Evaluate(7).ToLong());
+        }
+
+        /// <summary>
+        /// Test that we can cast finite integer values..
+        /// </summary>
+        [TestMethod]
+        public void TestCastingFixedIntegers5()
+        {
+            var zf = new ZenFunction<Int3, UInt8>(x => Zen.Cast<Int3, UInt8>(x));
+            Assert.AreEqual(7, zf.Evaluate(new Int3(-1)).ToLong());
+            zf.Compile();
+            Assert.AreEqual(7, zf.Evaluate(new Int3(-1)).ToLong());
+        }
+
+        /// <summary>
         /// Test that casting finite integers works with overflow.
         /// </summary>
         [TestMethod]
@@ -300,6 +360,40 @@ namespace ZenLib.Tests
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual(ushort.MaxValue, example.Value);
                 Assert.AreEqual((short)-1, zf.Evaluate(ushort.MaxValue));
+            }
+        }
+
+        /// <summary>
+        /// Test that casting fixed integers works.
+        /// </summary>
+        [TestMethod]
+        public void TestFixedIntegerCastConversion1()
+        {
+            var zf = new ZenFunction<UInt16, ulong>(x => Zen.Cast<UInt16, ulong>(x));
+
+            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var example = zf.Find((u, s) => u == new UInt16(ushort.MaxValue), backend: backend);
+                Assert.IsTrue(example.HasValue);
+                Assert.AreEqual(new UInt16(ushort.MaxValue), example.Value);
+                Assert.AreEqual((ulong)ushort.MaxValue, zf.Evaluate(new UInt16(ushort.MaxValue)));
+            }
+        }
+
+        /// <summary>
+        /// Test that casting fixed integers works.
+        /// </summary>
+        [TestMethod]
+        public void TestFixedIntegerCastConversion2()
+        {
+            var zf = new ZenConstraint<UInt3>(x => Zen.Cast<UInt3, Int3>(x) < new Int3(0));
+
+            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            {
+                var example = zf.Find(backend: backend);
+                Assert.IsTrue(example.HasValue);
+                Assert.IsTrue(example.Value.ToLong() >= 4);
+                Assert.IsTrue(zf.Evaluate(example.Value));
             }
         }
     }

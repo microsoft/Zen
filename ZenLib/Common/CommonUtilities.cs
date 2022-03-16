@@ -335,5 +335,34 @@ namespace ZenLib
             var integer = (dynamic)c.Invoke(constructorArgs);
             return integer.Size;
         }
+
+        /// <summary>
+        /// Copies the elements of the values stored right to left to a new array
+        /// of the target size. If the target size is larger than the current array,
+        /// it fills the left-most values with the provided default.
+        /// </summary>
+        /// <typeparam name="T">The element types.</typeparam>
+        /// <param name="values">The array of values.</param>
+        /// <param name="defaultValue">The default value to fill.</param>
+        /// <param name="targetSize">The target size of the new array.</param>
+        /// <returns></returns>
+        public static T[] CopyBigEndian<T>(T[] values, T defaultValue, int targetSize)
+        {
+            var newValues = new T[targetSize];
+
+            for (var i = 1; i <= targetSize; i++)
+            {
+                if (i <= values.Length)
+                {
+                    newValues[targetSize - i] = values[values.Length - i];
+                }
+                else
+                {
+                    newValues[targetSize - i] = defaultValue;
+                }
+            }
+
+            return newValues;
+        }
     }
 }

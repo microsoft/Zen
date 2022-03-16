@@ -1564,10 +1564,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Exception thrown for ascii strings.
+        /// No exception thrown for ascii strings.
         /// </summary>
         [TestMethod]
-        public void TestInvalidAsciiOk()
+        public void TestValidAsciiOk()
         {
             Constant("hello");
         }

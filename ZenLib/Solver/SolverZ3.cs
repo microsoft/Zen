@@ -378,7 +378,7 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkMul(x, y);
         }
 
-        public BitVecExpr Resize(BitVecExpr x, uint sourceSize, uint targetSize)
+        public BitVecExpr Resize(BitVecExpr x, int sourceSize, int targetSize)
         {
             if (sourceSize == targetSize)
             {
@@ -386,11 +386,11 @@ namespace ZenLib.Solver
             }
             else if (sourceSize < targetSize)
             {
-                return this.Context.MkZeroExt(targetSize - sourceSize, x);
+                return this.Context.MkZeroExt((uint)(targetSize - sourceSize), x);
             }
             else
             {
-                return this.Context.MkExtract(targetSize - 1, 0U, x);
+                return this.Context.MkExtract((uint)(targetSize - 1), 0U, x);
             }
         }
 

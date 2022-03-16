@@ -1072,18 +1072,23 @@ namespace ZenLib
         /// </summary>
         /// <typeparam name="T">The integer type.</typeparam>
         /// <returns>The bitwidth size of the integer.</returns>
-        public static uint GetFiniteIntegerSize<T>()
+        public static int GetFiniteIntegerSize<T>()
         {
             var type = typeof(T);
 
             if (type == ByteType)
                 return 8;
-            if (type == typeof(char) || type == ShortType || type == UshortType)
+            if (type == ShortType || type == UshortType)
                 return 16;
             if (type == IntType || type == UintType)
                 return 32;
-            Contract.Assert(type == LongType || type == UlongType);
-            return 64;
+            if (type == LongType || type == UlongType)
+                return 64;
+
+            Contract.Assert(IsFixedIntegerType(type));
+            var c = type.GetConstructor(new Type[] { typeof(long) });
+            dynamic obj = (T)c.Invoke(new object[] { 0L });
+            return obj.Size;
         }
 
         /// <summary>
@@ -1093,7 +1098,42 @@ namespace ZenLib
         /// <returns>The resulting finite integer.</returns>
         public static TTarget CastFiniteInteger<TSource, TTarget>(TSource x)
         {
-            return (TTarget)(dynamic)x;
+            var b1 = IsFixedIntegerType(typeof(TSource));
+            var b2 = IsFixedIntegerType(typeof(TTarget));
+
+            if (!b1 && !b2)
+            {
+                return (TTarget)(dynamic)x;
+            }
+            else if (b1 && !b2)
+            {
+                var result = 0L;
+                byte[] bytes = ((dynamic)x).Bytes;
+                for (int i = 0; i < Math.Min(bytes.Length, 4); i++)
+                {
+                    result <<= 8;
+                    result |= bytes[bytes.Length - 1 - i];
+                }
+
+                return (TTarget)(dynamic)result;
+            }
+            else
+            {
+                byte[] bytes;
+                if (b1)
+                {
+                    bytes = ((dynamic)x).Bytes;
+                }
+                else
+                {
+                    bytes = BitConverter.GetBytes((long)(dynamic)x);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(bytes);
+                }
+
+                var c = typeof(TTarget).GetConstructor(new Type[] { typeof(byte[]) });
+                return (TTarget)c.Invoke(new object[] { bytes });
+            }
         }
 
         /// <summary>

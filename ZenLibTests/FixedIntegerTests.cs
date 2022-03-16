@@ -321,16 +321,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that a byte range is invalid.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestInvalidByteLength2()
-        {
-            new Int1(new byte[] { 1, 2 });
-        }
-
-        /// <summary>
         /// Test that the integer size is correct.
         /// </summary>
         [TestMethod]

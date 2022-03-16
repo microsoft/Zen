@@ -34,19 +34,8 @@ namespace ZenLib
         public IntN(byte[] bytes)
         {
             var numBytes = this.NumBytes();
-
-            if (bytes.Length > numBytes)
-            {
-                throw new ArgumentException($"Invalid byte[] length, expected {this.Size / 8} but got {bytes.Length}");
-            }
-
+            this.Bytes = CommonUtilities.CopyBigEndian<byte>(bytes, 0, numBytes);
             this.Signed = typeof(TSign) == typeof(Signed);
-            this.Bytes = new byte[numBytes];
-
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                this.Bytes[this.Bytes.Length - 1 - i] = bytes[bytes.Length - 1 - i];
-            }
         }
 
         /// <summary>
