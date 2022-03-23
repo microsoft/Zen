@@ -204,10 +204,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIntegerEquality()
         {
-            // RandomBytes(x => CheckAgreement<byte>(i => i == x));
-            // RandomBytes(x => CheckAgreement<byte>(i => x == i));
+            RandomBytes(x => CheckAgreement<byte>(i => i == x));
+            RandomBytes(x => CheckAgreement<byte>(i => x == i));
             RandomBytes(x => CheckAgreement<Char>(i => new Char(x) == i, runBdds: false));
-            /* RandomBytes(x => CheckAgreement<short>(i => i == (short)x));
+            RandomBytes(x => CheckAgreement<short>(i => i == (short)x));
             RandomBytes(x => CheckAgreement<short>(i => (short)x == i));
             RandomBytes(x => CheckAgreement<ushort>(i => i == (ushort)x));
             RandomBytes(x => CheckAgreement<ushort>(i => (ushort)x == i));
@@ -220,7 +220,7 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => i == (ulong)x));
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x == i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i == new BigInteger(x)));
-            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) == i)); */
+            RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) == i));
         }
 
         /// <summary>
