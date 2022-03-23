@@ -154,9 +154,19 @@ namespace ZenLib
         private static Dictionary<Type, Type[]> genericArgumentsCache = new Dictionary<Type, Type[]>();
 
         /// <summary>
+        /// Generic arguments cache lock.
+        /// </summary>
+        private static object genericArgumentsCacheLock = new object();
+
+        /// <summary>
         /// Cache for property infos.
         /// </summary>
         private static Dictionary<(Type, string), PropertyInfo> propertyCache = new Dictionary<(Type, string), PropertyInfo>();
+
+        /// <summary>
+        /// Property cache lock.
+        /// </summary>
+        private static object propertyCacheLock = new object();
 
         /// <summary>
         /// Cache for field infos.
@@ -164,14 +174,29 @@ namespace ZenLib
         private static Dictionary<(Type, string), FieldInfo> fieldCache = new Dictionary<(Type, string), FieldInfo>();
 
         /// <summary>
+        /// Field cache lock.
+        /// </summary>
+        private static object fieldCacheLock = new object();
+
+        /// <summary>
         /// Cache for GetGenericTypeDefinition().
         /// </summary>
         private static Dictionary<Type, Type> genericDefinitionCache = new Dictionary<Type, Type>();
 
         /// <summary>
+        /// Generic definition cache lock.
+        /// </summary>
+        private static object genericDefinitionCacheLock = new object();
+
+        /// <summary>
         /// Cache for method infos.
         /// </summary>
         public static Dictionary<(Type, string), MethodInfo> methodCache = new Dictionary<(Type, string), MethodInfo>();
+
+        /// <summary>
+        /// Method cache lock.
+        /// </summary>
+        private static object methodCacheLock = new object();
 
         /// <summary>
         /// Get the generic arguments for a given type.
@@ -180,14 +205,17 @@ namespace ZenLib
         /// <returns>The generic argument types.</returns>
         public static Type[] GetGenericArgumentsCached(this Type type)
         {
-            if (genericArgumentsCache.TryGetValue(type, out var args))
+            lock (genericArgumentsCacheLock)
             {
-                return args;
-            }
+                if (genericArgumentsCache.TryGetValue(type, out var args))
+                {
+                    return args;
+                }
 
-            var ret = type.GetGenericArguments();
-            genericArgumentsCache[type] = ret;
-            return ret;
+                var ret = type.GetGenericArguments();
+                genericArgumentsCache[type] = ret;
+                return ret;
+            }
         }
 
         /// <summary>
@@ -198,15 +226,18 @@ namespace ZenLib
         /// <returns>The PropertyInfo object.</returns>
         public static PropertyInfo GetPropertyCached(this Type type, string propertyName)
         {
-            var key = (type, propertyName);
-            if (propertyCache.TryGetValue(key, out var propertyInfo))
+            lock (propertyCacheLock)
             {
-                return propertyInfo;
-            }
+                var key = (type, propertyName);
+                if (propertyCache.TryGetValue(key, out var propertyInfo))
+                {
+                    return propertyInfo;
+                }
 
-            var ret = type.GetProperty(propertyName);
-            propertyCache[key] = ret;
-            return ret;
+                var ret = type.GetProperty(propertyName);
+                propertyCache[key] = ret;
+                return ret;
+            }
         }
 
         /// <summary>
@@ -217,15 +248,18 @@ namespace ZenLib
         /// <returns>The FieldInfo object.</returns>
         public static FieldInfo GetFieldCached(this Type type, string fieldName)
         {
-            var key = (type, fieldName);
-            if (fieldCache.TryGetValue(key, out var fieldInfo))
+            lock (fieldCacheLock)
             {
-                return fieldInfo;
-            }
+                var key = (type, fieldName);
+                if (fieldCache.TryGetValue(key, out var fieldInfo))
+                {
+                    return fieldInfo;
+                }
 
-            var ret = type.GetField(fieldName);
-            fieldCache[key] = ret;
-            return ret;
+                var ret = type.GetField(fieldName);
+                fieldCache[key] = ret;
+                return ret;
+            }
         }
 
         /// <summary>
@@ -235,14 +269,17 @@ namespace ZenLib
         /// <returns>The generic type.</returns>
         public static Type GetGenericTypeDefinitionCached(this Type type)
         {
-            if (genericDefinitionCache.TryGetValue(type, out var genericType))
+            lock (genericDefinitionCacheLock)
             {
-                return genericType;
-            }
+                if (genericDefinitionCache.TryGetValue(type, out var genericType))
+                {
+                    return genericType;
+                }
 
-            var ret = type.GetGenericTypeDefinition();
-            genericDefinitionCache[type] = ret;
-            return ret;
+                var ret = type.GetGenericTypeDefinition();
+                genericDefinitionCache[type] = ret;
+                return ret;
+            }
         }
 
         /// <summary>
@@ -253,15 +290,18 @@ namespace ZenLib
         /// <returns>The generic type.</returns>
         public static MethodInfo GetMethodCached(this Type type, string methodName)
         {
-            var key = (type, methodName);
-            if (methodCache.TryGetValue(key, out var methodInfo))
+            lock (methodCacheLock)
             {
-                return methodInfo;
-            }
+                var key = (type, methodName);
+                if (methodCache.TryGetValue(key, out var methodInfo))
+                {
+                    return methodInfo;
+                }
 
-            var ret = type.GetMethod(methodName);
-            methodCache[key] = ret;
-            return ret;
+                var ret = type.GetMethod(methodName);
+                methodCache[key] = ret;
+                return ret;
+            }
         }
 
         /// <summary>

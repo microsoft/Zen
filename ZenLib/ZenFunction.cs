@@ -109,6 +109,11 @@ namespace ZenLib
     public class ZenFunction<T1, T2>
     {
         /// <summary>
+        /// Lock for creating the argument.
+        /// </summary>
+        private static object argumentLock = new object();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -145,7 +150,10 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.Function = function;
-            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            lock (argumentLock)
+            {
+                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+            }
             this.FunctionBodyExpr = this.Function(Argument1);
         }
 
@@ -302,6 +310,11 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3>
     {
         /// <summary>
+        /// Lock for creating the argument.
+        /// </summary>
+        private static object argumentLock = new object();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -343,8 +356,11 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.Function = function;
-            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+            lock (argumentLock)
+            {
+                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+            }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2);
         }
 
@@ -523,6 +539,11 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4>
     {
         /// <summary>
+        /// Lock for creating the argument.
+        /// </summary>
+        private static object argumentLock = new object();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -569,9 +590,12 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.Function = function;
-            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
-            Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+            lock (argumentLock)
+            {
+                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+                Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+            }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3);
         }
 
@@ -766,6 +790,11 @@ namespace ZenLib
     public class ZenFunction<T1, T2, T3, T4, T5>
     {
         /// <summary>
+        /// Lock for creating the argument.
+        /// </summary>
+        private static object argumentLock = new object();
+
+        /// <summary>
         /// First argument expression.
         /// </summary>
         internal static ZenArgumentExpr<T1> Argument1;
@@ -817,10 +846,13 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(function);
             this.Function = function;
-            Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-            Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
-            Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
-            Argument4 = Argument4 ?? new ZenArgumentExpr<T4>();
+            lock (argumentLock)
+            {
+                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+                Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+                Argument4 = Argument4 ?? new ZenArgumentExpr<T4>();
+            }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3, Argument4);
         }
 

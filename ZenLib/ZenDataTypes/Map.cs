@@ -169,13 +169,7 @@ namespace ZenLib
         {
             return EmptyDict<TKey, TValue>();
         }
-    }
 
-    /// <summary>
-    /// Extension methods for Zen map objects.
-    /// </summary>
-    public static class MapExtensions
-    {
         /// <summary>
         /// Add a value to a Zen map.
         /// </summary>
