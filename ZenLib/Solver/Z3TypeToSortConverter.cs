@@ -54,6 +54,11 @@ namespace ZenLib.Solver
             return this.solver.BigIntSort;
         }
 
+        public Sort VisitReal(Unit parameter)
+        {
+            return this.solver.RealSort;
+        }
+
         public Sort VisitBool(Unit parameter)
         {
             return this.solver.BoolSort;

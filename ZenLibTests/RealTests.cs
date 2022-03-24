@@ -171,5 +171,87 @@ namespace ZenLib.Tests
         {
             Assert.AreEqual(new Real(35, 6), new Real(10, 3) * new Real(7, 4));
         }
+
+        /// <summary>
+        /// Test Real find operations.
+        /// </summary>
+        [TestMethod]
+        public void TestRealFind1()
+        {
+            Assert.AreEqual(new Real(1, 3), new ZenConstraint<Real>(r => r + new Real(1) == new Real(4, 3)).Find().Value);
+            Assert.AreEqual(new Real(7, 3), new ZenConstraint<Real>(r => r - new Real(1) == new Real(4, 3)).Find().Value);
+            Assert.AreEqual(new Real(1, 6), new ZenConstraint<Real>(r => (Real)2 * r + (Real)1 == new Real(4, 3)).Find().Value);
+            Assert.AreEqual(new Real(-1, 6), new ZenConstraint<Real>(r => (Real)2 * r - (Real)1 == new Real(4, -3)).Find().Value);
+            Assert.IsTrue(new ZenConstraint<Real>(r => r > new Real(3)).Find().Value > 3);
+            Assert.IsTrue(new ZenConstraint<Real>(r => r < new Real(3)).Find().Value < 3);
+            Assert.IsTrue(new ZenConstraint<Real>(r => r == new Real(3)).Find().Value == 3);
+        }
+
+        /// <summary>
+        /// Test Real find with ite.
+        /// </summary>
+        [TestMethod]
+        public void TestRealFind2()
+        {
+            var zf = new ZenFunction<Real, Real>(r => Zen.If<Real>(r == new Real(10), new Real(5), new Real(7)));
+            Assert.IsTrue(zf.Find((a, b) => b == new Real(5)).Value == new Real(10));
+        }
+
+        /// <summary>
+        /// Test Real add.
+        /// </summary>
+        [TestMethod]
+        public void TestRealAdd()
+        {
+            var zf = new ZenFunction<Real, Real, Real>((a, b) => a + b);
+
+            Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(4, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(13, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+
+            zf.Compile();
+
+            Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(4, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(13, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+        }
+
+        /// <summary>
+        /// Test Real add.
+        /// </summary>
+        [TestMethod]
+        public void TestRealSubtract()
+        {
+            var zf = new ZenFunction<Real, Real, Real>((a, b) => a - b);
+
+            Assert.AreEqual(new Real(-1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(2, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(-1, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+
+            zf.Compile();
+
+            Assert.AreEqual(new Real(-1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(2, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(-1, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+        }
+
+        /// <summary>
+        /// Test Real add.
+        /// </summary>
+        [TestMethod]
+        public void TestRealMultiply()
+        {
+            var zf = new ZenFunction<Real, Real, Real>((a, b) => a * b);
+
+            Assert.AreEqual(new Real(0), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(2, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+
+            zf.Compile();
+
+            Assert.AreEqual(new Real(0), zf.Evaluate(new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(2, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
+        }
     }
 }

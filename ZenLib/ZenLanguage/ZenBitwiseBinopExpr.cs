@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenIntegerBinopExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenBitwiseBinopExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -6,22 +6,21 @@ namespace ZenLib
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Numerics;
 
     /// <summary>
-    /// Class representing a binary operation expression.
+    /// Class representing a binary bitvector operation expression.
     /// </summary>
-    internal sealed class ZenIntegerBinopExpr<T> : Zen<T>
+    internal sealed class ZenBitwiseBinopExpr<T> : Zen<T>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<T>, Zen<T>, Op), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<T>, Zen<T>, BitwiseOp), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// The operation strings for integer operations.
         /// </summary>
-        private static string[] opStrings = new string[] { "&", "|", "^", "+", "-", "*" };
+        private static string[] opStrings = new string[] { "&", "|", "^" };
 
         /// <summary>
         /// The evaluation functions for integer operations.
@@ -31,19 +30,6 @@ namespace ZenLib
             (x, y) => x & y,
             (x, y) => x | y,
             (x, y) => x ^ y,
-            (x, y) => x + y,
-            (x, y) => x - y,
-            (x, y) => x * y,
-        };
-
-        /// <summary>
-        /// The evaluation functions for integer operations.
-        /// </summary>
-        private static Func<BigInteger, BigInteger, BigInteger>[] constantBigIntFuncs = new Func<BigInteger, BigInteger, BigInteger>[]
-        {
-            (x, y) => x + y,
-            (x, y) => x - y,
-            (x, y) => x * y,
         };
 
         /// <summary>
@@ -52,7 +38,7 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Zen<T>> hashConsTable = new HashConsTable<(long, long, int), Zen<T>>();
 
         /// <summary>
-        /// Unroll the ZenIntegerBinopExpr.
+        /// Unroll the ZenBitwiseBinopExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
         public override Zen<T> Unroll()
@@ -61,19 +47,14 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Simplify and create a new ZenIntegerBinopExpr.
+        /// Simplify and create a new ZenBitwiseBinopExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>
         /// <param name="e2">The second expr.</param>
         /// <param name="op">The integer operation.</param>
         /// <returns>The new expr.</returns>
-        private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, Op op)
+        private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, BitwiseOp op)
         {
-            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
-            {
-                return (Zen<T>)(object)ZenConstantExpr<BigInteger>.Create(constantBigIntFuncs[(int)op - 3](be1.Value, be2.Value));
-            }
-
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
@@ -83,76 +64,35 @@ namespace ZenLib
                 return ReflectionUtilities.CreateConstantIntegerValue<T>(f(x.Value, y.Value));
             }
 
-            switch (op)
-            {
-                case Op.Addition:
-                    if (x.HasValue && x.Value == 0)
-                        return e2;
-                    if (y.HasValue && y.Value == 0)
-                        return e1;
-                    break;
-
-                case Op.Subtraction:
-                    if (y.HasValue && y.Value == 0)
-                        return e1;
-                    break;
-
-                case Op.Multiplication:
-                    if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
-                        return ReflectionUtilities.CreateConstantIntegerValue<T>(0);
-                    if (x.HasValue && x.Value == 1)
-                        return e2;
-                    if (y.HasValue && y.Value == 1)
-                        return e1;
-                    break;
-            }
-
-            return new ZenIntegerBinopExpr<T>(e1, e2, op);
+            return new ZenBitwiseBinopExpr<T>(e1, e2, op);
         }
 
         /// <summary>
-        /// Create a new ZenIntegerBinopExpr.
+        /// Create a new ZenBitwiseBinopExpr.
         /// </summary>
         /// <param name="expr1">The first expr.</param>
         /// <param name="expr2">The second expr.</param>
         /// <param name="op">The integer operation.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2, Op op)
+        public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2, BitwiseOp op)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateIsIntegerType(typeof(T));
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
 
             var type = typeof(T);
-
-            if ((type == ReflectionUtilities.BigIntType && IsBitwiseOp(op)) ||
-                (ReflectionUtilities.IsFixedIntegerType(type) && op == Op.Multiplication))
-            {
-                throw new ZenException($"Operation: {op} is not supported for type {type}");
-            }
-
             var key = (expr1.Id, expr2.Id, (int)op);
             hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);
             return value;
         }
 
         /// <summary>
-        /// Whether an op is a bitwise operation.
-        /// </summary>
-        /// <param name="op">The operation.</param>
-        /// <returns>True or false.</returns>
-        private static bool IsBitwiseOp(Op op)
-        {
-            return op == Op.BitwiseAnd || op == Op.BitwiseOr || op == Op.BitwiseXor;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ZenIntegerBinopExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenBitwiseBinopExpr{T}"/> class.
         /// </summary>
         /// <param name="expr1">First Zen expression.</param>
         /// <param name="expr2">Second Zen expression.</param>
         /// <param name="op">The binary operation.</param>
-        private ZenIntegerBinopExpr(Zen<T> expr1, Zen<T> expr2, Op op)
+        private ZenBitwiseBinopExpr(Zen<T> expr1, Zen<T> expr2, BitwiseOp op)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;
@@ -172,7 +112,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the operation.
         /// </summary>
-        internal Op Operation { get; }
+        internal BitwiseOp Operation { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -201,13 +141,10 @@ namespace ZenLib
     /// <summary>
     /// A binary operation.
     /// </summary>
-    internal enum Op
+    internal enum BitwiseOp
     {
         BitwiseAnd,
         BitwiseOr,
         BitwiseXor,
-        Addition,
-        Subtraction,
-        Multiplication,
     }
 }

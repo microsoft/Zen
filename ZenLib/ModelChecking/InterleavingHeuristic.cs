@@ -88,21 +88,27 @@ namespace ZenLib.ModelChecking
             return new InterleavingSet(emptyVariableSet);
         }
 
-        public InterleavingResult Visit<T>(ZenIntegerBinopExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenArithBinopExpr<T> expression, Dictionary<long, object> parameter)
+        {
+            var x = Evaluate(expression.Expr1, parameter);
+            var y = Evaluate(expression.Expr2, parameter);
+            this.Combine(x, y);
+            return x.Union(y);
+        }
+
+        public InterleavingResult Visit<T>(ZenBitwiseBinopExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);
 
             switch (expression.Operation)
             {
-                case Op.Addition:
-                case Op.Multiplication:
-                case Op.Subtraction:
-                case Op.BitwiseAnd:
-                case Op.BitwiseXor:
+                case BitwiseOp.BitwiseAnd:
+                case BitwiseOp.BitwiseXor:
                     this.Combine(x, y);
                     return x.Union(y);
                 default:
+                    Contract.Assert(expression.Operation == BitwiseOp.BitwiseOr);
                     return x.Union(y);
             }
         }
@@ -201,7 +207,7 @@ namespace ZenLib.ModelChecking
             return x.Union(y);
         }
 
-        public InterleavingResult Visit<T>(ZenIntegerComparisonExpr<T> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<T>(ZenArithComparisonExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);

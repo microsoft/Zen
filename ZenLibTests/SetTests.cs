@@ -547,6 +547,27 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetWorksWithRealsAndChars()
+        {
+            var s1 = Symbolic<Set<Pair<ZenLib.Char, Real>>>();
+            var s2 = Symbolic<Set<Pair<ZenLib.Char, Real>>>();
+
+            var p1 = Pair.Create<ZenLib.Char, Real>(new ZenLib.Char('a'), new Real(3));
+            var expr = And(s1.Contains(p1), s1.IsSubsetOf(s2));
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+
+            Assert.IsTrue(r1.Contains(new Pair<ZenLib.Char, Real> { Item1 = new ZenLib.Char('a'), Item2 = new Real(3) }));
+            Assert.IsTrue(r1.Count() <= r2.Count());
+            Assert.IsTrue(r1.IsSubsetOf(r2));
+        }
+
+        /// <summary>
         /// Test set equality and hashcode.
         /// </summary>
         [TestMethod]

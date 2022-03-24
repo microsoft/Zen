@@ -122,7 +122,7 @@ namespace ZenLib.Tests
 
             foreach (var type in types)
             {
-                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType)
+                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType || type == ReflectionUtilities.RealType)
                 {
                     ps = GetUnboundedParameters();
                 }

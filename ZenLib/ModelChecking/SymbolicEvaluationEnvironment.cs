@@ -10,7 +10,7 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// An environment for the symbolic evaluator.
     /// </summary>
-    internal class SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
         /// <summary>
         /// Initializes a new instance of the class.
@@ -18,7 +18,7 @@ namespace ZenLib.ModelChecking
         public SymbolicEvaluationEnvironment(Dictionary<long, object> argumentsToExpr)
         {
             this.ArgumentsToExpr = argumentsToExpr;
-            this.ArgumentsToValue = ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>>.Empty;
+            this.ArgumentsToValue = ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace ZenLib.ModelChecking
         /// <param name="argumentAssignment">The initial argument assignment.</param>
         public SymbolicEvaluationEnvironment(
             Dictionary<long, object> argumentsToExpr,
-            ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> argumentAssignment)
+            ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> argumentAssignment)
         {
             this.ArgumentsToValue = argumentAssignment;
             this.ArgumentsToExpr = argumentsToExpr;
@@ -37,7 +37,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the argument to value assignment.
         /// </summary>
-        public ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> ArgumentsToValue { get; }
+        public ImmutableDictionary<long, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> ArgumentsToValue { get; }
 
         /// <summary>
         /// Gets the argument to expression assignment.

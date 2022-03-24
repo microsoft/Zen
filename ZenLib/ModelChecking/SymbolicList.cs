@@ -12,9 +12,9 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic boolean value.
     /// </summary>
-    internal class SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public SymbolicList(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> value) : base(solver)
+        public SymbolicList(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver, GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value) : base(solver)
         {
             this.GuardedListGroup = value;
         }
@@ -22,11 +22,11 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Gets the guarded lists representing the symbolic list.
         /// </summary>
-        public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> GuardedListGroup { get; }
+        public GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> GuardedListGroup { get; }
 
         [ExcludeFromCodeCoverage]
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.Visit(this, parameter);
@@ -38,13 +38,13 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="other">The other list.</param>
         /// <returns>A new symbolic list.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
         {
-            var o = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
+            var o = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
             var result = Merge(guard, this.GuardedListGroup, o.GuardedListGroup);
-            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, result);
+            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace ZenLib.ModelChecking
         /// <param name="lists1">The first lists.</param>
         /// <param name="lists2">The second lists.</param>
         /// <returns>A new guarded group of lists.</returns>
-        private GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
+        private GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
             TBool guard,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> lists1,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> lists2)
+            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> lists1,
+            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> lists2)
         {
             var result = CommonUtilities.Merge(lists1.Mapping, lists2.Mapping, (len, list1, list2) =>
             {
@@ -77,13 +77,13 @@ namespace ZenLib.ModelChecking
 
                 /* if (merged.Guard.Equals(this.Solver.False()))
                 {
-                    return Option.None<GuardedList<TModel, TVar, TBool, TInt, TSeq, TArray, TChar>>();
+                    return Option.None<GuardedList<TModel, TVar, TBool, TInt, TSeq, TArray, TChar, TReal>>();
                 } */
 
                 return Option.Some(merged);
             });
 
-            return new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(result);
+            return new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(result);
         }
 
         /// <summary>
@@ -92,10 +92,10 @@ namespace ZenLib.ModelChecking
         /// <param name="guard">The guard.</param>
         /// <param name="list">The list.</param>
         /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> MapGuard(TBool guard, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> list)
+        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> MapGuard(TBool guard, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list)
         {
             var newGuard = this.Solver.And(guard, list.Guard);
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(newGuard, list.Values);
+            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(newGuard, list.Values);
         }
 
         /// <summary>
@@ -105,13 +105,13 @@ namespace ZenLib.ModelChecking
         /// <param name="list1">The first list.</param>
         /// <param name="list2">The second list.</param>
         /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
+        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
             TBool guard,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> list1,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> list2)
+            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list1,
+            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list2)
         {
             var newGuard = this.Solver.Ite(guard, list1.Guard, list2.Guard);
-            var newValues = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>>.Empty;
+            var newValues = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
             for (int i = 0; i < list1.Values.Count; i++)
             {
                 var v1 = list1.Values[i];
@@ -119,7 +119,7 @@ namespace ZenLib.ModelChecking
                 newValues = newValues.Add(v1.Merge(guard, v2));
             }
 
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(newGuard, newValues);
+            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(newGuard, newValues);
         }
 
         /// <summary>
@@ -136,14 +136,14 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Represents a guarded group of lists, distinguishing by length.
     /// </summary>
-    internal class GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public GuardedListGroup(ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> mapping)
+        public GuardedListGroup(ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> mapping)
         {
             this.Mapping = mapping;
         }
 
-        public ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> Mapping { get; }
+        public ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> Mapping { get; }
 
         /// <summary>
         /// Convert the object to a string.
@@ -167,9 +167,9 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// A single list with a fixed length guarded by a predicate.
     /// </summary>
-    internal class GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public GuardedList(TBool guard, ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> values)
+        public GuardedList(TBool guard, ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> values)
         {
             this.Guard = guard;
             this.Values = values;
@@ -177,7 +177,7 @@ namespace ZenLib.ModelChecking
 
         public TBool Guard { get; }
 
-        public ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>> Values { get; }
+        public ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> Values { get; }
 
         /// <summary>
         /// Convert the object to a string.

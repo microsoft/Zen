@@ -14,7 +14,7 @@ namespace ZenLib.Solver
     /// <summary>
     /// Zen solver based on the Z3 SMT solver.
     /// </summary>
-    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr>
+    internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>
     {
         internal Context Context;
 
@@ -37,6 +37,8 @@ namespace ZenLib.Solver
         internal Sort LongSort;
 
         internal Sort BigIntSort;
+
+        internal Sort RealSort;
 
         internal Sort StringSort;
 
@@ -69,6 +71,7 @@ namespace ZenLib.Solver
             this.IntSort = this.Context.MkBitVecSort(32);
             this.LongSort = this.Context.MkBitVecSort(64);
             this.BigIntSort = this.Context.MkIntSort();
+            this.RealSort = this.Context.MkRealSort();
             this.StringSort = this.Context.StringSort;
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
@@ -202,6 +205,17 @@ namespace ZenLib.Solver
             return (v, (IntExpr)v);
         }
 
+        public RealExpr CreateRealConst(Real r)
+        {
+            return this.Context.MkReal(r.ToString());
+        }
+
+        public (Expr, RealExpr) CreateRealVar(object e)
+        {
+            var v = this.Context.MkConst(FreshSymbol(), this.RealSort);
+            return (v, (RealExpr)v);
+        }
+
         public (Expr, SeqExpr) CreateSeqVar(object e)
         {
             var seqType = e.GetType().GetGenericArgumentsCached()[0];
@@ -244,6 +258,11 @@ namespace ZenLib.Solver
         }
 
         public BoolExpr Eq(IntExpr x, IntExpr y)
+        {
+            return this.Context.MkEq(x, y);
+        }
+
+        public BoolExpr Eq(RealExpr x, RealExpr y)
         {
             return this.Context.MkEq(x, y);
         }
@@ -293,6 +312,11 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkITE(g, t, f);
         }
 
+        public RealExpr Ite(BoolExpr g, RealExpr t, RealExpr f)
+        {
+            return (RealExpr)this.Context.MkITE(g, t, f);
+        }
+
         public SeqExpr Ite(BoolExpr g, SeqExpr t, SeqExpr f)
         {
             return (SeqExpr)this.Context.MkITE(g, t, f);
@@ -318,6 +342,11 @@ namespace ZenLib.Solver
             return this.Context.MkLe(x, y);
         }
 
+        public BoolExpr LessThanOrEqual(RealExpr x, RealExpr y)
+        {
+            return this.Context.MkLe(x, y);
+        }
+
         public BoolExpr LessThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
         {
             return this.Context.MkBVSLE(x, y);
@@ -329,6 +358,11 @@ namespace ZenLib.Solver
         }
 
         public BoolExpr GreaterThanOrEqual(IntExpr x, IntExpr y)
+        {
+            return this.Context.MkGe(x, y);
+        }
+
+        public BoolExpr GreaterThanOrEqual(RealExpr x, RealExpr y)
         {
             return this.Context.MkGe(x, y);
         }
@@ -358,6 +392,11 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkAdd(x, y);
         }
 
+        public RealExpr Add(RealExpr x, RealExpr y)
+        {
+            return (RealExpr)this.Context.MkAdd(x, y);
+        }
+
         public BitVecExpr Subtract(BitVecExpr x, BitVecExpr y)
         {
             return this.Context.MkBVSub(x, y);
@@ -368,6 +407,11 @@ namespace ZenLib.Solver
             return (IntExpr)this.Context.MkSub(x, y);
         }
 
+        public RealExpr Subtract(RealExpr x, RealExpr y)
+        {
+            return (RealExpr)this.Context.MkSub(x, y);
+        }
+
         public BitVecExpr Multiply(BitVecExpr x, BitVecExpr y)
         {
             return this.Context.MkBVMul(x, y);
@@ -376,6 +420,11 @@ namespace ZenLib.Solver
         public IntExpr Multiply(IntExpr x, IntExpr y)
         {
             return (IntExpr)this.Context.MkMul(x, y);
+        }
+
+        public RealExpr Multiply(RealExpr x, RealExpr y)
+        {
+            return (RealExpr)this.Context.MkMul(x, y);
         }
 
         public BitVecExpr Resize(BitVecExpr x, int sourceSize, int targetSize)
@@ -466,8 +515,8 @@ namespace ZenLib.Solver
 
         public ArrayExpr DictSet(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> valueExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> valueExpr,
             Type keyType,
             Type valueType)
         {
@@ -488,7 +537,7 @@ namespace ZenLib.Solver
         }
 
         public SeqExpr SeqUnit(
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> valueExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> valueExpr,
             Type type)
         {
             var value = this.SymbolicValueToExprConverter.ConvertSymbolicValue(valueExpr, type);
@@ -497,7 +546,7 @@ namespace ZenLib.Solver
 
         public ArrayExpr DictDelete(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> keyExpr,
             Type keyType,
             Type valueType)
         {
@@ -518,7 +567,7 @@ namespace ZenLib.Solver
 
         public (BoolExpr, object) DictGet(
             ArrayExpr arrayExpr,
-            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> keyExpr,
+            SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> keyExpr,
             Type keyType,
             Type valueType)
         {
@@ -564,7 +613,7 @@ namespace ZenLib.Solver
             return this.ExprToObjectConverter.Convert(e, type);
         }
 
-        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr> ConvertExprToSymbolicValue(object e, Type type)
+        public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> ConvertExprToSymbolicValue(object e, Type type)
         {
             return this.ExprToSymbolicValueConverter.ConvertExpr((Expr)e, type);
         }

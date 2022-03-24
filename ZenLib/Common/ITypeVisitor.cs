@@ -79,6 +79,12 @@ namespace ZenLib
         T VisitFixedInteger(Type intType, TParam parameter);
 
         /// <summary>
+        /// Visit the Real type.
+        /// </summary>
+        /// <returns></returns>
+        T VisitReal(TParam parameter);
+
+        /// <summary>
         /// Visit the string type.
         /// </summary>
         /// <returns>A value.</returns>

@@ -105,6 +105,14 @@ namespace ZenLib
         /// <summary>
         /// Instantiate a new <see cref="Real"/> value.
         /// </summary>
+        /// <param name="value">The integer value.</param>
+        public Real(BigInteger value) : this(value, BigInteger.One)
+        {
+        }
+
+        /// <summary>
+        /// Instantiate a new <see cref="Real"/> value.
+        /// </summary>
         /// <param name="numerator">The numerator.</param>
         /// <param name="denominator">The denominator.</param>
         public Real(BigInteger numerator, BigInteger denominator)
@@ -202,10 +210,10 @@ namespace ZenLib
         {
             if (this.Denominator == BigInteger.One)
             {
-                return $"{this.Numerator}.0";
+                return $"{this.Numerator}";
             }
 
-            return $"{this.Numerator}.0/{this.Denominator}.0";
+            return $"{this.Numerator}/{this.Denominator}";
         }
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace ZenLib.Tests
         /// Test integer greater than.
         /// </summary>
         [TestMethod]
-        public void TestIntegerGreaterThan()
+        public void TestGreaterThan()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i > x));
             RandomBytes(x => CheckAgreement<byte>(i => x > i));
@@ -52,13 +52,15 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x > i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i > new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) > i));
+            RandomBytes(x => CheckAgreement<Real>(i => i > new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(x) > i));
         }
 
         /// <summary>
         /// Test integer less than.
         /// </summary>
         [TestMethod]
-        public void TestIntegerLessThan()
+        public void TestLessThan()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i < x));
             RandomBytes(x => CheckAgreement<byte>(i => x < i));
@@ -76,6 +78,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x < i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i < new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) < i));
+            RandomBytes(x => CheckAgreement<Real>(i => i < new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(x) < i));
         }
 
         /// <summary>
@@ -145,7 +149,7 @@ namespace ZenLib.Tests
         /// Test integer less than or equal.
         /// </summary>
         [TestMethod]
-        public void TestIntegerLessThanOrEqual()
+        public void TestLessThanOrEqual()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i <= x));
             RandomBytes(x => CheckAgreement<byte>(i => x <= i));
@@ -163,13 +167,15 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x <= i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i <= new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) <= i));
+            RandomBytes(x => CheckAgreement<Real>(i => i <= new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(x) <= i));
         }
 
         /// <summary>
         /// Test integer greater than or equal.
         /// </summary>
         [TestMethod]
-        public void TestIntegerGreaterThanOrEqualByte()
+        public void TestGreaterThanOrEqual()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i >= x));
             RandomBytes(x => CheckAgreement<byte>(i => x >= i));
@@ -187,6 +193,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x >= i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i >= new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) >= i));
+            RandomBytes(x => CheckAgreement<Real>(i => i >= new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(x) >= i));
         }
 
         /// <summary>
@@ -265,7 +273,7 @@ namespace ZenLib.Tests
         /// Test integer inequality.
         /// </summary>
         [TestMethod]
-        public void TestIntegerInequality()
+        public void TestInequality()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i != x));
             RandomBytes(x => CheckAgreement<byte>(i => x != i));
@@ -283,6 +291,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => (ulong)x != i));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i != new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(x) != i));
+            RandomBytes(x => CheckAgreement<Real>(i => i != new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(x) != i));
         }
 
         /// <summary>
@@ -412,7 +422,7 @@ namespace ZenLib.Tests
         /// Test integer addition with constants.
         /// </summary>
         [TestMethod]
-        public void TestIntegerSumConstant()
+        public void TestSumConstant()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i + Constant<byte>(4) == (x + Constant<byte>(4))));
             RandomBytes(x => CheckAgreement<byte>(i => Constant<byte>(4) + i == (x + Constant<byte>(4))));
@@ -430,6 +440,8 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => Constant<ulong>(4) + i == (x + Constant<ulong>(4))));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i + Constant<BigInteger>(4) == (new BigInteger(x) + Constant<BigInteger>(4))));
             RandomBytes(x => CheckAgreement<BigInteger>(i => Constant<BigInteger>(4) + i == (new BigInteger(x) + Constant<BigInteger>(4))));
+            RandomBytes(x => CheckAgreement<Real>(i => i + Constant<Real>(4) == (new Real(x) + Constant<Real>(4))));
+            RandomBytes(x => CheckAgreement<Real>(i => Constant<Real>(4) + i == (new Real(x) + Constant<Real>(4))));
         }
 
         /// <summary>
@@ -451,7 +463,7 @@ namespace ZenLib.Tests
         /// Test integer minus with constants.
         /// </summary>
         [TestMethod]
-        public void TestIntegerMinusConstant()
+        public void TestMinusConstant()
         {
             RandomBytes(x => CheckAgreement<byte>(i => i - (byte)4 == x));
             RandomBytes(x => CheckAgreement<byte>(i => (byte)4 - i == x));
@@ -469,16 +481,18 @@ namespace ZenLib.Tests
             RandomBytes(x => CheckAgreement<ulong>(i => 4UL - i == x));
             RandomBytes(x => CheckAgreement<BigInteger>(i => i - new BigInteger(4) == new BigInteger(x)));
             RandomBytes(x => CheckAgreement<BigInteger>(i => new BigInteger(4) - i == new BigInteger(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => i - new Real(4) == new Real(x)));
+            RandomBytes(x => CheckAgreement<Real>(i => new Real(4) - i == new Real(x)));
         }
 
         /// <summary>
         /// Test multiplication of integers.
         /// </summary>
         [TestMethod]
-        public void TestMultiplication()
+        public void TestMultiplicationIntegers()
         {
             var f = new ZenFunction<int, int, bool>((a, b) => a * b == 10);
-            var inputs = f.Find((a, b, res) => res, backend: ModelChecking.Backend.Z3);
+            var inputs = f.Find((a, b, res) => res, backend: Backend.Z3);
             Assert.IsTrue(inputs.HasValue);
             Assert.AreEqual(10, inputs.Value.Item1 * inputs.Value.Item2);
 
@@ -491,6 +505,28 @@ namespace ZenLib.Tests
             Assert.IsTrue(f.Evaluate(5, 2));
             Assert.IsTrue(f.Evaluate(1, 10));
             Assert.IsFalse(f.Evaluate(4, 3));
+        }
+
+        /// <summary>
+        /// Test multiplication of reals.
+        /// </summary>
+        [TestMethod]
+        public void TestMultiplicationReals()
+        {
+            var f = new ZenFunction<Real, bool>(a => (Real)2 * a == (Real)10);
+            var inputs = f.Find((a, res) => res, backend: Backend.Z3);
+            Assert.IsTrue(inputs.HasValue);
+            Assert.AreEqual(new Real(10), new Real(2) * inputs.Value);
+
+            Assert.IsTrue(f.Evaluate(5));
+            Assert.IsFalse(f.Evaluate(4));
+            Assert.IsFalse(f.Evaluate(-5));
+
+            f.Compile();
+
+            Assert.IsTrue(f.Evaluate(5));
+            Assert.IsFalse(f.Evaluate(4));
+            Assert.IsFalse(f.Evaluate(-5));
         }
 
         /// <summary>

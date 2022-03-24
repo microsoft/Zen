@@ -86,6 +86,13 @@ namespace ZenLib.Generation
             return e;
         }
 
+        public object VisitReal(ZenDepthConfiguration parameter)
+        {
+            var e = new ZenArbitraryExpr<Real>();
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
         public object VisitList(Type listType, Type elementType, ZenDepthConfiguration config)
         {
             if (!config.ExhaustiveDepth)

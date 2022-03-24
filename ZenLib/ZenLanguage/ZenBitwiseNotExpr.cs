@@ -55,7 +55,7 @@ namespace ZenLib
         public static Zen<T> Create(Zen<T> expr)
         {
             CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateIsIntegerType(typeof(T));
+            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
 
             hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;

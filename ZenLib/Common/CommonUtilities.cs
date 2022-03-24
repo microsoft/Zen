@@ -186,14 +186,26 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Validate that a type is an integer type.
+        /// Validate that a type is an arithmetic type.
         /// </summary>
         /// <param name="type"></param>
-        public static void ValidateIsIntegerType(Type type)
+        public static void ValidateIsArithmeticType(Type type)
         {
-            if (!ReflectionUtilities.IsIntegerType(type))
+            if (!ReflectionUtilities.IsArithmeticType(type))
             {
                 throw new ZenException($"Invalid non-integer type {type} used.");
+            }
+        }
+
+        /// <summary>
+        /// Validate that a type is a finite integer type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static void ValidateIsFiniteIntegerType(Type type)
+        {
+            if (!ReflectionUtilities.IsFiniteIntegerType(type))
+            {
+                throw new ZenException($"Invalid non-finite-integer type {type} used.");
             }
         }
 
