@@ -31,6 +31,15 @@ namespace ZenLib.Solver
             return BigInteger.Parse(parameter.ToString());
         }
 
+        public object VisitReal(Expr parameter)
+        {
+            Contract.Assert(parameter.IsRatNum);
+            var e = (RatNum)parameter;
+            var numerator = BigInteger.Parse(e.Numerator.ToString());
+            var denominator = BigInteger.Parse(e.Denominator.ToString());
+            return new Real(numerator, denominator);
+        }
+
         public object VisitBool(Expr parameter)
         {
             if (parameter.IsEq)

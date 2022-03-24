@@ -15,7 +15,7 @@ namespace ZenLib.Solver
     /// Implementation of a solver using decision diagrams.
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
-    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit>
+    internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit>
         where T : IDDNode
     {
         /// <summary>
@@ -491,7 +491,7 @@ namespace ZenLib.Solver
             return this.Manager.Or(x, y);
         }
 
-        public Assignment<T> Satisfiable(DD x)
+        public Assignment<T> Solve(DD x)
         {
             return this.Manager.Sat(x);
         }
@@ -612,26 +612,26 @@ namespace ZenLib.Solver
         [ExcludeFromCodeCoverage]
         public Unit DictSet(
             Unit arrayExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr,
-            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type keyType, Type valueType)
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> keyExpr,
+            SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> valueExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
+        public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
+        public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
         [ExcludeFromCodeCoverage]
-        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
+        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
@@ -661,7 +661,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit> valueExpr, Type type)
+        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> valueExpr, Type type)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
@@ -688,6 +688,42 @@ namespace ZenLib.Solver
         public Unit CreateStringConst(string s)
         {
             throw new ZenException("Decision diagram backend does not support String operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateRealVar(object e)
+        {
+            throw new ZenException("Decision diagram backend does not support Real operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Unit CreateRealConst(Real r)
+        {
+            throw new ZenException("Decision diagram backend does not support Real operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Maximize(BitVector<T> objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Maximize(Unit objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Minimize(BitVector<T> objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Minimize(Unit objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
         }
     }
 }

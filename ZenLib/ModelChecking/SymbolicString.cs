@@ -10,26 +10,26 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic string value.
     /// </summary>
-    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>
+    internal class SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> solver, TSeq value) : base(solver)
+        public SymbolicString(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver, TSeq value) : base(solver)
         {
             this.Value = value;
         }
 
         public TSeq Value { get; }
 
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> Merge(
+        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
             TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar> other)
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
         {
-            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>)other;
+            var o = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar>(this.Solver, value);
+            return new SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, value);
         }
 
         internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReturn, TParam> visitor,
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
             TParam parameter)
         {
             return visitor.Visit(this, parameter);

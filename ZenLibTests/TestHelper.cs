@@ -122,7 +122,7 @@ namespace ZenLib.Tests
 
             foreach (var type in types)
             {
-                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType)
+                if (type == ReflectionUtilities.StringType || type == ReflectionUtilities.BigIntType || type == ReflectionUtilities.RealType)
                 {
                     ps = GetUnboundedParameters();
                 }
@@ -143,7 +143,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = new ZenFunction<T1, bool>(function);
+                var f = Zen.Function<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -172,7 +172,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = new ZenFunction<T1, T2, bool>(function);
+                var f = Zen.Function<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -201,7 +201,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = new ZenFunction<T1, T2, T3, bool>(function);
+                var f = Zen.Function<T1, T2, T3, bool>(function);
                 var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -231,7 +231,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
-                var f = new ZenFunction<T1, T2, T3, T4, bool>(function);
+                var f = Zen.Function<T1, T2, T3, T4, bool>(function);
                 var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
@@ -258,7 +258,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is not valid
-                var f = new ZenFunction<T1, bool>(function);
+                var f = Zen.Function<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
@@ -282,7 +282,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = new ZenFunction<T1, T2, bool>(function);
+                var f = Zen.Function<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
@@ -302,7 +302,7 @@ namespace ZenLib.Tests
         {
             foreach (var p in GetBoundedParameters(defaultBddListSize, runBdds))
             {
-                var f = new ZenFunction<bool>(function);
+                var f = Zen.Function<bool>(function);
                 var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
 
                 Assert.AreEqual(f.Evaluate(), result);
@@ -323,7 +323,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = new ZenFunction<T1, bool>(function);
+                var f = Zen.Function<T1, bool>(function);
                 var result = f.Find((i1, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
                 if (result.HasValue)
                 {
@@ -348,7 +348,7 @@ namespace ZenLib.Tests
 
             foreach (var p in selectedParams)
             {
-                var f = new ZenFunction<T1, T2, bool>(function);
+                var f = Zen.Function<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)

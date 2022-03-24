@@ -81,7 +81,7 @@ namespace ZenLib.Interpretation
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
-        public object Visit<T>(ZenIntegerBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenArithBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -89,25 +89,7 @@ namespace ZenLib.Interpretation
 
             switch (expression.Operation)
             {
-                case Op.BitwiseAnd:
-                    if (ReflectionUtilities.IsFixedIntegerType(type))
-                        return ((dynamic)e1).BitwiseAnd((dynamic)e2);
-                    else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
-
-                case Op.BitwiseOr:
-                    if (ReflectionUtilities.IsFixedIntegerType(type))
-                        return ((dynamic)e1).BitwiseOr((dynamic)e2);
-                    else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
-
-                case Op.BitwiseXor:
-                    if (ReflectionUtilities.IsFixedIntegerType(type))
-                        return ((dynamic)e1).BitwiseXor((dynamic)e2);
-                    else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
-
-                case Op.Addition:
+                case ArithmeticOp.Addition:
                     if (type == ReflectionUtilities.ByteType)
                         return (byte)((byte)e1 + (byte)e2);
                     else if (type == ReflectionUtilities.ShortType)
@@ -124,13 +106,15 @@ namespace ZenLib.Interpretation
                         return (ulong)e1 + (ulong)e2;
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 + (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 + (Real)e2;
                     else
                     {
                         Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
                         return ((dynamic)e1).Add((dynamic)e2);
                     }
 
-                case Op.Subtraction:
+                case ArithmeticOp.Subtraction:
                     if (type == ReflectionUtilities.ByteType)
                         return (byte)((byte)e1 - (byte)e2);
                     else if (type == ReflectionUtilities.ShortType)
@@ -147,6 +131,8 @@ namespace ZenLib.Interpretation
                         return (ulong)e1 - (ulong)e2;
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 - (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 - (Real)e2;
                     else
                     {
                         Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
@@ -154,7 +140,7 @@ namespace ZenLib.Interpretation
                     }
 
                 default:
-                    Contract.Assert(expression.Operation == Op.Multiplication);
+                    Contract.Assert(expression.Operation == ArithmeticOp.Multiplication);
                     if (type == ReflectionUtilities.ByteType)
                         return (byte)((byte)e1 * (byte)e2);
                     else if (type == ReflectionUtilities.ShortType)
@@ -169,11 +155,42 @@ namespace ZenLib.Interpretation
                         return (long)e1 * (long)e2;
                     else if (type == ReflectionUtilities.UlongType)
                         return (ulong)e1 * (ulong)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 * (Real)e2;
                     else
                     {
                         Contract.Assert(ReflectionUtilities.IsBigIntegerType(type));
                         return (BigInteger)e1 * (BigInteger)e2;
                     }
+            }
+        }
+
+        public object Visit<T>(ZenBitwiseBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = Evaluate(expression.Expr1, parameter);
+            var e2 = Evaluate(expression.Expr2, parameter);
+            var type = typeof(T);
+
+            switch (expression.Operation)
+            {
+                case BitwiseOp.BitwiseAnd:
+                    if (ReflectionUtilities.IsFixedIntegerType(type))
+                        return ((dynamic)e1).BitwiseAnd((dynamic)e2);
+                    else
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
+
+                case BitwiseOp.BitwiseOr:
+                    if (ReflectionUtilities.IsFixedIntegerType(type))
+                        return ((dynamic)e1).BitwiseOr((dynamic)e2);
+                    else
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
+
+                default:
+                    Contract.Assert(expression.Operation == BitwiseOp.BitwiseXor);
+                    if (ReflectionUtilities.IsFixedIntegerType(type))
+                        return ((dynamic)e1).BitwiseXor((dynamic)e2);
+                    else
+                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
             }
         }
 
@@ -243,7 +260,7 @@ namespace ZenLib.Interpretation
             return ((T)e1).Equals((T)e2);
         }
 
-        public object Visit<T>(ZenIntegerComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
@@ -268,6 +285,8 @@ namespace ZenLib.Interpretation
                         return (ulong)e1 >= (ulong)e2;
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 >= (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 >= (Real)e2;
                     else
                     {
                         Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
@@ -292,6 +311,8 @@ namespace ZenLib.Interpretation
                         return (ulong)e1 <= (ulong)e2;
                     else if (type == ReflectionUtilities.BigIntType)
                         return (BigInteger)e1 <= (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 <= (Real)e2;
                     else
                     {
                         Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));

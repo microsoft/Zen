@@ -201,9 +201,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatMultipleValues()
         {
-            var f1 = new ZenFunction<string, string, bool>((w, x) => w + x == "hello");
-            var f2 = new ZenFunction<string, string, string, bool>((w, x, y) => w + x + y == "hello");
-            var f3 = new ZenFunction<string, string, string, string, bool>((w, x, y, z) => w + x + y + z == "hello");
+            var f1 = Zen.Function<string, string, bool>((w, x) => w + x == "hello");
+            var f2 = Zen.Function<string, string, string, bool>((w, x, y) => w + x + y == "hello");
+            var f3 = Zen.Function<string, string, string, string, bool>((w, x, y, z) => w + x + y + z == "hello");
             var r1 = f1.Find((i1, i2, o) => o);
             var r2 = f2.Find((i1, i2, i3, o) => o);
             var r3 = f3.Find((i1, i2, i3, i4, o) => o);
@@ -241,7 +241,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "uick", false)]
         public void TestStartsWithEvaluation(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.StartsWith(s2));
+            var f = Zen.Function<string, string, bool>((s1, s2) => s1.StartsWith(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -257,7 +257,7 @@ namespace ZenLib.Tests
         [DataRow("quick fox", "", true)]
         public void TestEndsWithEvaluation(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.EndsWith(s2));
+            var f = Zen.Function<string, string, bool>((s1, s2) => s1.EndsWith(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -274,7 +274,7 @@ namespace ZenLib.Tests
         [DataRow("hello", "b", false)]
         public void TestContainsEvaluation(string s, string sub, bool expected)
         {
-            var f = new ZenFunction<string, string, bool>((s1, s2) => s1.Contains(s2));
+            var f = Zen.Function<string, string, bool>((s1, s2) => s1.Contains(s2));
             Assert.AreEqual(expected, f.Evaluate(s, sub));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, sub));
@@ -291,7 +291,7 @@ namespace ZenLib.Tests
         [DataRow("abc", "b", "", "ac")]
         public void TestReplaceEvaluation(string s, string sub, string replace, string expected)
         {
-            var f = new ZenFunction<string, string>(s => s.ReplaceFirst(sub, replace));
+            var f = Zen.Function<string, string>(s => s.ReplaceFirst(sub, replace));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -307,7 +307,7 @@ namespace ZenLib.Tests
         [DataRow("hello", 0, 20, "hello")]
         public void TestSubstringEvaluation(string s, int offset, int length, string expected)
         {
-            var f = new ZenFunction<string, string>(s => s.Slice(new BigInteger(offset), new BigInteger(length)));
+            var f = Zen.Function<string, string>(s => s.Slice(new BigInteger(offset), new BigInteger(length)));
             Assert.AreEqual(expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s));
@@ -328,7 +328,7 @@ namespace ZenLib.Tests
         [DataRow("", 2, "")]
         public void TestAtEvaluation(string s, int index, string expected)
         {
-            var f = new ZenFunction<string, BigInteger, string>((s, idx) => s.At(idx));
+            var f = Zen.Function<string, BigInteger, string>((s, idx) => s.At(idx));
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
             f.Compile();
             Assert.AreEqual(expected, f.Evaluate(s, (ushort)index));
@@ -353,7 +353,7 @@ namespace ZenLib.Tests
         [DataRow("\x01\x02", 2)]
         public void TestLengthEvaluation(string s, int expected)
         {
-            var f = new ZenFunction<string, BigInteger>(s => s.Length());
+            var f = Zen.Function<string, BigInteger>(s => s.Length());
             Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
             f.Compile();
             Assert.AreEqual(new BigInteger(expected), f.Evaluate(s));
@@ -374,7 +374,7 @@ namespace ZenLib.Tests
         [DataRow("abcda", "e", 0, -1)]
         public void TestIndexOfEvaluation(string s, string sub, int offset, int expected)
         {
-            var f = new ZenFunction<string, BigInteger>(s => s.IndexOf(sub, new BigInteger(offset)));
+            var f = Zen.Function<string, BigInteger>(s => s.IndexOf(sub, new BigInteger(offset)));
             Assert.AreEqual((short)expected, f.Evaluate(s));
             f.Compile();
             Assert.AreEqual((short)expected, f.Evaluate(s));
@@ -386,7 +386,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestIndexOfFind()
         {
-            var f = new ZenFunction<string, BigInteger>(s => s.IndexOf("a", new BigInteger(0)));
+            var f = Zen.Function<string, BigInteger>(s => s.IndexOf("a", new BigInteger(0)));
             var input = f.Find((s, o) => o == new BigInteger(5));
             Assert.AreEqual((short)5, f.Evaluate(input.Value));
         }
@@ -397,7 +397,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMultipleOperations()
         {
-            var f = new ZenFunction<string, bool>(s =>
+            var f = Zen.Function<string, bool>(s =>
             {
                 var c = s.At(new BigInteger(3));
                 var s2 = s.Slice(new BigInteger(5), new BigInteger(2));
@@ -463,7 +463,7 @@ namespace ZenLib.Tests
         {
             var r = Regex.Parse(regex);
 
-            var examples = new ZenConstraint<string>(s => s.MatchesRegex(regex)).FindAll().Take(5);
+            var examples = Zen.Constraint<string>(s => s.MatchesRegex(regex)).FindAll().Take(5);
 
             foreach (var example in examples)
             {
@@ -471,7 +471,7 @@ namespace ZenLib.Tests
                 Assert.IsTrue(r.IsMatch(Seq.FromString(example).Values));
             }
 
-            examples = new ZenConstraint<string>(s => Not(s.MatchesRegex(regex))).FindAll().Take(5);
+            examples = Zen.Constraint<string>(s => Not(s.MatchesRegex(regex))).FindAll().Take(5);
 
             foreach (var example in examples)
             {
@@ -485,7 +485,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestNegationDot()
         {
-            var example = new ZenConstraint<string>(s => Not(s.MatchesRegex(".*"))).Find();
+            var example = Zen.Constraint<string>(s => Not(s.MatchesRegex(".*"))).Find();
             Assert.IsFalse(example.HasValue);
         }
 
@@ -496,7 +496,7 @@ namespace ZenLib.Tests
         public void TestMatchesRegexEmpty1()
         {
             var r = Regex.Empty<ZenLib.Char>();
-            var s = new ZenConstraint<string>(s => s.MatchesRegex(r)).Find();
+            var s = Zen.Constraint<string>(s => s.MatchesRegex(r)).Find();
             Assert.IsFalse(s.HasValue);
         }
 
@@ -507,7 +507,7 @@ namespace ZenLib.Tests
         public void TestMatchesRegexEmpty2()
         {
             var r = Regex.Empty<byte>();
-            var s = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+            var s = Zen.Constraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
             Assert.IsFalse(s.HasValue);
         }
 
@@ -517,7 +517,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatenationEquality()
         {
-            var s = new ZenConstraint<string, string>((s1, s2) => s1 == s2 + "string").Find();
+            var s = Zen.Constraint<string, string>((s1, s2) => s1 == s2 + "string").Find();
             Assert.IsTrue(s.Value.Item1 == s.Value.Item2 + "string");
         }
 
@@ -527,7 +527,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharSeqWorks()
         {
-            var s = new ZenConstraint<Seq<ZenLib.Char>>(s => s.Contains(new ZenLib.Char(70))).Find();
+            var s = Zen.Constraint<Seq<ZenLib.Char>>(s => s.Contains(new ZenLib.Char(70))).Find();
             Console.WriteLine(s.Value);
             Assert.AreEqual("[F]", s.Value.ToString());
         }
@@ -539,7 +539,7 @@ namespace ZenLib.Tests
         public void TestStringInvalidUnicodeRange()
         {
             var seq = new Seq<ZenLib.Char>().Add(new ZenLib.Char(0xd800)).Add(new ZenLib.Char(0xdfff));
-            var s = new ZenConstraint<string>(s => s == Seq.AsString(seq)).Find();
+            var s = Zen.Constraint<string>(s => s == Seq.AsString(seq)).Find();
             Assert.AreEqual(s.Value, @"\u{0D800}\u{0DFFF}");
         }
 

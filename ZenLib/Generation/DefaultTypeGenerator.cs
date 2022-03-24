@@ -90,6 +90,11 @@ namespace ZenLib.Generation
             return ZenConstantExpr<BigInteger>.Create(new BigInteger(0));
         }
 
+        public object VisitReal(Unit parameter)
+        {
+            return ZenConstantExpr<Real>.Create(new Real(0));
+        }
+
         public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Unit u)
         {
             var asList = fields.ToArray();

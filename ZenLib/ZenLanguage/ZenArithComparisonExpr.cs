@@ -9,9 +9,9 @@ namespace ZenLib
     using System.Numerics;
 
     /// <summary>
-    /// Class representing a comparison expression.
+    /// Class representing an arithmetic comparison expression.
     /// </summary>
-    internal sealed class ZenIntegerComparisonExpr<T> : Zen<bool>
+    internal sealed class ZenArithComparisonExpr<T> : Zen<bool>
     {
         /// <summary>
         /// Static creation function for hash consing.
@@ -56,6 +56,15 @@ namespace ZenLib
         };
 
         /// <summary>
+        /// The interpretation functions for comparison operations.
+        /// </summary>
+        private static Func<Real, Real, bool>[] constantRealFuncs = new Func<Real, Real, bool>[]
+        {
+            (x, y) => x >= y,
+            (x, y) => x <= y,
+        };
+
+        /// <summary>
         /// Unroll a ZenComparisonExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -83,6 +92,11 @@ namespace ZenLib
                 return Zen.Constant(constantUlongFuncs[(int)comparisonType](ue1.Value, ue2.Value));
             }
 
+            if (e1 is ZenConstantExpr<Real> re1 && e2 is ZenConstantExpr<Real> re2)
+            {
+                return Zen.Constant(constantRealFuncs[(int)comparisonType](re1.Value, re2.Value));
+            }
+
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
             if (x.HasValue && y.HasValue)
@@ -90,7 +104,7 @@ namespace ZenLib
                 return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)comparisonType](x.Value, y.Value));
             }
 
-            return new ZenIntegerComparisonExpr<T>(e1, e2, comparisonType);
+            return new ZenArithComparisonExpr<T>(e1, e2, comparisonType);
         }
 
         /// <summary>
@@ -104,7 +118,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateIsIntegerType(typeof(T));
+            CommonUtilities.ValidateIsArithmeticType(typeof(T));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
             hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), createFunc, out var value);
@@ -112,12 +126,12 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenIntegerComparisonExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenArithComparisonExpr{T}"/> class.
         /// </summary>
         /// <param name="expr1">The first expression.</param>
         /// <param name="expr2">The second expression.</param>
         /// <param name="comparisonType">The comparison type.</param>
-        private ZenIntegerComparisonExpr(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
+        private ZenArithComparisonExpr(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;

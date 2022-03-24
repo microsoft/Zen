@@ -5,11 +5,14 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
     using System.Threading;
     using ZenLib.Generation;
+    using ZenLib.Interpretation;
+    using ZenLib.ModelChecking;
 
     /// <summary>
     /// A Zen expression object parameterized over the C# type.
@@ -518,7 +521,7 @@ namespace ZenLib
             if (type == ReflectionUtilities.BoolType ||
                 type == ReflectionUtilities.CharType ||
                 type == ReflectionUtilities.StringType ||
-                ReflectionUtilities.IsIntegerType(type) ||
+                ReflectionUtilities.IsArithmeticType(type) ||
                 ReflectionUtilities.IsMapType(type) ||
                 ReflectionUtilities.IsSeqType(type))
             {
@@ -566,7 +569,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
+            return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
         }
 
         /// <summary>
@@ -608,7 +611,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
+            return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
         }
 
         /// <summary>
@@ -622,7 +625,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Addition);
+            return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Addition);
         }
 
         /// <summary>
@@ -835,7 +838,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Subtraction);
+            return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Subtraction);
         }
 
         /// <summary>
@@ -849,7 +852,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.Multiplication);
+            return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Multiplication);
         }
 
         /// <summary>
@@ -1087,7 +1090,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseAnd);
+            return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseAnd);
         }
 
         /// <summary>
@@ -1113,7 +1116,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseOr);
+            return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseOr);
         }
 
         /// <summary>
@@ -1151,7 +1154,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenIntegerBinopExpr<T>.Create(expr1, expr2, Op.BitwiseXor);
+            return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseXor);
         }
 
         /// <summary>
@@ -1339,6 +1342,241 @@ namespace ZenLib
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Solves for an assignment to Arbitrary variables in a boolean expression.
+        /// </summary>
+        /// <param name="expr">The boolean expression.</param>
+        /// <param name="backend">The solver backend to use.</param>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static ZenSolution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
+        {
+            return new ZenSolution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+        }
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The objective function.</param>
+        /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        {
+            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            return new ZenSolution(SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+        }
+
+        /// <summary>
+        /// Minimize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The objective function.</param>
+        /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        {
+            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            return new ZenSolution(SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+        }
+
+        /// <summary>
+        /// Alias for new ZenFunction.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenFunction<T> Function<T>(Func<Zen<T>> f)
+        {
+            return new ZenFunction<T>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenFunction.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenFunction<T1, T2> Function<T1, T2>(Func<Zen<T1>, Zen<T2>> f)
+        {
+            return new ZenFunction<T1, T2>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenFunction.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenFunction<T1, T2, T3> Function<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> f)
+        {
+            return new ZenFunction<T1, T2, T3>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenFunction.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenFunction<T1, T2, T3, T4> Function<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f)
+        {
+            return new ZenFunction<T1, T2, T3, T4>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenFunction.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenFunction<T1, T2, T3, T4, T5> Function<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f)
+        {
+            return new ZenFunction<T1, T2, T3, T4, T5>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenConstraint.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenConstraint<T> Constraint<T>(Func<Zen<T>, Zen<bool>> f)
+        {
+            return new ZenConstraint<T>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenConstraint.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenConstraint<T1, T2> Constraint<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> f)
+        {
+            return new ZenConstraint<T1, T2>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenConstraint.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenConstraint<T1, T2, T3> Constraint<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> f)
+        {
+            return new ZenConstraint<T1, T2, T3>(f);
+        }
+
+        /// <summary>
+        /// Alias for new ZenConstraint.
+        /// </summary>
+        /// <param name="f">The function expression.</param>
+        /// <returns>The Zen function.</returns>
+        public static ZenConstraint<T1, T2, T3, T4> Constraint<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> f)
+        {
+            return new ZenConstraint<T1, T2, T3, T4>(f);
+        }
+
+        /// <summary>
+        /// Evaluates a Zen expression given an assignment from arbitrary variable to C# object.
+        /// </summary>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static T Evaluate<T>(this Zen<T> expr, Dictionary<object, object> assignment)
+        {
+            Zen<bool> constraints = true;
+            foreach (var kv in assignment)
+            {
+                var keyType = kv.Key.GetType();
+                var valueType = kv.Value.GetType();
+                ReflectionUtilities.ValidateIsZenType(keyType);
+                var innerType = keyType.GetGenericArgumentsCached()[0];
+                CommonUtilities.ValidateIsTrue(innerType.IsAssignableFrom(valueType), "Type mismatch in assignment between key and value");
+                constraints = Zen.And(constraints, Zen.Eq((dynamic)kv.Key, (dynamic)kv.Value));
+            }
+
+            var solution = constraints.Solve();
+            var environment = new ExpressionEvaluatorEnvironment(solution.ArbitraryAssignment);
+            var interpreter = new ExpressionEvaluator(false);
+            return (T)interpreter.Evaluate(expr, environment);
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSet<T> StateSet<T>(this ZenFunction<T, bool> function, StateSetTransformerManager manager = null)
+        {
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof(T), function.FunctionBodyExpr.Id);
+            if (manager.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return (StateSet<T>)stateSet;
+            }
+
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(function.Function, manager));
+            manager.StateSetCache.Add(key, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSet<Pair<T1, T2>> StateSet<T1, T2>(this ZenFunction<T1, T2, bool> function, StateSetTransformerManager manager = null)
+        {
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof(Pair<T1, T2>), function.FunctionBodyExpr.Id);
+            if (manager.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return (StateSet<Pair<T1, T2>>)stateSet;
+            }
+
+            Func<Zen<Pair<T1, T2>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2());
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            manager.StateSetCache.Add(key, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSet<Pair<T1, T2, T3>> StateSet<T1, T2, T3>(this ZenFunction<T1, T2, T3, bool> function, StateSetTransformerManager manager = null)
+        {
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof(Pair<T1, T2, T3>), function.FunctionBodyExpr.Id);
+            if (manager.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return (StateSet<Pair<T1, T2, T3>>)stateSet;
+            }
+
+            Func<Zen<Pair<T1, T2, T3>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3());
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            manager.StateSetCache.Add(key, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSet<Pair<T1, T2, T3, T4>> StateSet<T1, T2, T3, T4>(this ZenFunction<T1, T2, T3, T4, bool> function, StateSetTransformerManager manager = null)
+        {
+            manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
+
+            var key = (typeof(Pair<T1, T2, T3, T4>), function.FunctionBodyExpr.Id);
+            if (manager.StateSetCache.TryGetValue(key, out var stateSet))
+            {
+                return (StateSet<Pair<T1, T2, T3, T4>>)stateSet;
+            }
+
+            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<bool>> f = p => function.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
+            manager.StateSetCache.Add(key, result);
+            return result;
         }
     }
 }

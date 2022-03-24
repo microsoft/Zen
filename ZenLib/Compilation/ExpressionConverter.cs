@@ -137,26 +137,37 @@ namespace ZenLib.Compilation
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
-        public Expression Visit<T>(ZenIntegerBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenArithBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
 
             switch (expression.Operation)
             {
-                case Op.BitwiseAnd:
-                    return BitwiseAnd<T>(e1, e2);
-                case Op.BitwiseOr:
-                    return BitwiseOr<T>(e1, e2);
-                case Op.BitwiseXor:
-                    return BitwiseXor<T>(e1, e2);
-                case Op.Addition:
+                case ArithmeticOp.Addition:
                     return Add<T>(e1, e2);
-                case Op.Subtraction:
+                case ArithmeticOp.Subtraction:
                     return Subtract<T>(e1, e2);
                 default:
-                    Contract.Assert(expression.Operation == Op.Multiplication);
+                    Contract.Assert(expression.Operation == ArithmeticOp.Multiplication);
                     return Expression.Multiply(e1, e2);
+            }
+        }
+
+        public Expression Visit<T>(ZenBitwiseBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.Expr1, parameter);
+            var e2 = Convert(expression.Expr2, parameter);
+
+            switch (expression.Operation)
+            {
+                case BitwiseOp.BitwiseAnd:
+                    return BitwiseAnd<T>(e1, e2);
+                case BitwiseOp.BitwiseOr:
+                    return BitwiseOr<T>(e1, e2);
+                default:
+                    Contract.Assert(expression.Operation == BitwiseOp.BitwiseXor);
+                    return BitwiseXor<T>(e1, e2);
             }
         }
 
@@ -221,7 +232,7 @@ namespace ZenLib.Compilation
         {
             var type = typeof(T);
 
-            if (type == ReflectionUtilities.BigIntType)
+            if (type == ReflectionUtilities.BigIntType || type == ReflectionUtilities.RealType)
             {
                 return Expression.Add(left, right);
             }
@@ -246,7 +257,7 @@ namespace ZenLib.Compilation
         {
             var type = typeof(T);
 
-            if (type == ReflectionUtilities.BigIntType)
+            if (type == ReflectionUtilities.BigIntType || type == ReflectionUtilities.RealType)
             {
                 return Expression.Subtract(left, right);
             }
@@ -350,7 +361,7 @@ namespace ZenLib.Compilation
             return Expression.Equal(e1, e2);
         }
 
-        public Expression Visit<T>(ZenIntegerComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);

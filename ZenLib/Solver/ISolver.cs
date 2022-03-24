@@ -19,7 +19,8 @@ namespace ZenLib.Solver
     /// <typeparam name="TSeq">The sequence type.</typeparam>
     /// <typeparam name="TArray">The array type.</typeparam>
     /// <typeparam name="TChar">The character type.</typeparam>
-    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar>
+    /// <typeparam name="TReal">The real type.</typeparam>
+    internal interface ISolver<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal>
     {
         /// <summary>
         /// The false expression.
@@ -140,6 +141,19 @@ namespace ZenLib.Solver
         TInteger CreateBigIntegerConst(BigInteger b);
 
         /// <summary>
+        /// Create a new real expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        (TVariable, TReal) CreateRealVar(object e);
+
+        /// <summary>
+        /// Create a real constant.
+        /// </summary>
+        /// <returns></returns>
+        TReal CreateRealConst(Real r);
+
+        /// <summary>
         /// Create a new sequence expression.
         /// </summary>
         /// <param name="e">Zen arbitrary expr.</param>
@@ -233,6 +247,14 @@ namespace ZenLib.Solver
         TInteger Add(TInteger x, TInteger y);
 
         /// <summary>
+        /// The 'Add' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TReal Add(TReal x, TReal y);
+
+        /// <summary>
         /// The 'Subtract' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -249,6 +271,14 @@ namespace ZenLib.Solver
         TInteger Subtract(TInteger x, TInteger y);
 
         /// <summary>
+        /// The 'Subtract' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TReal Subtract(TReal x, TReal y);
+
+        /// <summary>
         /// The 'Multiply' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -263,6 +293,14 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TInteger Multiply(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'Multiply' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TReal Multiply(TReal x, TReal y);
 
         /// <summary>
         /// The 'Resize' of a bitvec expressions.
@@ -286,7 +324,7 @@ namespace ZenLib.Solver
         /// <param name="valueExpr">The value expression.</param>
         /// <param name="type">The type of the sequence.</param>
         /// <returns></returns>
-        TSeq SeqUnit(SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> valueExpr, Type type);
+        TSeq SeqUnit(SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> valueExpr, Type type);
 
         /// <summary>
         /// The 'Concat' of two expressions.
@@ -387,7 +425,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> valueExpr, Type keyType, Type valueType);
+        TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> valueExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of setting a key to a value for an array.
@@ -397,7 +435,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, Type keyType, Type valueType);
+        TArray DictDelete(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of getting a value for a key from an array.
@@ -407,7 +445,7 @@ namespace ZenLib.Solver
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <returns></returns>
-        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> keyExpr, Type keyType, Type valueType);
+        (TBool, object) DictGet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> keyExpr, Type keyType, Type valueType);
 
         /// <summary>
         /// The result of unioning two arrays.
@@ -440,6 +478,14 @@ namespace ZenLib.Solver
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool Eq(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'Equal' of two reals.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool Eq(TReal x, TReal y);
 
         /// <summary>
         /// The 'Equal' of two seqs.
@@ -487,10 +533,18 @@ namespace ZenLib.Solver
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
-        TBool LessThanOrEqualSigned(TBitvec x, TBitvec y);
+        TBool LessThanOrEqual(TReal x, TReal y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool LessThanOrEqualSigned(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'GreaterThanOrEqual' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
@@ -498,12 +552,20 @@ namespace ZenLib.Solver
         TBool GreaterThanOrEqual(TBitvec x, TBitvec y);
 
         /// <summary>
-        /// The 'LessThanOrEqual' of two expressions.
+        /// The 'GreaterThanOrEqual' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool GreaterThanOrEqual(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'GreaterThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThanOrEqual(TReal x, TReal y);
 
         /// <summary>
         /// The 'LessThanOrEqual' of two expressions.
@@ -568,11 +630,68 @@ namespace ZenLib.Solver
         TChar Ite(TBool g, TChar t, TChar f);
 
         /// <summary>
+        /// The 'Ite' of a guard and two reals.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
+        TReal Ite(TBool g, TReal t, TReal f);
+
+        /// <summary>
         /// Check whether a boolean expression is satisfiable.
         /// </summary>
         /// <param name="x">The expression.</param>
         /// <returns>A model, if satisfiable.</returns>
-        TModel Satisfiable(TBool x);
+        TModel Solve(TBool x);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TBitvec objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TInteger objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TReal objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TBitvec objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TInteger objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TReal objective, TBool subjectTo);
 
         /// <summary>
         /// Get the value for a variable in a model.
@@ -589,6 +708,6 @@ namespace ZenLib.Solver
         /// <param name="e"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar> ConvertExprToSymbolicValue(object e, Type type);
+        SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> ConvertExprToSymbolicValue(object e, Type type);
     }
 }

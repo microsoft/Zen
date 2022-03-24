@@ -36,7 +36,7 @@ namespace ZenLib.SymbolicExecution
 
             (T2, PathConstraint) interpretFunction(T1 e)
             {
-                var assignment = ModelCheckerFactory.CreateModelChecker(backend, null, arguments).ModelCheck(input == e, arguments);
+                var assignment = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments).ModelCheck(input == e, arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
                 return ((T2)evaluator.Evaluate(expression, env), evaluator.PathConstraint);
@@ -69,7 +69,7 @@ namespace ZenLib.SymbolicExecution
             (T3, PathConstraint) interpretFunction((T1, T2) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null, arguments)
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
@@ -105,7 +105,7 @@ namespace ZenLib.SymbolicExecution
             (T4, PathConstraint) interpretFunction((T1, T2, T3) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null, arguments)
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
@@ -143,7 +143,7 @@ namespace ZenLib.SymbolicExecution
             (T5, PathConstraint) interpretFunction((T1, T2, T3, T4) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, null, arguments)
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), arguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);

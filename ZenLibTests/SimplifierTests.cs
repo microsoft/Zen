@@ -174,6 +174,8 @@ namespace ZenLib.Tests
             Assert.AreEqual((Constant<ulong>(1) <= Constant<ulong>(0)), False());
             Assert.AreEqual((Constant<BigInteger>(1) <= Constant<BigInteger>(1)), True());
             Assert.AreEqual((Constant<BigInteger>(1) <= Constant<BigInteger>(0)), False());
+            Assert.AreEqual((Constant<Real>(1) <= Constant<Real>(1)), True());
+            Assert.AreEqual((Constant<Real>(1) <= Constant<Real>(0)), False());
         }
 
         /// <summary>
@@ -198,6 +200,8 @@ namespace ZenLib.Tests
             Assert.AreEqual((Constant<ulong>(0) >= Constant<ulong>(1)), False());
             Assert.AreEqual((Constant<BigInteger>(1) >= Constant<BigInteger>(1)), True());
             Assert.AreEqual((Constant<BigInteger>(0) >= Constant<BigInteger>(1)), False());
+            Assert.AreEqual((Constant<Real>(1) >= Constant<Real>(1)), True());
+            Assert.AreEqual((Constant<Real>(0) >= Constant<Real>(1)), False());
         }
 
         /// <summary>
@@ -210,6 +214,8 @@ namespace ZenLib.Tests
             Assert.AreEqual((Constant<byte>(0) + Constant<byte>(1)), Constant<byte>(1));
             Assert.AreEqual((Constant<BigInteger>(1) + Constant<BigInteger>(0)), Constant<BigInteger>(1));
             Assert.AreEqual((Constant<BigInteger>(0) + Constant<BigInteger>(1)), Constant<BigInteger>(1));
+            Assert.AreEqual((Constant<Real>(1) + Constant<Real>(0)), Constant<Real>(1));
+            Assert.AreEqual((Constant<Real>(0) + Constant<Real>(1)), Constant<Real>(1));
             CheckValid<byte>(x => x + 0 == x);
             CheckValid<byte>(x => 0 + x == x);
         }
@@ -222,6 +228,7 @@ namespace ZenLib.Tests
         {
             Assert.AreEqual((Constant<byte>(1) - Constant<byte>(0)), Constant<byte>(1));
             Assert.AreEqual((Constant<BigInteger>(1) - Constant<BigInteger>(0)), Constant<BigInteger>(1));
+            Assert.AreEqual((Constant<Real>(1) - Constant<Real>(0)), Constant<Real>(1));
         }
 
         /// <summary>
@@ -232,6 +239,7 @@ namespace ZenLib.Tests
         {
             Assert.AreEqual((Constant<byte>(2) * Constant<byte>(2)), Constant<byte>(4));
             Assert.AreEqual((Constant<BigInteger>(2) * Constant<BigInteger>(2)), Constant<BigInteger>(4));
+            Assert.AreEqual((Constant<Real>(2) * Constant<Real>(2)), Constant<Real>(4));
             CheckValid<byte>(x => x * 1 == x);
             CheckValid<byte>(x => 1 * x == x);
             CheckValid<byte>(x => x * 0 == 0);

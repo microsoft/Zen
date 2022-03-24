@@ -88,6 +88,11 @@ namespace ZenLib
         public readonly static Type BigIntType = typeof(BigInteger);
 
         /// <summary>
+        /// The type of real values.
+        /// </summary>
+        public readonly static Type RealType = typeof(Real);
+
+        /// <summary>
         /// The type of seq values.
         /// </summary>
         public readonly static Type SeqType = typeof(Seq<>);
@@ -309,9 +314,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>True or false.</returns>
-        public static bool IsIntegerType(Type type)
+        public static bool IsArithmeticType(Type type)
         {
-            return IsFiniteIntegerType(type) || IsBigIntegerType(type);
+            return IsFiniteIntegerType(type) || IsBigIntegerType(type) || IsRealType(type);
         }
 
         /// <summary>
@@ -376,6 +381,16 @@ namespace ZenLib
         public static bool IsBigIntegerType(Type type)
         {
             return type == BigIntType;
+        }
+
+        /// <summary>
+        /// Check if a type is a real.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>True or false.</returns>
+        public static bool IsRealType(Type type)
+        {
+            return type == RealType;
         }
 
         /// <summary>
@@ -708,6 +723,8 @@ namespace ZenLib
                 return 0UL;
             if (type == BigIntType)
                 return new BigInteger(0);
+            if (type == RealType)
+                return new Real(0, 1);
             if (type == StringType)
                 return string.Empty;
             if (IsFixedIntegerType(type))
@@ -782,6 +799,8 @@ namespace ZenLib
                 return visitor.VisitUlong(parameter);
             if (type == BigIntType)
                 return visitor.VisitBigInteger(parameter);
+            if (type == RealType)
+                return visitor.VisitReal(parameter);
             if (type == StringType)
                 return visitor.VisitString(parameter);
             if (IsFixedIntegerType(type))
@@ -918,7 +937,7 @@ namespace ZenLib
 
                 if (value is bool || value is byte || value is Char || value is short || value is ushort ||
                     value is int  || value is uint || value is long || value is ulong || value is BigInteger ||
-                    IsFixedIntegerType(type))
+                    value is Real || IsFixedIntegerType(type))
                 {
                     return ZenConstantExpr<T>.Create((dynamic)value);
                 }

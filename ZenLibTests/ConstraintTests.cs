@@ -23,10 +23,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFind()
         {
-            var a = new ZenConstraint<int>(x => x == 11).Find();
-            var b = new ZenConstraint<int, int>((x, y) => And(x == 11, y == 11)).Find();
-            var c = new ZenConstraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).Find();
-            var d = new ZenConstraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).Find();
+            var a = Zen.Constraint<int>(x => x == 11).Find();
+            var b = Zen.Constraint<int, int>((x, y) => And(x == 11, y == 11)).Find();
+            var c = Zen.Constraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).Find();
+            var d = Zen.Constraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).Find();
 
             Assert.AreEqual(11, a.Value);
             Assert.AreEqual(11, b.Value.Item1);
@@ -46,10 +46,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFindAll()
         {
-            Assert.AreEqual(1, new ZenConstraint<int>(x => x == 11).FindAll().Count());
-            Assert.AreEqual(1, new ZenConstraint<int, int>((x, y) => And(x == 11, y == 11)).FindAll().Count());
-            Assert.AreEqual(1, new ZenConstraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).FindAll().Count());
-            Assert.AreEqual(1, new ZenConstraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).FindAll().Count());
+            Assert.AreEqual(1, Zen.Constraint<int>(x => x == 11).FindAll().Count());
+            Assert.AreEqual(1, Zen.Constraint<int, int>((x, y) => And(x == 11, y == 11)).FindAll().Count());
+            Assert.AreEqual(1, Zen.Constraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).FindAll().Count());
+            Assert.AreEqual(1, Zen.Constraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).FindAll().Count());
         }
 
         /// <summary>
@@ -71,10 +71,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestStateSet2()
         {
-            var c1 = new ZenConstraint<uint>(x => x == 1);
-            var c2 = new ZenConstraint<uint, uint>((x, y) => And(x == 1, y == 1));
-            var c3 = new ZenConstraint<uint, uint, uint>((x, y, z) => And(x == 1, y == 1, z == 1));
-            var c4 = new ZenConstraint<uint, uint, uint, uint>((w, x, y, z) => And(w == 1, x == 1, y == 1, z == 1));
+            var c1 = Zen.Constraint<uint>(x => x == 1);
+            var c2 = Zen.Constraint<uint, uint>((x, y) => And(x == 1, y == 1));
+            var c3 = Zen.Constraint<uint, uint, uint>((x, y, z) => And(x == 1, y == 1, z == 1));
+            var c4 = Zen.Constraint<uint, uint, uint, uint>((w, x, y, z) => And(w == 1, x == 1, y == 1, z == 1));
 
             var v1 = c1.StateSet().Element();
             var v2 = c2.StateSet().Element();

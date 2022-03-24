@@ -1040,6 +1040,16 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
+        public void TestMultiplyException3()
+        {
+            Zen.Multiply(Constant(new UInt9(0)), Constant(new UInt9(0)));
+        }
+
+        /// <summary>
+        /// Exception thrown for null parameter.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestNotException()
         {
             Zen.Not(null);
