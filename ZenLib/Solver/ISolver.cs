@@ -643,7 +643,55 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="x">The expression.</param>
         /// <returns>A model, if satisfiable.</returns>
-        TModel Satisfiable(TBool x);
+        TModel Solve(TBool x);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TBitvec objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TInteger objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Maximize(TReal objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TBitvec objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TInteger objective, TBool subjectTo);
+
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
+        TModel Minimize(TReal objective, TBool subjectTo);
 
         /// <summary>
         /// Get the value for a variable in a model.

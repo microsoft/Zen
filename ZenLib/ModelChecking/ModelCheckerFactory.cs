@@ -18,17 +18,18 @@ namespace ZenLib.ModelChecking
         /// Create a model checker.
         /// </summary>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="context">The checking context.</param>
         /// <param name="expression">The expression to evaluate.</param>
         /// <param name="arguments">The arguements.</param>
         /// <returns>A new model checker.</returns>
-        internal static IModelChecker CreateModelChecker(Backend backend, Zen<bool> expression, Dictionary<long, object> arguments)
+        internal static IModelChecker CreateModelChecker(Backend backend, ModelCheckerContext context, Zen<bool> expression, Dictionary<long, object> arguments)
         {
             if (backend == Backend.DecisionDiagrams)
             {
                 return CreateModelCheckerDD(expression, arguments);
             }
 
-            return CreateModelCheckerZ3();
+            return CreateModelCheckerZ3(context);
         }
 
         /// <summary>
@@ -50,10 +51,11 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Create a model checker based on SMT with Z3.
         /// </summary>
+        /// <param name="context">The model checker context.</param>
         /// <returns>A model checker.</returns>
-        private static IModelChecker CreateModelCheckerZ3()
+        private static IModelChecker CreateModelCheckerZ3(ModelCheckerContext context)
         {
-            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(new SolverZ3());
+            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(new SolverZ3(context));
         }
     }
 }

@@ -16,11 +16,15 @@ namespace ZenLib.Solver
     /// </summary>
     internal class SolverZ3 : ISolver<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>
     {
+        internal ModelCheckerContext ModelCheckerContext;
+
         internal Context Context;
 
         internal Params Params;
 
         internal Solver Solver;
+
+        internal Optimize Optimize;
 
         private int nextIndex;
 
@@ -52,9 +56,10 @@ namespace ZenLib.Solver
 
         internal Z3ExprToObjectConverter ExprToObjectConverter;
 
-        public SolverZ3()
+        public SolverZ3(ModelCheckerContext context)
         {
             this.nextIndex = 0;
+            this.ModelCheckerContext = context;
             this.Context = new Context();
             this.Params = this.Context.MkParams();
             this.Params.Add("compact", false);
@@ -64,6 +69,7 @@ namespace ZenLib.Solver
             var tactic = this.Context.AndThen(t1, t2, t3);
             this.Solver = this.Context.MkSolver(tactic);
             this.Solver.Parameters = this.Params;
+            this.Optimize = this.Context.MkOptimize();
             this.BoolSort = this.Context.MkBoolSort();
             this.ByteSort = this.Context.MkBitVecSort(8);
             this.CharSort = this.Context.CharSort;
@@ -78,6 +84,20 @@ namespace ZenLib.Solver
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
             this.ExprToObjectConverter = new Z3ExprToObjectConverter();
             this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
+        }
+
+        private void Assert(BoolExpr e)
+        {
+            switch (this.ModelCheckerContext)
+            {
+                case ModelCheckerContext.Solving:
+                    this.Solver.Assert(e);
+                    return;
+                default:
+                    Contract.Assert(this.ModelCheckerContext == ModelCheckerContext.Optimization);
+                    this.Optimize.Assert(e);
+                    return;
+            }
         }
 
         private Symbol FreshSymbol()
@@ -239,7 +259,7 @@ namespace ZenLib.Solver
             if (valueType == ReflectionUtilities.SetUnitType)
             {
                 var v = this.Context.MkArrayConst(FreshSymbol(), keySort, this.BoolSort);
-                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), this.Context.MkFalse()));
+                this.Assert(this.Context.MkEq(this.Context.MkTermArray(v), this.Context.MkFalse()));
                 return (v, v);
             }
             else
@@ -247,7 +267,7 @@ namespace ZenLib.Solver
                 var optionSort = this.GetOrCreateOptionSort(valueSort);
                 var none = this.Context.MkApp(optionSort.Constructors[0]);
                 var v = this.Context.MkArrayConst(FreshSymbol(), keySort, optionSort);
-                this.Solver.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
+                this.Assert(this.Context.MkEq(this.Context.MkTermArray(v), none));
                 return (v, v);
             }
         }
@@ -618,9 +638,9 @@ namespace ZenLib.Solver
             return this.ExprToSymbolicValueConverter.ConvertExpr((Expr)e, type);
         }
 
-        public Model Satisfiable(BoolExpr x)
+        public Model Solve(BoolExpr x)
         {
-            this.Solver.Assert(x);
+            this.Assert(x);
             var status = this.Solver.Check();
             if (status == Status.UNSATISFIABLE)
             {
@@ -629,6 +649,64 @@ namespace ZenLib.Solver
 
             ThrowIfUnknown(status);
             return this.Solver.Model;
+        }
+
+        public Model Maximize(BitVecExpr objective, BoolExpr subjectTo)
+        {
+            return Maximize((Expr)objective, subjectTo);
+        }
+
+        public Model Maximize(IntExpr objective, BoolExpr subjectTo)
+        {
+            return Maximize((Expr)objective, subjectTo);
+        }
+
+        public Model Maximize(RealExpr objective, BoolExpr subjectTo)
+        {
+            return Maximize((Expr)objective, subjectTo);
+        }
+
+        public Model Maximize(Expr objective, BoolExpr subjectTo)
+        {
+            this.Assert(subjectTo);
+            this.Optimize.MkMaximize(objective);
+            var status = this.Optimize.Check();
+            if (status == Status.UNSATISFIABLE)
+            {
+                return null;
+            }
+
+            ThrowIfUnknown(status);
+            return this.Optimize.Model;
+        }
+
+        public Model Minimize(BitVecExpr objective, BoolExpr subjectTo)
+        {
+            return Minimize((Expr)objective, subjectTo);
+        }
+
+        public Model Minimize(IntExpr objective, BoolExpr subjectTo)
+        {
+            return Minimize((Expr)objective, subjectTo);
+        }
+
+        public Model Minimize(RealExpr objective, BoolExpr subjectTo)
+        {
+            return Minimize((Expr)objective, subjectTo);
+        }
+
+        public Model Minimize(Expr objective, BoolExpr subjectTo)
+        {
+            this.Assert(subjectTo);
+            this.Optimize.MkMinimize(objective);
+            var status = this.Optimize.Check();
+            if (status == Status.UNSATISFIABLE)
+            {
+                return null;
+            }
+
+            ThrowIfUnknown(status);
+            return this.Optimize.Model;
         }
 
         [ExcludeFromCodeCoverage]

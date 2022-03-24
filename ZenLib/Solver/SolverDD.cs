@@ -491,7 +491,7 @@ namespace ZenLib.Solver
             return this.Manager.Or(x, y);
         }
 
-        public Assignment<T> Satisfiable(DD x)
+        public Assignment<T> Solve(DD x)
         {
             return this.Manager.Sat(x);
         }
@@ -700,6 +700,30 @@ namespace ZenLib.Solver
         public Unit CreateRealConst(Real r)
         {
             throw new ZenException("Decision diagram backend does not support Real operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Maximize(BitVector<T> objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Maximize(Unit objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Minimize(BitVector<T> objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Assignment<T> Minimize(Unit objective, DD subjectTo)
+        {
+            throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
         }
     }
 }

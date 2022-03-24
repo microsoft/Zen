@@ -1356,6 +1356,30 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The objective function.</param>
+        /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        {
+            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            return new ZenSolution(SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+        }
+
+        /// <summary>
+        /// Minimize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The objective function.</param>
+        /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
+        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        {
+            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            return new ZenSolution(SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+        }
+
+        /// <summary>
         /// Alias for new ZenFunction.
         /// </summary>
         /// <param name="f">The function expression.</param>
