@@ -127,7 +127,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"if({this.GuardExpr}, {this.TrueExpr}, {this.FalseExpr})";
+            return $"If({this.GuardExpr}, {this.TrueExpr}, {this.FalseExpr})";
         }
 
         /// <summary>

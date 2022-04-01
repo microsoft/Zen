@@ -66,7 +66,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Cast({this.SourceExpr}, {typeof(TTarget)})";
+            return $"({this.SourceExpr} as {typeof(TTarget).Name})";
         }
 
         /// <summary>

@@ -15,12 +15,21 @@ namespace ZenLib
         /// <summary>
         /// Initializes a new instance of the <see cref="ZenArbitraryExpr{T}"/> class.
         /// </summary>
-        public ZenArbitraryExpr() { }
+        public ZenArbitraryExpr(string name)
+        {
+            CommonUtilities.ValidateNotNull(name);
+            this.Name = name;
+        }
 
         public override Zen<T> Unroll()
         {
             return this;
         }
+
+        /// <summary>
+        /// The name, if any, for the expression.
+        /// </summary>
+        public string Name { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -29,7 +38,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Var({this.GetHashCode()})";
+            return this.Name;
         }
 
         /// <summary>

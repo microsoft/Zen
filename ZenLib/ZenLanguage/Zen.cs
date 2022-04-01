@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
     using System.Reflection;
@@ -41,6 +42,15 @@ namespace ZenLib
         /// </summary>
         /// <returns>A value of the return type.</returns>
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
+
+        /// <summary>
+        /// Simplify an expression recursively.
+        /// </summary>
+        /// <returns></returns>
+        public string Format()
+        {
+            return CommonUtilities.RunWithLargeStack(() => new ZenFormatVisitor().Format(this));
+        }
 
         /// <summary>
         /// Simplify an expression recursively.
@@ -242,6 +252,11 @@ namespace ZenLib
     public static class Zen
     {
         /// <summary>
+        /// The next unique arbitrary id.
+        /// </summary>
+        private static long nextArbitraryId = 0;
+
+        /// <summary>
         /// Get field method for reflection.
         /// </summary>
         private static MethodInfo getFieldMethod = typeof(Zen).GetMethod("GetField");
@@ -302,31 +317,38 @@ namespace ZenLib
         /// <summary>
         /// A Zen object representing some symbolic value.
         /// </summary>
+        /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
         /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Symbolic<T>(int depth = 5, bool exhaustiveDepth = true)
+        public static Zen<T> Symbolic<T>(string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
-            var generator = new SymbolicInputGenerator();
-            return Arbitrary<T>(generator, depth, exhaustiveDepth);
+            return Arbitrary<T>(name, depth, exhaustiveDepth);
         }
 
         /// <summary>
         /// A Zen object representing some arbitrary value.
         /// </summary>
+        /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
         /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Arbitrary<T>(int depth = 5, bool exhaustiveDepth = true)
+        public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
             var generator = new SymbolicInputGenerator();
-            return Arbitrary<T>(generator, depth, exhaustiveDepth);
+            return Arbitrary<T>(generator, name, depth, exhaustiveDepth);
         }
 
-        internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator, int depth, bool exhaustiveDepth)
+        internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
-            var parameter = new ZenDepthConfiguration { Depth = depth, ExhaustiveDepth = exhaustiveDepth };
+            var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)), ExhaustiveDepth = exhaustiveDepth };
             return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T), parameter);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal static string GetName(string name, Type type)
+        {
+            return name == "k!" ? name + Interlocked.Increment(ref nextArbitraryId) + "_" + type : name;
         }
 
         /// <summary>
@@ -1274,19 +1296,21 @@ namespace ZenLib
         /// <summary>
         /// The Zen value for an empty dict.
         /// </summary>
+        /// <param name="name">An optional name for the expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<TKey, TValue>> ArbitraryDict<TKey, TValue>()
+        internal static Zen<Map<TKey, TValue>> ArbitraryDict<TKey, TValue>(string name = null)
         {
-            return new ZenArbitraryExpr<Map<TKey, TValue>>();
+            return new ZenArbitraryExpr<Map<TKey, TValue>>(name);
         }
 
         /// <summary>
         /// The Zen value for an empty seq.
         /// </summary>
+        /// <param name="name">An optional name for the expression.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<Seq<T>> ArbitrarySeq<T>()
+        internal static Zen<Seq<T>> ArbitrarySeq<T>(string name = null)
         {
-            return new ZenArbitraryExpr<Seq<T>>();
+            return new ZenArbitraryExpr<Seq<T>>(name);
         }
 
         /// <summary>
