@@ -395,6 +395,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that the tostring method works.
+        /// </summary>
+        [TestMethod]
+        public void TestToString()
+        {
+            Assert.AreEqual("5", new UInt7(5).ToString());
+            Assert.AreEqual("-5", new Int7(-5).ToString());
+            Assert.AreEqual(128 + 2, "#b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011".Length);
+            Assert.AreEqual("#b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011", new UInt128(3).ToString());
+        }
+
+        /// <summary>
         /// Test interpreting fixed integers.
         /// </summary>
         [TestMethod]
