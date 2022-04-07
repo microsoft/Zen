@@ -1,7 +1,6 @@
 ﻿// <copyright file="InterleavingHeuristic.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
-[assembly:System.Runtime.CompilerServices.InternalsVisibleTo("ZenLibTest")]
 
 namespace ZenLib.ModelChecking
 {
