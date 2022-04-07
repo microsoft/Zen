@@ -104,7 +104,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Eq({this.Expr1}, {this.Expr2})";
+            return $"({this.Expr1} == {this.Expr2})";
         }
 
         /// <summary>

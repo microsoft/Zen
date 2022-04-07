@@ -6,6 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Text;
 
     /// <summary>
     /// A class representing a fixed bit size integer.
@@ -230,6 +231,30 @@ namespace ZenLib
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Convert the integer to a string.
+        /// </summary>
+        /// <returns>The integer as a string.</returns>
+        public override string ToString()
+        {
+            if (this.Size <= 64)
+            {
+                var l = this.ToLong();
+                return this.Signed ? l.ToString() : ((ulong)l).ToString();
+            }
+            else
+            {
+                var sb = new StringBuilder();
+                sb.Append("#b");
+                for (int i = 0; i < this.Size; i++)
+                {
+                    sb.Append(this.GetBit(i) ? "1" : "0");
+                }
+
+                return sb.ToString();
+            }
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ namespace ZenLib.Tests
         /// <param name="es">The events.</param>
         /// <param name="initialState">The initial state.</param>
         /// <returns>The updated switch state.</returns>
-        private static Zen<SwitchState> ProcessEvents(Zen<FSeq<Event>> es, Zen<SwitchState> initialState)
+        internal static Zen<SwitchState> ProcessEvents(Zen<FSeq<Event>> es, Zen<SwitchState> initialState)
         {
             return es.Fold(initialState, ProcessEvent);
         }
@@ -117,7 +117,7 @@ namespace ZenLib.Tests
         /// <param name="e">The event to process.</param>
         /// <param name="currentState">The current watchdog state.</param>
         /// <returns>The new watchdog state.</returns>
-        private static Zen<SwitchState> ProcessEvent(Zen<Event> e, Zen<SwitchState> currentState)
+        internal static Zen<SwitchState> ProcessEvent(Zen<Event> e, Zen<SwitchState> currentState)
         {
             var switchState = currentState;
 

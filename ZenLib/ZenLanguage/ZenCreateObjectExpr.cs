@@ -119,9 +119,13 @@ namespace ZenLib
         {
             StringBuilder sb = new StringBuilder();
             sb.Append($"new {typeof(TObject).Name}(");
+            var fieldCount = this.Fields.Count;
+            int i = 0;
             foreach (var fieldValuePair in this.Fields)
             {
-                sb.Append($"{fieldValuePair.Key}={fieldValuePair.Value}, ");
+                sb.Append($"{fieldValuePair.Key}={fieldValuePair.Value}");
+                if (++i < fieldCount)
+                    sb.Append(", ");
             }
 
             sb.Append(")");

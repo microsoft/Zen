@@ -37,10 +37,9 @@ namespace ZenLib.Tests
             var s1 = o.GetField<ObjectAttribute, FSeq<int>>("Field1").ToString();
             var s2 = o.GetField<ObjectAttribute, FSeq<int>>("Field2").ToString();
             var s3 = o.GetField<ObjectAttribute, FSeq<int>>("Field3").ToString();
-
             Assert.AreEqual(11, s1.Split("Cons").Length);
-            Assert.AreEqual(6, s2.Split("Eq").Length);
-            Assert.AreEqual(4, s3.Split("Eq").Length);
+            Assert.AreEqual(6, s2.Split("==").Length);
+            Assert.AreEqual(4, s3.Split("==").Length);
         }
 
         private struct ObjectAttribute
