@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>netstandard2.0</TargetFramework>
+	<Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+	<Company>Microsoft</Company>
+	<Product />
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<PackageProjectUrl>https://github.com/microsoft/Zen</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/microsoft/Zen</RepositoryUrl>
+	<Description>Automatic generation of Zen field access methods.</Description>
+	<PackageTags>zen zenlib modeling constraint solving verification smt solver binary decision diagrams diagram</PackageTags>
+	<Version>0.1.0</Version>
+	<LangVersion>10</LangVersion>
+	<IncludeBuildOutput>false</IncludeBuildOutput>
+	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <Import Project="..\.stylecop\StyleCop.props" />
+
+  <ItemGroup>
+	<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3"></PackageReference>
+  </ItemGroup>
+
+</Project>
