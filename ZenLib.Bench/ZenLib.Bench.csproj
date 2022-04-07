@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ZenLibTests\ZenLibTests.csproj" />
+    <ProjectReference Include="..\ZenLib.Tests\ZenLib.Tests.csproj" />
     <ProjectReference Include="..\ZenLib\ZenLib.csproj" />
   </ItemGroup>
   
