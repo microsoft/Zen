@@ -14,12 +14,45 @@
 	<LangVersion>10</LangVersion>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
 	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+	<Platforms>AnyCPU;x64</Platforms>
+    <PackageIcon>Zen-Icon.png</PackageIcon>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <Import Project="..\.stylecop\StyleCop.props" />
 
   <ItemGroup>
+    <Compile Remove="bin\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <None Remove="bin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="bin\x64\Release\netstandard2.0\\ZenLib.Generators.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	<None Include="..\LICENSE" Link="LICENSE">
+	  <PackagePath></PackagePath>
+	  <Pack>True</Pack>
+	</None>
+	<None Include="..\Zen-Icon.png" Pack="true" PackagePath=""/>
   </ItemGroup>
 	
   <ItemGroup>

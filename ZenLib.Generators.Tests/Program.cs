@@ -40,6 +40,4 @@ public class Bar
 public struct Fat<T>
 {
     public T Field { get; set; }
-
-    private int Other;
 }

@@ -4,6 +4,7 @@
 	<OutputType>Exe</OutputType>
 	<TargetFramework>net6.0</TargetFramework>
 	<LangVersion>latest</LangVersion>
+	<Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
