@@ -95,7 +95,7 @@ namespace ZenLib.Generators
             {
                 var namedTypedSymbol = compilation.GetSemanticModel(syntaxNode.SyntaxTree).GetDeclaredSymbol(syntaxNode) as INamedTypeSymbol;
                 var sourceCodeText = SourceText.From(CreateZenCode(namedTypedSymbol), Encoding.UTF8);
-                context.AddSource($"{namedTypedSymbol.Name}Extensions_{namedTypedSymbol.Arity}_zen_yo.cs", sourceCodeText);
+                context.AddSource($"{namedTypedSymbol.Name}Extensions_{namedTypedSymbol.Arity}_zen.cs", sourceCodeText);
             }
         }
 

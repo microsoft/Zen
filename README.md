@@ -6,25 +6,28 @@
 Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
 
 # Table of contents
-1. [Installation](#installation)
-2. [Overview of Zen](#overview-of-zen)
-    1. [Computing with Zen Expressions](#computing-with-zen-expressions)
-    2. [Executing a Function](#executing-a-function)
-    3. [Searching for Inputs](#searching-for-inputs)
-    4. [Computing with Sets](#computing-with-sets)
-    5. [Generating Test Inputs](#generating-test-inputs)
-3. [Supported Data Types](#supported-data-types)
-    1. [Primitive Types](#primitive-types)
-    2. [Integer Types](#integer-types)
-    3. [Options and Tuples](#options-tuples)
-    4. [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
-    5. [Unbounded Sets, Maps](#unbounded-sets-and-maps)
-    6. [Strings, Sequences, and Regexes](#strings-and-sequences)
-    7. [Custom Classes and Structs](#custom-classes-and-structs)
-4. [Solver Backends](#solver-backends)
-5. [Example: Network ACLs](#example-network-acls)
-6. [Implementation Details](#implementation)
-7. [Contributing](#contributing)
+- [Introduction](#introduction)
+- [Table of contents](#table-of-contents)
+- [Installation](#installation)
+- [Overview of Zen](#overview-of-zen)
+    - [Computing with Zen Expressions](#computing-with-zen-expressions)
+    - [Executing a function](#executing-a-function)
+    - [Searching for inputs](#searching-for-inputs)
+    - [Computing with sets](#computing-with-sets)
+    - [Generating test inputs](#generating-test-inputs)
+- [Supported data types](#supported-data-types)
+    - [Primitive types](#primitive-types)
+    - [Integer types](#integer-types)
+    - [Options, Tuples](#options-tuples)
+    - [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
+    - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
+    - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
+    - [Custom classes and structs](#custom-classes-and-structs)
+- [Zen Attributes](#zen-attributes)
+- [Solver backends](#solver-backends)
+- [Example: Network ACLs](#example-network-acls)
+- [Implementation Details](#implementation-details)
+- [Contributing](#contributing)
 
 <a name="installation"></a>
 # Installation
@@ -263,6 +266,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
 | `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
+| `Real` | arbitrary precision rational number | :heavy_check_mark:           | :x:                 | :x:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
@@ -272,9 +276,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 <a name="primitive-types"></a>
 ### Primitive types
 
-Zen supports the following primitive types: `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic.
-
-##### Example
+Zen supports the following primitive types: `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic. As an example:
 
 ```csharp
 var x = Symbolic<int>();
@@ -305,10 +307,7 @@ public class Int65 : IntN<Int65, Signed>
     public Int65(long value) : base(value) { } 
 }
 ```
-The library should take care of the rest. Or equivalently, for unsigned integer semantics use `Unsigned`.
-
-
-##### Example
+The library should take care of the rest. Or equivalently, for unsigned integer semantics use `Unsigned`. As an example:
 
 ```csharp
 var b = Symbolic<bool>();
@@ -337,8 +336,6 @@ Zen supports a number of high-level data types that are finite (bounded) in size
 - `FSeq<T>` for reasoning about variable length sequences of values where the order is important. For instance, the sorting example earlier.
 - `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is usually preferred to use `FBag<T>` if possible compared to `FSeq<T>` as it will frequently scale better.
 - `FMap<T1, T2>` type to emulate finite maps from keys to values.
-
-##### Example
 
 As an example, we can write an implementation for the insertion sort algorithm using recursion:
 
@@ -398,9 +395,7 @@ Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of 
 
 As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth.
 
-Sequences also support matching against regular expressions.
-
-##### Example
+Sequences also support matching against regular expressions. As an example:
 
 ```csharp
 var r = Regex.Star(Regex.Char(1));
@@ -419,9 +414,7 @@ s1: [1]
 s2: [0]
 ```
 
-Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<Char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does support anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`.
-
-##### Example
+Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<Char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does support anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
 
 ```csharp
 var r1 = Regex.Parse("[0-9a-z]+");
@@ -482,6 +475,39 @@ public class Point
 
 ```
 
+
+<a name="zen-attributes"></a>
+# Zen Attributes
+
+Zen provides two attributes to simplify the creation and manipulation of symbolic objects. The first attribute `[ZenObject]` can be applied to classes or structs. It leverages C# source generators to generate Get and With methods for all public fields and properties in a class.
+
+```csharp
+[ZenObject]
+public class Point 
+{ 
+    public int X { get; set; }
+    public int Y { get; set; }
+
+    public static Zen<Point> Add(Zen<Point> p1, Zen<Point> p2)
+    {
+        return p1.WithX(p1.GetX() + p2.GetX()).WithY(p1.GetY() + p2.GetY());
+    }
+}
+```
+
+Note that this requires C# 9.0 and .NET 6 or later to work. In addition, you must add the ZenLib.Generators nuget package to enable code generation. The other attribute supported is the `ZenSize` attribute, which controls the size of a generated field in an object. For example, to fix the size of a `FSeq` to 10:
+
+```csharp
+public class Person
+{
+    [ZenSize(depth: 10, enumerationType: EnumerationType.FixedSize)]
+    public FSeq<Person> Children { get; set; }
+}
+```
+
+
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
+
 <a name="solver-backends"></a>
 # Solver backends
 
@@ -494,26 +520,13 @@ As a more complete example, the following shows how to use Zen to encode and the
 
 ```csharp
 // define a class to model Packets using public properties
+[ZenObject]
 public class Packet
 {
     // packet destination ip
     public uint DstIp { get; set; } 
     // packet source ip
     public uint SrcIp { get; set; }
-}
-
-// define helper extension methods for manipulating packets.
-public static class PacketExtensions
-{
-    public static Zen<uint> GetDstIp(this Zen<Packet> packet)
-    {
-        return packet.GetField<Packet, uint>("DstIp");
-    }
-
-    public static Zen<uint> GetSrcIp(this Zen<Packet> packet)
-    {
-        return packet.GetField<Packet, uint>("SrcIp");
-    }
 }
 
 // class representing an ACL with a list of prioritized rules.
@@ -554,10 +567,11 @@ public class AclLine
     // a packet matches a line if it falls within the specified ranges.
     public Zen<bool> Matches(Zen<Packet> packet)
     {
-        return And(packet.GetDstIp() >= this.DstIpLow,
-                   packet.GetDstIp() <= this.DstIpHigh,
-                   packet.GetSrcIp() >= this.SrcIpLow,
-                   packet.GetSrcIp() <= this.SrcIpHigh);
+        return And(
+            packet.GetDstIp() >= this.DstIpLow,
+            packet.GetDstIp() <= this.DstIpHigh,
+            packet.GetSrcIp() >= this.SrcIpLow,
+            packet.GetSrcIp() <= this.SrcIpHigh);
     }
 }
 ```

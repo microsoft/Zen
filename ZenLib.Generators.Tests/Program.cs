@@ -23,6 +23,19 @@ partial class Program
 }
 
 [ZenObject]
+public class Point
+{
+    public int X { get; set; }
+
+    public int Y { get; set; }
+
+    public static Zen<Point> Add(Zen<Point> p1, Zen<Point> p2)
+    {
+        return p1.WithX(p1.GetX() + p2.GetX()).WithY(p1.GetY() + p2.GetY());
+    }
+}
+
+[ZenObject]
 public class Foo
 {
     public Real Id { get; set; }
