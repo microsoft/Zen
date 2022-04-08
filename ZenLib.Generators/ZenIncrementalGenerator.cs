@@ -1,69 +1,101 @@
-﻿// <copyright file="ZenGenerator.cs" company="Microsoft">
+﻿// <copyright file="ZenGeneratorIncremental.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib.Generators
 {
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Text;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Text;
 
     /// <summary>
     /// Generator for Zen methods for a given type.
     /// </summary>
     [Generator]
-    public class ZenGenerator : ISourceGenerator
+    public class ZenIncrementalGenerator : IIncrementalGenerator
     {
         /// <summary>
-        /// Initialize the generator.
+        /// Initialize the incremental source code generator.
         /// </summary>
-        /// <param name="context">The initialization context.</param>
-        public void Initialize(GeneratorInitializationContext context)
+        /// <param name="context">The incremental generator initialization context.</param>
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            var objectDeclarations = context.SyntaxProvider.CreateSyntaxProvider(
+                    predicate: static (s, _) => IsSyntaxTarget(s),
+                    transform: static (ctx, _) => GetClassForGeneration(ctx))
+                .Where(static m => m is not null);
+
+            var compilationAndClasses = context.CompilationProvider.Combine(objectDeclarations.Collect());
+
+            context.RegisterSourceOutput(compilationAndClasses, static (spc, source) => Execute(source.Item1, source.Item2, spc));
         }
 
         /// <summary>
-        /// Execute the generator.
+        /// Determine if a syntax node is a target for generation.
         /// </summary>
-        /// <param name="context">The execution context.</param>
-        public void Execute(GeneratorExecutionContext context)
+        /// <param name="syntaxNode">The syntax node.</param>
+        /// <returns>True or false.</returns>
+        internal static bool IsSyntaxTarget(SyntaxNode syntaxNode)
         {
-            if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
+            return (syntaxNode is ClassDeclarationSyntax c && c.AttributeLists.Count > 0) || (syntaxNode is StructDeclarationSyntax s && s.AttributeLists.Count > 0);
+        }
+
+        /// <summary>
+        /// Get the class for source code generation.
+        /// </summary>
+        /// <param name="context">The generation syntax context.</param>
+        /// <returns>The class syntax or null if it doesn't have the ZenObject attribute.</returns>
+        internal static SyntaxNode GetClassForGeneration(GeneratorSyntaxContext context)
+        {
+            var attributeLists = context.Node is ClassDeclarationSyntax ?
+                ((ClassDeclarationSyntax)context.Node).AttributeLists :
+                ((StructDeclarationSyntax)context.Node).AttributeLists;
+
+            foreach (var attributeListSyntax in attributeLists)
+            {
+                foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                {
+                    var attributeSymbol = context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol;
+                    if (attributeSymbol == null)
+                    {
+                        continue;
+                    }
+
+                    if (attributeSymbol.ContainingType.ToDisplayString() == "ZenLib.ZenObjectAttribute")
+                    {
+                        return context.Node;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Execute the source code generator for the classes.
+        /// </summary>
+        /// <param name="compilation">The compilation object.</param>
+        /// <param name="syntaxNodes">The nodes with the ZenObject attribute.</param>
+        /// <param name="context">The source code production context.</param>
+        private static void Execute(Compilation compilation, ImmutableArray<SyntaxNode> syntaxNodes, SourceProductionContext context)
+        {
+            if (syntaxNodes.IsDefaultOrEmpty)
             {
                 return;
             }
 
-            var zenObjectAttributeSymbol = context.Compilation.GetTypeByMetadataName($"ZenLib.ZenObjectAttribute");
+            var distinctClasses = syntaxNodes.Distinct();
 
-            var namedTypedSymbols = new List<INamedTypeSymbol>();
-
-            foreach (var candidateClass in receiver.ClassesWithAttributes)
+            foreach (var syntaxNode in distinctClasses)
             {
-                var model = context.Compilation.GetSemanticModel(candidateClass.SyntaxTree);
-                namedTypedSymbols.Add(model.GetDeclaredSymbol(candidateClass));
-            }
-
-            foreach (var candidateStruct in receiver.StructsWithAttributes)
-            {
-                var model = context.Compilation.GetSemanticModel(candidateStruct.SyntaxTree);
-                namedTypedSymbols.Add(model.GetDeclaredSymbol(candidateStruct));
-            }
-
-            foreach (var typedSymbol in namedTypedSymbols)
-            {
-                var hasZenObjectAttribute = typedSymbol
-                    .GetAttributes()
-                    .Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, zenObjectAttributeSymbol));
-
-                if (hasZenObjectAttribute)
-                {
-                    var code = SourceText.From(CreateZenCode(typedSymbol), Encoding.UTF8);
-                    context.AddSource($"{typedSymbol.Name}Extensions_{typedSymbol.Arity}_zen.cs", code);
-                }
+                var namedTypedSymbol = compilation.GetSemanticModel(syntaxNode.SyntaxTree).GetDeclaredSymbol(syntaxNode) as INamedTypeSymbol;
+                var sourceCodeText = SourceText.From(CreateZenCode(namedTypedSymbol), Encoding.UTF8);
+                context.AddSource($"{namedTypedSymbol.Name}Extensions_{namedTypedSymbol.Arity}_zen_yo.cs", sourceCodeText);
             }
         }
 
@@ -72,7 +104,7 @@ namespace ZenLib.Generators
         /// </summary>
         /// <param name="typeSymbol">The class.</param>B
         /// <returns>The text of the new class to compile.</returns>
-        private string CreateZenCode(INamedTypeSymbol typeSymbol)
+        private static string CreateZenCode(INamedTypeSymbol typeSymbol)
         {
             var namespaceName = typeSymbol.ContainingNamespace.ToDisplayString();
             var allProperties = GetPropertySymbols(typeSymbol).ToArray();
@@ -178,7 +210,7 @@ namespace ZenLib.Generators
         /// </summary>
         /// <param name="classSymbol">The class symbol.</param>
         /// <returns>The property symbols.</returns>
-        private IEnumerable<IPropertySymbol> GetPropertySymbols(ITypeSymbol classSymbol)
+        private static IEnumerable<IPropertySymbol> GetPropertySymbols(ITypeSymbol classSymbol)
         {
             return classSymbol
                 .GetMembers()
@@ -191,7 +223,7 @@ namespace ZenLib.Generators
         /// </summary>
         /// <param name="classSymbol">The class symbol.</param>
         /// <returns>The field symbols.</returns>
-        private IEnumerable<IFieldSymbol> GetFieldSymbols(ITypeSymbol classSymbol)
+        private static IEnumerable<IFieldSymbol> GetFieldSymbols(ITypeSymbol classSymbol)
         {
             return classSymbol
                 .GetMembers()

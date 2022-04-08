@@ -10,7 +10,7 @@
 	<RepositoryUrl>https://github.com/microsoft/Zen</RepositoryUrl>
 	<Description>Automatic generation of Zen field access methods.</Description>
 	<PackageTags>zen zenlib modeling constraint solving verification smt solver binary decision diagrams diagram</PackageTags>
-	<Version>0.1.0</Version>
+	<Version>0.1.1</Version>
 	<LangVersion>10</LangVersion>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
 	<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
