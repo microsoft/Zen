@@ -293,6 +293,56 @@ namespace ZenLib.Interpretation
                         return ((dynamic)e1) >= ((dynamic)e2);
                     }
 
+                case ComparisonType.Gt:
+                    if (type == ReflectionUtilities.ByteType)
+                        return (byte)e1 > (byte)e2;
+                    else if (type == ReflectionUtilities.ShortType)
+                        return (short)e1 > (short)e2;
+                    else if (type == ReflectionUtilities.UshortType)
+                        return (ushort)e1 > (ushort)e2;
+                    else if (type == ReflectionUtilities.IntType)
+                        return (int)e1 > (int)e2;
+                    else if (type == ReflectionUtilities.UintType)
+                        return (uint)e1 > (uint)e2;
+                    else if (type == ReflectionUtilities.LongType)
+                        return (long)e1 > (long)e2;
+                    else if (type == ReflectionUtilities.UlongType)
+                        return (ulong)e1 > (ulong)e2;
+                    else if (type == ReflectionUtilities.BigIntType)
+                        return (BigInteger)e1 > (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 > (Real)e2;
+                    else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
+                        return ((dynamic)e1) > ((dynamic)e2);
+                    }
+
+                case ComparisonType.Lt:
+                    if (type == ReflectionUtilities.ByteType)
+                        return (byte)e1 < (byte)e2;
+                    else if (type == ReflectionUtilities.ShortType)
+                        return (short)e1 < (short)e2;
+                    else if (type == ReflectionUtilities.UshortType)
+                        return (ushort)e1 < (ushort)e2;
+                    else if (type == ReflectionUtilities.IntType)
+                        return (int)e1 < (int)e2;
+                    else if (type == ReflectionUtilities.UintType)
+                        return (uint)e1 < (uint)e2;
+                    else if (type == ReflectionUtilities.LongType)
+                        return (long)e1 < (long)e2;
+                    else if (type == ReflectionUtilities.UlongType)
+                        return (ulong)e1 < (ulong)e2;
+                    else if (type == ReflectionUtilities.BigIntType)
+                        return (BigInteger)e1 < (BigInteger)e2;
+                    else if (type == ReflectionUtilities.RealType)
+                        return (Real)e1 < (Real)e2;
+                    else
+                    {
+                        Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
+                        return ((dynamic)e1) < ((dynamic)e2);
+                    }
+
                 default:
                     Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
                     if (type == ReflectionUtilities.ByteType)

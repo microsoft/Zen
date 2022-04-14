@@ -254,14 +254,34 @@ namespace ZenLib.Solver
             return this.Manager.LessOrEqual(x, y);
         }
 
-        public DD GreaterThanOrEqual(BitVector<T> x, BitVector<T> y)
+        public DD LessThan(BitVector<T> x, BitVector<T> y)
         {
-            return this.Manager.GreaterOrEqual(x, y);
+            return this.Manager.Less(x, y);
         }
 
         public DD LessThanOrEqualSigned(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.LessOrEqualSigned(x, y);
+        }
+
+        public DD LessThanSigned(BitVector<T> x, BitVector<T> y)
+        {
+            return this.Manager.And(this.Manager.Not(this.Manager.Eq(x, y)), this.Manager.LessOrEqualSigned(x, y));
+        }
+
+        public DD GreaterThanOrEqual(BitVector<T> x, BitVector<T> y)
+        {
+            return this.Manager.GreaterOrEqual(x, y);
+        }
+
+        public DD GreaterThan(BitVector<T> x, BitVector<T> y)
+        {
+            return this.Manager.Greater(x, y);
+        }
+
+        public DD GreaterThanSigned(BitVector<T> x, BitVector<T> y)
+        {
+            return this.Manager.And(this.Manager.Not(this.Manager.Eq(x, y)), this.Manager.GreaterOrEqualSigned(x, y));
         }
 
         public DD GreaterThanOrEqualSigned(BitVector<T> x, BitVector<T> y)
@@ -592,7 +612,19 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
+        public DD LessThan(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
         public DD LessThanOrEqual(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        public DD GreaterThan(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }

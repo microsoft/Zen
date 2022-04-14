@@ -52,7 +52,7 @@
 	  <PackagePath></PackagePath>
 	  <Pack>True</Pack>
 	</None>
-	<None Include="..\Zen-Icon.png" Pack="true" PackagePath=""/>
+	<None Include="..\Zen-Icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 	
   <ItemGroup>

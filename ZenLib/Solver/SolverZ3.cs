@@ -372,6 +372,26 @@ namespace ZenLib.Solver
             return this.Context.MkBVSLE(x, y);
         }
 
+        public BoolExpr LessThan(BitVecExpr x, BitVecExpr y)
+        {
+            return this.Context.MkBVULT(x, y);
+        }
+
+        public BoolExpr LessThan(IntExpr x, IntExpr y)
+        {
+            return this.Context.MkLt(x, y);
+        }
+
+        public BoolExpr LessThan(RealExpr x, RealExpr y)
+        {
+            return this.Context.MkLt(x, y);
+        }
+
+        public BoolExpr LessThanSigned(BitVecExpr x, BitVecExpr y)
+        {
+            return this.Context.MkBVSLT(x, y);
+        }
+
         public BoolExpr GreaterThanOrEqual(BitVecExpr x, BitVecExpr y)
         {
             return this.Context.MkBVUGE(x, y);
@@ -390,6 +410,26 @@ namespace ZenLib.Solver
         public BoolExpr GreaterThanOrEqualSigned(BitVecExpr x, BitVecExpr y)
         {
             return this.Context.MkBVSGE(x, y);
+        }
+
+        public BoolExpr GreaterThan(BitVecExpr x, BitVecExpr y)
+        {
+            return this.Context.MkBVUGT(x, y);
+        }
+
+        public BoolExpr GreaterThan(IntExpr x, IntExpr y)
+        {
+            return this.Context.MkGt(x, y);
+        }
+
+        public BoolExpr GreaterThan(RealExpr x, RealExpr y)
+        {
+            return this.Context.MkGt(x, y);
+        }
+
+        public BoolExpr GreaterThanSigned(BitVecExpr x, BitVecExpr y)
+        {
+            return this.Context.MkBVSGT(x, y);
         }
 
         public BoolExpr Not(BoolExpr x)

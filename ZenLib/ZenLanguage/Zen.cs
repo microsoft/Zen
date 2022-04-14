@@ -605,7 +605,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return And(Leq(expr1, expr2), expr1 != expr2);
+            return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Lt);
         }
 
         /// <summary>
@@ -619,7 +619,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return Not(Leq(expr1, expr2));
+            return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Gt);
         }
 
         /// <summary>
@@ -1376,7 +1376,8 @@ namespace ZenLib
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
         public static ZenSolution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
         {
-            return new ZenSolution(SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            return new ZenSolution(model);
         }
 
         /// <summary>
@@ -1388,7 +1389,8 @@ namespace ZenLib
         public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
             CommonUtilities.ValidateIsArithmeticType(typeof(T));
-            return new ZenSolution(SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            return new ZenSolution(model);
         }
 
         /// <summary>
@@ -1400,7 +1402,8 @@ namespace ZenLib
         public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
             CommonUtilities.ValidateIsArithmeticType(typeof(T));
-            return new ZenSolution(SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            return new ZenSolution(model);
         }
 
         /// <summary>

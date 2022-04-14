@@ -164,6 +164,34 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Greater than for fixed bit size integers.
+        /// </summary>
+        /// <param name="left">The first integer.</param>
+        /// <param name="right">The second integer.</param>
+        /// <returns></returns>
+        public static bool operator >(IntN<T, TSign> left, IntN<T, TSign> right)
+        {
+            CommonUtilities.ValidateNotNull(left);
+            CommonUtilities.ValidateNotNull(right);
+
+            return left.GreaterThan(right);
+        }
+
+        /// <summary>
+        /// Less than for fixed bit size integers.
+        /// </summary>
+        /// <param name="left">The first integer.</param>
+        /// <param name="right">The second integer.</param>
+        /// <returns></returns>
+        public static bool operator <(IntN<T, TSign> left, IntN<T, TSign> right)
+        {
+            CommonUtilities.ValidateNotNull(left);
+            CommonUtilities.ValidateNotNull(right);
+
+            return left.LessThan(right);
+        }
+
+        /// <summary>
         /// Greater than or equal to for fixed bit size integers.
         /// </summary>
         /// <param name="other">The other integer.</param>
@@ -171,6 +199,26 @@ namespace ZenLib
         public bool GreaterThanOrEqual(IntN<T, TSign> other)
         {
             return !(this <= other) || this == other;
+        }
+
+        /// <summary>
+        /// Greater than or equal to for fixed bit size integers.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns></returns>
+        public bool GreaterThan(IntN<T, TSign> other)
+        {
+            return !(this <= other);
+        }
+
+        /// <summary>
+        /// Greater than or equal to for fixed bit size integers.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns></returns>
+        public bool LessThan(IntN<T, TSign> other)
+        {
+            return this <= other && this != other;
         }
 
         /// <summary>

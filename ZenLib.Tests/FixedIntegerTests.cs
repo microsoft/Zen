@@ -608,11 +608,11 @@ namespace ZenLib.Tests
             var zf = new ZenConstraint<bool, int, UInt9>((b, x, y) =>
             {
                 var c1 = If(b, y < new UInt9(10), x == 3);
-                var c2 = Implies(Not(b), (y & new UInt9(1)) == new UInt9(1));
-                return And(c1, c2);
+                var c2 = Implies(b, (y & new UInt9(1)) == new UInt9(1));
+                return And(c1, c2, x == 5);
             });
 
-            Assert.AreEqual(4L, zf.Find().Value.Item3.ToLong());
+            Assert.IsTrue((zf.Find().Value.Item3.ToLong() & 1L) == 1L);
         }
 
         /// <summary>
@@ -647,6 +647,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAgreement()
         {
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x < new Int5(5));
+            TestHelper.CheckAgreement<Int5, Int5>((x, y) => x > new Int5(5));
             TestHelper.CheckAgreement<Int5, Int5>((x, y) => x <= new Int5(5));
             TestHelper.CheckAgreement<Int5, Int5>((x, y) => x >= new Int5(5));
             TestHelper.CheckAgreement<Int5, Int5>((x, y) => x == new Int5(5));

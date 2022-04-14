@@ -536,12 +536,44 @@ namespace ZenLib.Solver
         TBool LessThanOrEqual(TReal x, TReal y);
 
         /// <summary>
-        /// The 'LessThanOrEqual' of two expressions.
+        /// The 'LessThanOrEqualSigned' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool LessThanOrEqualSigned(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'LessThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool LessThan(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'LessThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool LessThan(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'LessThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool LessThan(TReal x, TReal y);
+
+        /// <summary>
+        /// The 'LessThanSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool LessThanSigned(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'GreaterThanOrEqual' of two expressions.
@@ -568,12 +600,44 @@ namespace ZenLib.Solver
         TBool GreaterThanOrEqual(TReal x, TReal y);
 
         /// <summary>
-        /// The 'LessThanOrEqual' of two expressions.
+        /// The 'GreaterThanOrEqualSigned' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
         /// <returns></returns>
         TBool GreaterThanOrEqualSigned(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'GreaterThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThan(TBitvec x, TBitvec y);
+
+        /// <summary>
+        /// The 'GreaterThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThan(TInteger x, TInteger y);
+
+        /// <summary>
+        /// The 'GreaterThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThan(TReal x, TReal y);
+
+        /// <summary>
+        /// The 'GreaterThanSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        TBool GreaterThanSigned(TBitvec x, TBitvec y);
 
         /// <summary>
         /// The 'Ite' of a guard and two expressions.
