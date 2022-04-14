@@ -7,6 +7,7 @@ namespace ZenLibBench
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Numerics;
     using ZenLib;
 
     /// <summary>
@@ -16,9 +17,27 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            BenchmarkTransformers();
+            Settings.UseLargeStack = true;
+
+            BenchmarkComparisons();
+            // BenchmarkTransformers();
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();
+        }
+
+        private static void BenchmarkComparisons()
+        {
+            Benchmark(nameof(BenchmarkAllocation), 3, () =>
+            {
+                var values = new Zen<BigInteger>[1000];
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values[i] = Zen.Symbolic<BigInteger>(i.ToString());
+                }
+
+                var min = values.Aggregate((a, b) => Zen.If(a < b, a, b));
+                var solution = (min >= new BigInteger(100)).Solve();
+            });
         }
 
         private static void BenchmarkTransformers()

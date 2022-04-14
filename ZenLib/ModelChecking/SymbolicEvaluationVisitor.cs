@@ -425,19 +425,51 @@ namespace ZenLib.ModelChecking
             {
                 var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e1;
                 var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e2;
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver,
-                    expression.ComparisonType == ComparisonType.Geq ?
-                        this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
-                        this.Solver.LessThanOrEqual(v1.Value, v2.Value));
+
+                TBool result;
+                switch (expression.ComparisonType)
+                {
+                    case ComparisonType.Geq:
+                        result = this.Solver.GreaterThanOrEqual(v1.Value, v2.Value);
+                        break;
+                    case ComparisonType.Leq:
+                        result = this.Solver.LessThanOrEqual(v1.Value, v2.Value);
+                        break;
+                    case ComparisonType.Gt:
+                        result = this.Solver.GreaterThan(v1.Value, v2.Value);
+                        break;
+                    default:
+                        Contract.Assert(expression.ComparisonType == ComparisonType.Lt);
+                        result = this.Solver.LessThan(v1.Value, v2.Value);
+                        break;
+                }
+
+                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
             }
             else if (e1 is SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)
             {
                 var v1 = (SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e1;
                 var v2 = (SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e2;
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver,
-                    expression.ComparisonType == ComparisonType.Geq ?
-                        this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
-                        this.Solver.LessThanOrEqual(v1.Value, v2.Value));
+
+                TBool result;
+                switch (expression.ComparisonType)
+                {
+                    case ComparisonType.Geq:
+                        result = this.Solver.GreaterThanOrEqual(v1.Value, v2.Value);
+                        break;
+                    case ComparisonType.Leq:
+                        result = this.Solver.LessThanOrEqual(v1.Value, v2.Value);
+                        break;
+                    case ComparisonType.Gt:
+                        result = this.Solver.GreaterThan(v1.Value, v2.Value);
+                        break;
+                    default:
+                        Contract.Assert(expression.ComparisonType == ComparisonType.Lt);
+                        result = this.Solver.LessThan(v1.Value, v2.Value);
+                        break;
+                }
+
+                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
             }
             else
             {
@@ -445,14 +477,51 @@ namespace ZenLib.ModelChecking
 
                 var v1 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e1;
                 var v2 = (SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e2;
-                var r = ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)) ?
-                        (expression.ComparisonType == ComparisonType.Geq ?
-                            this.Solver.GreaterThanOrEqual(v1.Value, v2.Value) :
-                            this.Solver.LessThanOrEqual(v1.Value, v2.Value)) :
-                        (expression.ComparisonType == ComparisonType.Geq ?
-                            this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value) :
-                            this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value));
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, r);
+
+                if (ReflectionUtilities.IsUnsignedIntegerType(typeof(T1)))
+                {
+                    TBool result;
+                    switch (expression.ComparisonType)
+                    {
+                        case ComparisonType.Geq:
+                            result = this.Solver.GreaterThanOrEqual(v1.Value, v2.Value);
+                            break;
+                        case ComparisonType.Leq:
+                            result = this.Solver.LessThanOrEqual(v1.Value, v2.Value);
+                            break;
+                        case ComparisonType.Gt:
+                            result = this.Solver.GreaterThan(v1.Value, v2.Value);
+                            break;
+                        default:
+                            Contract.Assert(expression.ComparisonType == ComparisonType.Lt);
+                            result = this.Solver.LessThan(v1.Value, v2.Value);
+                            break;
+                    }
+
+                    return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
+                }
+                else
+                {
+                    TBool result;
+                    switch (expression.ComparisonType)
+                    {
+                        case ComparisonType.Geq:
+                            result = this.Solver.GreaterThanOrEqualSigned(v1.Value, v2.Value);
+                            break;
+                        case ComparisonType.Leq:
+                            result = this.Solver.LessThanOrEqualSigned(v1.Value, v2.Value);
+                            break;
+                        case ComparisonType.Gt:
+                            result = this.Solver.GreaterThanSigned(v1.Value, v2.Value);
+                            break;
+                        default:
+                            Contract.Assert(expression.ComparisonType == ComparisonType.Lt);
+                            result = this.Solver.LessThanSigned(v1.Value, v2.Value);
+                            break;
+                    }
+
+                    return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
+                }
             }
         }
 

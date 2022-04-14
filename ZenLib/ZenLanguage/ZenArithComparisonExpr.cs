@@ -26,7 +26,7 @@ namespace ZenLib
         /// <summary>
         /// The strings for different comparison operations.
         /// </summary>
-        private string[] opStrings = new string[] { ">=", "<=" };
+        private string[] opStrings = new string[] { ">=", "<=", ">", "<" };
 
         /// <summary>
         /// The constant functions for comparison operations.
@@ -35,6 +35,8 @@ namespace ZenLib
         {
             (x, y) => x >= y ? 1L : 0L,
             (x, y) => x <= y ? 1L : 0L,
+            (x, y) => x > y ? 1L : 0L,
+            (x, y) => x < y ? 1L : 0L,
         };
 
         /// <summary>
@@ -44,6 +46,8 @@ namespace ZenLib
         {
             (x, y) => x >= y,
             (x, y) => x <= y,
+            (x, y) => x > y,
+            (x, y) => x < y,
         };
 
         /// <summary>
@@ -53,6 +57,8 @@ namespace ZenLib
         {
             (x, y) => x >= y,
             (x, y) => x <= y,
+            (x, y) => x > y,
+            (x, y) => x < y,
         };
 
         /// <summary>
@@ -62,6 +68,8 @@ namespace ZenLib
         {
             (x, y) => x >= y,
             (x, y) => x <= y,
+            (x, y) => x > y,
+            (x, y) => x < y,
         };
 
         /// <summary>
@@ -181,5 +189,7 @@ namespace ZenLib
     {
         Geq,
         Leq,
+        Gt,
+        Lt,
     }
 }

@@ -376,6 +376,22 @@ namespace ZenLib.Compilation
 
                     return Expression.GreaterThanOrEqual(e1, e2);
 
+                case ComparisonType.Gt:
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("GreaterThan"), e2);
+                    }
+
+                    return Expression.GreaterThan(e1, e2);
+
+                case ComparisonType.Lt:
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("LessThan"), e2);
+                    }
+
+                    return Expression.LessThan(e1, e2);
+
                 default:
                     Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
                     if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))

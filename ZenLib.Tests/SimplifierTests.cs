@@ -179,6 +179,32 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify less than.
+        /// </summary>
+        [TestMethod]
+        public void TestLtSimplification()
+        {
+            Assert.AreEqual((Constant<byte>(1) < Constant<byte>(1)), False());
+            Assert.AreEqual((Constant<byte>(0) < Constant<byte>(1)), True());
+            Assert.AreEqual((Constant<short>(1) < Constant<short>(1)), False());
+            Assert.AreEqual((Constant<short>(0) < Constant<short>(1)), True());
+            Assert.AreEqual((Constant<ushort>(1) < Constant<ushort>(1)), False());
+            Assert.AreEqual((Constant<ushort>(0) < Constant<ushort>(1)), True());
+            Assert.AreEqual((Constant<int>(1) < Constant<int>(1)), False());
+            Assert.AreEqual((Constant<int>(0) < Constant<int>(1)), True());
+            Assert.AreEqual((Constant<uint>(1) < Constant<uint>(1)), False());
+            Assert.AreEqual((Constant<uint>(0) < Constant<uint>(1)), True());
+            Assert.AreEqual((Constant<long>(1) < Constant<long>(1)), False());
+            Assert.AreEqual((Constant<long>(0) < Constant<long>(1)), True());
+            Assert.AreEqual((Constant<ulong>(1) < Constant<ulong>(1)), False());
+            Assert.AreEqual((Constant<ulong>(0) < Constant<ulong>(1)), True());
+            Assert.AreEqual((Constant<BigInteger>(1) < Constant<BigInteger>(1)), False());
+            Assert.AreEqual((Constant<BigInteger>(0) < Constant<BigInteger>(1)), True());
+            Assert.AreEqual((Constant<Real>(1) < Constant<Real>(1)), False());
+            Assert.AreEqual((Constant<Real>(0) < Constant<Real>(1)), True());
+        }
+
+        /// <summary>
         /// Simplify greater than or equal.
         /// </summary>
         [TestMethod]
@@ -202,6 +228,32 @@ namespace ZenLib.Tests
             Assert.AreEqual((Constant<BigInteger>(0) >= Constant<BigInteger>(1)), False());
             Assert.AreEqual((Constant<Real>(1) >= Constant<Real>(1)), True());
             Assert.AreEqual((Constant<Real>(0) >= Constant<Real>(1)), False());
+        }
+
+        /// <summary>
+        /// Simplify greater than.
+        /// </summary>
+        [TestMethod]
+        public void TestGtSimplification()
+        {
+            Assert.AreEqual((Constant<byte>(2) > Constant<byte>(1)), True());
+            Assert.AreEqual((Constant<byte>(1) > Constant<byte>(1)), False());
+            Assert.AreEqual((Constant<short>(2) > Constant<short>(1)), True());
+            Assert.AreEqual((Constant<short>(1) > Constant<short>(1)), False());
+            Assert.AreEqual((Constant<ushort>(2) > Constant<ushort>(1)), True());
+            Assert.AreEqual((Constant<ushort>(1) > Constant<ushort>(1)), False());
+            Assert.AreEqual((Constant<int>(2) > Constant<int>(1)), True());
+            Assert.AreEqual((Constant<int>(1) > Constant<int>(1)), False());
+            Assert.AreEqual((Constant<uint>(2) > Constant<uint>(1)), True());
+            Assert.AreEqual((Constant<uint>(1) > Constant<uint>(1)), False());
+            Assert.AreEqual((Constant<long>(2) > Constant<long>(1)), True());
+            Assert.AreEqual((Constant<long>(1) > Constant<long>(1)), False());
+            Assert.AreEqual((Constant<ulong>(2) > Constant<ulong>(1)), True());
+            Assert.AreEqual((Constant<ulong>(1) > Constant<ulong>(1)), False());
+            Assert.AreEqual((Constant<BigInteger>(2) > Constant<BigInteger>(1)), True());
+            Assert.AreEqual((Constant<BigInteger>(1) > Constant<BigInteger>(1)), False());
+            Assert.AreEqual((Constant<Real>(2) > Constant<Real>(1)), True());
+            Assert.AreEqual((Constant<Real>(1) > Constant<Real>(1)), False());
         }
 
         /// <summary>
