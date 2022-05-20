@@ -23,11 +23,6 @@ namespace ZenLibBench
             // BenchmarkTransformers();
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();
-
-            foreach (var input in Zen.GenerateInputs<FSeq<int>, FSeq<int>>(l => l.Sort(), depth: 8))
-            {
-                Console.WriteLine(input);
-            }
         }
 
         private static void BenchmarkComparisons()
