@@ -287,6 +287,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Gets the default value for a type as a zen value.
+        /// </summary>
+        /// <returns>The default expression.</returns>
+        public static Zen<T> Default<T>()
+        {
+            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T), new Unit());
+        }
+
+        /// <summary>
         /// The Zen value for false.
         /// </summary>
         /// <returns>Zen value.</returns>

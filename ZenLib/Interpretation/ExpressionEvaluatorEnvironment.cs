@@ -5,7 +5,6 @@
 namespace ZenLib.Interpretation
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
 
     /// <summary>
     /// An environment for the interpreter.

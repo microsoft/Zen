@@ -19,10 +19,22 @@ namespace ZenLibBench
         {
             Settings.UseLargeStack = true;
 
-            BenchmarkComparisons();
+            // BenchmarkComparisons();
             // BenchmarkTransformers();
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();
+
+            /* var f = new ZenFunction<BigInteger, int>(x => Zen.If(x == new BigInteger(10), 1, Zen.If<int>(x == new BigInteger(20), 2, 3)));
+            foreach (var input in f.GenerateInputs(depth: 3, exhaustiveDepth: false))
+            {
+                Console.WriteLine(input);
+            } */
+
+            var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Sort());
+            foreach (var input in f.GenerateInputs(depth: 3, exhaustiveDepth: true))
+            {
+                Console.WriteLine(input);
+            }
         }
 
         private static void BenchmarkComparisons()
