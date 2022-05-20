@@ -76,47 +76,112 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, ArithmeticOp op)
         {
-            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
+            if (typeof(T) == typeof(BigInteger))
             {
-                return (Zen<T>)(object)ZenConstantExpr<BigInteger>.Create(constantBigIntFuncs[(int)op](be1.Value, be2.Value));
+                // constant folding for BigInteger.
+                if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
+                {
+                    return (Zen<T>)(object)ZenConstantExpr<BigInteger>.Create(constantBigIntFuncs[(int)op](be1.Value, be2.Value));
+                }
+
+                // arithmetic identities.
+                switch (op)
+                {
+                    case ArithmeticOp.Addition:
+                        if (e1 is ZenConstantExpr<BigInteger> a && a.Value == BigInteger.Zero)
+                            return e2;
+                        if (e2 is ZenConstantExpr<BigInteger> b && b.Value == BigInteger.Zero)
+                            return e1;
+                        break;
+
+                    case ArithmeticOp.Subtraction:
+                        if (e2 is ZenConstantExpr<BigInteger> e && e.Value == BigInteger.Zero)
+                            return e1;
+                        break;
+
+                    case ArithmeticOp.Multiplication:
+                        if (e1 is ZenConstantExpr<BigInteger> g && g.Value == BigInteger.Zero)
+                            return (Zen<T>)(object)Zen.Constant(BigInteger.Zero);
+                        if (e2 is ZenConstantExpr<BigInteger> h && h.Value == BigInteger.Zero)
+                            return (Zen<T>)(object)Zen.Constant(BigInteger.Zero);
+                        if (e1 is ZenConstantExpr<BigInteger> i && i.Value == BigInteger.One)
+                            return e2;
+                        if (e2 is ZenConstantExpr<BigInteger> j && j.Value == BigInteger.One)
+                            return e1;
+                        break;
+                }
             }
-
-            if (e1 is ZenConstantExpr<Real> re1 && e2 is ZenConstantExpr<Real> re2)
+            else if (typeof(T) == typeof(Real))
             {
-                return (Zen<T>)(object)ZenConstantExpr<Real>.Create(constantRealFuncs[(int)op](re1.Value, re2.Value));
+                // constant folding for Real.
+                if (e1 is ZenConstantExpr<Real> re1 && e2 is ZenConstantExpr<Real> re2)
+                {
+                    return (Zen<T>)(object)ZenConstantExpr<Real>.Create(constantRealFuncs[(int)op](re1.Value, re2.Value));
+                }
+
+                // arithmetic identities.
+                switch (op)
+                {
+                    case ArithmeticOp.Addition:
+                        if (e1 is ZenConstantExpr<Real> c && c.Value == new Real(0))
+                            return e2;
+                        if (e2 is ZenConstantExpr<Real> d && d.Value == new Real(0))
+                            return e1;
+                        break;
+
+                    case ArithmeticOp.Subtraction:
+                        if (e2 is ZenConstantExpr<Real> f && f.Value == new Real(0))
+                            return e1;
+                        break;
+
+                    case ArithmeticOp.Multiplication:
+                        if (e1 is ZenConstantExpr<Real> k && k.Value == new Real(0))
+                            return (Zen<T>)(object)Zen.Constant(new Real(0));
+                        if (e2 is ZenConstantExpr<Real> l && l.Value == new Real(0))
+                            return (Zen<T>)(object)Zen.Constant(new Real(0));
+                        if (e1 is ZenConstantExpr<Real> m && m.Value == new Real(1))
+                            return e2;
+                        if (e2 is ZenConstantExpr<Real> n && n.Value == new Real(1))
+                            return e1;
+                        break;
+                }
             }
-
-            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
-
-            if (x.HasValue && y.HasValue)
+            else
             {
-                var f = constantFuncs[(int)op];
-                return ReflectionUtilities.CreateConstantIntegerValue<T>(f(x.Value, y.Value));
-            }
+                // constant folding for other types.
+                var x = ReflectionUtilities.GetConstantIntegerValue(e1);
+                var y = ReflectionUtilities.GetConstantIntegerValue(e2);
 
-            switch (op)
-            {
-                case ArithmeticOp.Addition:
-                    if (x.HasValue && x.Value == 0)
-                        return e2;
-                    if (y.HasValue && y.Value == 0)
-                        return e1;
-                    break;
+                if (x.HasValue && y.HasValue)
+                {
+                    var f = constantFuncs[(int)op];
+                    return ReflectionUtilities.CreateConstantIntegerValue<T>(f(x.Value, y.Value));
+                }
 
-                case ArithmeticOp.Subtraction:
-                    if (y.HasValue && y.Value == 0)
-                        return e1;
-                    break;
+                // arithmetic identities.
+                switch (op)
+                {
+                    case ArithmeticOp.Addition:
+                        if (x.HasValue && x.Value == 0)
+                            return e2;
+                        if (y.HasValue && y.Value == 0)
+                            return e1;
+                        break;
 
-                case ArithmeticOp.Multiplication:
-                    if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
-                        return ReflectionUtilities.CreateConstantIntegerValue<T>(0);
-                    if (x.HasValue && x.Value == 1)
-                        return e2;
-                    if (y.HasValue && y.Value == 1)
-                        return e1;
-                    break;
+                    case ArithmeticOp.Subtraction:
+                        if (y.HasValue && y.Value == 0)
+                            return e1;
+                        break;
+
+                    case ArithmeticOp.Multiplication:
+                        if ((x.HasValue && x.Value == 0) || (y.HasValue && y.Value == 0))
+                            return ReflectionUtilities.CreateConstantIntegerValue<T>(0);
+                        if (x.HasValue && x.Value == 1)
+                            return e2;
+                        if (y.HasValue && y.Value == 1)
+                            return e1;
+                        break;
+                }
             }
 
             return new ZenArithBinopExpr<T>(e1, e2, op);

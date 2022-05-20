@@ -273,6 +273,33 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify for addition.
+        /// </summary>
+        [TestMethod]
+        public void TestArithmeticSimplification()
+        {
+            var x = Zen.Symbolic<Real>("x");
+            var y = Zen.Symbolic<BigInteger>("y");
+
+            Assert.AreEqual(x, x + new Real(0));
+            Assert.AreEqual(x, new Real(0) + x);
+            Assert.AreEqual(y, y + BigInteger.Zero);
+            Assert.AreEqual(y, BigInteger.Zero + y);
+
+            Assert.AreEqual(x, x - new Real(0));
+            Assert.AreEqual(y, y - BigInteger.Zero);
+
+            Assert.AreEqual(x, x * new Real(1));
+            Assert.AreEqual(x, new Real(1) * x);
+            Assert.AreEqual(new Real(0), x * new Real(0));
+            Assert.AreEqual(new Real(0), new Real(0) * x);
+            Assert.AreEqual(y, y * BigInteger.One);
+            Assert.AreEqual(y, BigInteger.One * y);
+            Assert.AreEqual(Constant(BigInteger.Zero), y * BigInteger.Zero);
+            Assert.AreEqual(Constant(BigInteger.Zero), BigInteger.Zero * y);
+        }
+
+        /// <summary>
         /// Simplify for subtraction.
         /// </summary>
         [TestMethod]

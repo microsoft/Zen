@@ -14,14 +14,14 @@ namespace ZenLib
     public struct Real : IEquatable<Real>, IComparable<Real>
     {
         /// <summary>
-        /// The numerator.
+        /// The Real number numerator.
         /// </summary>
-        internal BigInteger Numerator;
+        public BigInteger Numerator;
 
         /// <summary>
-        /// The denominator.
+        /// The Real number denominator.
         /// </summary>
-        internal BigInteger Denominator;
+        public BigInteger Denominator;
 
         /// <summary>
         /// Convert a C# long to a Real.
