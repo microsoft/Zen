@@ -15,7 +15,7 @@ namespace ZenLib
         /// <summary>
         /// Assignment from arbitrary variables to C# values.
         /// </summary>
-        internal Dictionary<object, object> ArbitraryAssignment;
+        public Dictionary<object, object> VariableAssignment;
 
         /// <summary>
         /// Creates a new instance of the <see cref="ZenSolution"/> class.
@@ -23,7 +23,7 @@ namespace ZenLib
         /// <param name="arbitraryAssignment">The arbitrary assignment.</param>
         internal ZenSolution(Dictionary<object, object> arbitraryAssignment)
         {
-            this.ArbitraryAssignment = arbitraryAssignment;
+            this.VariableAssignment = arbitraryAssignment;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace ZenLib
         /// <returns>True if the solution exists.</returns>
         public bool IsSatisfiable()
         {
-            return ArbitraryAssignment != null;
+            return VariableAssignment != null;
         }
 
         /// <summary>
@@ -43,12 +43,12 @@ namespace ZenLib
         /// <returns>The C# value associated with the expression.</returns>
         public T Get<T>(Zen<T> expr)
         {
-            if (this.ArbitraryAssignment != null && this.ArbitraryAssignment.TryGetValue(expr, out var value))
+            if (this.VariableAssignment != null && this.VariableAssignment.TryGetValue(expr, out var value))
             {
                 return (T)value;
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(this.ArbitraryAssignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment(this.VariableAssignment);
             var interpreter = new ExpressionEvaluator(false);
             return (T)interpreter.Evaluate(expr, interpreterEnv);
         }

@@ -27,8 +27,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStrings()
         {
-            var f = new ZenFunction<string, int>(x => If(x.Contains("a"), 1, If<int>(x.Contains("b"), 2, 3)));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(3, Zen.GenerateInputs<string, int>(x => If(x.Contains("a"), 1, If<int>(x.Contains("b"), 2, 3))).Count());
         }
 
         /// <summary>
@@ -37,8 +36,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionBigIntegers()
         {
-            var f = new ZenFunction<BigInteger, int>(x => If(x == new BigInteger(10), 1, If<int>(x == new BigInteger(20), 2, 3)));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(3, Zen.GenerateInputs<BigInteger, int>(x => If(x == new BigInteger(10), 1, If<int>(x == new BigInteger(20), 2, 3))).Count());
         }
 
         /// <summary>
@@ -47,14 +45,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionLogic()
         {
-            var f1 = new ZenFunction<int, int, bool>((x, y) => And(x == 1, y == 2));
-            var f2 = new ZenFunction<int, int, bool>((x, y) => Or(x == 1, y == 2));
-            var f3 = new ZenFunction<int, int, bool>((x, y) => Not(Or(x == 1, y == 2)));
-            var f4 = new ZenFunction<int, bool>(x => Or(x == 1, x == 2, x == 3));
-            Assert.AreEqual(1, f1.GenerateInputs().Count());
-            Assert.AreEqual(1, f2.GenerateInputs().Count());
-            Assert.AreEqual(1, f3.GenerateInputs().Count());
-            Assert.AreEqual(1, f4.GenerateInputs().Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<int, int, bool>((x, y) => And(x == 1, y == 2)).Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<int, int, bool>((x, y) => Or(x == 1, y == 2)).Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<int, int, bool>((x, y) => Not(Or(x == 1, y == 2))).Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<int, bool>(x => Or(x == 1, x == 2, x == 3)).Count());
         }
 
         /// <summary>
@@ -63,8 +57,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionBitvectors()
         {
-            var f1 = new ZenFunction<int, int, int, int>((x, y, z) => ((x | y) & z) ^ x);
-            Assert.AreEqual(1, f1.GenerateInputs().Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<int, int, int, int>((x, y, z) => ((x | y) & z) ^ x).Count());
         }
 
         /// <summary>
@@ -74,8 +67,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionStringOperations()
         {
             Settings.PreserveBranches = true;
-            var f = new ZenFunction<string, string, string, string, bool>((w, x, y, z) => If(w.EndsWith(x), True(), If(w.StartsWith(y), True(), w.Contains(z))));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(3, Zen.GenerateInputs<string, string, string, string, bool>((w, x, y, z) => If(w.EndsWith(x), True(), If(w.StartsWith(y), True(), w.Contains(z)))).Count());
             Settings.PreserveBranches = false;
         }
 
@@ -86,8 +78,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             Settings.PreserveBranches = true;
-            var f = new ZenFunction<FSeq<int>, bool>(x => x.Contains(3));
-            Assert.AreEqual(6, f.GenerateInputs().Count());
+            Assert.AreEqual(6, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
             Settings.PreserveBranches = false;
         }
 
@@ -103,12 +94,23 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test symbolic execution for lists.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionListFilter()
+        {
+            var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
+            Assert.AreEqual(8, f.GenerateInputs(depth: 3, exhaustiveDepth: false).Count());
+            Assert.AreEqual(15, f.GenerateInputs(depth: 3, exhaustiveDepth: true).Count());
+        }
+
+        /// <summary>
         /// Test symbolic execution for an ite chain.
         /// </summary>
         [TestMethod]
         public void TestSymbolicExecutionIfThenElse()
         {
-            var f = new ZenFunction<int, int, int, int>((x, y, z) =>
+            var f = Zen.Function<int, int, int, int>((x, y, z) =>
             {
                 return If(x > 10, 1, If(y > x, If<int>(z > 10, 2, 3), If<int>(z > y, 4, 5)));
             });
@@ -140,8 +142,7 @@ namespace ZenLib.Tests
             var lines = new AclLine[2] { aclLine1, aclLine2 };
             var acl = new Acl { Lines = lines };
 
-            var f = new ZenFunction<IpHeader, bool>(h => acl.Process(h, 0));
-            Assert.AreEqual(3, f.GenerateInputs().Count());
+            Assert.AreEqual(3, Zen.GenerateInputs<IpHeader, bool>(h => acl.Process(h, 0)).Count());
             Settings.PreserveBranches = false;
         }
 
@@ -164,8 +165,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionOptions()
         {
-            var f = new ZenFunction<Option<int>, Option<int>>(x => x.Where(v => v == 1));
-            Assert.AreEqual(2, f.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<Option<int>, Option<int>>(x => x.Where(v => v == 1)).Count());
         }
 
         /// <summary>
@@ -174,8 +174,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringAt()
         {
-            var f = new ZenFunction<string, bool, string>((s, b) => s.At(If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
-            Assert.AreEqual(2, f.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, bool, string>((s, b) => s.At(If<BigInteger>(b, new BigInteger(1), new BigInteger(2)))).Count());
         }
 
         /// <summary>
@@ -184,8 +183,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringSubstring()
         {
-            var f = new ZenFunction<string, bool, string>((s, b) => s.Slice(new BigInteger(0), If<BigInteger>(b, new BigInteger(1), new BigInteger(2))));
-            Assert.AreEqual(2, f.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, bool, string>((s, b) => s.Slice(new BigInteger(0), If<BigInteger>(b, new BigInteger(1), new BigInteger(2)))).Count());
         }
 
         /// <summary>
@@ -194,8 +192,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringReplace()
         {
-            var f = new ZenFunction<string, bool, string>((s, b) => s.ReplaceFirst("hello", If<string>(b, "x", "y")));
-            Assert.AreEqual(2, f.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, bool, string>((s, b) => s.ReplaceFirst("hello", If<string>(b, "x", "y"))).Count());
         }
 
         /// <summary>
@@ -220,10 +217,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringLength()
         {
-            var f1 = new ZenFunction<string, int>(s => If<int>(s.Length() == new BigInteger(3), 1, 2));
-            var f2 = new ZenFunction<string, int>(s => If(s.Length() == new BigInteger(3), If<int>(s.Length() == new BigInteger(2), 1, 2), 3));
-            Assert.AreEqual(2, f1.GenerateInputs().Count());
-            Assert.AreEqual(2, f2.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, int>(s => If<int>(s.Length() == new BigInteger(3), 1, 2)).Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, int>(s => If(s.Length() == new BigInteger(3), If<int>(s.Length() == new BigInteger(2), 1, 2), 3)).Count());
         }
 
         /// <summary>
@@ -232,8 +227,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringIndexOf()
         {
-            var f = new ZenFunction<string, bool, BigInteger>((s, b) => s.IndexOf(If<string>(b, "hello", "world)")));
-            Assert.AreEqual(2, f.GenerateInputs().Count());
+            Assert.AreEqual(2, Zen.GenerateInputs<string, bool, BigInteger>((s, b) => s.IndexOf(If<string>(b, "hello", "world)"))).Count());
         }
 
         /// <summary>

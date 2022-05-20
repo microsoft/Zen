@@ -24,14 +24,7 @@ namespace ZenLibBench
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();
 
-            /* var f = new ZenFunction<BigInteger, int>(x => Zen.If(x == new BigInteger(10), 1, Zen.If<int>(x == new BigInteger(20), 2, 3)));
-            foreach (var input in f.GenerateInputs(depth: 3, exhaustiveDepth: false))
-            {
-                Console.WriteLine(input);
-            } */
-
-            var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Sort());
-            foreach (var input in f.GenerateInputs(depth: 3, exhaustiveDepth: true))
+            foreach (var input in Zen.GenerateInputs<FSeq<int>, FSeq<int>>(l => l.Sort(), depth: 8))
             {
                 Console.WriteLine(input);
             }

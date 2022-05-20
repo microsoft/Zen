@@ -130,7 +130,7 @@ namespace ZenLib.Tests
                 y = Zen.If(x >= i, i, y);
             }
 
-            y.Simplify();
+            y.Flatten();
             Settings.UseLargeStack = false;
         }
 

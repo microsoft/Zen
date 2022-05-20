@@ -413,8 +413,6 @@ namespace ZenLib.Interpretation
 
                 if (this.trackBranches)
                 {
-                    // Console.WriteLine(expression.ListExpr.IsEmpty().Format());
-
                     this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
                     this.PathConstraintSymbolicEnvironment[argHd.ArgumentId] = expression.ListExpr.Head();
                     this.PathConstraintSymbolicEnvironment[argTl.ArgumentId] = expression.ListExpr.Tail();

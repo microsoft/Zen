@@ -44,21 +44,12 @@ namespace ZenLib
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
 
         /// <summary>
-        /// Simplify an expression recursively.
+        /// Format an expression to be more readable.
         /// </summary>
         /// <returns></returns>
         public string Format()
         {
             return CommonUtilities.RunWithLargeStack(() => new ZenFormatVisitor().Format(this));
-        }
-
-        /// <summary>
-        /// Simplify an expression recursively.
-        /// </summary>
-        /// <returns></returns>
-        public Zen<T> Simplify()
-        {
-            return CommonUtilities.RunWithLargeStack(() => this.Unroll());
         }
 
         /// <summary>
@@ -1506,6 +1497,202 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Evaluate a Zen function.
+        /// </summary>
+        /// <param name="f">The function.</param>
+        /// <returns>The value from running the function.</returns>
+        public static T Evaluate<T>(Func<Zen<T>> f)
+        {
+            return new ZenFunction<T>(f).Evaluate();
+        }
+
+        /// <summary>
+        /// Evaluate a Zen function.
+        /// </summary>
+        /// <param name="f">The function.</param>
+        /// <param name="input1">The input.</param>
+        /// <returns>The value from running the function.</returns>
+        public static T2 Evaluate<T1, T2>(Func<Zen<T1>, Zen<T2>> f, T1 input1)
+        {
+            return new ZenFunction<T1, T2>(f).Evaluate(input1);
+        }
+
+        /// <summary>
+        /// Evaluate a Zen function.
+        /// </summary>
+        /// <param name="f">The function.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <returns>The value from running the function.</returns>
+        public static T3 Evaluate<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> f, T1 input1, T2 input2)
+        {
+            return new ZenFunction<T1, T2, T3>(f).Evaluate(input1, input2);
+        }
+
+        /// <summary>
+        /// Evaluate a Zen function.
+        /// </summary>
+        /// <param name="f">The function.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <param name="input3">The third input.</param>
+        /// <returns>The value from running the function.</returns>
+        public static T4 Evaluate<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f, T1 input1, T2 input2, T3 input3)
+        {
+            return new ZenFunction<T1, T2, T3, T4>(f).Evaluate(input1, input2, input3);
+        }
+
+        /// <summary>
+        /// Evaluate a Zen function.
+        /// </summary>
+        /// <param name="f">The function.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <param name="input3">The third input.</param>
+        /// <param name="input4">The fourth input.</param>
+        /// <returns>The value from running the function.</returns>
+        public static T5 Evaluate<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f, T1 input1, T2 input2, T3 input3, T4 input4)
+        {
+            return new ZenFunction<T1, T2, T3, T4, T5>(f).Evaluate(input1, input2, input3, input4);
+        }
+
+        /// <summary>
+        /// Compile a Zen function to a C# function.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <returns>The compiled C# function.</returns>
+        public static Func<T> Compile<T>(Func<Zen<T>> f)
+        {
+            var zf = new ZenFunction<T>(f);
+            zf.Compile();
+            return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Compile a Zen function to a C# function.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <returns>The compiled C# function.</returns>
+        public static Func<T1, T2> Compile<T1, T2>(Func<Zen<T1>, Zen<T2>> f)
+        {
+            var zf = new ZenFunction<T1, T2>(f);
+            zf.Compile();
+            return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Compile a Zen function to a C# function.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <returns>The compiled C# function.</returns>
+        public static Func<T1, T2, T3> Compile<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> f)
+        {
+            var zf = new ZenFunction<T1, T2, T3>(f);
+            zf.Compile();
+            return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Compile a Zen function to a C# function.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <returns>The compiled C# function.</returns>
+        public static Func<T1, T2, T3, T4> Compile<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f)
+        {
+            var zf = new ZenFunction<T1, T2, T3, T4>(f);
+            zf.Compile();
+            return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Compile a Zen function to a C# function.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <returns>The compiled C# function.</returns>
+        public static Func<T1, T2, T3, T4, T5> Compile<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f)
+        {
+            var zf = new ZenFunction<T1, T2, T3, T4, T5>(f);
+            zf.Compile();
+            return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Generate inputs using symbolic execution.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <param name="precondition">The precondition.</param>
+        /// <param name="depth">The maximum depth.</param>
+        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
+        /// <param name="backend">The backend solver.</param>
+        /// <returns>The input values.</returns>
+        public static IEnumerable<T1> GenerateInputs<T1, T2>(
+            Func<Zen<T1>, Zen<T2>> f,
+            Func<Zen<T1>, Zen<bool>> precondition = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Generate inputs using symbolic execution.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <param name="precondition">The precondition.</param>
+        /// <param name="depth">The maximum depth.</param>
+        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
+        /// <param name="backend">The backend solver.</param>
+        /// <returns>The input values.</returns>
+        public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>> f,
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Generate inputs using symbolic execution.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <param name="precondition">The precondition.</param>
+        /// <param name="depth">The maximum depth.</param>
+        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
+        /// <param name="backend">The backend solver.</param>
+        /// <returns>The input values.</returns>
+        public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Generate inputs using symbolic execution.
+        /// </summary>
+        /// <param name="f">The Zen function.</param>
+        /// <param name="precondition">The precondition.</param>
+        /// <param name="depth">The maximum depth.</param>
+        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
+        /// <param name="backend">The backend solver.</param>
+        /// <returns>The input values.</returns>
+        public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f,
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
         /// Evaluates a Zen expression given an assignment from arbitrary variable to C# object.
         /// </summary>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
@@ -1523,7 +1710,7 @@ namespace ZenLib
             }
 
             var solution = constraints.Solve();
-            var environment = new ExpressionEvaluatorEnvironment(solution.ArbitraryAssignment);
+            var environment = new ExpressionEvaluatorEnvironment(solution.VariableAssignment);
             var interpreter = new ExpressionEvaluator(false);
             return (T)interpreter.Evaluate(expr, environment);
         }
@@ -1533,7 +1720,51 @@ namespace ZenLib
         /// </summary>
         /// <param name="function">The zen function.</param>
         /// <param name="manager">An optional manager object.</param>
-        /// <returns>A transformer for the function.</returns>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<T> StateSet<T>(Func<Zen<T>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        {
+            return Zen.StateSet<T>(new ZenFunction<T, bool>(function), manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<Pair<T1, T2>> StateSet<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, bool>(function).StateSet(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<Pair<T1, T2, T3>> StateSet<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, T3, bool>(function).StateSet(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<Pair<T1, T2, T3, T4>> StateSet<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, T3, T4, bool>(function).StateSet(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a state set.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
         public static StateSet<T> StateSet<T>(this ZenFunction<T, bool> function, StateSetTransformerManager manager = null)
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
@@ -1554,7 +1785,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="function">The zen function.</param>
         /// <param name="manager">An optional manager object.</param>
-        /// <returns>A transformer for the function.</returns>
+        /// <returns>A state set for the function.</returns>
         public static StateSet<Pair<T1, T2>> StateSet<T1, T2>(this ZenFunction<T1, T2, bool> function, StateSetTransformerManager manager = null)
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
@@ -1576,7 +1807,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="function">The zen function.</param>
         /// <param name="manager">An optional manager object.</param>
-        /// <returns>A transformer for the function.</returns>
+        /// <returns>A state set for the function.</returns>
         public static StateSet<Pair<T1, T2, T3>> StateSet<T1, T2, T3>(this ZenFunction<T1, T2, T3, bool> function, StateSetTransformerManager manager = null)
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
@@ -1598,7 +1829,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="function">The zen function.</param>
         /// <param name="manager">An optional manager object.</param>
-        /// <returns>A transformer for the function.</returns>
+        /// <returns>A state set for the function.</returns>
         public static StateSet<Pair<T1, T2, T3, T4>> StateSet<T1, T2, T3, T4>(this ZenFunction<T1, T2, T3, T4, bool> function, StateSetTransformerManager manager = null)
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
@@ -1613,6 +1844,60 @@ namespace ZenLib
             var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateStateSet(f, manager));
             manager.StateSetCache.Add(key, result);
             return result;
+        }
+
+        /// <summary>
+        /// Gets the function as a transformer.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSetTransformer<T1, T2> Transformer<T1, T2>(Func<Zen<T1>, Zen<T2>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2>(function).Transformer(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a transformer.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSetTransformer<Pair<T1, T2>, T3> Transformer<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, T3>(function).Transformer(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a transformer.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSetTransformer<Pair<T1, T2, T3>, T4> Transformer<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, T3, T4>(function).Transformer(manager);
+        }
+
+        /// <summary>
+        /// Gets the function as a transformer.
+        /// </summary>
+        /// <param name="function">The zen function.</param>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A transformer for the function.</returns>
+        public static StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function, StateSetTransformerManager manager = null)
+        {
+            return new ZenFunction<T1, T2, T3, T4, T5>(function).Transformer(manager);
+        }
+
+        /// <summary>
+        /// Flattens an expression recursively by removing list operations.
+        /// Note: this can explode the size of the expression.
+        /// </summary>
+        /// <returns>The resulting expression.</returns>
+        public static Zen<T> Flatten<T>(this Zen<T> expression)
+        {
+            return CommonUtilities.RunWithLargeStack(() => expression.Unroll());
         }
     }
 }
