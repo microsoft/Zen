@@ -203,12 +203,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestRealAdd()
         {
+            Assert.AreEqual(new Real(1, 3), Zen.Evaluate((a, b) => a + b, new Real(0), new Real(1, 3)));
+            Assert.AreEqual(new Real(4, 3), Zen.Evaluate((a, b) => a + b, new Real(2, 2), new Real(1, 3)));
+            Assert.AreEqual(new Real(13, 21), Zen.Evaluate((a, b) => a + b, new Real(2, 7), new Real(1, 3)));
+
             var zf = new ZenFunction<Real, Real, Real>((a, b) => a + b);
-
-            Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));
-            Assert.AreEqual(new Real(4, 3), zf.Evaluate(new Real(2, 2), new Real(1, 3)));
-            Assert.AreEqual(new Real(13, 21), zf.Evaluate(new Real(2, 7), new Real(1, 3)));
-
             zf.Compile();
 
             Assert.AreEqual(new Real(1, 3), zf.Evaluate(new Real(0), new Real(1, 3)));

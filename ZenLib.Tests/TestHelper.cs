@@ -17,6 +17,9 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public static class TestHelper
     {
+        /// <summary>
+        /// The default bdd list size.
+        /// </summary>
         private static int defaultBddListSize = 4;
 
         /// <summary>
@@ -80,9 +83,9 @@ namespace ZenLib.Tests
             return (byte)random.Next(0, 255);
         }
 
-        private static Zen<T> Simplify<T>(Zen<T> expr, TestParameter p)
+        private static Zen<T> Flatten<T>(Zen<T> expr, TestParameter p)
         {
-            return p.Simplify ? expr.Simplify() : expr;
+            return p.Simplify ? expr.Flatten() : expr;
         }
 
         private static TestParameter[] GetBoundedParameters(int bddListSize, bool runBdds)
@@ -144,7 +147,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
@@ -173,11 +176,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -202,11 +205,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -232,11 +235,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -259,7 +262,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is not valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -283,7 +286,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -303,7 +306,7 @@ namespace ZenLib.Tests
             foreach (var p in GetBoundedParameters(defaultBddListSize, runBdds))
             {
                 var f = Zen.Function<bool>(function);
-                var result = f.Assert(o => Simplify(o, p), backend: p.Backend);
+                var result = f.Assert(o => Flatten(o, p), backend: p.Backend);
 
                 Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
@@ -324,7 +327,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
                 if (result.HasValue)
                 {
                     Assert.IsTrue(f.Evaluate(result.Value));
@@ -349,7 +352,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Simplify(o, p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
 
                 if (result.HasValue)
                 {

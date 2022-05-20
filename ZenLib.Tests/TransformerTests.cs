@@ -173,14 +173,14 @@ namespace ZenLib.Tests
         public void TestTransformerArgTypes()
         {
             var manager = new StateSetTransformerManager(0);
-            Assert.IsTrue(new ZenFunction<bool, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<byte, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<short, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<ushort, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<int, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<uint, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<long, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
-            Assert.IsTrue(new ZenFunction<ulong, bool>(b => true).Transformer(manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<bool, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<byte, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<short, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<ushort, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<int, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<uint, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<long, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
+            Assert.IsTrue(Zen.Transformer<ulong, bool>(b => true, manager).InputSet((i, o) => o).IsFull());
         }
 
         /// <summary>
@@ -345,9 +345,9 @@ namespace ZenLib.Tests
         public void TestTransformersMultipleArguments()
         {
             var manager = new StateSetTransformerManager(0);
-            var t1 = new ZenFunction<uint, uint, uint>((x, y) => x).Transformer(manager);
-            var t2 = new ZenFunction<uint, uint, uint, uint>((x, y, z) => y).Transformer(manager);
-            var t3 = new ZenFunction<uint, uint, uint, uint, uint>((w, x, y, z) => y).Transformer(manager);
+            var t1 = Zen.Transformer<uint, uint, uint>((x, y) => x, manager);
+            var t2 = Zen.Transformer<uint, uint, uint, uint>((x, y, z) => y, manager);
+            var t3 = Zen.Transformer<uint, uint, uint, uint, uint>((w, x, y, z) => y, manager);
 
             Assert.AreEqual(3U, t1.OutputSet((p, o) => p.Item1() == 3U).Element());
             Assert.AreEqual(3U, t2.OutputSet((p, o) => p.Item2() == 3U).Element());
@@ -361,8 +361,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestTransformerInvalidArguments1()
         {
-            var t1 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
-            var t2 = new ZenFunction<uint, bool>(x => true).Transformer(new StateSetTransformerManager());
+            var t1 = Zen.Transformer<uint, bool>(x => true, new StateSetTransformerManager());
+            var t2 = Zen.Transformer<uint, bool>(x => true, new StateSetTransformerManager());
 
             var set1 = t1.InputSet((i, o) => o);
             t2.TransformForward(set1);

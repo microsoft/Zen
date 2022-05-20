@@ -19,7 +19,7 @@ namespace ZenLibBench
         {
             Settings.UseLargeStack = true;
 
-            BenchmarkComparisons();
+            // BenchmarkComparisons();
             // BenchmarkTransformers();
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();

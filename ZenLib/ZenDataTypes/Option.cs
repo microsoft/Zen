@@ -189,8 +189,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Null<T>()
         {
-            var v = (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T), new Unit());
-            return Zen.Create<Option<T>>(("HasValue", False()), ("Value", v));
+            return Zen.Create<Option<T>>(("HasValue", False()), ("Value", Zen.Default<T>()));
         }
 
         /// <summary>

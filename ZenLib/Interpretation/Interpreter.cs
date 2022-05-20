@@ -24,12 +24,7 @@ namespace ZenLib.Interpretation
         /// <returns>The result and any path constraint.</returns>
         public static (T, PathConstraint) Run<T>(Zen<T> expression, Dictionary<long, object> args, bool trackBranches = false)
         {
-            return Interpret(expression, args, trackBranches);
-        }
-
-        private static (T, PathConstraint) Interpret<T>(Zen<T> expression, Dictionary<long, object> arguments, bool trackBranches)
-        {
-            var environment = new ExpressionEvaluatorEnvironment(arguments);
+            var environment = new ExpressionEvaluatorEnvironment(args);
             var interpreter = new ExpressionEvaluator(trackBranches);
             var result = (T)interpreter.Evaluate(expression, environment);
             return (result, interpreter.PathConstraint);
@@ -42,7 +37,7 @@ namespace ZenLib.Interpretation
             ImmutableDictionary<long, object> args)
         {
             var expression = function(Constant(value1), Constant(value2));
-            return Interpret(expression, new Dictionary<long, object>(args), false).Item1;
+            return Run(expression, new Dictionary<long, object>(args), false).Item1;
         }
     }
 }

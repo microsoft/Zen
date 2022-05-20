@@ -15,7 +15,10 @@ namespace ZenLib.SymbolicExecution
     /// </summary>
     internal static class InputGenerator
     {
-        private static Dictionary<long, object> arguments = new Dictionary<long, object>();
+        /// <summary>
+        /// The empty arguments.
+        /// </summary>
+        private static Dictionary<long, object> emptyArguments = new Dictionary<long, object>();
 
         /// <summary>
         /// Generate inputs that exercise different program paths.
@@ -31,18 +34,18 @@ namespace ZenLib.SymbolicExecution
             Zen<T1> input,
             Backend backend)
         {
-            var expression = function(input).Simplify();
-            var assume = precondition(input).Simplify();
+            var expression = function(input);
+            var assume = precondition(input);
 
-            (T2, PathConstraint) interpretFunction(T1 e)
+            (T2, PathConstraint, Dictionary<long, object>) interpretFunction(T1 e)
             {
-                var assignment = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments).ModelCheck(input == e, arguments);
+                var assignment = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, null, emptyArguments).ModelCheck(input == e, emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T2)evaluator.Evaluate(expression, env), evaluator.PathConstraint);
+                return ((T2)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<T1> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input, backend);
+            Option<T1> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -63,20 +66,20 @@ namespace ZenLib.SymbolicExecution
             Zen<T2> input2,
             Backend backend)
         {
-            var expression = function(input1, input2).Simplify();
-            var assume = precondition(input1, input2).Simplify();
+            var expression = function(input1, input2);
+            var assume = precondition(input1, input2);
 
-            (T3, PathConstraint) interpretFunction((T1, T2) e)
+            (T3, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), arguments);
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, emptyArguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T3)evaluator.Evaluate(expression, env), evaluator.PathConstraint);
+                return ((T3)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, backend);
+            Option<(T1, T2)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -99,20 +102,20 @@ namespace ZenLib.SymbolicExecution
             Zen<T3> input3,
             Backend backend)
         {
-            var expression = function(input1, input2, input3).Simplify();
-            var assume = precondition(input1, input2, input3).Simplify();
+            var expression = function(input1, input2, input3);
+            var assume = precondition(input1, input2, input3);
 
-            (T4, PathConstraint) interpretFunction((T1, T2, T3) e)
+            (T4, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2, T3) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), arguments);
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, emptyArguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T4)evaluator.Evaluate(expression, env), evaluator.PathConstraint);
+                return ((T4)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2, T3)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, input3, backend);
+            Option<(T1, T2, T3)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -137,20 +140,20 @@ namespace ZenLib.SymbolicExecution
             Zen<T4> input4,
             Backend backend)
         {
-            var expression = function(input1, input2, input3, input4).Simplify();
-            var assume = precondition(input1, input2, input3, input4).Simplify();
+            var expression = function(input1, input2, input3, input4);
+            var assume = precondition(input1, input2, input3, input4);
 
-            (T5, PathConstraint) interpretFunction((T1, T2, T3, T4) e)
+            (T5, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2, T3, T4) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, arguments)
-                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), arguments);
+                    .CreateModelChecker(backend, ModelCheckerContext.Solving, null, emptyArguments)
+                    .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T5)evaluator.Evaluate(expression, env), evaluator.PathConstraint);
+                return ((T5)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e) => SymbolicEvaluator.Find(e, arguments, input1, input2, input3, input4, backend);
+            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, input4, backend);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -164,16 +167,16 @@ namespace ZenLib.SymbolicExecution
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<T1> GenerateInputsSage<T1, T2>(
             Zen<bool> precondition,
-            Func<Zen<bool>, Option<T1>> findFunction,
-            Func<T1, (T2, PathConstraint)> interpretFunction)
+            Func<Zen<bool>, Dictionary<long, object>, Option<T1>> findFunction,
+            Func<T1, (T2, PathConstraint, Dictionary<long, object>)> interpretFunction)
         {
-            var queue = new Queue<(Zen<bool>, int)>();
-            queue.Enqueue((precondition, 0));
+            var queue = new Queue<(Zen<bool>, Dictionary<long, object>, int)>();
+            queue.Enqueue((precondition, new Dictionary<long, object>(), 0));
 
             while (queue.Count > 0)
             {
-                var (expr, bound) = queue.Dequeue();
-                var example = findFunction(expr);
+                var (expr, environment, bound) = queue.Dequeue();
+                var example = findFunction(expr, environment);
 
                 if (!example.HasValue)
                 {
@@ -183,14 +186,14 @@ namespace ZenLib.SymbolicExecution
                 // return the next example.
                 yield return example.Value;
 
-                var (_, pathConstraint) = interpretFunction(example.Value);
+                var (_, pathConstraint, pathConstraintEnv) = interpretFunction(example.Value);
 
                 // generate all the children by negating some path constraint.
                 for (int j = bound; j < pathConstraint.Conjuncts.Count; j++)
                 {
                     var pc = pathConstraint.GetRange(0, j - 1);
                     var e = And(precondition, pc.GetExpr(), Not(pathConstraint.Conjuncts[j]));
-                    queue.Enqueue((e, j + 1));
+                    queue.Enqueue((e, pathConstraintEnv, j + 1));
                 }
             }
         }

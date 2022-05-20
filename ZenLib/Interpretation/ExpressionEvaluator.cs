@@ -4,6 +4,7 @@
 
 namespace ZenLib.Interpretation
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Numerics;
@@ -32,6 +33,11 @@ namespace ZenLib.Interpretation
         public PathConstraint PathConstraint { get; set; }
 
         /// <summary>
+        /// Track the symbolic assignment to arguments when collecting path constraints.
+        /// </summary>
+        public Dictionary<long, object> PathConstraintSymbolicEnvironment { get; set; }
+
+        /// <summary>
         /// Cache of inputs and results.
         /// </summary>
         private Dictionary<object, object> cache = new Dictionary<object, object>();
@@ -44,9 +50,10 @@ namespace ZenLib.Interpretation
         {
             this.trackBranches = trackBranches;
 
-            if (trackBranches)
+            if (this.trackBranches)
             {
                 this.PathConstraint = new PathConstraint();
+                this.PathConstraintSymbolicEnvironment = new Dictionary<long, object>();
             }
         }
 
@@ -235,7 +242,7 @@ namespace ZenLib.Interpretation
 
             if (e1)
             {
-                if (trackBranches)
+                if (this.trackBranches)
                 {
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
@@ -244,7 +251,7 @@ namespace ZenLib.Interpretation
             }
             else
             {
-                if (trackBranches)
+                if (this.trackBranches)
                 {
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
@@ -389,12 +396,29 @@ namespace ZenLib.Interpretation
 
             if (e.Count() == 0)
             {
+                if (this.trackBranches)
+                {
+                    this.PathConstraint.Add(expression.ListExpr.IsEmpty());
+                }
+
                 return Evaluate(expression.EmptyCase, parameter);
             }
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-                var c = expression.ConsCase.Invoke(Constant(hd), Constant(tl));
+                var argHd = new ZenArgumentExpr<T>();
+                var argTl = new ZenArgumentExpr<FSeq<T>>();
+                parameter.ArgumentAssignment[argHd.ArgumentId] = hd;
+                parameter.ArgumentAssignment[argTl.ArgumentId] = tl;
+
+                if (this.trackBranches)
+                {
+                    this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
+                    this.PathConstraintSymbolicEnvironment[argHd.ArgumentId] = expression.ListExpr.Head();
+                    this.PathConstraintSymbolicEnvironment[argTl.ArgumentId] = expression.ListExpr.Tail();
+                }
+
+                var c = expression.ConsCase.Invoke(argHd, argTl);
                 return (TResult)Evaluate(c, parameter);
             }
         }
@@ -541,7 +565,7 @@ namespace ZenLib.Interpretation
             else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
             {
                 Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-                return Seq.AsString((Seq<Char>)e);
+                return Seq.AsString((Seq<ZenLib.Char>)e);
             }
             else
             {

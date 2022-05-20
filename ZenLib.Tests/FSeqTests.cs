@@ -80,7 +80,7 @@ namespace ZenLib.Tests
         public void TestSeqAnyObjects()
         {
             var f1 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
-            var f2 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7).Simplify());
+            var f2 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
             var f3 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field2") == 7));
 
             var input1 = f1.Find((i, o) => o);
