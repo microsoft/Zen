@@ -15,7 +15,7 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class MemoryTests
     {
-        /// <summary>
+        /* /// <summary>
         /// Test that we are able to reclaim memory after GC.
         /// </summary>
         [TestMethod]
@@ -64,6 +64,6 @@ namespace ZenLib.Tests
             }
 
             return Zen.If(x == i, 100 - i, CreateFunction(x, i + 1));
-        }
+        } */
     }
 }
