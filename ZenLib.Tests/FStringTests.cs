@@ -268,7 +268,7 @@ namespace ZenLib.Tests
                 var ex = f.Find((fs, i) => i.IsSome()).Value.ToString();
                 var idx = f.Evaluate(ex);
                 Assert.IsTrue(ex.Contains(s));
-                Assert.AreEqual(idx.Value, ex.IndexOf(s));
+                Assert.AreEqual(idx.Value, ex.IndexOf(s, StringComparison.Ordinal));
             });
         }
 
