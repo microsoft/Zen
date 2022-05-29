@@ -396,7 +396,7 @@ As there is no complete decision procedure for sequences, queries for sequences 
 Sequences also support matching against regular expressions. As an example:
 
 ```csharp
-var r = Regex.Star(Regex.Char(1));
+Regex<int> r = Regex.Star(Regex.Char(1));
 
 var s1 = Symbolic<Seq<int>>();
 var s2 = Symbolic<Seq<int>>();
@@ -499,12 +499,10 @@ Note that this requires C# 9.0 and .NET 6 or later to work. In addition, you mus
 public class Person
 {
     [ZenSize(depth: 10, enumerationType: EnumerationType.FixedSize)]
-    public FSeq<Person> Children { get; set; }
+    public FSeq<string> Contacts { get; set; }
 }
 ```
 
-
-Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
 
 <a name="solver-backends"></a>
 # Solver backends

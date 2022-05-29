@@ -93,7 +93,7 @@ namespace ZenLib.Solver
                 {
                     var fieldName = fieldsAndTypes[i].Key;
                     var fieldAccessor = dataTypeSort.Accessors[0][i];
-                    var fieldSymbolicValue = this.solver.ConvertExprToSymbolicValue(this.solver.Context.MkApp(fieldAccessor, parameter), fieldsAndTypes[i].Value);
+                    var fieldSymbolicValue = this.solver.ConvertExprToSymbolicValue(SolverZ3.Context.MkApp(fieldAccessor, parameter), fieldsAndTypes[i].Value);
                     result = result.Add(fieldName, fieldSymbolicValue);
                 }
             }

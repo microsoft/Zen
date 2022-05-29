@@ -78,7 +78,7 @@ namespace ZenLib.Solver
 
             var dataTypeSort = (DatatypeSort)this.solver.TypeToSortConverter.GetSortForType(parameter);
             var objectConstructor = dataTypeSort.Constructors[0];
-            var ret = this.solver.Context.MkApp(objectConstructor, fieldExprs);
+            var ret = SolverZ3.Context.MkApp(objectConstructor, fieldExprs);
             return ret;
         }
 

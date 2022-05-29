@@ -22,30 +22,30 @@ namespace ZenLib.Solver
 
         public ReExpr Visit(RegexEmptyExpr<T> expression, Sort parameter)
         {
-            var seqSort = this.solver.Context.MkSeqSort(parameter);
-            var regexSort = this.solver.Context.MkReSort(seqSort);
-            return this.solver.Context.MkEmptyRe(regexSort);
+            var seqSort = SolverZ3.Context.MkSeqSort(parameter);
+            var regexSort = SolverZ3.Context.MkReSort(seqSort);
+            return SolverZ3.Context.MkEmptyRe(regexSort);
         }
 
         public ReExpr Visit(RegexEpsilonExpr<T> expression, Sort parameter)
         {
-            var seqSort = this.solver.Context.MkSeqSort(parameter);
-            var seq = this.solver.Context.MkEmptySeq(seqSort);
-            return this.solver.Context.MkToRe(seq);
+            var seqSort = SolverZ3.Context.MkSeqSort(parameter);
+            var seq = SolverZ3.Context.MkEmptySeq(seqSort);
+            return SolverZ3.Context.MkToRe(seq);
         }
 
         public ReExpr Visit(RegexRangeExpr<T> expression, Sort parameter)
         {
             if (expression.CharacterRange.Low.Equals(expression.CharacterRange.High))
             {
-                return this.solver.Context.MkToRe((SeqExpr)GetSeqConstant(expression.CharacterRange.Low));
+                return SolverZ3.Context.MkToRe((SeqExpr)GetSeqConstant(expression.CharacterRange.Low));
             }
             else
             {
                 Contract.Assert(typeof(T) == typeof(ZenLib.Char), "Regex range only supported for unicode (char)");
                 var charLow = GetSeqConstant(expression.CharacterRange.Low);
                 var charHigh = GetSeqConstant(expression.CharacterRange.High);
-                return this.solver.Context.MkRange((SeqExpr)charLow, (SeqExpr)charHigh);
+                return SolverZ3.Context.MkRange((SeqExpr)charLow, (SeqExpr)charHigh);
             }
         }
 
@@ -54,15 +54,15 @@ namespace ZenLib.Solver
             var type = typeof(T);
 
             if (type == ReflectionUtilities.ByteType)
-                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 8));
+                return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 8));
             if (type == ReflectionUtilities.CharType)
                 return this.solver.CreateStringConst(((ZenLib.Char)obj).Escape());
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
-                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 16));
+                return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 16));
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
-                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 32));
+                return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 32));
             if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
-                return this.solver.Context.MkUnit(this.solver.Context.MkBV(obj.ToString(), 64));
+                return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 64));
 
             Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
             dynamic value = obj;
@@ -71,7 +71,7 @@ namespace ZenLib.Solver
             {
                 bits[bits.Length - i - 1] = value.GetBit(i);
             }
-            return this.solver.Context.MkUnit(this.solver.Context.MkBV(bits));
+            return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(bits));
         }
 
         public ReExpr Visit(RegexUnopExpr<T> expression, Sort parameter)
@@ -81,10 +81,10 @@ namespace ZenLib.Solver
             switch (expression.OpType)
             {
                 case RegexUnopExprType.Star:
-                    return this.solver.Context.MkStar(e);
+                    return SolverZ3.Context.MkStar(e);
                 default:
                     Contract.Assert(expression.OpType == RegexUnopExprType.Negation);
-                    return this.solver.Context.MkComplement(e);
+                    return SolverZ3.Context.MkComplement(e);
             }
         }
 
@@ -96,12 +96,12 @@ namespace ZenLib.Solver
             switch (expression.OpType)
             {
                 case RegexBinopExprType.Union:
-                    return this.solver.Context.MkUnion(l, r);
+                    return SolverZ3.Context.MkUnion(l, r);
                 case RegexBinopExprType.Intersection:
-                    return this.solver.Context.MkIntersect(l, r);
+                    return SolverZ3.Context.MkIntersect(l, r);
                 default:
                     Contract.Assert(expression.OpType == RegexBinopExprType.Concatenation);
-                    return this.solver.Context.MkConcat(l, r);
+                    return SolverZ3.Context.MkConcat(l, r);
             }
         }
 

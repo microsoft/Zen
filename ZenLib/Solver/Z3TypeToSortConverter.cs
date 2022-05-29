@@ -84,13 +84,13 @@ namespace ZenLib.Solver
                 valueSort = this.solver.GetOrCreateOptionSort(valueSort);
             }
 
-            return this.solver.Context.MkArraySort(keySort, valueSort);
+            return SolverZ3.Context.MkArraySort(keySort, valueSort);
         }
 
         public Sort VisitFixedInteger(Type intType, Unit parameter)
         {
             int size = ((dynamic)Activator.CreateInstance(intType, 0L)).Size;
-            return this.solver.Context.MkBitVecSort((uint)size);
+            return SolverZ3.Context.MkBitVecSort((uint)size);
         }
 
         public Sort VisitInt(Unit parameter)
@@ -121,8 +121,8 @@ namespace ZenLib.Solver
             }
 
             this.ObjectAppNames.Add(objectType.ToString());
-            var objectConstructor = this.solver.Context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
-            return this.solver.Context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
+            var objectConstructor = SolverZ3.Context.MkConstructor(objectType.ToString(), "value", fieldNames, fieldSorts);
+            return SolverZ3.Context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
         }
 
         public Sort VisitShort(Unit parameter)
@@ -153,7 +153,7 @@ namespace ZenLib.Solver
         public Sort VisitSeq(Type sequenceType, Type innerType, Unit parameter)
         {
             var valueSort = this.GetSortForType(innerType);
-            return this.solver.Context.MkSeqSort(valueSort);
+            return SolverZ3.Context.MkSeqSort(valueSort);
         }
     }
 }
