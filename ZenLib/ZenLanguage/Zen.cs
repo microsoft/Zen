@@ -390,7 +390,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenAndExpr.Create(expr1, expr2);
+            return ZenLogicalBinopExpr.Create(expr1, expr2, ZenLogicalBinopExpr.LogicalOp.And);
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            return ZenOrExpr.Create(expr1, expr2);
+            return ZenLogicalBinopExpr.Create(expr1, expr2, ZenLogicalBinopExpr.LogicalOp.Or);
         }
 
         /// <summary>

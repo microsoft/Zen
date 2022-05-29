@@ -108,7 +108,7 @@ namespace ZenLib.Compilation
             return variable;
         }
 
-        public Expression Visit(ZenAndExpr expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit(ZenLogicalBinopExpr expression, ExpressionConverterEnvironment parameter)
         {
             var left = CodeGenerator.CompileToBlock(
                 expression.Expr1,
@@ -124,7 +124,14 @@ namespace ZenLib.Compilation
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
-            return Expression.AndAlso(left, right);
+            switch (expression.Operation)
+            {
+                case ZenLogicalBinopExpr.LogicalOp.And:
+                    return Expression.AndAlso(left, right);
+                default:
+                    Contract.Assert(expression.Operation == ZenLogicalBinopExpr.LogicalOp.Or);
+                    return Expression.OrElse(left, right);
+            }
         }
 
         public Expression Visit<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
@@ -503,25 +510,6 @@ namespace ZenLib.Compilation
         public Expression Visit(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Not(Convert(expression.Expr, parameter));
-        }
-
-        public Expression Visit(ZenOrExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            var left = CodeGenerator.CompileToBlock(
-                expression.Expr1,
-                parameter,
-                this.SubexpressionCache,
-                this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth);
-
-            var right = CodeGenerator.CompileToBlock(
-                expression.Expr2,
-                parameter,
-                this.SubexpressionCache,
-                this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth);
-
-            return Expression.OrElse(left, right);
         }
 
         public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)

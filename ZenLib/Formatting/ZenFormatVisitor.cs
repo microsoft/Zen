@@ -161,21 +161,21 @@ namespace ZenLib.Generation
             return (str, inline);
         }
 
-        public (LazyString, bool) Visit(ZenAndExpr expression, Parameter parameter)
+        public (LazyString, bool) Visit(ZenLogicalBinopExpr expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var stack = new Stack<Zen<bool>>();
             var exprs = new List<Zen<bool>>();
-            var queue = new Queue<ZenAndExpr>();
+            var queue = new Queue<ZenLogicalBinopExpr>();
             queue.Enqueue(expression);
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.Expr1 is ZenAndExpr e1)
+                if (current.Expr1 is ZenLogicalBinopExpr e1 && e1.Operation == expression.Operation)
                     queue.Enqueue(e1);
                 else
                     exprs.Add(current.Expr1);
-                if (current.Expr2 is ZenAndExpr e2)
+                if (current.Expr2 is ZenLogicalBinopExpr e2 && e2.Operation == expression.Operation)
                     queue.Enqueue(e2);
                 else
                     stack.Push(current.Expr2);
@@ -184,29 +184,6 @@ namespace ZenLib.Generation
             exprs.AddRange(stack);
             var arguments = exprs.Select(e => Format(e, indent)).ToArray();
             return FormatFunction(parameter, "And", arguments);
-        }
-
-        public (LazyString, bool) Visit(ZenOrExpr expression, Parameter parameter)
-        {
-            var indent = parameter.Indent();
-            var exprs = new List<Zen<bool>>();
-            var queue = new Queue<ZenOrExpr>();
-            queue.Enqueue(expression);
-            while (queue.Count > 0)
-            {
-                var current = queue.Dequeue();
-                if (current.Expr1 is ZenOrExpr e1)
-                    queue.Enqueue(e1);
-                else
-                    exprs.Add(current.Expr1);
-                if (current.Expr2 is ZenOrExpr e2)
-                    queue.Enqueue(e2);
-                else
-                    exprs.Add(current.Expr2);
-            }
-
-            var arguments = exprs.Select(e => Format(e, indent)).ToArray();
-            return FormatFunction(parameter, "Or", arguments);
         }
 
         public (LazyString, bool) Visit(ZenNotExpr expression, Parameter parameter)

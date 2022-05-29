@@ -55,14 +55,7 @@ namespace ZenLib.ModelChecking
             return result;
         }
 
-        public InterleavingResult Visit(ZenAndExpr expression, Dictionary<long, object> parameter)
-        {
-            var x = Evaluate(expression.Expr1, parameter);
-            var y = Evaluate(expression.Expr2, parameter);
-            return x.Union(y);
-        }
-
-        public InterleavingResult Visit(ZenOrExpr expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit(ZenLogicalBinopExpr expression, Dictionary<long, object> parameter)
         {
             var x = Evaluate(expression.Expr1, parameter);
             var y = Evaluate(expression.Expr2, parameter);

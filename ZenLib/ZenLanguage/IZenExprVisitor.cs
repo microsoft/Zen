@@ -17,15 +17,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit(ZenAndExpr expression, TParam parameter);
-
-        /// <summary>
-        /// Visit an OrExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn Visit(ZenOrExpr expression, TParam parameter);
+        TReturn Visit(ZenLogicalBinopExpr expression, TParam parameter);
 
         /// <summary>
         /// Visit a NotExpr.

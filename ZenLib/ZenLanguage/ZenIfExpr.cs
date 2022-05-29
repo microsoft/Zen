@@ -60,13 +60,13 @@ namespace ZenLib
                     // if e1 then true else e2 = Or(e1, e2)
                     if (t is ZenConstantExpr<bool> te && te.Value)
                     {
-                        return ZenOrExpr.Create((dynamic)g, (dynamic)f);
+                        return ZenLogicalBinopExpr.Create((dynamic)g, (dynamic)f, ZenLogicalBinopExpr.LogicalOp.Or);
                     }
 
                     // if e1 then e2 else false = And(e1, e2)
                     if (f is ZenConstantExpr<bool> fe && !fe.Value)
                     {
-                        return ZenAndExpr.Create((dynamic)g, (dynamic)t);
+                        return ZenLogicalBinopExpr.Create((dynamic)g, (dynamic)t, ZenLogicalBinopExpr.LogicalOp.And);
                     }
                 }
             }

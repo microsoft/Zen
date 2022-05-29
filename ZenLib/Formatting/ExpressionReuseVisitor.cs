@@ -47,14 +47,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit(ZenAndExpr expression, Unit parameter)
-        {
-            Compute(expression.Expr1, parameter);
-            Compute(expression.Expr2, parameter);
-            return parameter;
-        }
-
-        public Unit Visit(ZenOrExpr expression, Unit parameter)
+        public Unit Visit(ZenLogicalBinopExpr expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);

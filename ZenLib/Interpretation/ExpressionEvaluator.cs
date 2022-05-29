@@ -78,9 +78,19 @@ namespace ZenLib.Interpretation
             return value;
         }
 
-        public object Visit(ZenAndExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit(ZenLogicalBinopExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return (bool)Evaluate(expression.Expr1, parameter) && (bool)Evaluate(expression.Expr2, parameter);
+            var e1 = (bool)Evaluate(expression.Expr1, parameter);
+            var e2 = (bool)Evaluate(expression.Expr2, parameter);
+
+            switch (expression.Operation)
+            {
+                case ZenLogicalBinopExpr.LogicalOp.And:
+                    return e1 && e2;
+                default:
+                    Contract.Assert(expression.Operation == ZenLogicalBinopExpr.LogicalOp.Or);
+                    return e1 || e2;
+            }
         }
 
         public object Visit<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
@@ -426,11 +436,6 @@ namespace ZenLib.Interpretation
         public object Visit(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             return !(bool)Evaluate(expression.Expr, parameter);
-        }
-
-        public object Visit(ZenOrExpr expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return (bool)Evaluate(expression.Expr1, parameter) || (bool)Evaluate(expression.Expr2, parameter);
         }
 
         public object Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)

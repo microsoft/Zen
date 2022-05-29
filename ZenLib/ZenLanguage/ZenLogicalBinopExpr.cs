@@ -10,17 +10,17 @@ namespace ZenLib
     /// <summary>
     /// Class representing an And expression.
     /// </summary>
-    internal sealed class ZenAndExpr : Zen<bool>
+    internal sealed class ZenLogicalBinopExpr : Zen<bool>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<bool>, Zen<bool>), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2);
+        private static Func<(Zen<bool>, Zen<bool>, LogicalOp), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for And terms.
         /// </summary>
-        private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
+        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
 
         /// <summary>
         /// Unroll a ZenAndExpr.
@@ -28,7 +28,7 @@ namespace ZenLib
         /// <returns>The unrolled expression.</returns>
         public override Zen<bool> Unroll()
         {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
+            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
         }
 
         /// <summary>
@@ -36,25 +36,42 @@ namespace ZenLib
         /// </summary>
         /// <param name="e1">The first expr.</param>
         /// <param name="e2">The second expr.</param>
+        /// <param name="op">The operation.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2)
+        private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2, LogicalOp op)
         {
-            if (e1 is ZenConstantExpr<bool> x)
-            {
-                return (x.Value ? e2 : e1);
-            }
-
-            if (e2 is ZenConstantExpr<bool> y)
-            {
-                return (y.Value ? e1 : e2);
-            }
-
             if (ReferenceEquals(e1, e2))
             {
                 return e1;
             }
 
-            return new ZenAndExpr(e1, e2);
+            if (op == LogicalOp.And)
+            {
+                if (e1 is ZenConstantExpr<bool> x)
+                {
+                    return (x.Value ? e2 : e1);
+                }
+
+                if (e2 is ZenConstantExpr<bool> y)
+                {
+                    return (y.Value ? e1 : e2);
+                }
+            }
+            else
+            {
+                Contract.Assert(op == LogicalOp.Or);
+                if (e1 is ZenConstantExpr<bool> x)
+                {
+                    return (x.Value ? e1 : e2);
+                }
+
+                if (e2 is ZenConstantExpr<bool> y)
+                {
+                    return (y.Value ? e2 : e1);
+                }
+            }
+
+            return new ZenLogicalBinopExpr(e1, e2, op);
         }
 
         /// <summary>
@@ -62,26 +79,29 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr1">The first expr.</param>
         /// <param name="expr2">The second expr.</param>
+        /// <param name="op">The operation.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2)
+        public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2, LogicalOp op)
         {
             CommonUtilities.ValidateNotNull(expr1);
             CommonUtilities.ValidateNotNull(expr2);
 
-            var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), createFunc, out var value);
+            var key = (expr1.Id, expr2.Id, (int)op);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);
             return value;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenAndExpr"/> class.
+        /// Initializes a new instance of the <see cref="ZenLogicalBinopExpr"/> class.
         /// </summary>
         /// <param name="expr1">First Zen expression.</param>
         /// <param name="expr2">Second Zen expression.</param>
-        private ZenAndExpr(Zen<bool> expr1, Zen<bool> expr2)
+        /// <param name="op">The operation.</param>
+        private ZenLogicalBinopExpr(Zen<bool> expr1, Zen<bool> expr2, LogicalOp op)
         {
             this.Expr1 = expr1;
             this.Expr2 = expr2;
+            this.Operation = op;
         }
 
         /// <summary>
@@ -95,13 +115,26 @@ namespace ZenLib
         internal Zen<bool> Expr2 { get; }
 
         /// <summary>
+        /// Gets the operation.
+        /// </summary>
+        internal LogicalOp Operation { get; }
+
+        /// <summary>
         /// Convert the expression to a string.
         /// </summary>
         /// <returns>The string representation.</returns>
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"And({this.Expr1}, {this.Expr2})";
+            if (this.Operation == LogicalOp.And)
+            {
+                return $"And({this.Expr1}, {this.Expr2})";
+            }
+            else
+            {
+                Contract.Assert(this.Operation == LogicalOp.Or);
+                return $"Or({this.Expr1}, {this.Expr2})";
+            }
         }
 
         /// <summary>
@@ -115,6 +148,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// A logical binary operation.
+        /// </summary>
+        internal enum LogicalOp
+        {
+            And,
+            Or,
         }
     }
 }
