@@ -766,7 +766,7 @@ namespace ZenLib.Solver
                 return optionSort;
             }
 
-            var c1 = this.Context.MkConstructor("None", "none");
+            var c1 = this.Context.MkConstructor("None", "none", new string[] { }, new Sort[] { }, new uint[] { });
             var c2 = this.Context.MkConstructor("Some", "some", new string[] { "some" }, new Sort[] { valueSort });
             var optSort = this.Context.MkDatatypeSort("Option_" + valueSort, new Constructor[] { c1, c2 });
             this.OptionSorts[valueSort] = optSort;
