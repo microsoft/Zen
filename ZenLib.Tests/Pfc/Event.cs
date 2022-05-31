@@ -68,6 +68,7 @@ namespace ZenLib.Tests
     /// <summary>
     /// Extension methods for Events to access Zen objects.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal static class EventExtensions
     {
         internal static Zen<ushort> GetTimeStamp(this Zen<Event> e)

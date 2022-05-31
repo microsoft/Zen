@@ -10,19 +10,21 @@ Zen is a research library that provides high-level abstractions in .NET to make 
 - [Table of contents](#table-of-contents)
 - [Installation](#installation)
 - [Overview of Zen](#overview-of-zen)
-    - [Computing with Zen Expressions](#computing-with-zen-expressions)
-    - [Executing a function](#executing-a-function)
-    - [Searching for inputs](#searching-for-inputs)
-    - [Computing with sets](#computing-with-sets)
-    - [Generating test inputs](#generating-test-inputs)
+  - [Zen Expressions](#zen-expressions)
+  - [Executing a function](#executing-a-function)
+  - [Searching for inputs](#searching-for-inputs)
+  - [Computing with sets](#computing-with-sets)
+  - [Generating test inputs](#generating-test-inputs)
+  - [Optimization](#optimization)
 - [Supported data types](#supported-data-types)
-    - [Primitive types](#primitive-types)
-    - [Integer types](#integer-types)
-    - [Options, Tuples](#options-tuples)
-    - [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
-    - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
-    - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
-    - [Custom classes and structs](#custom-classes-and-structs)
+  - [Primitive types](#primitive-types)
+  - [Integer types](#integer-types)
+  - [Options, Tuples](#options-tuples)
+  - [Real Values](#real-values)
+  - [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
+  - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
+  - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
+  - [Custom classes and structs](#custom-classes-and-structs)
 - [Zen Attributes](#zen-attributes)
 - [Solver backends](#solver-backends)
 - [Example: Network ACLs](#example-network-acls)
@@ -31,17 +33,24 @@ Zen is a research library that provides high-level abstractions in .NET to make 
 
 <a name="installation"></a>
 # Installation
-Just add the project to your visual studio solution. A nuget package is available [here](https://www.nuget.org/packages/ZenLib).
+Just add the project to your visual studio solution. Alternatively, a nuget package is available [here](https://www.nuget.org/packages/ZenLib).
 
 <a name="overview-of-zen"></a>
 # Overview of Zen
-This page gives a high-level overview of the features in Zen. To see more detailed documentation, check out the [wiki](https://github.com/microsoft/Zen/wiki) page. To import the Zen library, add the following lines to your source file:
+
+To import the Zen library, add the following line to your source file:
 
 ```csharp
 using ZenLib;
 ```
 
-The main abstraction Zen provides is through the type `Zen<T>` which represents a value of type `T` that can take on any value. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., `bool`, `int`, `string`, `FSeq`) and then encodes constraints over those variables.
+Most library methods are found in the `Zen.*` namespace. To avoid having to write this prefix out every time, you can alternatively add the following using statement:
+
+```csharp
+using static ZenLib.Zen;
+```
+
+The Zen library provides the type `Zen<T>`, which represents a symbolic value of type `T`. The library can then solve constraints involving symbolic values. The following code shows a basic use of Zen -- it creates several symbolic variables of different types (e.g., `bool`, `int`, `string`, `FSeq` - finite sequences) and then encodes constraints over those variables.
 
 ```csharp
 // create symbolic variables of different types
@@ -80,8 +89,9 @@ l: [69,69,69,5,69,69,5,5,5,5]
 ```
 
 <a name="computing-with-zen-expressions"></a>
-### Computing with Zen Expressions
-Since `Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
+## Zen Expressions
+
+`Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
 
 ```csharp
 Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
@@ -90,32 +100,33 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 }
 ```
 
-Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions between C# values and Zen values. 
-
-Rather than manually building constraints as shown previously, we can also ask Zen to represent a "function" from some inputs to an output. To do so, we create a `ZenFunction` to wrap the `MultiplyAndAdd` function:
+Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions to lift C# values to Zen values. Zen can represent a "function" like the one above to perform various symbolic tasks by creating a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
 var function = new ZenFunction<int, int, int>(MultiplyAndAdd);
 ```
 
-Given a `ZenFunction` we can leverage the library to perform several additional tasks.
-
 <a name="executing-a-function"></a>
-### Executing a function
+## Executing a function
 
-Zen can execute the function we have built on a given collection of inputs. The simplest way to do so is to call the `Evaluate` method on the `ZenFunction`:
+Zen can execute the function we have built on inputs by calling the `Evaluate` method on the `ZenFunction`:
 
 ```csharp
 var output = function.Evaluate(3, 2); // output = 11
 ```
 
-This will interpret abstract syntax tree represented by the Zen function at runtime. Of course doing so can be quite slow, particularly compared to a native version of the function.
-
-When performance is important, or if you need to execute the model on many inputs, Zen can compile the model using the C# `System.Reflection.Emit` API. This generates IL instructions that execute more efficiently. Doing so is easy, just call the `Compile` method on the function first:
+This will interpret the expression tree represented by the Zen function at runtime and return back a C# `int` value in this case. Of course doing so can be quite slow, so if you need to execute a function many times, Zen can compile the model using the C# `System.Reflection.Emit` API. This generates IL instructions that execute more efficiently. Doing so is easy, just call the `Compile` method on the function first:
 
 ```csharp
 function.Compile();
 output = function.Evaluate(3, 2); // output = 11
+```
+
+Or alternatively:
+
+```csharp
+Func<int, int, int> f = Zen.Compile(MultiplyAndAdd);
+var output = f(3, 2); // output = 11
 ```
 
 We can see the difference by comparing the performance between the two:
@@ -146,19 +157,20 @@ compilation time: 4ms
 compiled function time: 2ms
 ```
 
-<a name="searching-for-inputs"></a>
-### Searching for inputs
 
-A powerful feature Zen supports is the ability to find function inputs that lead to some (un)desirable outcome. For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
+<a name="searching-for-inputs"></a>
+## Searching for inputs
+
+Zen can find function inputs that lead to some (un)desirable outcome. For example, we can find an `(x, y)` input pair such that `x` is less than zero and the output of the function is `11`:
 
 ```csharp
 var input = function.Find((x, y, result) => Zen.And(x <= 0, result == 11)); 
 // input.Value = (-1883171776, 1354548043)
 ```
 
-The type of the result in this case is `Option<(int, int)>`, which will have a pair of integer inputs that make the expression true if such a pair exists. In this case the library will find `x = -1883171776` and `y = 1354548043`
+The type of the result in this case is `Option<(int, int)>`, which will have a pair of integer inputs that make the output 11 if such a pair exists. In this case the library will find `x = -1883171776` and `y = 1354548043`
 
-To find multiple inputs, Zen supports an equivalent `FindAll` method, which returns an `IEnumerable` of inputs.
+To find multiple inputs, Zen supports an equivalent `FindAll` method, which returns an `IEnumerable` of inputs where each input in `inputs` will be unique so there are no duplicates.
 
 ```csharp
 using System.Linq;
@@ -166,42 +178,32 @@ using System.Linq;
 var inputs = function.FindAll((x, y, result) => Zen.And(x <= 0, result == 11)).Take(5);
 ```
 
-Each input in `inputs` will be unique so there will be no duplicates.
-
-Input search uses [bounded model checking](https://en.wikipedia.org/wiki/Model_checking#:~:text=Bounded%20model%20checking%20algorithms%20unroll,as%20an%20instance%20of%20SAT.) to perform verification. For data structures like lists, it finds examples up to a given input size *k*, which is an optional parameter to the function.
 
 <a name="computing-with-sets"></a>
-### Computing with sets
+## Computing with sets
 
-While the `Find` function provides a way to find a single input to a function, Zen also provides an additional API for reasoning about sets of inputs and outputs to functions. 
-
-It does this through a `StateSetTransformer` API. A transformer is created by calling the `Transformer()` method on a `ZenFunction`:
+While the `Find` function provides a way to find a single input to a function, Zen also provides an additional API for reasoning about sets of inputs and outputs to functions. It does this through a `StateSetTransformer` API. A transformer is created by calling the `Transformer()` method on a `ZenFunction` (or by calling `Zen.Transformer(...)`):
 
 ```csharp
 var f = new ZenFunction<uint, uint>(i => i + 1);
-
-// create a set transformer from the function
 StateSetTransformer<uint, uint> t = f.Transformer();
 ```
 
 Transformers allow for manipulating (potentially huge) sets of objects efficient. For example, we can get the set of all input `uint` values where adding one will result in an output `y` that is no more than 10 thousand:
 
 ```csharp
-// find the set of all inputs where the output is no more than 10,000
 StateSet<uint> inputSet = t.InputSet((x, y) => y <= 10000);
 ```
 
 This set will include all the values `0 - 9999` as well as `uint.MaxValue` due to wrapping. Transformers can also manpulate sets by propagating them forward or backwards: 
 
 ```csharp
-// run the set through the transformer to get the set of all outputs
 StateSet<uint> outputSet = t.TransformForward(inputSet);
 ```
 
-Finally, `StateSet` objects can also be intersected, unioned, and negated. We can pull an example element out of a set as follows:
+Finally, `StateSet` objects can also be intersected, unioned, and negated. We can pull an example element out of a set as follows (if one exists):
 
 ```csharp
-// get an example value in the set if one exists.
 Option<uint> example = inputSet.Element(); // example.Value = 0
 ```
 
@@ -209,9 +211,9 @@ Internally, transformers leverage [binary decision diagrams](https://github.com/
 
 
 <a name="generating-test-inputs"></a>
-### Generating test inputs
+## Generating test inputs
 
-As a final use case, Zen can automatically generate interesting use cases for a given model by finding inputs that will lead to different execution paths. For instance, consider again the insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
+Zen can automatically generate test inputs for a given model by finding inputs that will lead to different execution paths. For instance, consider an insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
 ```csharp
 var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
@@ -237,7 +239,19 @@ In this case, we get the following output, which includes all permutations of re
 [144,111,14]
 ```
 
-The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path.
+The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path. Each `Zen.If` expression is treated as a program branch point (note: you can set the setting `Settings.PreserveBranches = true` to preserve branches if needed.).
+
+<a name="optimization"></a>
+## Optimization
+
+Zen supports optimization of objective functions subject to constraints. The API is similar to that for `Solve`, but where you provide a maximization or minimization objective:
+
+```csharp
+var a = Zen.Symbolic<Real>();
+var b = Zen.Symbolic<Real>();
+var constraints = Zen.And(a <= (Real)10, b <= (Real)10, a + (Real)4 <= b);
+var solution = Zen.Maximize(objective: a + b, subjectTo: constraints); // a = 6, b = 10
+```
 
 
 <a name="supported-data-types"></a>
@@ -274,30 +288,22 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 
 
 <a name="primitive-types"></a>
-### Primitive types
+## Primitive types
 
-Zen supports the following primitive types: `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic. As an example:
+Zen supports the primitive types `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic operations. As an example:
 
 ```csharp
 var x = Symbolic<int>();
 var y = Symbolic<int>();
 var c1 = (~x & y) == 1;
 var c2 = And(x + y > 0, x + y < 100);
-var solution = And(c1, c2).Solve();
-```
-```csharp
-x: -20
-y: 105
+var solution = And(c1, c2).Solve(); // x = -20, y = 105
 ```
 
 <a name="integer-types"></a>
-### Integer types
+## Integer types
 
-Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers. Zen also supports other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer).
-
-Out of the box, Zen provides the types `Int1`, `UInt1`, `Int2`, `UInt2`, `Int3`, `UInt3` ..., `Int64`, `UInt64` as well as the types `Int128`, `UInt128`, `Int256`, `UInt256`.
-
-You can also create a custom fixed-width integer of a given length. For example, to create a 65-bit integer, just add the following code:
+Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers as well as other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer). Out of the box, Zen provides the types `Int1`, `UInt1`, `Int2`, `UInt2`, `Int3`, `UInt3` ..., `Int64`, `UInt64` as well as the types `Int128`, `UInt128`, `Int256`, `UInt256`. You can also create a custom fixed-width integer of a given length. For example, to create a 65-bit integer, add the following code:
 
 ```csharp
 public class Int65 : IntN<Int65, Signed> 
@@ -315,37 +321,55 @@ var x = Symbolic<BigInteger>();
 var y = Symbolic<UInt9>();
 var c1 = If(b, y < new UInt9(10), x == new BigInteger(3));
 var c2 = Implies(Not(b), (y & new UInt9(1)) == new UInt9(1));
-var solution = And(c1, c2).Solve();
-```
-```csharp
-b: True
-x: 0
-y: 4
+var solution = And(c1, c2).Solve(); // b = True, x = 0, y = 4
 ```
 
+
 <a name="options-and-tuples"></a>
-### Options, Tuples
+## Options, Tuples
 
 Zen offers `Pair<T1, T2, ...>`, types as a lightweight alternative to classes. By default all values are assumed to be non-null by Zen. For nullable values, it provides an `Option<T>` type.
 
-<a name="finite-sequences-bags-maps"></a>
-### Finite Sequences, Bags, Maps
+```csharp
+var b = Symbolic<Option<byte>>();
+var p = Symbolic<Pair<int, int>>>();
+var solution = And(b.IsSome(), p.Item1() == 3).Solve(); // b = None, p = (3, 0)
+```
 
-Zen supports a number of high-level data types that are finite (bounded) in size (the default size is 5 but can be changed). These include:
+<a name="real-values"></a>
+## Real Values
 
-- `FSeq<T>` for reasoning about variable length sequences of values where the order is important. For instance, the sorting example earlier.
-- `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is usually preferred to use `FBag<T>` if possible compared to `FSeq<T>` as it will frequently scale better.
-- `FMap<T1, T2>` type to emulate finite maps from keys to values.
-
-As an example, we can write an implementation for the insertion sort algorithm using recursion:
+Zen supports arbitrary precision real numbers through the `Real` type.
 
 ```csharp
-Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
+var c = new Real(3, 2); // the fraction 3/2 or equivalently 1.5 
+var x = Symbolic<Real>();
+var y = Symbolic<Real>();
+var solution = (2 * x + 3 * y == c).Solve(); // x = 1/2, y = 1/6
+```
+
+<a name="finite-sequences-bags-maps"></a>
+## Finite Sequences, Bags, Maps
+
+Zen supports several high-level data types that are finite (bounded) in size (the default size is 5 but can be changed). These include:
+
+- `FSeq<T>` for reasoning about variable length sequences of values where the order is important. For instance, the sorting example earlier.
+- `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is often preferred to use `FBag<T>` if compared to `FSeq<T>` as it may scale better.
+- `FMap<T1, T2>` type to emulate finite maps from keys to values.
+
+One can implement complex functionality over `FSeq<T>` types by recursively processing the list in the style of functional programming. This is done via the `Zen.Case` expression, which says what to return for an empty and non-empty list. As an example, below is the implementation for the insertion sort algorithm in Zen:
+
+```csharp
+// sort a finite sequence of elements of type T.
+public Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
 {
-    return expr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => Insert(hd, Sort(tl)));
+    return expr.Case(
+        empty: FSeq.Empty<T>(),
+        cons: (hd, tl) => Insert(hd, Sort(tl)));
 }
 
-Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
+// insert the element in sorted order into the sorted list.
+public Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
 {
     return list.Case(
         empty: FSeq.Create(elt),
@@ -357,15 +381,14 @@ We can verify properties about this sorting algorithm by proving that there is n
 
 ```csharp
 var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
-var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length());
-// input = None
+var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length()); // input = None
 ```
 
 
 <a name="unbounded-sets-maps"></a>
-### Unbounded Sets and Maps
+## Unbounded Sets and Maps
 
-Zen also supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map ahead of time. However, this type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain sequences or other maps/sets. For instance primitive types (bool, integers, string, BigInteger) as well as classes/structs are allowed.
+Zen supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map. This type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain any finitized types (`FSeq`, `FString`, or `FBag`). Primitive types (bool, integers, string, BigInteger), classes/structs are allowed.
 
 ```csharp
 var s  = Symbolic<string>();
@@ -378,27 +401,16 @@ var c1 = s1.Contains("a");
 var c2 = s1.Intersect(s2).Contains("b");
 var c3 = Implies(s == "c", s3.Add(s) == s2);
 var c4 = s4 == s1.Union(s2);
-var solution = And(c1, c2, c3, c4).Solve();
-```
-```csharp
-s:  a
-s1: {b, a}
-s2: {b}
-s3: {}
-s4: {b, a}
+var solution = And(c1, c2, c3, c4).Solve(); // s = "a", s1 = {b, a}, s2 = {b}, s3 = {}, s4 = {b, a}
 ```
 
 <a name="strings-and-sequences"></a>
-### Sequences, Strings, and Regular Expressions
+## Sequences, Strings, and Regular Expressions
 
-Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. The `string` type is implemented as a `Seq<Char>` for unicode strings.
-
-As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth.
-
-Sequences also support matching against regular expressions. As an example:
+Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth. Sequences also support matching against regular expressions. As an example:
 
 ```csharp
-Regex<int> r = Regex.Star(Regex.Char(1));
+Regex<int> r = Regex.Star(Regex.Char(1)); // zero or more 1s in a Seq<int>
 
 var s1 = Symbolic<Seq<int>>();
 var s2 = Symbolic<Seq<int>>();
@@ -407,32 +419,25 @@ var c1 = s1.MatchesRegex(r);
 var c2 = s1 != Seq.Empty<int>();
 var c3 = Not(s2.MatchesRegex(r));
 var c4 = s1.Length() == s2.Length();
-var solution = And(c1, c2, c3, c4).Solve();
-```
-```csharp
-s1: [1]
-s2: [0]
+var solution = And(c1, c2, c3, c4).Solve(); // s1 = [1], s2 = [0]
 ```
 
-Zen supports the `string` type for reasoning about unbounded strings. As mentioned above, these are implemented as `Seq<Char>`. Strings also support matching regular expressions. The regular expression parsing supports a limited subset of constructs currently - it does support anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
+Zen supports the `string` type for reasoning about unbounded strings (the `string` type is implemented as a `Seq<Char>` for unicode strings). Strings also support matching regular expressions. Zen supports a limited subset of constructs currently - it supports anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
 
 ```csharp
-var r1 = Regex.Parse("[0-9a-z]+");
-var r2 = Regex.Parse("(0.)*");
+Regex<Char> r1 = Regex.Parse("[0-9a-z]+");
+Regex<Char> r2 = Regex.Parse("(0.)*");
 
 var s = Symbolic<string>();
 
 var c1 = s.MatchesRegex(Regex.Intersect(r1, r2));
 var c2 = s.Contains("a0b0c");
 var c3 = s.Length() == new BigInteger(10);
-var solution = And(c1, c2, c3).Solve();
-```
-```csharp
-s: "020z0a0b0c"
+var solution = And(c1, c2, c3).Solve(); // s = "020z0a0b0c"
 ```
 
 <a name="custom-classes-and-structs"></a>
-### Custom classes and structs
+## Custom classes and structs
 
 Zen supports custom `class` and `struct` types with some limitations. It will attempt to model all public fields and properties. For these types to work, either (1) the class/struct must also have a default constructor and all properties must be allowed to be set, or (2) there must be a constructor with matching parameter names and types for all the public fields. For example, the following are examples that are and are not allowed:
 
@@ -479,7 +484,7 @@ public class Point
 <a name="zen-attributes"></a>
 # Zen Attributes
 
-Zen provides two attributes to simplify the creation and manipulation of symbolic objects. The first attribute `[ZenObject]` can be applied to classes or structs. It leverages C# source generators to generate Get and With methods for all public fields and properties in a class.
+Zen provides two attributes to simplify the creation and manipulation of symbolic objects. The first attribute `[ZenObject]` can be applied to classes or structs. It uses C# source generators to generate Get and With methods for all public fields and properties.
 
 ```csharp
 [ZenObject]
@@ -509,7 +514,7 @@ public class Person
 <a name="solver-backends"></a>
 # Solver backends
 
-Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` API provides an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` and `Zen.Solve` APIs provide an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` API uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded-size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
 
 <a name="example-network-acls"></a>
 # Example: Network ACLs
