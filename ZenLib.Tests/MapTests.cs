@@ -401,6 +401,7 @@ namespace ZenLib.Tests
         {
             Assert.IsTrue(new ZenConstraint<Map<bool, bool>>(m => m.Get(true).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<byte, byte>>(m => m.Get(1).IsSome()).Find().HasValue);
+            Assert.IsTrue(new ZenConstraint<Map<ZenLib.Char, ZenLib.Char>>(m => m.Get(new ZenLib.Char('a')).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<short, short>>(m => m.Get(2).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<ushort, ushort>>(m => m.Get(3).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<int, int>>(m => m.Get(4).IsSome()).Find().HasValue);
@@ -408,6 +409,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenConstraint<Map<long, long>>(m => m.Get(6).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<ulong, ulong>>(m => m.Get(7).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<BigInteger, BigInteger>>(m => m.Get(new BigInteger(8)).IsSome()).Find().HasValue);
+            Assert.IsTrue(new ZenConstraint<Map<Real, Real>>(m => m.Get(new Real(8)).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<string, string>>(m => m.Get("9").IsSome()).Find().HasValue);
         }
 

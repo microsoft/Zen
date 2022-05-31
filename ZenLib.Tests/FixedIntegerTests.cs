@@ -32,6 +32,25 @@ namespace ZenLib.Tests
         [DataRow(3, 4, true)]
         [DataRow(4, 3, false)]
         [DataRow(0, 1, true)]
+        [DataRow(-1, -1, false)]
+        [DataRow(1, -1, false)]
+        [DataRow(-1, 1, true)]
+        [DataRow(-1, 0, true)]
+        [DataRow(-30, -20, true)]
+        [DataRow(-20, -30, false)]
+        [DataRow(120, 129, true)]
+        public void TestLessThan(long x, long y, bool expected)
+        {
+            Assert.AreEqual(expected, new Int9(x) < new Int9(y));
+        }
+
+        /// <summary>
+        /// Test that less than or equal works as expected.
+        /// </summary>
+        [TestMethod]
+        [DataRow(3, 4, true)]
+        [DataRow(4, 3, false)]
+        [DataRow(0, 1, true)]
         [DataRow(-1, -1, true)]
         [DataRow(1, -1, false)]
         [DataRow(-1, 1, true)]

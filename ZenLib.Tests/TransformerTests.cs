@@ -48,6 +48,22 @@ namespace ZenLib.Tests
             }
         }
 
+        class Obj
+        {
+            public Seq<int> Value { get; set; }
+        }
+
+        /// <summary>
+        /// Test a transformer fails for unbounded types.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestTransformerExceptionForUnboundedTypes3()
+        {
+            var x = Zen.If(Symbolic<bool>(), Zen.Create<Obj>(("Value", Seq.Empty<int>())), Symbolic<Obj>());
+            new ZenFunction<Obj, Obj>(o => x).Transformer();
+        }
+
         /// <summary>
         /// Test a transformer with an abitrary works.
         /// </summary>

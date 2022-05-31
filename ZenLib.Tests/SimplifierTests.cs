@@ -492,6 +492,18 @@ namespace ZenLib.Tests
         /// Simplify get field.
         /// </summary>
         [TestMethod]
+        public void TestObjectGetSimplification0()
+        {
+            var x = If(Symbolic<bool>(), Symbolic<Object2>(), Symbolic<Object2>());
+            var y = x.WithField("Field1", Constant(3));
+            Assert.AreEqual(y.GetField<Object2, int>("Field1"), Constant(3));
+            Assert.AreEqual(y.GetField<Object2, int>("Field2"), x.GetField<Object2, int>("Field2"));
+        }
+
+        /// <summary>
+        /// Simplify get field.
+        /// </summary>
+        [TestMethod]
         public void TestObjectGetSimplification1()
         {
             var x = Create<Object2>(("Field1", Constant(1)), ("Field2", Constant(2)));

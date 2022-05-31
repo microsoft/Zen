@@ -14,6 +14,7 @@ namespace ZenLib.Solver
     /// <summary>
     /// Convert a Z3 Expr to a C# object.
     /// </summary>
+    [ExcludeFromCodeCoverage] // Z3 changes its internal representation every version.
     internal class Z3ExprToObjectConverter : ITypeVisitor<object, Expr>
     {
         public object Convert(Expr e, Type type)
@@ -61,16 +62,12 @@ namespace ZenLib.Solver
 
         public object VisitChar(Expr parameter)
         {
-            if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char")
-            {
-                return new ZenLib.Char(parameter.FuncDecl.Parameters[0].Int);
-            }
-            else
-            {
-                Contract.Assert(parameter.IsApp);
-                Contract.Assert(parameter.FuncDecl.Name.ToString() == "char.from_bv");
-                return new ZenLib.Char(int.Parse(parameter.Args[0].ToString()));
-            }
+            Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char");
+            return new ZenLib.Char(parameter.FuncDecl.Parameters[0].Int);
+
+            /* Contract.Assert(parameter.IsApp);
+            Contract.Assert(parameter.FuncDecl.Name.ToString() == "char.from_bv");
+            return new ZenLib.Char(int.Parse(parameter.Args[0].ToString())); */
         }
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)

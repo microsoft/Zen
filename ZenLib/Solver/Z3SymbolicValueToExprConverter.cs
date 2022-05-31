@@ -13,8 +13,7 @@ namespace ZenLib.Solver
     /// <summary>
     /// Convert a symbolic value to a Z3 expression.
     /// </summary>
-    internal class Z3SymbolicValueToExprConverter :
-        ISymbolicValueVisitor<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr, Expr, Type>
+    internal class Z3SymbolicValueToExprConverter : ISymbolicValueVisitor<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr, Expr, Type>
     {
         private SolverZ3 solver;
 
