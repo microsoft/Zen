@@ -62,7 +62,7 @@ namespace ZenLibBench
 
                 var rnd = new Random(0);
                 var randoms = new HashSet<(uint, uint)>();
-                for (int i = 0; i < 400; i++)
+                for (int i = 0; i < 1000; i++)
                 {
                     randoms.Add(((uint)rnd.Next(0, 65000), (uint)rnd.Next(0, 65000)));
                 }

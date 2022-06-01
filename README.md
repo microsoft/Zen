@@ -244,7 +244,7 @@ The test generation approach uses [symbolic execution](https://en.wikipedia.org/
 <a name="optimization"></a>
 ## Optimization
 
-Zen supports optimization of objective functions subject to constraints. The API is similar to that for `Solve`, but where you provide a maximization or minimization objective:
+Zen supports optimization of objective functions subject to constraints. The API is similar to that for `Solve`, but requires a maximization or minimization objective. The solver will find the maximal satisfying assignment to the variables.
 
 ```csharp
 var a = Zen.Symbolic<Real>();
@@ -275,16 +275,16 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, ...>`  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
-| `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
-| `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
-| `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :x:  |
-| `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :x:  |
-| `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :x:                 | :x:  |
-| `Real` | arbitrary precision rational number | :heavy_check_mark:           | :x:                 | :x:  |
-| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :x: | :x:  |
-| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :x: | :x:  |
-| `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :x: | :x:  |
-| `string` | arbitrary size strings. Implemented as `Seq<Char>` | :heavy_check_mark: | :x: | :x:  |
+| `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
+| `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
+| `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
+| `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :heavy_minus_sign:  |
+| `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
+| `Real` | arbitrary precision rational number | :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
+| `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `string` | arbitrary size strings. Implemented as `Seq<Char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 
 
 <a name="primitive-types"></a>
