@@ -308,7 +308,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetWithChar()
         {
-            var res = new ZenConstraint<Set<ZenLib.Char>, bool>((c, b) => If(c.Contains(new ZenLib.Char('a')), b, c.Contains(new ZenLib.Char('b')))).Find();
+            var res = new ZenConstraint<Set<char>, bool>((c, b) => If(c.Contains('a'), b, c.Contains('b'))).Find();
             Assert.IsTrue(res.Value.Item1.Contains('a') || res.Value.Item1.Contains('b'));
         }
 
@@ -552,17 +552,17 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetWorksWithRealsAndChars()
         {
-            var s1 = Symbolic<Set<Pair<ZenLib.Char, Real>>>();
-            var s2 = Symbolic<Set<Pair<ZenLib.Char, Real>>>();
+            var s1 = Symbolic<Set<Pair<char, Real>>>();
+            var s2 = Symbolic<Set<Pair<char, Real>>>();
 
-            var p1 = Pair.Create<ZenLib.Char, Real>(new ZenLib.Char('a'), new Real(3));
+            var p1 = Pair.Create<char, Real>('a', new Real(3));
             var expr = And(s1.Contains(p1), s1.IsSubsetOf(s2));
             var solution = expr.Solve();
 
             var r1 = solution.Get(s1);
             var r2 = solution.Get(s2);
 
-            Assert.IsTrue(r1.Contains(new Pair<ZenLib.Char, Real> { Item1 = new ZenLib.Char('a'), Item2 = new Real(3) }));
+            Assert.IsTrue(r1.Contains(new Pair<char, Real> { Item1 = 'a', Item2 = new Real(3) }));
             Assert.IsTrue(r1.Count() <= r2.Count());
             Assert.IsTrue(r1.IsSubsetOf(r2));
         }

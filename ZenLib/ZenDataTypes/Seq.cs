@@ -404,13 +404,12 @@ namespace ZenLib
         /// </summary>
         /// <param name="s">The string value.</param>
         /// <returns>A sequence of bytes.</returns>
-        public static Seq<Char> FromString(string s)
+        public static Seq<char> FromString(string s)
         {
-            var result = new Seq<Char>();
-            for (var i = 0; i < s.Length; i += char.IsSurrogatePair(s, i) ? 2 : 1)
+            var result = new Seq<char>();
+            for (var i = 0; i < s.Length; i++)
             {
-                var c = new Char(char.ConvertToUtf32(s, i));
-                result = result.Concat(new Seq<Char>(c));
+                result = result.Concat(new Seq<char>(s[i]));
             }
 
             return result;
@@ -422,9 +421,9 @@ namespace ZenLib
         /// </summary>
         /// <param name="seq">The sequence of bytes.</param>
         /// <returns>The string for the bytes.</returns>
-        public static string AsString(this Seq<Char> seq)
+        public static string AsString(this Seq<char> seq)
         {
-            return string.Join(string.Empty, seq.Values.Select(c => c.ToString()));
+            return string.Join(string.Empty, seq.Values.Select(c => CommonUtilities.CharToString(c)));
         }
 
         /// <summary>

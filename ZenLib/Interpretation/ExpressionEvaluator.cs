@@ -570,7 +570,7 @@ namespace ZenLib.Interpretation
             else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
             {
                 Contract.Assert(typeof(TKey) == ReflectionUtilities.UnicodeSequenceType);
-                return Seq.AsString((Seq<ZenLib.Char>)e);
+                return Seq.AsString((Seq<char>)e);
             }
             else
             {

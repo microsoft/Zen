@@ -65,7 +65,7 @@ namespace ZenLib.Solver
         /// Create a char constant.
         /// </summary>
         /// <returns></returns>
-        TChar CreateCharConst(ZenLib.Char c);
+        TChar CreateCharConst(char c);
 
         /// <summary>
         /// Create a char constant.

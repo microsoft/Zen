@@ -291,7 +291,7 @@ namespace ZenLib.ModelChecking
             }
             else if (type == ReflectionUtilities.CharType)
             {
-                var c = this.Solver.CreateCharConst((ZenLib.Char)(object)expression.Value);
+                var c = this.Solver.CreateCharConst((char)(object)expression.Value);
                 return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, c);
             }
             else if (type == ReflectionUtilities.ShortType)
@@ -331,8 +331,8 @@ namespace ZenLib.ModelChecking
             }
             else
             {
-                Contract.Assert(type == typeof(Seq<ZenLib.Char>));
-                var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<ZenLib.Char>)(object)expression.Value);
+                Contract.Assert(type == typeof(Seq<char>));
+                var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<char>)(object)expression.Value);
                 var s = this.Solver.CreateStringConst(escapedString);
                 return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, s);
             }

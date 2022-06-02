@@ -659,16 +659,37 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq find with regex range.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithRegexRange()
+        {
+            Assert.AreEqual(1, new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(Regex.Range<byte>(1, 4))).Find().Value.Values[0]);
+            Assert.AreEqual(1, new ZenConstraint<Seq<ushort>>(s => s.MatchesRegex(Regex.Range<ushort>(1, 4))).Find().Value.Values[0]);
+            Assert.AreEqual(1U, new ZenConstraint<Seq<uint>>(s => s.MatchesRegex(Regex.Range<uint>(1, 4))).Find().Value.Values[0]);
+            Assert.AreEqual(1UL, new ZenConstraint<Seq<ulong>>(s => s.MatchesRegex(Regex.Range<ulong>(1, 4))).Find().Value.Values[0]);
+            Assert.AreEqual('a', new ZenConstraint<Seq<char>>(s => s.MatchesRegex(Regex.Range('a', 'b'))).Find().Value.Values[0]);
+            Assert.AreEqual(1L, new ZenConstraint<Seq<UInt3>>(s => s.MatchesRegex(Regex.Range(new UInt3(1), new UInt3(4)))).Find().Value.Values[0].ToLong());
+        }
+
+        /// <summary>
         /// Test seq find with regex range exception.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestSeqFindWithRegexRangeException()
+        public void TestSeqFindWithRegexRangeException1()
         {
-            Func<Regex<byte>, Option<Seq<byte>>> solve =
-                (r) => new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(r)).Find();
+            new ZenConstraint<Seq<int>>(s => s.MatchesRegex(Regex.Range(-1, 1))).Find();
+        }
 
-            solve(Regex.Range<byte>(1, 4));
+        /// <summary>
+        /// Test seq find with regex range exception.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqFindWithRegexRangeException2()
+        {
+            new ZenConstraint<Seq<Int3>>(s => s.MatchesRegex(Regex.Range(new Int3(0), new Int3(1)))).Find();
         }
 
         /// <summary>

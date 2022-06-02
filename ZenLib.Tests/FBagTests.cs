@@ -250,7 +250,7 @@ namespace ZenLib.Tests
         public void TestBagSelect()
         {
             var b = Symbolic<FBag<uint>>(depth: 5);
-            var c = b.Select(i => If<ZenLib.Char>(i < 10, new ZenLib.Char('a'), new ZenLib.Char('b'))).Where(x => x == new ZenLib.Char('a')).Size() == 3;
+            var c = b.Select(i => If<char>(i < 10, 'a', 'b')).Where(x => x == 'a').Size() == 3;
             var solution = c.Solve();
             var r = solution.Get(b);
 

@@ -67,7 +67,7 @@ namespace ZenLib.Generation
 
         public object VisitChar(ZenGenerationConfiguration parameter)
         {
-            var e = new ZenArbitraryExpr<ZenLib.Char>(parameter.Name);
+            var e = new ZenArbitraryExpr<char>(parameter.Name);
             this.ArbitraryExpressions.Add(e);
             return e;
         }
@@ -247,8 +247,8 @@ namespace ZenLib.Generation
 
         public object VisitString(ZenGenerationConfiguration parameter)
         {
-            var v = (Zen<Seq<ZenLib.Char>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<ZenLib.Char>), parameter);
-            return ZenCastExpr<Seq<ZenLib.Char>, string>.Create(v);
+            var v = (Zen<Seq<char>>)ReflectionUtilities.ApplyTypeVisitor(this, typeof(Seq<char>), parameter);
+            return ZenCastExpr<Seq<char>, string>.Create(v);
         }
     }
 }

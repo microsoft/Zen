@@ -42,7 +42,15 @@ namespace ZenLib.Solver
             }
             else
             {
-                Contract.Assert(typeof(T) == typeof(ZenLib.Char), "Regex range only supported for unicode (char)");
+                Contract.Assert(
+                    typeof(T) == typeof(byte) ||
+                    typeof(T) == typeof(ushort) ||
+                    typeof(T) == typeof(uint) ||
+                    typeof(T) == typeof(ulong) ||
+                    typeof(T) == typeof(char) ||
+                    (ReflectionUtilities.IsFixedIntegerType(typeof(T)) && typeof(T).BaseType.GetGenericArgumentsCached()[1] == typeof(Unsigned)),
+                    "Regex range only supports unsigned integer types and char.");
+
                 var charLow = GetSeqConstant(expression.CharacterRange.Low);
                 var charHigh = GetSeqConstant(expression.CharacterRange.High);
                 return SolverZ3.Context.MkRange((SeqExpr)charLow, (SeqExpr)charHigh);
@@ -56,7 +64,7 @@ namespace ZenLib.Solver
             if (type == ReflectionUtilities.ByteType)
                 return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 8));
             if (type == ReflectionUtilities.CharType)
-                return this.solver.CreateStringConst(((ZenLib.Char)obj).Escape());
+                return this.solver.CreateStringConst(CommonUtilities.EscapeChar((char)obj));
             if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
                 return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 16));
             if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)

@@ -333,7 +333,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMapChars()
         {
-            var res = new ZenConstraint<Map<ZenLib.Char, int>>(d => d.Get(new ZenLib.Char('a')) == Option.Create<int>(1)).Find();
+            var res = new ZenConstraint<Map<char, int>>(d => d.Get('a') == Option.Create<int>(1)).Find();
             Assert.AreEqual(1, res.Value.Get('a').Value);
         }
 
@@ -401,7 +401,7 @@ namespace ZenLib.Tests
         {
             Assert.IsTrue(new ZenConstraint<Map<bool, bool>>(m => m.Get(true).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<byte, byte>>(m => m.Get(1).IsSome()).Find().HasValue);
-            Assert.IsTrue(new ZenConstraint<Map<ZenLib.Char, ZenLib.Char>>(m => m.Get(new ZenLib.Char('a')).IsSome()).Find().HasValue);
+            Assert.IsTrue(new ZenConstraint<Map<char, char>>(m => m.Get('a').IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<short, short>>(m => m.Get(2).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<ushort, ushort>>(m => m.Get(3).IsSome()).Find().HasValue);
             Assert.IsTrue(new ZenConstraint<Map<int, int>>(m => m.Get(4).IsSome()).Find().HasValue);
