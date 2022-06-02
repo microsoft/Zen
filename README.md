@@ -263,7 +263,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | ------ | -------------------- | ----------------------- | ------------------------ | ------------|
 | `bool`   | {true, false}        | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `byte`   | 8-bit value          | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
-| `Char`   | 18-bit unicode character   | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
+| `char`   | 16-bit UTF-16 character   | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `short`  | 16-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `ushort` | 16-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `int`    | 32-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
@@ -284,13 +284,13 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
-| `string` | arbitrary size strings. Implemented as `Seq<Char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 
 
 <a name="primitive-types"></a>
 ## Primitive types
 
-Zen supports the primitive types `bool, byte, Char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic operations. As an example:
+Zen supports the primitive types `bool, byte, char, short, ushort, int, uint, long, ulong`. All primitive types support (in)equality and integer types support integer arithmetic operations. As an example:
 
 ```csharp
 var x = Symbolic<int>();
@@ -333,7 +333,7 @@ Zen offers `Pair<T1, T2, ...>`, types as a lightweight alternative to classes. B
 ```csharp
 var b = Symbolic<Option<byte>>();
 var p = Symbolic<Pair<int, int>>>();
-var solution = And(b.IsSome(), p.Item1() == 3).Solve(); // b = None, p = (3, 0)
+var solution = And(b.IsNone(), p.Item1() == 3).Solve(); // b = None, p = (3, 0)
 ```
 
 <a name="real-values"></a>
@@ -422,11 +422,11 @@ var c4 = s1.Length() == s2.Length();
 var solution = And(c1, c2, c3, c4).Solve(); // s1 = [1], s2 = [0]
 ```
 
-Zen supports the `string` type for reasoning about unbounded strings (the `string` type is implemented as a `Seq<Char>` for unicode strings). Strings also support matching regular expressions. Zen supports a limited subset of constructs currently - it supports anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
+Zen supports the `string` type for reasoning about unbounded strings (the `string` type is implemented as a `Seq<char>` for unicode strings). Strings also support matching regular expressions. Zen supports a limited subset of constructs currently - it supports anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
 
 ```csharp
-Regex<Char> r1 = Regex.Parse("[0-9a-z]+");
-Regex<Char> r2 = Regex.Parse("(0.)*");
+Regex<char> r1 = Regex.Parse("[0-9a-z]+");
+Regex<char> r2 = Regex.Parse("(0.)*");
 
 var s = Symbolic<string>();
 
