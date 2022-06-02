@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: [windows-latest, ubuntu-latest]
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -22,7 +22,9 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal -p:CollectCoverage=true -p:CoverletOutput=TestResults/ -p:CoverletOutputFormat=opencover
+      run: dotnet test -c Release --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+    - name: Copy Coverage To Predictable Location
+        run: cp ZenLib.Tests/TestResults/**/coverage.opencover.xml ZenLib.Tests/TestResults/coverage.opencover.xml
     - name: Create Test Coverage Badge
       uses: simon-k/dotnet-code-coverage-badge@v1.0.0
       id: create_coverage_badge
