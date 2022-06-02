@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
     - name: Copy Coverage To Predictable Location
-        run: cp ZenLib.Tests/TestResults/**/coverage.opencover.xml ZenLib.Tests/TestResults/coverage.opencover.xml
+      run: cp ZenLib.Tests/TestResults/**/coverage.opencover.xml ZenLib.Tests/TestResults/coverage.opencover.xml
     - name: Create Test Coverage Badge
       uses: simon-k/dotnet-code-coverage-badge@v1.0.0
       id: create_coverage_badge
