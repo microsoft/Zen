@@ -664,12 +664,23 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSeqFindWithRegexRange()
         {
-            Assert.AreEqual(1, new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(Regex.Range<byte>(1, 4))).Find().Value.Values[0]);
-            Assert.AreEqual(1, new ZenConstraint<Seq<ushort>>(s => s.MatchesRegex(Regex.Range<ushort>(1, 4))).Find().Value.Values[0]);
-            Assert.AreEqual(1U, new ZenConstraint<Seq<uint>>(s => s.MatchesRegex(Regex.Range<uint>(1, 4))).Find().Value.Values[0]);
-            Assert.AreEqual(1UL, new ZenConstraint<Seq<ulong>>(s => s.MatchesRegex(Regex.Range<ulong>(1, 4))).Find().Value.Values[0]);
-            Assert.AreEqual('a', new ZenConstraint<Seq<char>>(s => s.MatchesRegex(Regex.Range('a', 'b'))).Find().Value.Values[0]);
-            Assert.AreEqual(1L, new ZenConstraint<Seq<UInt3>>(s => s.MatchesRegex(Regex.Range(new UInt3(1), new UInt3(4)))).Find().Value.Values[0].ToLong());
+            var v1 = new ZenConstraint<Seq<byte>>(s => s.MatchesRegex(Regex.Range<byte>(1, 4))).Find().Value.Values[0];
+            Assert.IsTrue(v1 >= 1 && v1 <= 4);
+
+            var v2 = new ZenConstraint<Seq<ushort>>(s => s.MatchesRegex(Regex.Range<ushort>(1, 4))).Find().Value.Values[0];
+            Assert.IsTrue(v2 >= 1 && v2 <= 4);
+
+            var v3 = new ZenConstraint<Seq<uint>>(s => s.MatchesRegex(Regex.Range<uint>(1, 4))).Find().Value.Values[0];
+            Assert.IsTrue(v3 >= 1U && v3 <= 4U);
+
+            var v4 = new ZenConstraint<Seq<ulong>>(s => s.MatchesRegex(Regex.Range<ulong>(1, 4))).Find().Value.Values[0];
+            Assert.IsTrue(v4 >= 1UL && v4 <= 4UL);
+
+            var v5 = new ZenConstraint<Seq<char>>(s => s.MatchesRegex(Regex.Range('a', 'b'))).Find().Value.Values[0];
+            Assert.IsTrue(v5 == 'a' || v5 == 'b');
+
+            var v6 = new ZenConstraint<Seq<UInt3>>(s => s.MatchesRegex(Regex.Range(new UInt3(1), new UInt3(4)))).Find().Value.Values[0].ToLong();
+            Assert.IsTrue(v6 >= 1L && v6 <= 4L);
         }
 
         /// <summary>
