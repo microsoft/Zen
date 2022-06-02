@@ -495,7 +495,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMatchesRegexEmpty1()
         {
-            var r = Regex.Empty<ZenLib.Char>();
+            var r = Regex.Empty<char>();
             var s = Zen.Constraint<string>(s => s.MatchesRegex(r)).Find();
             Assert.IsFalse(s.HasValue);
         }
@@ -527,7 +527,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharSeqWorks()
         {
-            var s = Zen.Constraint<Seq<ZenLib.Char>>(s => s.Contains(new ZenLib.Char(70))).Find();
+            var s = Zen.Constraint<Seq<char>>(s => s.Contains((char)70)).Find();
             Console.WriteLine(s.Value);
             Assert.AreEqual("[F]", s.Value.ToString());
         }
@@ -538,9 +538,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestStringInvalidUnicodeRange()
         {
-            var seq = new Seq<ZenLib.Char>().Add(new ZenLib.Char(0xd800)).Add(new ZenLib.Char(0xdfff));
+            var seq = new Seq<char>().Add((char)0xd800).Add((char)0xdfff);
             var s = Zen.Constraint<string>(s => s == Seq.AsString(seq)).Find();
-            Assert.AreEqual(s.Value, @"\u{0D800}\u{0DFFF}");
+            Assert.AreEqual(@"\u{D800}\u{DFFF}", s.Value);
         }
 
         /// <summary>

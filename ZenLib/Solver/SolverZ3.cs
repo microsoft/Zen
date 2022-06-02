@@ -125,6 +125,7 @@ namespace ZenLib.Solver
         /// </summary>
         static SolverZ3()
         {
+            Native.Z3_global_param_set("encoding", "bmp");
             _context = new ThreadLocal<Context>(() => new Context());
         }
 
@@ -233,9 +234,9 @@ namespace ZenLib.Solver
             return (v, v);
         }
 
-        public Expr CreateCharConst(ZenLib.Char c)
+        public Expr CreateCharConst(char c)
         {
-            return Context.CharFromBV(this.CreateBitvecConst(c.Value.GetBits()));
+            return Context.CharFromBV(this.CreateShortConst((short)c));
         }
 
         public SeqExpr CreateStringConst(string s)

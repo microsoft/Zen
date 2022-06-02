@@ -148,7 +148,7 @@ namespace ZenLib
         /// <summary>
         /// Function to parse an Unicode char.
         /// </summary>
-        private static Func<char, Char> parseUnicodeChar = (char c) => c;
+        private static Func<char, char> parseUnicodeChar = (char c) => c;
 
         /// <summary>
         /// Parse a regex from an ascii string describing the pattern.

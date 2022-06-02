@@ -227,7 +227,7 @@ namespace ZenLib
         /// <returns>The escaped Z3 string.</returns>
         public static string ConvertCShaprStringToZ3(Seq<Char> s)
         {
-            return string.Join(string.Empty, s.Values.Select(c => c.Escape()));
+            return string.Join(string.Empty, s.Values.Select(c => EscapeChar(c)));
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace ZenLib
                         hex[5 - (i - j)] = s[j];
                     var str = new string(hex);
                     var intVal = int.Parse(str, System.Globalization.NumberStyles.HexNumber);
-                    var c = new Char(intVal);
+                    var c = (char)intVal;
                     sb.Append(c.ToString());
                     continue;
                 }
@@ -375,6 +375,34 @@ namespace ZenLib
             }
 
             return newValues;
+        }
+
+        /// <summary>
+        /// Escape this character using the \uXXXX notation.
+        /// </summary>
+        /// <returns>The escaped character.</returns>
+        public static string EscapeChar(char c)
+        {
+            return @"\u{" + ((long)c).ToString("X4") + "}";
+        }
+
+        /// <summary>
+        /// Convert a char to a UTF-16 string.
+        /// </summary>
+        /// <returns>A string that is either a single character or a surrogate pair.</returns>
+        public static string CharToString(char c)
+        {
+            var intVal = (int)c;
+
+            // we need to leave escaped any characters in the range d800-dfff since
+            // these characters can not be represented in strings as they are part
+            // of a surrogate pair used for UTF-16 encodings.
+            if (intVal >= 0xd800 && intVal <= 0xdfff)
+            {
+                return @"\u{" + intVal.ToString("X4") + "}";
+            }
+
+            return c.ToString();
         }
     }
 }

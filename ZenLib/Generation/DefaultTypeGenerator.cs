@@ -47,7 +47,7 @@ namespace ZenLib.Generation
 
         public object VisitChar(Unit parameter)
         {
-            return ZenConstantExpr<ZenLib.Char>.Create(ZenLib.Char.MinValue);
+            return ZenConstantExpr<char>.Create('0');
         }
 
         public object VisitInt(Unit parameter)
@@ -132,7 +132,7 @@ namespace ZenLib.Generation
 
         public object VisitString(Unit parameter)
         {
-            return Zen.Cast<Seq<ZenLib.Char>, string>(Seq.Empty<ZenLib.Char>());
+            return Zen.Cast<Seq<char>, string>(Seq.Empty<char>());
         }
     }
 }

@@ -711,7 +711,7 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Unit CreateCharConst(ZenLib.Char c)
+        public Unit CreateCharConst(char c)
         {
             throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
         }
