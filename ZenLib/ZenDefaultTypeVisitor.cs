@@ -1,8 +1,8 @@
-﻿// <copyright file="SymbolicInputGenerator.cs" company="Microsoft">
+﻿// <copyright file="ZenDefaultTypeVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.Generation
+namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to help generate a default symbolic value.
     /// </summary>
-    internal class DefaultTypeGenerator : ITypeVisitor<object, Unit>
+    internal class ZenDefaultTypeVisitor : ITypeVisitor<object, Unit>
     {
         /// <summary>
         /// Method for the creating an empty Zen seq.

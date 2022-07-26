@@ -66,9 +66,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionStringOperations()
         {
-            Settings.PreserveBranches = true;
+            ZenSettings.PreserveBranches = true;
             Assert.AreEqual(3, Zen.GenerateInputs<string, string, string, string, bool>((w, x, y, z) => If(w.EndsWith(x), True(), If(w.StartsWith(y), True(), w.Contains(z)))).Count());
-            Settings.PreserveBranches = false;
+            ZenSettings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionListContains()
         {
-            Settings.PreserveBranches = true;
+            ZenSettings.PreserveBranches = true;
             Assert.AreEqual(6, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
-            Settings.PreserveBranches = false;
+            ZenSettings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionPacketAcl()
         {
-            Settings.PreserveBranches = true;
+            ZenSettings.PreserveBranches = true;
             var p1 = new Prefix { Length = 24, Address = Ip.Parse("72.1.2.0").Value };
             var p2 = new Prefix { Length = 24, Address = Ip.Parse("1.2.3.0").Value };
             var p3 = new Prefix { Length = 32, Address = Ip.Parse("8.8.8.8").Value };
@@ -143,7 +143,7 @@ namespace ZenLib.Tests
             var acl = new Acl { Lines = lines };
 
             Assert.AreEqual(3, Zen.GenerateInputs<IpHeader, bool>(h => acl.Process(h, 0)).Count());
-            Settings.PreserveBranches = false;
+            ZenSettings.PreserveBranches = false;
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionAcl()
         {
-            Settings.PreserveBranches = true;
+            ZenSettings.PreserveBranches = true;
             var random = new Random(1);
             var lines = new List<AclLine>();
 
@@ -340,7 +340,7 @@ namespace ZenLib.Tests
 
             var function = new ZenFunction<IpHeader, bool>(p => acl.Process(p, 0));
             Assert.AreEqual(20, function.GenerateInputs().Count());
-            Settings.PreserveBranches = false;
+            ZenSettings.PreserveBranches = false;
         }
     }
 }

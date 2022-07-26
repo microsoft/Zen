@@ -1,15 +1,15 @@
-﻿// <copyright file="Settings.cs" company="Microsoft">
+﻿// <copyright file="ZenSettings.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace ZenLib
 {
+    using System;
+
     /// <summary>
     /// Settings for Zen.
     /// </summary>
-    public static class Settings
+    public static class ZenSettings
     {
         /// <summary>
         /// Use a larger stack to avoid stack overflow errors for

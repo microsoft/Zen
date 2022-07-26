@@ -121,7 +121,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestStackOverflow()
         {
-            Settings.UseLargeStack = true;
+            ZenSettings.UseLargeStack = true;
             Zen<int> x = Zen.Arbitrary<int>();
             Zen<int> y = Zen.Arbitrary<int>();
 
@@ -131,7 +131,7 @@ namespace ZenLib.Tests
             }
 
             y.Flatten();
-            Settings.UseLargeStack = false;
+            ZenSettings.UseLargeStack = false;
         }
 
         private struct Test

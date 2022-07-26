@@ -35,7 +35,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestTransformerExceptionForUnboundedTypes2()
         {
-            Settings.UseLargeStack = true;
+            ZenSettings.UseLargeStack = true;
 
             try
             {
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
             }
             catch
             {
-                Settings.UseLargeStack = false;
+                ZenSettings.UseLargeStack = false;
             }
         }
 

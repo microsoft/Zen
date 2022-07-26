@@ -283,7 +283,7 @@ namespace ZenLib
         /// <returns>The default expression.</returns>
         public static Zen<T> Default<T>()
         {
-            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new DefaultTypeGenerator(), typeof(T), new Unit());
+            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), typeof(T), new Unit());
         }
 
         /// <summary>
@@ -335,11 +335,11 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
-            var generator = new SymbolicInputGenerator();
+            var generator = new SymbolicInputVisitor();
             return Arbitrary<T>(generator, name, depth, exhaustiveDepth);
         }
 
-        internal static Zen<T> Arbitrary<T>(SymbolicInputGenerator generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
+        internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
             var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)), ExhaustiveDepth = exhaustiveDepth };
             return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T), parameter);

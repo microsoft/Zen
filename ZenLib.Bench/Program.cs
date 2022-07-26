@@ -17,7 +17,7 @@ namespace ZenLibBench
     {
         static void Main(string[] args)
         {
-            Settings.UseLargeStack = true;
+            ZenSettings.UseLargeStack = true;
 
             // BenchmarkComparisons();
             // BenchmarkTransformers();
