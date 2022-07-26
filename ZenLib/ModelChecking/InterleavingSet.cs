@@ -40,7 +40,8 @@ namespace ZenLib.ModelChecking
         /// <returns>A new interleaving result.</returns>
         public override InterleavingResult Union(InterleavingResult other)
         {
-            return new InterleavingSet(this.Variables.Union(other.GetAllVariables()));
+            var o = (InterleavingSet)other;
+            return new InterleavingSet(this.Variables.Union(o.Variables));
         }
     }
 }

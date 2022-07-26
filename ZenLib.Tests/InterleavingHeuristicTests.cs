@@ -87,6 +87,22 @@ namespace ZenLib.Tests
         /// Test that the heuristic works with a simple arithmetic.
         /// </summary>
         [TestMethod]
+        public void TestCharInterleaving()
+        {
+            var a = Arbitrary<char>();
+            var b = Arbitrary<char>();
+            var expr = (a == b);
+            var i = new InterleavingHeuristic();
+            var disjointSets = i.Compute(expr, new Dictionary<long, object>());
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
+        }
+
+        /// <summary>
+        /// Test that the heuristic works with a simple arithmetic.
+        /// </summary>
+        [TestMethod]
         public void TestSimpleArithmeticBand()
         {
             var a = Arbitrary<int>();

@@ -5,6 +5,7 @@
 namespace ZenLib.ModelChecking
 {
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Representation of interleaving information for an object result.
@@ -29,6 +30,7 @@ namespace ZenLib.ModelChecking
         /// Gets all the possible variables the result could have.
         /// </summary>
         /// <returns>The variables as a set.</returns>
+        [ExcludeFromCodeCoverage] // we never combine classes.
         public override ImmutableHashSet<object> GetAllVariables()
         {
             var variables = ImmutableHashSet<object>.Empty;
@@ -46,18 +48,14 @@ namespace ZenLib.ModelChecking
         /// <returns>A new interleaving result.</returns>
         public override InterleavingResult Union(InterleavingResult other)
         {
-            if (other is InterleavingClass o)
+            var o = (InterleavingClass)other;
+            var result = this.Fields;
+            foreach (var fieldVariableSetPair in this.Fields)
             {
-                var result = this.Fields;
-                foreach (var fieldVariableSetPair in this.Fields)
-                {
-                    result = result.SetItem(fieldVariableSetPair.Key, fieldVariableSetPair.Value.Union(o.Fields[fieldVariableSetPair.Key]));
-                }
-
-                return new InterleavingClass(result);
+                result = result.SetItem(fieldVariableSetPair.Key, fieldVariableSetPair.Value.Union(o.Fields[fieldVariableSetPair.Key]));
             }
 
-            return new InterleavingSet(this.GetAllVariables().Union(other.GetAllVariables()));
+            return new InterleavingClass(result);
         }
     }
 }

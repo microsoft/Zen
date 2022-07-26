@@ -1,8 +1,8 @@
-﻿// <copyright file="SymbolicInputGenerator.cs" company="Microsoft">
+﻿// <copyright file="SymbolicInputVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.Generation
+namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to help generate a symbolic input.
     /// </summary>
-    internal class SymbolicInputGenerator : ITypeVisitor<object, ZenGenerationConfiguration>
+    internal class SymbolicInputVisitor : ITypeVisitor<object, ZenGenerationConfiguration>
     {
         /// <summary>
         /// The method for creating the empty list at runtime.

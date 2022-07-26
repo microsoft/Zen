@@ -47,7 +47,7 @@ namespace ZenLib
                 return ce.Value ? t : f;
             }
 
-            if (!Settings.PreserveBranches)
+            if (!ZenSettings.PreserveBranches)
             {
                 // if g then e else e = e
                 if (ReferenceEquals(t, f))
