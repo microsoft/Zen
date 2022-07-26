@@ -358,6 +358,11 @@ namespace ZenLib
         /// <returns>The symbol consumed.</returns>
         private string ExpectAnyCharacter()
         {
+            if (symbol == string.Empty)
+            {
+                throw new ZenException("Expected any character");
+            }
+
             var character = symbol;
             NextSymbol();
             return character;

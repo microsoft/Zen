@@ -455,6 +455,8 @@ namespace ZenLib.Tests
         [DataRow("a{10d}", false)]
         [DataRow("", true)]
         [DataRow("\\e", true)]
+        [DataRow("\\", false)]
+        [DataRow("BE\\", false)]
         public void TestRegexParsing(string input, bool expected)
         {
             try
