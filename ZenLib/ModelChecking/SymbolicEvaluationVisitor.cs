@@ -7,6 +7,7 @@ namespace ZenLib.ModelChecking
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using System.Reflection;
     using ZenLib.Solver;
@@ -338,6 +339,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
+        [ExcludeFromCodeCoverage] // Can't trigger TargetInvocationException
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             try

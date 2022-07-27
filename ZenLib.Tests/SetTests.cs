@@ -671,6 +671,61 @@ namespace ZenLib.Tests
         /// Test set combine operations.
         /// </summary>
         [TestMethod]
+        public void TestSetCombinations8()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(
+                s1.Union(s2).Difference(s3.Intersect(s1)) == s2,
+                s3.Intersect(s1) != Set.Empty<int>(),
+                s1 != Set.Empty<int>(),
+                s2 != Set.Empty<int>(),
+                s3 != Set.Empty<int>());
+
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Intersect(r3).Count() > 0);
+            Assert.IsTrue(r1.Count() > 0);
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r3.Count() > 0);
+            Assert.IsTrue(r1.Union(r2).Difference(r1.Intersect(r3)) == r2);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations9()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+
+            var expr = And(
+                Constant(new Set<int>(1, 2, 3, 4)).Difference(s1.Difference(s2)) == new Set<int>(1, 2),
+                s2 != Set.Empty<int>(),
+                s1.Intersect(s2) != Set.Empty<int>());
+
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+
+            Assert.IsTrue(r1.Contains(3));
+            Assert.IsTrue(r1.Contains(4));
+            Assert.IsTrue(r1.Count() > 2);
+            Assert.IsTrue(r2.Count() > 0);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
         public void TestSetWorksWithRealsAndChars()
         {
             var s1 = Symbolic<Set<Pair<char, Real>>>();
