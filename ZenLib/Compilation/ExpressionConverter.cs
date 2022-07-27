@@ -606,9 +606,12 @@ namespace ZenLib.Compilation
                 case ZenDictCombineExpr<TKey>.CombineType.Union:
                     method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                     break;
-                default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Intersect);
+                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
+                    break;
+                default:
+                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
                     break;
             }
 

@@ -5,7 +5,6 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -46,18 +45,67 @@ namespace ZenLib
             Zen<Map<TKey, SetUnit>> dict2,
             CombineType combinationType)
         {
+            // a union a = a
+            // a inter a = a
+            // a minus a = {}
+            if (dict1.Equals(dict2))
+            {
+                return combinationType == CombineType.Difference ? Zen.EmptyDict<TKey, SetUnit>() : dict1;
+            }
+
+            // {} union a == a
+            // {} inter a == {}
+            // {} minus a == {}
+            if (dict1 is ZenDictEmptyExpr<TKey, SetUnit>)
+            {
+                return combinationType == CombineType.Union ? dict2 : dict1;
+            }
+
+            // a union {} == a
+            // a inter {} == {}
+            // a minus {} == a
+            if (dict2 is ZenDictEmptyExpr<TKey, SetUnit>)
+            {
+                return combinationType == CombineType.Intersect ? dict2 : dict1;
+            }
+
+            // (a union b) union b == (a union b)
+            // (a union b) union a == (a union b)
+            // (a inter b) inter b == (a inter b)
+            // (a inter b) inter a == (a inter b)
             if (dict1 is ZenDictCombineExpr<TKey> e1 &&
                 e1.CombinationType == combinationType &&
+                combinationType != CombineType.Difference &&
                 (e1.DictExpr1.Equals(dict2) || e1.DictExpr2.Equals(dict2)))
             {
                 return dict1;
             }
 
+            // a union (a union b) == (a union b)
+            // b union (a union b) == (a union b)
+            // a inter (a inter b) == (a inter b)
+            // b inter (a inter b) == (a inter b)
             if (dict2 is ZenDictCombineExpr<TKey> e2 &&
                 e2.CombinationType == combinationType &&
+                combinationType != CombineType.Difference &&
                 (e2.DictExpr1.Equals(dict1) || e2.DictExpr2.Equals(dict1)))
             {
                 return dict2;
+            }
+
+            // (a minus b) minus a == {}
+            // (a minus b) minus b == a minus b
+            if (dict1 is ZenDictCombineExpr<TKey> e3 && combinationType == CombineType.Difference)
+            {
+                if (e3.CombinationType == CombineType.Difference && e3.DictExpr1.Equals(dict2))
+                {
+                    return Zen.EmptyDict<TKey, SetUnit>();
+                }
+
+                if (e3.CombinationType == CombineType.Difference && e3.DictExpr2.Equals(dict2))
+                {
+                    return dict1;
+                }
             }
 
             return new ZenDictCombineExpr<TKey>(dict1, dict2, combinationType);
@@ -127,6 +175,8 @@ namespace ZenLib
                     return $"Union({this.DictExpr1}, {this.DictExpr2})";
                 case CombineType.Intersect:
                     return $"Intersect({this.DictExpr1}, {this.DictExpr2})";
+                case CombineType.Difference:
+                    return $"Difference({this.DictExpr1}, {this.DictExpr2})";
                 default:
                     throw new ZenUnreachableException();
             }
@@ -149,6 +199,7 @@ namespace ZenLib
         {
             Union,
             Intersect,
+            Difference,
         }
     }
 }

@@ -481,9 +481,11 @@ namespace ZenLib.Interpretation
             {
                 case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     return CommonUtilities.DictionaryIntersect(e1, e2);
-                default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Union);
+                case ZenDictCombineExpr<TKey>.CombineType.Union:
                     return CommonUtilities.DictionaryUnion(e1, e2);
+                default:
+                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    return CommonUtilities.DictionaryDifference(e1, e2);
             }
         }
 

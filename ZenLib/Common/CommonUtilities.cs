@@ -121,6 +121,8 @@ namespace ZenLib
         /// <returns>The union of the two dictionaries.</returns>
         public static Map<T, SetUnit> DictionaryUnion<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
         {
+            Contract.Assert(!dict1.Negated);
+            Contract.Assert(!dict2.Negated);
             return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Union(dict2.Values)));
         }
 
@@ -132,7 +134,27 @@ namespace ZenLib
         /// <returns>The intersection of the two dictionaries.</returns>
         public static Map<T, SetUnit> DictionaryIntersect<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
         {
+            Contract.Assert(!dict1.Negated);
+
+            if (dict2.Negated)
+            {
+                return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Except(dict2.Values)));
+            }
+
             return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Intersect(dict2.Values)));
+        }
+
+        /// <summary>
+        /// Differences two dictionaries.
+        /// </summary>
+        /// <param name="dict1">A dictionary.</param>
+        /// <param name="dict2">A dictionary.</param>
+        /// <returns>The difference of the two dictionaries.</returns>
+        public static Map<T, SetUnit> DictionaryDifference<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
+        {
+            Contract.Assert(!dict1.Negated);
+            Contract.Assert(!dict2.Negated);
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Except(dict2.Values)));
         }
 
         /// <summary>

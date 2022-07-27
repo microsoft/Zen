@@ -741,6 +741,11 @@ namespace ZenLib.Solver
             return Context.MkSetIntersection(arrayExpr1, arrayExpr2);
         }
 
+        public ArrayExpr DictDifference(ArrayExpr arrayExpr1, ArrayExpr arrayExpr2)
+        {
+            return Context.MkSetDifference(arrayExpr1, arrayExpr2);
+        }
+
         public SeqExpr SeqEmpty(Type type)
         {
             var sort = this.TypeToSortConverter.GetSortForType(type);

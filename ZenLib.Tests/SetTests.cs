@@ -65,6 +65,7 @@ namespace ZenLib.Tests
             CheckValid<Set<byte>, byte>((d, e) => Implies(Not(d.Contains(e)), d.Delete(e) == d), runBdds: false);
             CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), s2.Contains(e)) == s1.Intersect(s2).Contains(e), runBdds: false);
             CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => Or(s1.Contains(e), s2.Contains(e)) == s1.Union(s2).Contains(e), runBdds: false);
+            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), Not(s2.Contains(e))) == s1.Difference(s2).Contains(e), runBdds: false);
         }
 
         /// <summary>
@@ -441,6 +442,37 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test set evaluation with difference.
+        /// </summary>
+        [TestMethod]
+        public void TestSetDifference()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, Set<int>>((d1, d2) => d1.Difference(d2));
+
+            // test interperter
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test compiler
+            zf.Compile();
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test data structure
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>()).Count());
+            Assert.AreEqual(0, new Set<int>().Add(10).Difference(new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, new Set<int>().Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(1).Add(2).Difference(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
         /// Test set evaluation with issubsetof.
         /// </summary>
         [TestMethod]
@@ -550,6 +582,150 @@ namespace ZenLib.Tests
         /// Test set combine operations.
         /// </summary>
         [TestMethod]
+        public void TestSetCombinations4()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+
+            var expr = And(s1.Contains(3), s1.Difference(s2) == Set.Empty<int>());
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            Console.WriteLine(r1 + ", " + r2);
+
+            Assert.IsTrue(r2.Contains(3));
+            Assert.AreEqual(0, r1.Difference(r2).Count());
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations5()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(s1.Contains(3), s2 != Set.Empty<int>(), s1.Union(s2).Contains(4), s3.Difference(s2) == s1);
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Contains(3));
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r1.Union(r2).Contains(4));
+            Assert.IsTrue(r3.Difference(r2) == r1);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations6()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(
+                s1.Difference(s3) == s1.Union(s2).Difference(s3),
+                s1 != Set.Empty<int>(),
+                s2 != Set.Empty<int>(),
+                s3 != Set.Empty<int>(),
+                s1 != s2,
+                s2 != s3,
+                Zen.Not(s2.IsSubsetOf(s1)));
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Count() > 0);
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r3.Count() > 0);
+            Assert.IsTrue(r1 != r2);
+            Assert.IsTrue(r1 != r3);
+            Assert.IsTrue(r2 != r3);
+            Assert.IsTrue(r1.Difference(r3) == r1.Union(r2).Difference(r3));
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations7()
+        {
+            var s = Symbolic<Set<int>>();
+
+            var expr = Implies(Zen.Not(s.Contains(3)), s.Add(3).Difference(new Set<int>(3)) == s);
+            var solution = Not(expr).Solve();
+            Assert.IsFalse(solution.IsSatisfiable());
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations8()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(
+                s1.Union(s2).Difference(s3.Intersect(s1)) == s2,
+                s3.Intersect(s1) != Set.Empty<int>(),
+                s1 != Set.Empty<int>(),
+                s2 != Set.Empty<int>(),
+                s3 != Set.Empty<int>());
+
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Intersect(r3).Count() > 0);
+            Assert.IsTrue(r1.Count() > 0);
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r3.Count() > 0);
+            Assert.IsTrue(r1.Union(r2).Difference(r1.Intersect(r3)) == r2);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations9()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+
+            var expr = And(
+                Constant(new Set<int>(1, 2, 3, 4)).Difference(s1.Difference(s2)) == new Set<int>(1, 2),
+                s2 != Set.Empty<int>(),
+                s1.Intersect(s2) != Set.Empty<int>());
+
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+
+            Assert.IsTrue(r1.Contains(3));
+            Assert.IsTrue(r1.Contains(4));
+            Assert.IsTrue(r1.Count() > 2);
+            Assert.IsTrue(r2.Count() > 0);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
         public void TestSetWorksWithRealsAndChars()
         {
             var s1 = Symbolic<Set<Pair<char, Real>>>();
@@ -573,9 +749,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetEqualsHashcode()
         {
-            var s1 = new Set<int>().Add(11).Add(10);
-            var s2 = new Set<int>().Add(10).Add(11);
-            var s3 = new Set<int>().Add(1).Add(2);
+            var s1 = new Set<int>(11, 10);
+            var s2 = new Set<int>(10, 11);
+            var s3 = new Set<int>(1, 2);
             var s4 = new Set<int>();
             Assert.IsTrue(s1.Equals(s2));
             Assert.IsTrue(s1.Equals((object)s2));

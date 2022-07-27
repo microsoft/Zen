@@ -22,6 +22,11 @@ namespace ZenLib
         public IDictionary<TKey, TValue> Values { get; set; }
 
         /// <summary>
+        /// Used to indicate that the map is negated.
+        /// </summary>
+        internal bool Negated = false;
+
+        /// <summary>
         /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
         /// </summary>
         public Map()
@@ -29,9 +34,31 @@ namespace ZenLib
             this.Values = ImmutableDictionary<TKey, TValue>.Empty;
         }
 
+        internal Map(bool negated)
+        {
+            if (negated)
+            {
+                Contract.Assert(typeof(TValue) == typeof(SetUnit));
+            }
+
+            this.Values = ImmutableDictionary<TKey, TValue>.Empty;
+            this.Negated = negated;
+        }
+
         internal Map(ImmutableDictionary<TKey, TValue> dictionary)
         {
             this.Values = dictionary;
+        }
+
+        internal Map(ImmutableDictionary<TKey, TValue> dictionary, bool negated)
+        {
+            if (negated)
+            {
+                Contract.Assert(typeof(TValue) == typeof(SetUnit));
+            }
+
+            this.Values = dictionary;
+            this.Negated = negated;
         }
 
         /// <summary>
@@ -47,7 +74,7 @@ namespace ZenLib
         public Map<TKey, TValue> Set(TKey key, TValue value)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new Map<TKey, TValue>(d.SetItem(key, value));
+            return new Map<TKey, TValue>(d.SetItem(key, value), this.Negated);
         }
 
         /// <summary>
@@ -57,7 +84,7 @@ namespace ZenLib
         public Map<TKey, TValue> Delete(TKey key)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new Map<TKey, TValue>(d.Remove(key));
+            return new Map<TKey, TValue>(d.Remove(key), this.Negated);
         }
 
         /// <summary>

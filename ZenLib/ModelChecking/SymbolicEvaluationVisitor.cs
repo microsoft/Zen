@@ -7,6 +7,7 @@ namespace ZenLib.ModelChecking
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using System.Reflection;
     using ZenLib.Solver;
@@ -338,6 +339,7 @@ namespace ZenLib.ModelChecking
             }
         }
 
+        [ExcludeFromCodeCoverage] // Can't trigger TargetInvocationException
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TObject>(ZenCreateObjectExpr<TObject> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             try
@@ -666,9 +668,12 @@ namespace ZenLib.ModelChecking
                 case ZenDictCombineExpr<TKey>.CombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Intersect);
+                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
                     expr = this.Solver.DictIntersect(e1.Value, e2.Value);
+                    break;
+                default:
+                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    expr = this.Solver.DictDifference(e1.Value, e2.Value);
                     break;
             }
 
