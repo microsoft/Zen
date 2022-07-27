@@ -464,6 +464,14 @@ namespace ZenLib.Solver
         TArray DictIntersect(TArray arrayExpr1, TArray arrayExpr2);
 
         /// <summary>
+        /// The result of differencing two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
+        TArray DictDifference(TArray arrayExpr1, TArray arrayExpr2);
+
+        /// <summary>
         /// The 'Equal' of two integers.
         /// </summary>
         /// <param name="x">The first expression.</param>

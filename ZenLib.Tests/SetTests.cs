@@ -65,6 +65,7 @@ namespace ZenLib.Tests
             CheckValid<Set<byte>, byte>((d, e) => Implies(Not(d.Contains(e)), d.Delete(e) == d), runBdds: false);
             CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), s2.Contains(e)) == s1.Intersect(s2).Contains(e), runBdds: false);
             CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => Or(s1.Contains(e), s2.Contains(e)) == s1.Union(s2).Contains(e), runBdds: false);
+            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), Not(s2.Contains(e))) == s1.Difference(s2).Contains(e), runBdds: false);
         }
 
         /// <summary>
@@ -575,6 +576,95 @@ namespace ZenLib.Tests
             Assert.IsFalse(r2.Contains(3));
             Assert.IsTrue(r2.Contains(5));
             Assert.IsTrue(r1.Intersect(r2).Count() == 0);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations4()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+
+            var expr = And(s1.Contains(3), s1.Difference(s2) == Set.Empty<int>());
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            Console.WriteLine(r1 + ", " + r2);
+
+            Assert.IsTrue(r2.Contains(3));
+            Assert.AreEqual(0, r1.Difference(r2).Count());
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations5()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(s1.Contains(3), s2 != Set.Empty<int>(), s1.Union(s2).Contains(4), s3.Difference(s2) == s1);
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Contains(3));
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r1.Union(r2).Contains(4));
+            Assert.IsTrue(r3.Difference(r2) == r1);
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations6()
+        {
+            var s1 = Symbolic<Set<int>>();
+            var s2 = Symbolic<Set<int>>();
+            var s3 = Symbolic<Set<int>>();
+
+            var expr = And(
+                s1.Difference(s3) == s1.Union(s2).Difference(s3),
+                s1 != Set.Empty<int>(),
+                s2 != Set.Empty<int>(),
+                s3 != Set.Empty<int>(),
+                s1 != s2,
+                s2 != s3,
+                Zen.Not(s2.IsSubsetOf(s1)));
+            var solution = expr.Solve();
+
+            var r1 = solution.Get(s1);
+            var r2 = solution.Get(s2);
+            var r3 = solution.Get(s3);
+
+            Assert.IsTrue(r1.Count() > 0);
+            Assert.IsTrue(r2.Count() > 0);
+            Assert.IsTrue(r3.Count() > 0);
+            Assert.IsTrue(r1 != r2);
+            Assert.IsTrue(r1 != r3);
+            Assert.IsTrue(r2 != r3);
+            Assert.IsTrue(r1.Difference(r3) == r1.Union(r2).Difference(r3));
+        }
+
+        /// <summary>
+        /// Test set combine operations.
+        /// </summary>
+        [TestMethod]
+        public void TestSetCombinations7()
+        {
+            var s = Symbolic<Set<int>>();
+
+            var expr = Implies(Zen.Not(s.Contains(3)), s.Add(3).Difference(new Set<int>().Add(3)) == s);
+            var solution = Not(expr).Solve();
+            Assert.IsFalse(solution.IsSatisfiable());
         }
 
         /// <summary>

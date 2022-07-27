@@ -74,7 +74,19 @@ namespace ZenLib.Solver
         {
             if (parameter.IsConstantArray)
             {
-                return CreateEmptyDictionary(keyType, valueType);
+                if (parameter.Args[0].IsTrue)
+                {
+                    var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+                    var c = typeof(Map<,>)
+                        .MakeGenericType(keyType, valueType)
+                        .GetConstructor(flags, null, new Type[] { typeof(bool) }, null);
+                    return c.Invoke(new object[] { true });
+                }
+                else
+                {
+                    var c = typeof(Map<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                    return c.Invoke(CommonUtilities.EmptyArray);
+                }
             }
             else if (parameter.IsStore)
             {
@@ -95,6 +107,7 @@ namespace ZenLib.Solver
                 var e1 = Convert(parameter.Args[0], dictionaryType);
                 var e2 = Convert(parameter.Args[1], dictionaryType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
+                Console.WriteLine($"{methodName} of {e1} and {e2}");
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
@@ -122,15 +135,9 @@ namespace ZenLib.Solver
             } */
         }
 
-        private object CreateEmptyDictionary(Type keyType, Type valueType)
-        {
-            var c = typeof(Map<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-            return c.Invoke(CommonUtilities.EmptyArray);
-        }
-
         private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
         {
-            Contract.Assert(!valueExpr.IsFalse);
+            // Contract.Assert(!valueExpr.IsFalse);
             // for sets, don't add the key when the value is false.
             /* if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
             {
