@@ -662,7 +662,7 @@ namespace ZenLib.Tests
         {
             var s = Symbolic<Set<int>>();
 
-            var expr = Implies(Zen.Not(s.Contains(3)), s.Add(3).Difference(new Set<int>().Add(3)) == s);
+            var expr = Implies(Zen.Not(s.Contains(3)), s.Add(3).Difference(new Set<int>(3)) == s);
             var solution = Not(expr).Solve();
             Assert.IsFalse(solution.IsSatisfiable());
         }
@@ -694,9 +694,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetEqualsHashcode()
         {
-            var s1 = new Set<int>().Add(11).Add(10);
-            var s2 = new Set<int>().Add(10).Add(11);
-            var s3 = new Set<int>().Add(1).Add(2);
+            var s1 = new Set<int>(11, 10);
+            var s2 = new Set<int>(10, 11);
+            var s3 = new Set<int>(1, 2);
             var s4 = new Set<int>();
             Assert.IsTrue(s1.Equals(s2));
             Assert.IsTrue(s1.Equals((object)s2));

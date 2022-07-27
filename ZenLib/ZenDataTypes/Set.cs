@@ -5,6 +5,7 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static ZenLib.Zen;
@@ -25,6 +26,25 @@ namespace ZenLib
         public Set()
         {
             this.Values = new Map<T, SetUnit>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Set{TKey}"/> class.
+        /// </summary>
+        public Set(params T[] values) : this((IEnumerable<T>)values)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Set{TKey}"/> class.
+        /// </summary>
+        public Set(IEnumerable<T> values)
+        {
+            this.Values = new Map<T, SetUnit>();
+            foreach (var value in values)
+            {
+                this.Values = this.Values.Set(value, new SetUnit());
+            }
         }
 
         private Set(Map<T, SetUnit> map)
