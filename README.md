@@ -25,6 +25,7 @@ Zen is a research library that provides high-level abstractions in .NET to make 
   - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
   - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
   - [Custom classes and structs](#custom-classes-and-structs)
+  - [Enumerated values](#enumerated-values)
 - [Zen Attributes](#zen-attributes)
 - [Solver backends](#solver-backends)
 - [Example: Network ACLs](#example-network-acls)
@@ -478,6 +479,30 @@ public class Point
     }
 }
 
+```
+
+<a name="enums"></a>
+## Enumerated values
+
+Zen models `enum` values as their backing type, which is an `int` by default unless specified by the user. For example, Zen will model the following enum as a byte:
+
+```csharp
+public enum Origin : byte
+{
+    Egp,
+    Igp,
+    Incomplete,
+}
+```
+
+By default, Zen does not constraint an enum value to only be one of the enumerated values - it can be any value allowed by the backing type (any value between 0 and 255 in this example instead of just the 3 listed). If you want to add a constraint to ensure the value is only one of those enumerated by the user, you write a function like the following to test if a value is one of those expected:
+
+```csharp
+public Zen<bool> IsValidOrigin(Zen<Origin> origin)
+{
+    var enumValues = Enum.GetValues<Origin>();
+    return Zen.Or(enumValues.Select(x => r.GetOrigin() == x).ToArray());
+}
 ```
 
 
