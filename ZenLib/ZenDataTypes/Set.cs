@@ -86,6 +86,16 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Difference of this set with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The difference of the two sets.</returns>
+        public Set<T> Difference(Set<T> other)
+        {
+            return new Set<T>(CommonUtilities.DictionaryDifference(this.Values, other.Values));
+        }
+
+        /// <summary>
         /// Check if this set is a subset of another.
         /// </summary>
         /// <param name="other">The other set.</param>
@@ -245,7 +255,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Union two sets together.
+        /// Intersect two sets.
         /// </summary>
         /// <param name="setExpr1">Zen set expression.</param>
         /// <param name="setExpr2">Zen set expression.</param>
@@ -256,6 +266,20 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(setExpr2);
 
             return Create<Set<T>>(("Values", Zen.Intersect(setExpr1.Values(), setExpr2.Values())));
+        }
+
+        /// <summary>
+        /// Difference of two sets.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Set<T>> Difference<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
+        {
+            CommonUtilities.ValidateNotNull(setExpr1);
+            CommonUtilities.ValidateNotNull(setExpr2);
+
+            return Create<Set<T>>(("Values", Zen.Difference(setExpr1.Values(), setExpr2.Values())));
         }
 
         /// <summary>

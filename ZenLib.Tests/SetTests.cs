@@ -441,6 +441,37 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test set evaluation with difference.
+        /// </summary>
+        [TestMethod]
+        public void TestSetDifference()
+        {
+            var zf = new ZenFunction<Set<int>, Set<int>, Set<int>>((d1, d2) => d1.Difference(d2));
+
+            // test interperter
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test compiler
+            zf.Compile();
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>()).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(10), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, zf.Evaluate(new Set<int>(), new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, zf.Evaluate(new Set<int>().Add(1).Add(2), new Set<int>().Add(2).Add(3)).Count());
+
+            // test data structure
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>()).Count());
+            Assert.AreEqual(0, new Set<int>().Add(10).Difference(new Set<int>().Add(10)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(10).Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(0, new Set<int>().Difference(new Set<int>().Add(11)).Count());
+            Assert.AreEqual(1, new Set<int>().Add(1).Add(2).Difference(new Set<int>().Add(2).Add(3)).Count());
+        }
+
+        /// <summary>
         /// Test set evaluation with issubsetof.
         /// </summary>
         [TestMethod]

@@ -478,12 +478,26 @@ namespace ZenLib.Tests
             var x = Set.Empty<int>().Add(10);
             var y = Set.Empty<int>().Add(11);
 
+            // equalities
             Assert.AreEqual(x.Intersect(y).Intersect(y), x.Intersect(y));
             Assert.AreEqual(x.Intersect(y).Intersect(x), x.Intersect(y));
             Assert.AreEqual(x.Intersect(y.Intersect(x)), y.Intersect(x));
             Assert.AreEqual(x.Union(y).Union(y), x.Union(y));
             Assert.AreEqual(x.Union(y).Union(x), x.Union(y));
             Assert.AreEqual(x.Union(y.Union(x)), y.Union(x));
+            Assert.AreEqual(x.Union(x), x);
+            Assert.AreEqual(x.Intersect(x), x);
+            Assert.AreEqual(x.Union(Set.Empty<int>()), x);
+            Assert.AreEqual(Set.Empty<int>().Union(x), x);
+            Assert.AreEqual(x.Intersect(Set.Empty<int>()), Set.Empty<int>());
+            Assert.AreEqual(Set.Empty<int>().Intersect(x), Set.Empty<int>());
+            Assert.AreEqual(x.Difference(Set.Empty<int>()), x);
+            Assert.AreEqual(x.Difference(x), Set.Empty<int>());
+            Assert.AreEqual(Set.Empty<int>().Difference(x), Set.Empty<int>());
+            Assert.AreEqual(x.Difference(y).Difference(x), Set.Empty<int>());
+            Assert.AreEqual(x.Difference(y).Difference(y), x.Difference(y));
+
+            // inequalities
             Assert.AreNotEqual(x.Union(y).Intersect(y), x.Union(y));
             Assert.AreNotEqual(x.Intersect(y).Union(x), x.Intersect(y));
         }

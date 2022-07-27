@@ -136,6 +136,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Differences two dictionaries.
+        /// </summary>
+        /// <param name="dict1">A dictionary.</param>
+        /// <param name="dict2">A dictionary.</param>
+        /// <returns>The difference of the two dictionaries.</returns>
+        public static Map<T, SetUnit> DictionaryDifference<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
+        {
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Except(dict2.Values)));
+        }
+
+        /// <summary>
         /// Validate that an argument is true.
         /// </summary>
         /// <param name="obj">The argument.</param>

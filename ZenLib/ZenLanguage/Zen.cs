@@ -1294,6 +1294,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The difference of two zen dictionaries.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<Map<TKey, SetUnit>> Difference<TKey>(
+            Zen<Map<TKey, SetUnit>> d1,
+            Zen<Map<TKey, SetUnit>> d2)
+        {
+            return ZenDictCombineExpr<TKey>.Create(d1, d2, ZenDictCombineExpr<TKey>.CombineType.Difference);
+        }
+
+        /// <summary>
         /// The Zen value for an empty dict.
         /// </summary>
         /// <param name="name">An optional name for the expression.</param>
