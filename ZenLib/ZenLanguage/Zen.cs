@@ -412,22 +412,35 @@ namespace ZenLib
         /// </summary>
         /// <param name="exprs">Zen expressions.</param>
         /// <returns>Zen value.</returns>
+        public static Zen<bool> And(IEnumerable<Zen<bool>> exprs)
+        {
+            CommonUtilities.ValidateNotNull(exprs);
+
+            return exprs.Aggregate(And);
+        }
+
+        /// <summary>
+        /// Compute the and of Zen values.
+        /// </summary>
+        /// <param name="exprs">Zen expressions.</param>
+        /// <returns>Zen value.</returns>
         public static Zen<bool> And(params Zen<bool>[] exprs)
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            if (exprs.Length == 0)
-            {
-                return True();
-            }
+            return exprs.Aggregate(And);
+        }
 
-            var result = True();
-            for (int i = exprs.Length - 1; i >= 0; i--)
-            {
-                result = And(exprs[i], result);
-            }
+        /// <summary>
+        /// Compute the or of Zen values.
+        /// </summary>
+        /// <param name="exprs">Zen expressions.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> Or(IEnumerable<Zen<bool>> exprs)
+        {
+            CommonUtilities.ValidateNotNull(exprs);
 
-            return result;
+            return exprs.Aggregate(Or);
         }
 
         /// <summary>
@@ -439,18 +452,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            if (exprs.Length == 0)
-            {
-                return False();
-            }
-
-            var result = False();
-            for (int i = exprs.Length - 1; i >= 0; i--)
-            {
-                result = Or(exprs[i], result);
-            }
-
-            return result;
+            return exprs.Aggregate(Or);
         }
 
         /// <summary>
@@ -1123,7 +1125,6 @@ namespace ZenLib
         public static Zen<T> BitwiseAnd<T>(params Zen<T>[] exprs)
         {
             CommonUtilities.ValidateNotNull(exprs);
-
             return exprs.Aggregate(BitwiseAnd);
         }
 

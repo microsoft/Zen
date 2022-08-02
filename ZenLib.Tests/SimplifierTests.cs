@@ -70,16 +70,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Simplify And, Or with empty arguments.
-        /// </summary>
-        [TestMethod]
-        public void TestAndOrEmpty()
-        {
-            Assert.AreEqual(And(new Zen<bool>[] { }), True());
-            Assert.AreEqual(Or(new Zen<bool>[] { }), False());
-        }
-
-        /// <summary>
         /// Simplify or with constants.
         /// </summary>
         [TestMethod]
