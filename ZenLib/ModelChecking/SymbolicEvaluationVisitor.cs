@@ -619,32 +619,32 @@ namespace ZenLib.ModelChecking
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(T1), this.Solver, o.Fields.SetItem(expression.FieldName, f));
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             var emptyDict = this.Solver.DictEmpty(typeof(TKey), typeof(TValue));
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, emptyDict);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.MapExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
             var e3 = Evaluate(expression.ValueExpr, parameter);
             var e = this.Solver.DictSet(e1.Value, e2, e3, typeof(TKey), typeof(TValue));
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, e);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.MapExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
             var e = this.Solver.DictDelete(e1.Value, e2, typeof(TKey), typeof(TValue));
             return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, e);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.MapExpr, parameter);
             var e2 = Evaluate(expression.KeyExpr, parameter);
             var (flag, e) = this.Solver.DictGet(e1.Value, e2, typeof(TKey), typeof(TValue));
 
@@ -657,22 +657,22 @@ namespace ZenLib.ModelChecking
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<TValue>), this.Solver, fields);
         }
 
-        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey>(ZenDictCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<TKey>(ZenMapCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.DictExpr1, parameter);
-            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.DictExpr2, parameter);
+            var e1 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.MapExpr1, parameter);
+            var e2 = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)Evaluate(expression.MapExpr2, parameter);
 
             TArray expr;
             switch (expression.CombinationType)
             {
-                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                case ZenMapCombineExpr<TKey>.CombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
                     expr = this.Solver.DictIntersect(e1.Value, e2.Value);
                     break;
                 default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
                     expr = this.Solver.DictDifference(e1.Value, e2.Value);
                     break;
             }

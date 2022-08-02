@@ -24,7 +24,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// The method for creating the empty list at runtime.
         /// </summary>
-        private static MethodInfo arbitraryDictMethod = typeof(Zen).GetMethod("ArbitraryDict", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo arbitraryMapMethod = typeof(Zen).GetMethod("ArbitraryMap", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating the empty seq at runtime.
@@ -120,7 +120,7 @@ namespace ZenLib.ModelChecking
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, ZenGenerationConfiguration parameter)
         {
-            var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
+            var method = arbitraryMapMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, new object[] { parameter.Name });
             this.ArbitraryExpressions.Add(e);
             return e;

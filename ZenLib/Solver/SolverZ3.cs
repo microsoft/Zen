@@ -183,7 +183,7 @@ namespace ZenLib.Solver
 
         private Symbol FreshSymbol()
         {
-            return Context.MkSymbol(nextIndex++);
+            return Context.MkSymbol(Interlocked.Increment(ref nextIndex));
         }
 
         public BoolExpr And(BoolExpr x, BoolExpr y)

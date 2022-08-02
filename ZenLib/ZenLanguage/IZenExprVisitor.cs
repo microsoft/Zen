@@ -81,7 +81,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListAddFrontExpr.
@@ -97,7 +97,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictDeleteExpr.
@@ -105,7 +105,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictGetExpr.
@@ -113,7 +113,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a DictCombineExpr.
@@ -121,7 +121,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey>(ZenDictCombineExpr<TKey> expression, TParam parameter);
+        TReturn Visit<TKey>(ZenMapCombineExpr<TKey> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListCaseExpr.

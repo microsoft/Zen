@@ -1,70 +1,69 @@
-﻿// <copyright file="ZenDictDeleteExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenMapDeleteExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a dictionary delete expression.
+    /// Class representing a map delete expression.
     /// </summary>
-    internal sealed class ZenDictDeleteExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
+    internal sealed class ZenMapDeleteExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<Map<TKey, TValue>>, Zen<TKey>), ZenDictDeleteExpr<TKey, TValue>> createFunc = (v) =>
-            new ZenDictDeleteExpr<TKey, TValue>(v.Item1, v.Item2);
+        private static Func<(Zen<Map<TKey, TValue>>, Zen<TKey>), ZenMapDeleteExpr<TKey, TValue>> createFunc = (v) =>
+            new ZenMapDeleteExpr<TKey, TValue>(v.Item1, v.Item2);
 
         /// <summary>
-        /// Hash cons table for ZenDictDeleteExpr.
+        /// Hash cons table for ZenMapDeleteExpr.
         /// </summary>
-        private static HashConsTable<(long, long), ZenDictDeleteExpr<TKey, TValue>> hashConsTable =
-            new HashConsTable<(long, long), ZenDictDeleteExpr<TKey, TValue>>();
+        private static HashConsTable<(long, long), ZenMapDeleteExpr<TKey, TValue>> hashConsTable =
+            new HashConsTable<(long, long), ZenMapDeleteExpr<TKey, TValue>>();
 
         /// <summary>
-        /// Unroll a ZenDictDeleteExpr.
+        /// Unroll a ZenMapDeleteExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
         public override Zen<Map<TKey, TValue>> Unroll()
         {
-            return Create(this.DictExpr.Unroll(), this.KeyExpr.Unroll());
+            return Create(this.MapExpr.Unroll(), this.KeyExpr.Unroll());
         }
 
         /// <summary>
-        /// Create a new ZenDictDeleteExpr.
+        /// Create a new ZenMapDeleteExpr.
         /// </summary>
-        /// <param name="dictExpr">The dictionary expr.</param>
+        /// <param name="mapExpr">The map expr.</param>
         /// <param name="key">The key expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenDictDeleteExpr<TKey, TValue> Create(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> key)
+        public static ZenMapDeleteExpr<TKey, TValue> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key)
         {
-            CommonUtilities.ValidateNotNull(dictExpr);
+            CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(key);
 
-            var k = (dictExpr.Id, key.Id);
-            hashConsTable.GetOrAdd(k, (dictExpr, key), createFunc, out var v);
+            var k = (mapExpr.Id, key.Id);
+            hashConsTable.GetOrAdd(k, (mapExpr, key), createFunc, out var v);
             return v;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenDictDeleteExpr{TKey, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="ZenMapDeleteExpr{TKey, TValue}"/> class.
         /// </summary>
-        /// <param name="dictExpr">The dictionary expression.</param>
+        /// <param name="mapExpr">The map expression.</param>
         /// <param name="keyExpr">The key expression to add a value for.</param>
-        private ZenDictDeleteExpr(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr)
+        private ZenMapDeleteExpr(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            this.DictExpr = dictExpr;
+            this.MapExpr = mapExpr;
             this.KeyExpr = keyExpr;
         }
 
         /// <summary>
-        /// Gets the dictionary expr.
+        /// Gets the map expr.
         /// </summary>
-        public Zen<Map<TKey, TValue>> DictExpr { get; }
+        public Zen<Map<TKey, TValue>> MapExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.
@@ -78,7 +77,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Delete({this.DictExpr}, {this.KeyExpr})";
+            return $"Delete({this.MapExpr}, {this.KeyExpr})";
         }
 
         /// <summary>

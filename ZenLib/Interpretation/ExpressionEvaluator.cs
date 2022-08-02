@@ -445,46 +445,46 @@ namespace ZenLib.Interpretation
             return ReflectionUtilities.WithField<T1>(e1, expression.FieldName, e2);
         }
 
-        public object Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return new Map<TKey, TValue>();
         }
 
-        public object Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             var e3 = (TValue)Evaluate(expression.ValueExpr, parameter);
             return e1.Set(e2, e3);
         }
 
-        public object Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             return e1.Delete(e2);
         }
 
-        public object Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.DictExpr, parameter);
+            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
             var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
             return e1.Get(e2);
         }
 
-        public object Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
+        public object Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, SetUnit>)Evaluate(expression.DictExpr1, parameter);
-            var e2 = (Map<TKey, SetUnit>)Evaluate(expression.DictExpr2, parameter);
+            var e1 = (Map<TKey, SetUnit>)Evaluate(expression.MapExpr1, parameter);
+            var e2 = (Map<TKey, SetUnit>)Evaluate(expression.MapExpr2, parameter);
 
             switch (expression.CombinationType)
             {
-                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
                     return CommonUtilities.DictionaryIntersect(e1, e2);
-                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                case ZenMapCombineExpr<TKey>.CombineType.Union:
                     return CommonUtilities.DictionaryUnion(e1, e2);
                 default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
                     return CommonUtilities.DictionaryDifference(e1, e2);
             }
         }

@@ -381,7 +381,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
@@ -393,7 +393,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
@@ -405,7 +405,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
@@ -417,7 +417,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }
@@ -429,7 +429,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult Visit<TKey>(ZenDictCombineExpr<TKey> expression, Dictionary<long, object> parameter)
+        public InterleavingResult Visit<TKey>(ZenMapCombineExpr<TKey> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }

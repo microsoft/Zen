@@ -26,9 +26,9 @@ namespace ZenLib
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Method for the creating an empty Zen list.
+        /// Method for the creating an empty Zen map.
         /// </summary>
-        private static MethodInfo emptyDictMethod = typeof(Zen).GetMethod("EmptyDict", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo emptyMapMethod = typeof(Zen).GetMethod("EmptyMap", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// Name of the function used to create an object via reflection.
@@ -69,7 +69,7 @@ namespace ZenLib
 
         public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
         {
-            var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
+            var method = emptyMapMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 

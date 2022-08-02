@@ -98,7 +98,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Unit parameter)
+        public Unit Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Unit parameter)
         {
             return parameter;
         }
@@ -110,32 +110,32 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Unit parameter)
+        public Unit Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Unit parameter)
         {
-            Compute(expression.DictExpr, parameter);
+            Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
             Compute(expression.ValueExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Unit parameter)
+        public Unit Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Unit parameter)
         {
-            Compute(expression.DictExpr, parameter);
+            Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Unit parameter)
+        public Unit Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Unit parameter)
         {
-            Compute(expression.DictExpr, parameter);
+            Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey>(ZenDictCombineExpr<TKey> expression, Unit parameter)
+        public Unit Visit<TKey>(ZenMapCombineExpr<TKey> expression, Unit parameter)
         {
-            Compute(expression.DictExpr1, parameter);
-            Compute(expression.DictExpr2, parameter);
+            Compute(expression.MapExpr1, parameter);
+            Compute(expression.MapExpr2, parameter);
             return parameter;
         }
 

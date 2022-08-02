@@ -564,15 +564,15 @@ namespace ZenLib.Compilation
             }
         }
 
-        public Expression Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
             return Expression.New(c);
         }
 
-        public Expression Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var dict = Convert(expression.DictExpr, parameter);
+            var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
             var value = Convert(expression.ValueExpr, parameter);
             var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
@@ -580,43 +580,43 @@ namespace ZenLib.Compilation
             return Expression.Call(mapExpr, method, key, value);
         }
 
-        public Expression Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var dict = Convert(expression.DictExpr, parameter);
+            var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
             var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
             var method = typeof(Map<TKey, TValue>).GetMethodCached("Delete");
             return Expression.Call(mapExpr, method, key);
         }
 
-        public Expression Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
-            var dict = Convert(expression.DictExpr, parameter);
+            var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
             var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
             var method = typeof(Map<TKey, TValue>).GetMethodCached("Get");
             return Expression.Call(mapExpr, method, key);
         }
 
-        public Expression Visit<TKey>(ZenDictCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        public Expression Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
         {
             MethodInfo method;
             switch (expression.CombinationType)
             {
-                case ZenDictCombineExpr<TKey>.CombineType.Union:
+                case ZenMapCombineExpr<TKey>.CombineType.Union:
                     method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
                     break;
-                case ZenDictCombineExpr<TKey>.CombineType.Intersect:
+                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
                     method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
                     break;
                 default:
-                    Contract.Assert(expression.CombinationType == ZenDictCombineExpr<TKey>.CombineType.Difference);
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
                     method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
                     break;
             }
 
-            var dict1 = Convert(expression.DictExpr1, parameter);
-            var dict2 = Convert(expression.DictExpr2, parameter);
+            var dict1 = Convert(expression.MapExpr1, parameter);
+            var dict2 = Convert(expression.MapExpr2, parameter);
             var mapExpr1 = Expression.Convert(dict1, typeof(Map<TKey, SetUnit>));
             var mapExpr2 = Expression.Convert(dict2, typeof(Map<TKey, SetUnit>));
             return Expression.Call(null, method, mapExpr1, mapExpr2);

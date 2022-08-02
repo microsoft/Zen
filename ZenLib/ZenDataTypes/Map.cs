@@ -194,7 +194,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Map<TKey, TValue>> Empty<TKey, TValue>()
         {
-            return EmptyDict<TKey, TValue>();
+            return EmptyMap<TKey, TValue>();
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return DictSet(mapExpr, keyExpr, valueExpr);
+            return MapSet(mapExpr, keyExpr, valueExpr);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return DictDelete(mapExpr, keyExpr);
+            return MapDelete(mapExpr, keyExpr);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return DictGet(mapExpr, keyExpr);
+            return MapGet(mapExpr, keyExpr);
         }
 
         /// <summary>

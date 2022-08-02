@@ -898,11 +898,11 @@ namespace ZenLib
         /// <returns>The Zen value representing the list.</returns>
         internal static Zen<Map<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(Map<TKey, TValue> value)
         {
-            Zen<Map<TKey, TValue>> dict = ZenDictEmptyExpr<TKey, TValue>.Instance;
+            Zen<Map<TKey, TValue>> dict = ZenMapEmptyExpr<TKey, TValue>.Instance;
             foreach (var elt in value.Values)
             {
                 ReportIfNullConversionError(elt, "element", typeof(Map<TKey, TValue>));
-                dict = ZenDictSetExpr<TKey, TValue>.Create(dict, elt.Key, elt.Value);
+                dict = ZenMapSetExpr<TKey, TValue>.Create(dict, elt.Key, elt.Value);
             }
 
             return dict;
