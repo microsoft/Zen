@@ -413,7 +413,7 @@ namespace ZenLib.Compilation
         public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var list = Convert(expression.Expr, parameter);
-            var element = Convert(expression.Element, parameter);
+            var element = Convert(expression.ElementExpr, parameter);
             var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
             var method = typeof(FSeq<T>).GetMethodCached("AddFront");
             return Expression.Call(fseqExpr, method, element);
@@ -451,7 +451,7 @@ namespace ZenLib.Compilation
             var tlExpr = Expression.PropertyOrField(splitVariable, "Item2");
 
             // compile the empty expression
-            var emptyExpr = Convert(expression.EmptyCase, parameter);
+            var emptyExpr = Convert(expression.EmptyExpr, parameter);
 
             // run the cons lambda
             var runMethod = typeof(Interpreter)
@@ -515,7 +515,7 @@ namespace ZenLib.Compilation
         public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             var obj = Convert(expression.Expr, parameter);
-            var value = Convert(expression.FieldValue, parameter);
+            var value = Convert(expression.FieldExpr, parameter);
             return WithField<T1>(obj, expression.FieldName, value);
         }
 
@@ -620,6 +620,25 @@ namespace ZenLib.Compilation
             var mapExpr1 = Expression.Convert(dict1, typeof(Map<TKey, SetUnit>));
             var mapExpr2 = Expression.Convert(dict2, typeof(Map<TKey, SetUnit>));
             return Expression.Call(null, method, mapExpr1, mapExpr2);
+        }
+
+        public Expression Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Expression.Constant(expression.Key);
+            var value = Convert(expression.ValueExpr, parameter);
+            var mapExpr = Expression.Convert(dict, typeof(ConstMap<TKey, TValue>));
+            var method = typeof(ConstMap<TKey, TValue>).GetMethodCached("Set");
+            return Expression.Call(mapExpr, method, key, value);
+        }
+
+        public Expression Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Expression.Constant(expression.Key);
+            var mapExpr = Expression.Convert(dict, typeof(ConstMap<TKey, TValue>));
+            var method = typeof(ConstMap<TKey, TValue>).GetMethodCached("Get");
+            return Expression.Call(mapExpr, method, key);
         }
 
         public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)

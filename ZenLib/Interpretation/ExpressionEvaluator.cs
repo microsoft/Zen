@@ -396,7 +396,7 @@ namespace ZenLib.Interpretation
         public object Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (FSeq<T>)Evaluate(expression.Expr, parameter);
-            var e2 = (T)Evaluate(expression.Element, parameter);
+            var e2 = (T)Evaluate(expression.ElementExpr, parameter);
             return e1.AddFront(e2);
         }
 
@@ -411,7 +411,7 @@ namespace ZenLib.Interpretation
                     this.PathConstraint.Add(expression.ListExpr.IsEmpty());
                 }
 
-                return Evaluate(expression.EmptyCase, parameter);
+                return Evaluate(expression.EmptyExpr, parameter);
             }
             else
             {
@@ -441,7 +441,7 @@ namespace ZenLib.Interpretation
         public object Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (T1)Evaluate(expression.Expr, parameter);
-            var e2 = (T2)Evaluate(expression.FieldValue, parameter);
+            var e2 = (T2)Evaluate(expression.FieldExpr, parameter);
             return ReflectionUtilities.WithField<T1>(e1, expression.FieldName, e2);
         }
 
@@ -487,6 +487,19 @@ namespace ZenLib.Interpretation
                     Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
                     return CommonUtilities.DictionaryDifference(e1, e2);
             }
+        }
+
+        public object Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = (ConstMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
+            var e2 = (TValue)Evaluate(expression.ValueExpr, parameter);
+            return e1.Set(expression.Key, e2);
+        }
+
+        public object Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = (ConstMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
+            return e1.Get(expression.Key);
         }
 
         public object Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)

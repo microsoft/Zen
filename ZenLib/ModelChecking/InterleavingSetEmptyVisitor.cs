@@ -100,13 +100,27 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Generate an empty set result.
         /// </summary>
-        /// <param name="dictionaryType">The dictionary type.</param>
+        /// <param name="mapType">The dictionary type.</param>
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public InterleavingResult VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        {
+            throw new ZenException("Maps not supported in BDDs");
+        }
+
+        /// <summary>
+        /// Generate an empty set result.
+        /// </summary>
+        /// <param name="mapType">The dictionary type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>An empty interleaving result set.</returns>
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             throw new ZenException("Maps not supported in BDDs");
         }

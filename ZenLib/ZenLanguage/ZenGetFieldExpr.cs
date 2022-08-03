@@ -46,7 +46,7 @@ namespace ZenLib
             if (type.GetGenericTypeDefinition() == typeof(ZenWithFieldExpr<,>))
             {
                 var fieldNameProperty = type.GetProperty("FieldName");
-                var fieldValueProperty = type.GetProperty("FieldValue");
+                var fieldValueProperty = type.GetProperty("FieldExpr");
                 var exprProperty = type.GetProperty("Expr");
 
                 return ((string)fieldNameProperty.GetValue(expr) == fieldName) ?

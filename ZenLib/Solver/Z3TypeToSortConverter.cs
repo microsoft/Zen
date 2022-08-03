@@ -74,7 +74,7 @@ namespace ZenLib.Solver
             return this.solver.CharSort;
         }
 
-        public Sort VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public Sort VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             var keySort = this.GetSortForType(keyType);
             var valueSort = this.GetSortForType(valueType);
@@ -85,6 +85,11 @@ namespace ZenLib.Solver
             }
 
             return SolverZ3.Context.MkArraySort(keySort, valueSort);
+        }
+
+        public Sort VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        {
+            throw new NotImplementedException();
         }
 
         public Sort VisitFixedInteger(Type intType, Unit parameter)

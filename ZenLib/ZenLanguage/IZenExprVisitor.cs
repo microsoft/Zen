@@ -124,6 +124,22 @@ namespace ZenLib
         TReturn Visit<TKey>(ZenMapCombineExpr<TKey> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ConstMapSetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ConstMapGetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

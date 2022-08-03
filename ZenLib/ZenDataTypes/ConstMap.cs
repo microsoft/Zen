@@ -1,4 +1,4 @@
-﻿// <copyright file="Map.cs" company="Microsoft">
+﻿// <copyright file="ConstMap.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -12,9 +12,9 @@ namespace ZenLib
     using static ZenLib.Zen;
 
     /// <summary>
-    /// A class representing an arbitrary sized map.
+    /// A class representing a const map.
     /// </summary>
-    public class Map<TKey, TValue> : IEquatable<Map<TKey, TValue>>
+    public class ConstMap<TKey, TValue> : IEquatable<ConstMap<TKey, TValue>>
     {
         /// <summary>
         /// Gets the underlying values of the map.
@@ -22,56 +22,20 @@ namespace ZenLib
         public IDictionary<TKey, TValue> Values { get; set; }
 
         /// <summary>
-        /// Used to indicate that the map is negated.
+        /// Creates a new instance of the <see cref="ConstMap{TKey, TValue}"/> class.
         /// </summary>
-        internal bool Negated = false;
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
-        /// </summary>
-        public Map()
+        public ConstMap()
         {
             this.Values = ImmutableDictionary<TKey, TValue>.Empty;
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
-        /// </summary>
-        /// <param name="negated">Whether this map is negated for sets.</param>
-        internal Map(bool negated)
-        {
-            if (negated)
-            {
-                Contract.Assert(typeof(TValue) == typeof(SetUnit));
-            }
-
-            this.Values = ImmutableDictionary<TKey, TValue>.Empty;
-            this.Negated = negated;
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
+        /// Creates a new instance of the <see cref="ConstMap{TKey, TValue}"/> class.
         /// </summary>
         /// <param name="dictionary">The dictionary of initial values.</param>
-        internal Map(ImmutableDictionary<TKey, TValue> dictionary)
+        internal ConstMap(ImmutableDictionary<TKey, TValue> dictionary)
         {
             this.Values = dictionary;
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
-        /// </summary>
-        /// <param name="dictionary">The dictionary of initial values.</param>
-        /// <param name="negated">Whether this map is negated for sets.</param>
-        internal Map(ImmutableDictionary<TKey, TValue> dictionary, bool negated)
-        {
-            if (negated)
-            {
-                Contract.Assert(typeof(TValue) == typeof(SetUnit));
-            }
-
-            this.Values = dictionary;
-            this.Negated = negated;
         }
 
         /// <summary>
@@ -84,20 +48,20 @@ namespace ZenLib
         /// </summary>
         /// <param name="key">The key to add.</param>
         /// <param name="value">The value to add.</param>
-        public Map<TKey, TValue> Set(TKey key, TValue value)
+        public ConstMap<TKey, TValue> Set(TKey key, TValue value)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new Map<TKey, TValue>(d.SetItem(key, value), this.Negated);
+            return new ConstMap<TKey, TValue>(d.SetItem(key, value));
         }
 
         /// <summary>
         /// Delete a key from the Map.
         /// </summary>
         /// <param name="key">The key to add.</param>
-        public Map<TKey, TValue> Delete(TKey key)
+        public ConstMap<TKey, TValue> Delete(TKey key)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new Map<TKey, TValue>(d.Remove(key), this.Negated);
+            return new ConstMap<TKey, TValue>(d.Remove(key));
         }
 
         /// <summary>
@@ -115,14 +79,14 @@ namespace ZenLib
         /// </summary>
         /// <param name="key">The specified key.</param>
         /// <returns></returns>
-        public Option<TValue> Get(TKey key)
+        public TValue Get(TKey key)
         {
             if (this.Values.TryGetValue(key, out var value))
             {
-                return Option.Some(value);
+                return value;
             }
 
-            return Option.None<TValue>();
+            return ReflectionUtilities.GetDefaultValue<TValue>();
         }
 
         /// <summary>
@@ -142,7 +106,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is Map<TKey, TValue> o && Equals(o);
+            return obj is ConstMap<TKey, TValue> o && Equals(o);
         }
 
         /// <summary>
@@ -150,7 +114,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other map.</param>
         /// <returns>True or false.</returns>
-        public bool Equals(Map<TKey, TValue> other)
+        public bool Equals(ConstMap<TKey, TValue> other)
         {
             var count = this.Count();
             var otherCount = other.Count();
@@ -179,7 +143,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator ==(Map<TKey, TValue> left, Map<TKey, TValue> right)
+        public static bool operator ==(ConstMap<TKey, TValue> left, ConstMap<TKey, TValue> right)
         {
             return left.Equals(right);
         }
@@ -190,7 +154,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator !=(Map<TKey, TValue> left, Map<TKey, TValue> right)
+        public static bool operator !=(ConstMap<TKey, TValue> left, ConstMap<TKey, TValue> right)
         {
             return !(left == right);
         }
@@ -199,73 +163,36 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for map Zen objects.
     /// </summary>
-    public static class Map
+    public static class ConstMap
     {
-        /// <summary>
-        /// The Zen value for an empty map.
-        /// </summary>
-        /// <returns>Zen value.</returns>
-        public static Zen<Map<TKey, TValue>> Empty<TKey, TValue>()
-        {
-            return EmptyMap<TKey, TValue>();
-        }
-
         /// <summary>
         /// Add a value to a Zen map.
         /// </summary>
         /// <param name="mapExpr">Zen map expression.</param>
-        /// <param name="keyExpr">Zen key expression.</param>
+        /// <param name="key">The key.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Map<TKey, TValue>> Set<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        public static Zen<ConstMap<TKey, TValue>> Set<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            CommonUtilities.ValidateNotNull(key);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return MapSet(mapExpr, keyExpr, valueExpr);
-        }
-
-        /// <summary>
-        /// Delete a key from a Zen map.
-        /// </summary>
-        /// <param name="mapExpr">Zen map expression.</param>
-        /// <param name="keyExpr">Zen key expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<Map<TKey, TValue>> Delete<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
-        {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
-
-            return MapDelete(mapExpr, keyExpr);
+            return ConstMapSet(mapExpr, key, valueExpr);
         }
 
         /// <summary>
         /// Get a value from a Zen map.
         /// </summary>
         /// <param name="mapExpr">Zen map expression.</param>
-        /// <param name="keyExpr">Zen key expression.</param>
+        /// <param name="key">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
+        public static Zen<TValue> Get<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
         {
             CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            CommonUtilities.ValidateNotNull(key);
 
-            return MapGet(mapExpr, keyExpr);
-        }
-
-        /// <summary>
-        /// Check if a Zen map contains a key.
-        /// </summary>
-        /// <param name="mapExpr">Zen map expression.</param>
-        /// <param name="keyExpr">Zen key expression.</param>
-        /// <returns>Zen value.</returns>
-        public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
-        {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
-
-            return Get(mapExpr, keyExpr).IsSome();
+            return ConstMapGet(mapExpr, key);
         }
     }
 }

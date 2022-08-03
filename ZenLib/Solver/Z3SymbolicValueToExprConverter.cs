@@ -42,9 +42,15 @@ namespace ZenLib.Solver
             return v.Value;
         }
 
-        public Expr Visit(SymbolicDict<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)
+        public Expr Visit(SymbolicMap<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)
         {
             return v.Value;
+        }
+
+        [ExcludeFromCodeCoverage]
+        public Expr Visit(SymbolicConstMap<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)
+        {
+            throw new ZenException("Invalid use of const map in map or set type.");
         }
 
         public Expr Visit(SymbolicInteger<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)

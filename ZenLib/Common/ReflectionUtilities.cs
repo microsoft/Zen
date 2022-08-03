@@ -103,6 +103,11 @@ namespace ZenLib
         public readonly static Type MapType = typeof(Map<,>);
 
         /// <summary>
+        /// The type of map values.
+        /// </summary>
+        public readonly static Type ConstMapType = typeof(ConstMap<,>);
+
+        /// <summary>
         /// The type of fseq values.
         /// </summary>
         public readonly static Type FSeqType = typeof(FSeq<>);
@@ -130,10 +135,16 @@ namespace ZenLib
             typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
-        /// The zen constant dict creation method.
+        /// The zen constant map creation method.
         /// </summary>
-        public static MethodInfo CreateZenDictConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenDictConstant", BindingFlags.NonPublic | BindingFlags.Static);
+        public static MethodInfo CreateZenMapConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenMapConstant", BindingFlags.NonPublic | BindingFlags.Static);
+
+        /// <summary>
+        /// The zen constant map creation method.
+        /// </summary>
+        public static MethodInfo CreateZenConstMapConstantMethod =
+            typeof(ReflectionUtilities).GetMethod("CreateZenConstMapConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// The zen constant option creation method.
@@ -411,6 +422,16 @@ namespace ZenLib
         public static bool IsMapType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == MapType;
+        }
+
+        /// <summary>
+        /// Check if a type is a ConstMap type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsConstMapType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == ConstMapType;
         }
 
         /// <summary>
@@ -746,6 +767,15 @@ namespace ZenLib
                 return c.Invoke(CommonUtilities.EmptyArray);
             }
 
+            if (IsConstMapType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                var c = ConstMapType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                return c.Invoke(CommonUtilities.EmptyArray);
+            }
+
             if (IsFSeqType(type))
             {
                 var c = type.GetConstructor(new Type[] { });
@@ -818,6 +848,14 @@ namespace ZenLib
                 var keyType = typeParameters[0];
                 var valueType = typeParameters[1];
                 return visitor.VisitMap(type, keyType, valueType, parameter);
+            }
+
+            if (IsConstMapType(type))
+            {
+                var typeParameters = type.GetGenericArgumentsCached();
+                var keyType = typeParameters[0];
+                var valueType = typeParameters[1];
+                return visitor.VisitConstMap(type, keyType, valueType, parameter);
             }
 
             if (IsFSeqType(type))
@@ -896,16 +934,16 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The list value.</param>
         /// <returns>The Zen value representing the list.</returns>
-        internal static Zen<Map<TKey, TValue>> CreateZenDictConstant<TKey, TValue>(Map<TKey, TValue> value)
+        internal static Zen<Map<TKey, TValue>> CreateZenMapConstant<TKey, TValue>(Map<TKey, TValue> value)
         {
-            Zen<Map<TKey, TValue>> dict = ZenMapEmptyExpr<TKey, TValue>.Instance;
+            Zen<Map<TKey, TValue>> map = ZenMapEmptyExpr<TKey, TValue>.Instance;
             foreach (var elt in value.Values)
             {
                 ReportIfNullConversionError(elt, "element", typeof(Map<TKey, TValue>));
-                dict = ZenMapSetExpr<TKey, TValue>.Create(dict, elt.Key, elt.Value);
+                map = ZenMapSetExpr<TKey, TValue>.Create(map, elt.Key, elt.Value);
             }
 
-            return dict;
+            return map;
         }
 
         /// <summary>
@@ -937,9 +975,9 @@ namespace ZenLib
 
                 if (value is bool || value is byte || value is char || value is short || value is ushort ||
                     value is int  || value is uint || value is long || value is ulong || value is BigInteger ||
-                    value is Real || IsFixedIntegerType(type))
+                    value is Real || IsFixedIntegerType(type) || IsConstMapType(type))
                 {
-                    return ZenConstantExpr<T>.Create((dynamic)value);
+                    return ZenConstantExpr<T>.Create(value);
                 }
 
                 var typeArgs = type.GetGenericArgumentsCached();
@@ -966,7 +1004,7 @@ namespace ZenLib
                 {
                     var keyType = typeArgs[0];
                     var valueType = typeArgs[1];
-                    return CreateZenDictConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
+                    return CreateZenMapConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
                 }
 
                 // option type, we need this separate from classes/structs

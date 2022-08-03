@@ -135,6 +135,11 @@ namespace ZenLib.Solver
             } */
         }
 
+        public object VisitConstMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
         {
             // Contract.Assert(!valueExpr.IsFalse);

@@ -176,7 +176,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
         {
-            var x = Evaluate(expression.Element, parameter);
+            var x = Evaluate(expression.ElementExpr, parameter);
             var y = Evaluate(expression.Expr, parameter);
             return x.Union(y);
         }
@@ -201,7 +201,7 @@ namespace ZenLib.ModelChecking
         public InterleavingResult Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
             var _ = Evaluate(expression.ListExpr, parameter);
-            var e = Evaluate(expression.EmptyCase, parameter);
+            var e = Evaluate(expression.EmptyExpr, parameter);
             return e; // no easy way to evaluate cons case.
         }
 
@@ -227,7 +227,7 @@ namespace ZenLib.ModelChecking
         public InterleavingResult Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Dictionary<long, object> parameter)
         {
             var x = (InterleavingClass)Evaluate(expression.Expr, parameter);
-            var y = Evaluate(expression.FieldValue, parameter);
+            var y = Evaluate(expression.FieldExpr, parameter);
 
             var result = new InterleavingClass(x.Fields.SetItem(expression.FieldName, y));
             this.cache[expression] = result;
@@ -430,6 +430,30 @@ namespace ZenLib.ModelChecking
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey>(ZenMapCombineExpr<TKey> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        /// <summary>
+        /// Evaluate an expression.
+        /// </summary>
+        /// <param name="expression">The zen expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The interleaving result.</returns>
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+        }
+
+        /// <summary>
+        /// Evaluate an expression.
+        /// </summary>
+        /// <param name="expression">The zen expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The interleaving result.</returns>
+        [ExcludeFromCodeCoverage]
+        public InterleavingResult Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
         }

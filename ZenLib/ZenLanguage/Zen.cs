@@ -552,6 +552,11 @@ namespace ZenLib
                 return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
             }
 
+            if (ReflectionUtilities.IsConstMapType(type))
+            {
+                throw new ZenException("Can not use ConstMap type in equality.");
+            }
+
             if (ReflectionUtilities.IsFSeqType(type))
             {
                 var innerType = type.GetGenericArgumentsCached()[0];
@@ -1306,13 +1311,23 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The Zen value for an empty map.
+        /// The Zen value for an arbitrary map.
         /// </summary>
         /// <param name="name">An optional name for the expression.</param>
         /// <returns>Zen value.</returns>
         internal static Zen<Map<TKey, TValue>> ArbitraryMap<TKey, TValue>(string name = null)
         {
             return new ZenArbitraryExpr<Map<TKey, TValue>>(name);
+        }
+
+        /// <summary>
+        /// The Zen value for an arbitrary map.
+        /// </summary>
+        /// <param name="name">An optional name for the expression.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<ConstMap<TKey, TValue>> ArbitraryConstMap<TKey, TValue>(string name = null)
+        {
+            return new ZenArbitraryExpr<ConstMap<TKey, TValue>>(name);
         }
 
         /// <summary>
@@ -1357,6 +1372,29 @@ namespace ZenLib
         internal static Zen<Option<TValue>> MapGet<TKey, TValue>(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
             return ZenMapGetExpr<TKey, TValue>.Create(mapExpr, keyExpr);
+        }
+
+        /// <summary>
+        /// Update a map with a new value for a given key.
+        /// </summary>
+        /// <param name="mapExpr">The map expression.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<ConstMap<TKey, TValue>> ConstMapSet<TKey, TValue>(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
+        {
+            return ZenConstMapSetExpr<TKey, TValue>.Create(mapExpr, key, valueExpr);
+        }
+
+        /// <summary>
+        /// Get a value from a map.
+        /// </summary>
+        /// <param name="mapExpr">The map expression.</param>
+        /// <param name="key">The key.</param>
+        /// <returns>Zen value.</returns>
+        internal static Zen<TValue> ConstMapGet<TKey, TValue>(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
+        {
+            return ZenConstMapGetExpr<TKey, TValue>.Create(mapExpr, key);
         }
 
         /// <summary>

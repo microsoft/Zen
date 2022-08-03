@@ -106,7 +106,7 @@ namespace ZenLib.Generation
         public Unit Visit<T>(ZenListAddFrontExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
-            Compute(expression.Element, parameter);
+            Compute(expression.ElementExpr, parameter);
             return parameter;
         }
 
@@ -139,10 +139,23 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        public Unit Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Unit parameter)
+        {
+            Compute(expression.MapExpr, parameter);
+            Compute(expression.ValueExpr, parameter);
+            return parameter;
+        }
+
+        public Unit Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Unit parameter)
+        {
+            Compute(expression.MapExpr, parameter);
+            return parameter;
+        }
+
         public Unit Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
         {
             Compute(expression.ListExpr, parameter);
-            Compute(expression.EmptyCase, parameter);
+            Compute(expression.EmptyExpr, parameter);
             return parameter;
         }
 
@@ -223,7 +236,7 @@ namespace ZenLib.Generation
         public Unit Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
-            Compute(expression.FieldValue, parameter);
+            Compute(expression.FieldExpr, parameter);
             return parameter;
         }
 
