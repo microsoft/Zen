@@ -62,6 +62,31 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>The set of ConstMap variables.</returns>
+        public override void Visit<T>(ZenConstantExpr<T> expression)
+        {
+            var type = typeof(T);
+
+            if (type.IsGenericType && type.GetGenericTypeDefinitionCached() == typeof(ConstMap<,>))
+            {
+                if (!this.constants.TryGetValue(type, out var consts))
+                {
+                    consts = new HashSet<object>();
+                    this.constants.Add(type, consts);
+                }
+
+                dynamic value = expression.Value;
+                foreach (var kv in value.Values)
+                {
+                    consts.Add(kv.Key);
+                }
+            }
+        }
+
+        /// <summary>
         /// Add a constant to the constants.
         /// </summary>
         /// <param name="constant">The constant.</param>

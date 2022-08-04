@@ -4,7 +4,6 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
@@ -38,6 +37,13 @@ namespace ZenLib.ModelChecking
             }
 
             return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
+        {
+            throw new ZenUnreachableException();
         }
 
         internal override TReturn Accept<TParam, TReturn>(

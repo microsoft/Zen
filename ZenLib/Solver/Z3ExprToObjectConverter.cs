@@ -107,7 +107,6 @@ namespace ZenLib.Solver
                 var e1 = Convert(parameter.Args[0], dictionaryType);
                 var e2 = Convert(parameter.Args[1], dictionaryType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
-                Console.WriteLine($"{methodName} of {e1} and {e2}");
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }

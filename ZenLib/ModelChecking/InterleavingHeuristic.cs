@@ -383,7 +383,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -419,7 +419,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey>(ZenMapCombineExpr<TKey> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>
@@ -455,7 +455,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public InterleavingResult Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            throw new ZenException($"Invalid dictionary type used with Decision Diagram backend.");
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
         }
 
         /// <summary>

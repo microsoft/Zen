@@ -52,24 +52,20 @@ namespace ZenLib.Tests
         public void TestConstMapSetImplementation()
         {
             Assert.AreEqual(0, new ConstMap<int, int>().Count());
-            Assert.AreEqual(1, new ConstMap<int, int>().Set(1, 10).Delete(10).Count());
-            Assert.AreEqual(0, new ConstMap<int, int>().Set(1, 10).Delete(1).Count());
-            Assert.AreEqual(1, new ConstMap<int, int>().Set(1, 10).Set(10, 10).Delete(1).Count());
             Assert.AreEqual(10, new ConstMap<int, int>().Set(1, 10).Get(1));
             Assert.AreEqual(0, new ConstMap<int, int>().Set(1, 10).Get(2));
+            Assert.AreEqual(0, new ConstMap<int, int>().Set(1, 10).Set(1, 0).Count());
         }
 
-        /* /// <summary>
+        /// <summary>
         /// Test that some basic map equations hold.
         /// </summary>
         [TestMethod]
-        public void TestMapEquations()
+        public void TestConstMapEquations()
         {
-            CheckValid<Map<byte, byte>, byte, byte>((d, k, v) => d.Set(k, v).Delete(k) == d.Delete(k), runBdds: false);
-            CheckValid<Map<byte, byte>, byte, byte>((d, k, v) => d.Delete(k).Set(k, v) == d.Set(k, v), runBdds: false);
-            CheckValid<Map<byte, byte>, byte, byte>((d, k, v) => Implies(d.Get(k) == Option.Create(v), d.Set(k, v) == d), runBdds: false);
-            CheckValid<Map<byte, byte>, byte, byte>((d, k, v) => Implies(d.Get(k).IsNone(), d.Delete(k) == d), runBdds: false);
-        } */
+            CheckValid<ConstMap<int, int>, int>((m, v) => m.Set(1, v).Get(1) == v, runBdds: false);
+            CheckValid<ConstMap<int, int>, int, int>((m, v1, v2) => Zen.Implies(m.Get(2) == v2, m.Set(1, v1).Get(2) == v2), runBdds: false);
+        }
 
         /// <summary>
         /// Test that map evaluation works.
@@ -179,17 +175,6 @@ namespace ZenLib.Tests
 
             Assert.IsTrue(solution.IsSatisfiable());
             Assert.AreEqual(false, solution.Get(b));
-        }
-
-        /// <summary>
-        /// Test map equality.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestConstMapEquals()
-        {
-            var cm = Zen.Symbolic<ConstMap<int, int>>();
-            (cm == new ConstMap<int, int>()).Solve();
         }
 
         /// <summary>
@@ -343,8 +328,146 @@ namespace ZenLib.Tests
             Assert.AreEqual(5, result.Item2.Get(4));
         }
 
-        /*
-            can't use with lists?
-         */
+        /// <summary>
+        /// Test maps work as keys.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapInKey()
+        {
+            var x = Zen.Symbolic<ConstMap<ConstMap<int, int>, int>>();
+            var cm1 = new ConstMap<int, int>();
+            var solution = (x.Get(cm1) == 2).Solve();
+
+            var result = solution.Get(x);
+            Assert.AreEqual(2, result.Get(cm1));
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality1()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = (x == new ConstMap<int, int>().Set(0, 1)).Solve();
+            var result = solution.Get(x);
+            Assert.IsTrue(result.Count() == 1);
+            Assert.IsTrue(result.Get(0) == 1);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality2()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = (x == new ConstMap<int, int>()).Solve();
+            var result = solution.Get(x);
+            Assert.IsTrue(result.Count() == 0);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality3()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = Zen.And(x.Set(1, 10) == new ConstMap<int, int>()).Solve();
+            Assert.IsFalse(solution.IsSatisfiable());
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality4()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = Zen.And(x.Set(1, 10) == new ConstMap<int, int>().Set(1, 10).Set(2, 20)).Solve();
+            var result = solution.Get(x);
+            Assert.AreEqual(20, result.Get(2));
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality5()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = (x != new ConstMap<int, int>().Set(0, 1)).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            var result = solution.Get(x);
+            Assert.IsTrue(result.Get(0) != 1);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestConstMapEquality6()
+        {
+            var x = Zen.Symbolic<ConstMap<int, ConstMap<string, bool>>>();
+            (x == new ConstMap<int, ConstMap<string, bool>>().Set(1, new ConstMap<string, bool>().Set("a", true))).Solve();
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality7()
+        {
+            var x = Zen.Symbolic<ConstMap<int, ConstMap<int, int>>>();
+            var y = Zen.Symbolic<ConstMap<int, ConstMap<int, int>>>();
+            var solution = Zen.And(x.Get(0).Get(0) == 99, x == y).Solve();
+            Assert.IsTrue(solution.Get(x).Get(0).Get(0) == 99);
+            Assert.IsTrue(solution.Get(y).Get(0).Get(0) == 99);
+        }
+
+        /// <summary>
+        /// Test maps work with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapStringValue()
+        {
+            var x = Zen.Symbolic<ConstMap<int, string>>();
+            var solution = (x.Get(1) == "hi").Solve();
+            var result = solution.Get(x);
+            Assert.AreEqual("hi", result.Get(1));
+        }
+
+        /// <summary>
+        /// Test maps work with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapMultiple()
+        {
+            var x = Zen.Symbolic<ConstMap<int, string>>();
+            var y = Zen.Symbolic<ConstMap<int, string>>();
+            var solution = Zen.And(x.Get(1) == "hi", x.Get(1) == y.Get(1)).Solve();
+            Assert.AreEqual("hi", solution.Get(x).Get(1));
+            Assert.AreEqual("hi", solution.Get(y).Get(1));
+        }
+
+        /// <summary>
+        /// Test maps work with lists.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapWithLists()
+        {
+            var x = Zen.Symbolic<ConstMap<int, FSeq<int>>>();
+            var y = Zen.Symbolic<ConstMap<int, FSeq<int>>>();
+            var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == 2).Solve();
+            Console.WriteLine(solution.Get(x));
+            Console.WriteLine(solution.Get(y));
+
+            Assert.IsTrue(solution.Get(x).Get(1).Values.Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(1).Values.Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(2).Values.Count == 2);
+        }
     }
 }

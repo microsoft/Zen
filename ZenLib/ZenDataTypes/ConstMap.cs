@@ -12,10 +12,18 @@ namespace ZenLib
     using static ZenLib.Zen;
 
     /// <summary>
-    /// A class representing a const map.
+    /// A total map whose keys can only refer to C# constants rather than Zen values.
+    /// this maps every key to some value, and the default value for every key is the
+    /// default for that type (e.g., 0 for int, false for bool). Because these are total
+    /// maps, there is no notion of deleting an element or an empty map.
     /// </summary>
     public class ConstMap<TKey, TValue> : IEquatable<ConstMap<TKey, TValue>>
     {
+        /// <summary>
+        /// The default value of the given type.
+        /// </summary>
+        private static TValue defaultValue = ReflectionUtilities.GetDefaultValue<TValue>();
+
         /// <summary>
         /// Gets the underlying values of the map.
         /// </summary>
@@ -39,7 +47,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The number of elements in the map.
+        /// The number of non-default elements in the map.
         /// </summary>
         public int Count() { return this.Values.Count; }
 
@@ -51,27 +59,8 @@ namespace ZenLib
         public ConstMap<TKey, TValue> Set(TKey key, TValue value)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new ConstMap<TKey, TValue>(d.SetItem(key, value));
-        }
-
-        /// <summary>
-        /// Delete a key from the Map.
-        /// </summary>
-        /// <param name="key">The key to add.</param>
-        public ConstMap<TKey, TValue> Delete(TKey key)
-        {
-            var d = (ImmutableDictionary<TKey, TValue>)this.Values;
-            return new ConstMap<TKey, TValue>(d.Remove(key));
-        }
-
-        /// <summary>
-        /// Check if the Map contains the key.
-        /// </summary>
-        /// <param name="key">The given key.</param>
-        /// <returns>True or false.</returns>
-        public bool ContainsKey(TKey key)
-        {
-            return this.Values.ContainsKey(key);
+            d = value.Equals(defaultValue) ? d.Remove(key) : d.SetItem(key, value);
+            return new ConstMap<TKey, TValue>(d);
         }
 
         /// <summary>
@@ -85,18 +74,22 @@ namespace ZenLib
             {
                 return value;
             }
-
-            return ReflectionUtilities.GetDefaultValue<TValue>();
+            else
+            {
+                return defaultValue;
+            }
         }
 
         /// <summary>
-        /// Convert the dict to a string.
+        /// Convert the map to a string.
         /// </summary>
         /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "{" + string.Join(", ", this.Values.Select(kv => $"{kv.Key} => {kv.Value}")) + "}";
+            var strings = this.Values.Select(kv => $"{kv.Key} => {kv.Value}").ToList();
+            strings.Add("_ => " + defaultValue.ToString());
+            return "{" + string.Join(", ", strings) + "}";
         }
 
         /// <summary>

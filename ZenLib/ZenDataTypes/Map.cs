@@ -12,7 +12,9 @@ namespace ZenLib
     using static ZenLib.Zen;
 
     /// <summary>
-    /// A class representing an arbitrary sized map.
+    /// A class representing a map from keys to values that is supported by Zen.
+    /// This class is handled symbolically using the SMT theory of arrays.
+    /// When the keys to the map are constants, take a look at the <see cref="ConstMap{TKey, TValue}"/> class.
     /// </summary>
     public class Map<TKey, TValue> : IEquatable<Map<TKey, TValue>>
     {

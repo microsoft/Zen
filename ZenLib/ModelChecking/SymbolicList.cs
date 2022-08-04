@@ -47,6 +47,13 @@ namespace ZenLib.ModelChecking
             return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
+        [ExcludeFromCodeCoverage]
+        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
+        {
+            throw new ZenUnreachableException();
+        }
+
         /// <summary>
         /// Merge two groups of guarded lists together.
         /// </summary>

@@ -188,7 +188,11 @@ namespace ZenLib.ModelChecking
             }
             else if (ReflectionUtilities.IsConstMapType(type))
             {
-                var constants = this.mapConstants[type];
+                if (!this.mapConstants.TryGetValue(type, out var constants))
+                {
+                    throw new ZenException("Unsuppoted const map operation detected");
+                }
+
                 var valueType = type.GetGenericArgumentsCached()[1];
                 var arbitraryMethod = typeof(Zen).GetMethod("Symbolic").MakeGenericMethod(valueType);
 
@@ -506,49 +510,46 @@ namespace ZenLib.ModelChecking
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
+            return Equals(typeof(T), e1, e2, parameter);
+        }
 
-            if (e1 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> b1 &&
-                e2 is SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> b2)
+        public SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Equals(
+            Type type,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value1,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value2,
+            SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        {
+            if (value1 is SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> cm1 &&
+                value2 is SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> cm2)
             {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Iff(b1.Value, b2.Value));
-            }
-            else if (e1 is SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> c1 &&
-                     e2 is SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> c2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(c1.Value, c2.Value));
-            }
-            else if (e1 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> s1 &&
-                     e2 is SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> s2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(s1.Value, s2.Value));
-            }
-            else if (e1 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> bi1 &&
-                     e2 is SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> bi2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(bi1.Value, bi2.Value));
-            }
-            else if (e1 is SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> di1 &&
-                     e2 is SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> di2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(di1.Value, di2.Value));
-            }
-            else if (e1 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> i1 &&
-                     e2 is SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> i2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(i1.Value, i2.Value));
-            }
-            else if (e1 is SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> r1 &&
-                     e2 is SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> r2)
-            {
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(r1.Value, r2.Value));
+                var keys1 = new HashSet<object>(cm1.Value.Keys);
+                var keys2 = new HashSet<object>(cm2.Value.Keys);
+                keys1.UnionWith(keys2);
+                var result = this.Solver.True();
+                object deflt = null;
+
+                foreach (var key in keys1)
+                {
+                    if (!cm1.Value.TryGetValue(key, out var v1))
+                    {
+                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), new Unit());
+                        v1 = Evaluate((dynamic)deflt, parameter);
+                    }
+
+                    if (!cm2.Value.TryGetValue(key, out var v2))
+                    {
+                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), new Unit());
+                        v2 = Evaluate((dynamic)deflt, parameter);
+                    }
+
+                    result = this.Solver.And(result, Equals(type, v1, v2, parameter).Value);
+                }
+
+                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
             }
             else
             {
-                Contract.Assert(e1 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>);
-                Contract.Assert(e2 is SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>);
-                var seq1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e1;
-                var seq2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)e2;
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(seq1.Value, seq2.Value));
+                return value1.Eq(value2);
             }
         }
 

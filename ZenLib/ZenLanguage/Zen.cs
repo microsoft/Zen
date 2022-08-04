@@ -553,14 +553,10 @@ namespace ZenLib
                 type == ReflectionUtilities.StringType ||
                 ReflectionUtilities.IsArithmeticType(type) ||
                 ReflectionUtilities.IsMapType(type) ||
+                ReflectionUtilities.IsConstMapType(type) ||
                 ReflectionUtilities.IsSeqType(type))
             {
                 return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
-            }
-
-            if (ReflectionUtilities.IsConstMapType(type))
-            {
-                throw new ZenException("Can not use ConstMap type in equality.");
             }
 
             if (ReflectionUtilities.IsFSeqType(type))
