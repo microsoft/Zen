@@ -44,6 +44,12 @@ namespace ZenLib
         internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
 
         /// <summary>
+        /// Accept a visitor for the ZenExpr object.
+        /// </summary>
+        /// <returns>A value of the return type.</returns>
+        internal abstract void Accept(ZenExprActionVisitor visitor);
+
+        /// <summary>
         /// Format an expression to be more readable.
         /// </summary>
         /// <returns></returns>

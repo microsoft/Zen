@@ -46,7 +46,7 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// The map constants for the ConstMap type.
         /// </summary>
-        private Dictionary<object, ImmutableHashSet<object>> mapConstants;
+        private Dictionary<Type, ISet<object>> mapConstants;
 
         /// <summary>
         /// Cache of results to avoid the cost of common subexpressions.
@@ -69,7 +69,8 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Compute<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            this.mapConstants = new ConstantMapKeyVisitor().Compute(expression, parameter.ArgumentsToExpr);
+            var constantMapKeyVisitor = new ConstantMapKeyVisitor(parameter.ArgumentsToExpr);
+            this.mapConstants = constantMapKeyVisitor.Compute(expression);
             return Evaluate(expression, parameter);
         }
 
@@ -187,7 +188,7 @@ namespace ZenLib.ModelChecking
             }
             else if (ReflectionUtilities.IsConstMapType(type))
             {
-                var constants = this.mapConstants[expression];
+                var constants = this.mapConstants[type];
                 var valueType = type.GetGenericArgumentsCached()[1];
                 var arbitraryMethod = typeof(Zen).GetMethod("Symbolic").MakeGenericMethod(valueType);
 

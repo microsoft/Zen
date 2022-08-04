@@ -87,9 +87,10 @@ namespace ZenLib.Solver
             return SolverZ3.Context.MkArraySort(keySort, valueSort);
         }
 
+        [ExcludeFromCodeCoverage]
         public Sort VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
-            throw new NotImplementedException();
+            throw new ZenException("Can not use a const map in another map.");
         }
 
         public Sort VisitFixedInteger(Type intType, Unit parameter)

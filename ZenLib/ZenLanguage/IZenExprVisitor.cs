@@ -12,7 +12,7 @@ namespace ZenLib
     internal interface IZenExprVisitor<TParam, TReturn>
     {
         /// <summary>
-        /// Visit an AndExpr.
+        /// Visit a LogicalBinopExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>

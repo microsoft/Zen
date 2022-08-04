@@ -92,5 +92,14 @@ namespace ZenLib
         {
             return visitor.Visit(this, parameter);
         }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

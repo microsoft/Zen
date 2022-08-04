@@ -151,6 +151,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
         /// A logical binary operation.
         /// </summary>
         internal enum LogicalOp
