@@ -5,11 +5,13 @@
 namespace ZenLib
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <summary>
     /// Visitor interface for ZenExpr that performs side effects.
     /// </summary>
+    [ExcludeFromCodeCoverage] // methods overridden
     internal abstract class ZenExprActionVisitor
     {
         /// <summary>

@@ -434,7 +434,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            return exprs.Aggregate(And);
+            return And((IEnumerable<Zen<bool>>)exprs);
         }
 
         /// <summary>
@@ -458,7 +458,7 @@ namespace ZenLib
         {
             CommonUtilities.ValidateNotNull(exprs);
 
-            return exprs.Aggregate(Or);
+            return Or((IEnumerable<Zen<bool>>)exprs);
         }
 
         /// <summary>

@@ -59,9 +59,10 @@ namespace ZenLib.Solver
             return new SymbolicMap<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(this.solver, (ArrayExpr)parameter);
         }
 
+        [ExcludeFromCodeCoverage]
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> VisitConstMap(Type mapType, Type keyType, Type valueType, Expr parameter)
         {
-            throw new NotImplementedException();
+            throw new ZenException("Invalid use of constant map in map or set type");
         }
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> VisitFixedInteger(Type intType, Expr parameter)

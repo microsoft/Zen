@@ -46,6 +46,7 @@ namespace ZenLib.ModelChecking
             throw new ZenUnreachableException();
         }
 
+        [ExcludeFromCodeCoverage]
         internal override TReturn Accept<TParam, TReturn>(
             ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
             TParam parameter)

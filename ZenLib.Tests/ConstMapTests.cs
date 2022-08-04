@@ -46,15 +46,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test map symbolic evaluation with delete.
+        /// Test map implementation.
         /// </summary>
         [TestMethod]
-        public void TestConstMapSetImplementation()
+        public void TestConstMapImplementation()
         {
             Assert.AreEqual(0, new ConstMap<int, int>().Count());
             Assert.AreEqual(10, new ConstMap<int, int>().Set(1, 10).Get(1));
             Assert.AreEqual(0, new ConstMap<int, int>().Set(1, 10).Get(2));
             Assert.AreEqual(0, new ConstMap<int, int>().Set(1, 10).Set(1, 0).Count());
+            Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) == new ConstMap<int, int>().Set(1, 2));
+            Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) != new ConstMap<int, int>().Set(1, 3));
+            Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) != new ConstMap<int, int>());
         }
 
         /// <summary>
@@ -426,6 +429,17 @@ namespace ZenLib.Tests
             var solution = Zen.And(x.Get(0).Get(0) == 99, x == y).Solve();
             Assert.IsTrue(solution.Get(x).Get(0).Get(0) == 99);
             Assert.IsTrue(solution.Get(y).Get(0).Get(0) == 99);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality8()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var solution = (new ConstMap<int, int>().Set(0, 1) == x.Set(3, 4).Set(1, 2)).Solve();
+            Assert.IsFalse(solution.IsSatisfiable());
         }
 
         /// <summary>
