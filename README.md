@@ -23,6 +23,7 @@ Zen is a research library that provides high-level abstractions in .NET to make 
   - [Real Values](#real-values)
   - [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
   - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
+  - [Constant Sets and Maps](#constant-sets-and-maps)
   - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
   - [Custom classes and structs](#custom-classes-and-structs)
   - [Enumerated values](#enumerated-values)
@@ -284,6 +285,8 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Real` | arbitrary precision rational number | :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `ConstMap<T1, T2>` | maps of constant keys of type `T1` to values of type `T2`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `ConstSet<T>` | sets of constants of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 
@@ -404,6 +407,35 @@ var c3 = Implies(s == "c", s3.Add(s) == s2);
 var c4 = s4 == s1.Union(s2);
 var solution = And(c1, c2, c3, c4).Solve(); // s = "a", s1 = {b, a}, s2 = {b}, s3 = {}, s4 = {b, a}
 ```
+
+<a name="constant-sets-maps"></a>
+## Constant Sets and Maps
+
+Arbitrary sets and maps described above are compiled to the SMT solver theory of Arrays. While this theory is quite general, it has known performance limitations, particularly for sets/maps that contain many elements. As a lightweight alternative, Zen provides the `ConstMap<T1, T2>` and `ConstSet<T>` classes that offer similar APIs but with the restriction that any maps keys or set elements must be C# constant values and are not themselves arbitrary Zen expressions. Zen will compile these sets and maps by expanding fresh variables for all possible constants used by the user for these types, which can lead to an efficient encoding.
+
+Constant maps are useful for managing a finite number of unknown variables that should be indexed to some data (e.g., a symbolic boolean variable for every edge in a C# graph).
+
+`ConstMap<T1, T2>` represents a total map from keys of type `T1` to values of type `T2`. When a key is not explicitly added to the map, the resulting value will be the Zen default value for the type `T2` (e.g., `0` for integers, `false` for booleans). `ConstSet<T>` is simply implemented as a `ConstMap<T, bool>` that says for each key, if the element is in the set. Any example use is shown below:
+
+
+```csharp
+var x = Symbolic<int>();
+var m1 = Symbolic<ConstMap<string, int>>();
+var m2 = Symbolic<ConstMap<string, int>>();
+
+var c1 = m1.Get("a") == Zen.If(x < 10, x + 1, x + 2);
+var c2 = m2 == m1.Set("b", x);
+var solution = And(c1, c2).Solve(); // x = 0, m1 = m2 = {"a" => 1, _ => 0}
+```
+
+Constant maps and sets have several limitations:
+* `T1` and `T2` are allowed to be any supported Zen types, including finitized types like `FSeq` or `FBag`.
+* Equality may fail at runtime for nested maps (e.g., `ConstMap<int, ConstMap<int, int>>`). This can often be avoided by simply using the simpler type `ConstMap<(int, int), int>`. This may be handled in the future.
+* Inequality may not always give the expected result, as the constant maps do not have a canonical representation.
+* They can not be used as values in the `Map`, `Set`, or `Seq` types at the moment.
+* You can not use them in recursive `FSeq.Case` definitions (e.g., see the sorting example from earlier).
+* They do not work with the BDD backend currently.
+
 
 <a name="strings-and-sequences"></a>
 ## Sequences, Strings, and Regular Expressions

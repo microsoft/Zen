@@ -13,7 +13,7 @@ namespace ZenLib.Tests
     using static ZenLib.Zen;
 
     /// <summary>
-    /// Tests for the Zen dictionary type.
+    /// Tests for the Zen const map type.
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
@@ -23,7 +23,7 @@ namespace ZenLib.Tests
         /// Test map evaluation with set.
         /// </summary>
         [TestMethod]
-        public void TestConstMapSet()
+        public void TestConstMapEvaluation()
         {
             var zf = new ZenFunction<ConstMap<int, int>, ConstMap<int, int>>(d => d.Set(10, 1));
 
@@ -58,6 +58,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) == new ConstMap<int, int>().Set(1, 2));
             Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) != new ConstMap<int, int>().Set(1, 3));
             Assert.IsTrue(new ConstMap<int, int>().Set(1, 2) != new ConstMap<int, int>());
+            Assert.IsFalse(new ConstMap<int, int>().Equals(new object()));
         }
 
         /// <summary>

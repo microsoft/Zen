@@ -19,10 +19,65 @@ namespace ZenLibBench
         {
             ZenSettings.UseLargeStack = true;
 
+            var x = Zen.Symbolic<int>();
+            var m1 = Zen.Symbolic<ConstMap<string, int>>();
+            var m2 = Zen.Symbolic<ConstMap<string, int>>();
+
+            var c1 = m1.Get("a") == Zen.If(x < 10, x + 1, x + 2);
+            var c2 = m2 == m1.Set("b", x);
+            var solution = Zen.And(c1, c2).Solve();
+            Console.WriteLine(solution.Get(x));
+            Console.WriteLine(solution.Get(m1));
+            Console.WriteLine(solution.Get(m2));
+
+            // BenchmarkSets();
             // BenchmarkComparisons();
             // BenchmarkTransformers();
             // BenchmarkTransformerCache();
             // BenchmarkAllocation();
+        }
+
+        private static void BenchmarkSets()
+        {
+            Benchmark("BenchmarkSets", 3, () =>
+            {
+                var s = Zen.Symbolic<Set<string>>();
+
+                for (int i = 0; i < 50; i++)
+                {
+                    s = s.Add(i.ToString());
+                }
+
+                for (int i = 0; i < 50; i++)
+                {
+                    s = s.Delete(i.ToString());
+                }
+
+                (s == Set.Empty<string>()).Solve();
+            });
+
+            Benchmark("BenchmarkConstSets", 10, () =>
+            {
+                var s = Zen.Symbolic<ConstSet<string>>();
+
+                for (int i = 0; i < 50; i++)
+                {
+                    s = s.Add(i.ToString());
+                }
+
+                for (int i = 0; i < 50; i++)
+                {
+                    s = s.Delete(i.ToString());
+                }
+
+                var acc = Zen.False();
+                for (int i = 0; i < 50; i++)
+                {
+                    acc = Zen.Or(acc, s.Contains(i.ToString()));
+                }
+
+                acc.Solve();
+            });
         }
 
         private static void BenchmarkComparisons()
