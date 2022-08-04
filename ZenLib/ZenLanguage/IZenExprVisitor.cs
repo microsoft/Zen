@@ -12,7 +12,7 @@ namespace ZenLib
     internal interface IZenExprVisitor<TParam, TReturn>
     {
         /// <summary>
-        /// Visit an AndExpr.
+        /// Visit a LogicalBinopExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
@@ -76,14 +76,6 @@ namespace ZenLib
         TReturn Visit<T>(ZenListEmptyExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a ListAddFrontExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -92,36 +84,60 @@ namespace ZenLib
         TReturn Visit<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictSetExpr.
+        /// Visit a MapEmptyExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictDeleteExpr.
+        /// Visit a MapSetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictGetExpr.
+        /// Visit a MapDeleteExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a DictCombineExpr.
+        /// Visit a MapGetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        TReturn Visit<TKey>(ZenDictCombineExpr<TKey> expression, TParam parameter);
+        TReturn Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a MapCombineExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<TKey>(ZenMapCombineExpr<TKey> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ConstMapSetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, TParam parameter);
+
+        /// <summary>
+        /// Visit a ConstMapGetExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        TReturn Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListCaseExpr.

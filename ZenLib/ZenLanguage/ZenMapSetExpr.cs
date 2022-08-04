@@ -1,17 +1,16 @@
-﻿// <copyright file="ZenDictSetExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenMapSetExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a dictionary set expression.
+    /// Class representing a map set expression.
     /// </summary>
-    internal sealed class ZenDictSetExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
+    internal sealed class ZenMapSetExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
         /// <summary>
         /// Static creation function for hash consing.
@@ -20,77 +19,77 @@ namespace ZenLib
             Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
-        /// Hash cons table for ZenDictSetExpr.
+        /// Hash cons table for ZenMapSetExpr.
         /// </summary>
         private static HashConsTable<(long, long, long), Zen<Map<TKey, TValue>>> hashConsTable =
             new HashConsTable<(long, long, long), Zen<Map<TKey, TValue>>>();
 
         /// <summary>
-        /// Unroll a ZenDictSetExpr.
+        /// Unroll a ZenMapSetExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
         public override Zen<Map<TKey, TValue>> Unroll()
         {
-            return Create(this.DictExpr.Unroll(), this.KeyExpr.Unroll(), this.ValueExpr.Unroll());
+            return Create(this.MapExpr.Unroll(), this.KeyExpr.Unroll(), this.ValueExpr.Unroll());
         }
 
         /// <summary>
-        /// Simplify and create a new ZenDictSetExpr.
+        /// Simplify and create a new ZenMapSetExpr.
         /// </summary>
-        /// <param name="dict">The dictionary expr.</param>
+        /// <param name="map">The map expr.</param>
         /// <param name="key">The key expr.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<Map<TKey, TValue>> Simplify(Zen<Map<TKey, TValue>> dict, Zen<TKey> key, Zen<TValue> value)
+        private static Zen<Map<TKey, TValue>> Simplify(Zen<Map<TKey, TValue>> map, Zen<TKey> key, Zen<TValue> value)
         {
-            if (dict is ZenDictSetExpr<TKey, TValue> e1 && e1.KeyExpr.Equals(key))
+            if (map is ZenMapSetExpr<TKey, TValue> e1 && e1.KeyExpr.Equals(key))
             {
-                return Create(e1.DictExpr, key, value);
+                return Create(e1.MapExpr, key, value);
             }
 
-            if (dict is ZenDictDeleteExpr<TKey, TValue> e2 && e2.KeyExpr.Equals(key))
+            if (map is ZenMapDeleteExpr<TKey, TValue> e2 && e2.KeyExpr.Equals(key))
             {
-                return Create(e2.DictExpr, key, value);
+                return Create(e2.MapExpr, key, value);
             }
 
-            return new ZenDictSetExpr<TKey, TValue>(dict, key, value);
+            return new ZenMapSetExpr<TKey, TValue>(map, key, value);
         }
 
         /// <summary>
-        /// Create a new ZenDictSetExpr.
+        /// Create a new ZenMapSetExpr.
         /// </summary>
-        /// <param name="dictExpr">The dictionary expr.</param>
+        /// <param name="mapExpr">The map expr.</param>
         /// <param name="key">The key expr.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<Map<TKey, TValue>> Create(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> key, Zen<TValue> value)
+        public static Zen<Map<TKey, TValue>> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key, Zen<TValue> value)
         {
-            CommonUtilities.ValidateNotNull(dictExpr);
+            CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(key);
             CommonUtilities.ValidateNotNull(value);
 
-            var k = (dictExpr.Id, key.Id, value.Id);
-            hashConsTable.GetOrAdd(k, (dictExpr, key, value), createFunc, out var v);
+            var k = (mapExpr.Id, key.Id, value.Id);
+            hashConsTable.GetOrAdd(k, (mapExpr, key, value), createFunc, out var v);
             return v;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenDictSetExpr{TKey, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="ZenMapSetExpr{TKey, TValue}"/> class.
         /// </summary>
-        /// <param name="dictExpr">The dictionary expression.</param>
+        /// <param name="mapExpr">The map expression.</param>
         /// <param name="keyExpr">The key expression to add a value for.</param>
         /// <param name="valueExpr">The expression for the value.</param>
-        private ZenDictSetExpr(Zen<Map<TKey, TValue>> dictExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
+        private ZenMapSetExpr(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
-            this.DictExpr = dictExpr;
+            this.MapExpr = mapExpr;
             this.KeyExpr = keyExpr;
             this.ValueExpr = valueExpr;
         }
 
         /// <summary>
-        /// Gets the dictionary expr.
+        /// Gets the map expr.
         /// </summary>
-        public Zen<Map<TKey, TValue>> DictExpr { get; }
+        public Zen<Map<TKey, TValue>> MapExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.
@@ -109,7 +108,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Set({this.DictExpr}, {this.KeyExpr}, {this.ValueExpr})";
+            return $"Set({this.MapExpr}, {this.KeyExpr}, {this.ValueExpr})";
         }
 
         /// <summary>
@@ -123,6 +122,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

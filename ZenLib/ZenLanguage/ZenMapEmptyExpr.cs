@@ -1,21 +1,20 @@
-﻿// <copyright file="ZenDictEmptyExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenMapEmptyExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing an empty dictionary expression.
+    /// Class representing an empty map expression.
     /// </summary>
-    internal sealed class ZenDictEmptyExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
+    internal sealed class ZenMapEmptyExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
         /// <summary>
-        /// The empty dictionary instance.
+        /// The empty map instance.
         /// </summary>
-        public static ZenDictEmptyExpr<TKey, TValue> Instance = new ZenDictEmptyExpr<TKey, TValue>();
+        public static ZenMapEmptyExpr<TKey, TValue> Instance = new ZenMapEmptyExpr<TKey, TValue>();
 
         /// <summary>
         /// Unroll the expression.
@@ -27,9 +26,9 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenDictEmptyExpr{TKey, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="ZenMapEmptyExpr{TKey, TValue}"/> class.
         /// </summary>
-        private ZenDictEmptyExpr()
+        private ZenMapEmptyExpr()
         {
         }
 
@@ -54,6 +53,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

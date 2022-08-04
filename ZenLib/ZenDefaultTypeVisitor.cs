@@ -26,9 +26,14 @@ namespace ZenLib
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// Method for the creating an empty Zen list.
+        /// Method for the creating an empty Zen map.
         /// </summary>
-        private static MethodInfo emptyDictMethod = typeof(Zen).GetMethod("EmptyDict", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo emptyMapMethod = typeof(Zen).GetMethod("EmptyMap", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
+        /// Method for the creating a constant.
+        /// </summary>
+        private static MethodInfo constantMethod = typeof(Zen).GetMethod("Constant");
 
         /// <summary>
         /// Name of the function used to create an object via reflection.
@@ -67,10 +72,19 @@ namespace ZenLib
             return method.Invoke(null, CommonUtilities.EmptyArray);
         }
 
-        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Unit parameter)
+        public object VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
-            var method = emptyDictMethod.MakeGenericMethod(keyType, valueType);
+            var method = emptyMapMethod.MakeGenericMethod(keyType, valueType);
             return method.Invoke(null, CommonUtilities.EmptyArray);
+        }
+
+        public object VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        {
+            var emptyMap = typeof(ConstMap<,>)
+                .MakeGenericType(keyType, valueType)
+                .GetConstructor(new Type[] { })
+                .Invoke(CommonUtilities.EmptyArray);
+            return constantMethod.MakeGenericMethod(mapType).Invoke(null, new object[] { emptyMap });
         }
 
         public object VisitLong(Unit parameter)

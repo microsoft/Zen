@@ -29,7 +29,7 @@ namespace ZenLib
         /// <returns>The unrolled expr.</returns>
         public override Zen<FSeq<T>> Unroll()
         {
-            return Create(this.Expr.Unroll(), this.Element.Unroll());
+            return Create(this.Expr.Unroll(), this.ElementExpr.Unroll());
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ZenLib
         private ZenListAddFrontExpr(Zen<FSeq<T>> expr, Zen<T> element)
         {
             this.Expr = expr;
-            this.Element = element;
+            this.ElementExpr = element;
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the element to add.
         /// </summary>
-        public Zen<T> Element { get; }
+        public Zen<T> ElementExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -76,7 +76,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Cons({this.Element}, {this.Expr})";
+            return $"Cons({this.ElementExpr}, {this.Expr})";
         }
 
         /// <summary>
@@ -90,6 +90,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

@@ -45,9 +45,14 @@ namespace ZenLib.ModelChecking
         TReturn Visit(SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
 
         /// <summary>
-        /// Visit the symbolic dict type.
+        /// Visit the symbolic map type.
         /// </summary>
-        TReturn Visit(SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
+        TReturn Visit(SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
+
+        /// <summary>
+        /// Visit the symbolic const map type.
+        /// </summary>
+        TReturn Visit(SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
 
         /// <summary>
         /// Visit the symbolic list type.

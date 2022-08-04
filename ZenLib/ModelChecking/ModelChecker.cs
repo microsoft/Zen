@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using ZenLib.Interpretation;
     using ZenLib.Solver;
 
     /// <summary>
@@ -47,9 +48,9 @@ namespace ZenLib.ModelChecking
         {
             var symbolicEvaluator = new SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(solver);
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(arguments);
-            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Evaluate(expression, env);
+            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Compute(expression, env);
             var model = solver.Solve(symbolicResult.Value);
-            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator.ArbitraryVariables);
+            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator);
         }
 
         /// <summary>
@@ -69,8 +70,8 @@ namespace ZenLib.ModelChecking
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(arguments);
 
             // evaluate both the constraints and the objective.
-            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Evaluate(subjectTo, env);
-            var symbolicResultOpt = symbolicEvaluator.Evaluate(maximize, env);
+            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Compute(subjectTo, env);
+            var symbolicResultOpt = symbolicEvaluator.Compute(maximize, env);
 
             // get the model
             TModel model;
@@ -89,7 +90,7 @@ namespace ZenLib.ModelChecking
                 model = solver.Maximize(r.Value, symbolicResult.Value);
             }
 
-            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator.ArbitraryVariables);
+            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator);
         }
 
         /// <summary>
@@ -109,8 +110,8 @@ namespace ZenLib.ModelChecking
             var env = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(arguments);
 
             // evaluate both the constraints and the objective.
-            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Evaluate(subjectTo, env);
-            var symbolicResultOpt = symbolicEvaluator.Evaluate(maximize, env);
+            var symbolicResult = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)symbolicEvaluator.Compute(subjectTo, env);
+            var symbolicResultOpt = symbolicEvaluator.Compute(maximize, env);
 
             // get the model
             TModel model;
@@ -129,28 +130,55 @@ namespace ZenLib.ModelChecking
                 model = solver.Minimize(r.Value, symbolicResult.Value);
             }
 
-            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator.ArbitraryVariables);
+            return model == null ? null : GetCSharpAssignmentFromModel(model, symbolicEvaluator);
         }
 
         /// <summary>
         /// Get the C# assignment from the model assignment.
         /// </summary>
         /// <param name="model">The solver model.</param>
-        /// <param name="values">The symbolic values.</param>
+        /// <param name="evaluator">The evaluator and its state.</param>
         /// <returns>The C# assignment.</returns>
-        private Dictionary<object, object> GetCSharpAssignmentFromModel(TModel model, Dictionary<object, TVar> values)
+        private Dictionary<object, object> GetCSharpAssignmentFromModel(
+            TModel model,
+            SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluator)
         {
-            var arbitraryAssignment = new Dictionary<object, object>();
-            foreach (var kv in values)
+            // first get all the assignments to arbitrary variables.
+            var assignment = new Dictionary<object, object>();
+            foreach (var kv in evaluator.ArbitraryVariables)
             {
                 var expr = kv.Key;
                 var variable = kv.Value;
                 var type = expr.GetType().GetGenericArgumentsCached()[0];
                 var obj = this.solver.Get(model, variable, type);
-                arbitraryAssignment.Add(expr, obj);
+                assignment.Add(expr, obj);
             }
 
-            return arbitraryAssignment;
+            // next we need to interpret any ConstMap variables since they are
+            // expanded into new variables.
+            foreach (var kv in evaluator.ConstMapAssignment)
+            {
+                var arbitrary = kv.Key;
+                var constants = kv.Value;
+                var types = arbitrary.GetType().GetGenericArgumentsCached()[0].GetGenericArgumentsCached();
+                var keyType = types[0];
+                var valueType = types[1];
+                dynamic result = typeof(ConstMap<,>)
+                    .MakeGenericType(keyType, valueType)
+                    .GetConstructor(new Type[] { })
+                    .Invoke(CommonUtilities.EmptyArray);
+
+                foreach (var constant in constants)
+                {
+                    var environment = new ExpressionEvaluatorEnvironment(assignment);
+                    var interpreter = new ExpressionEvaluator(false);
+                    var ret = interpreter.Evaluate((dynamic)constant.Value, environment);
+                    result = result.Set((dynamic)constant.Key, (dynamic)ret);
+                    assignment[arbitrary] = result;
+                }
+            }
+
+            return assignment;
         }
     }
 }

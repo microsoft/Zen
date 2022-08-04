@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenDictUnionExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenMapCombineExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,9 +8,9 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Class representing a dictionary union expression.
+    /// Class representing a map union expression.
     /// </summary>
-    internal sealed class ZenDictCombineExpr<TKey> : Zen<Map<TKey, SetUnit>>
+    internal sealed class ZenMapCombineExpr<TKey> : Zen<Map<TKey, SetUnit>>
     {
         /// <summary>
         /// Static creation function for hash consing.
@@ -19,143 +19,143 @@ namespace ZenLib
             Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
-        /// Hash cons table for ZenDictUnionExpr.
+        /// Hash cons table for ZenMapCombineExpr.
         /// </summary>
         private static HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>> hashConsTable =
             new HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>>();
 
         /// <summary>
-        /// Unroll a ZenDictUnionExpr.
+        /// Unroll a ZenMapCombineExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
         public override Zen<Map<TKey, SetUnit>> Unroll()
         {
-            return Create(this.DictExpr1.Unroll(), this.DictExpr2.Unroll(), this.CombinationType);
+            return Create(this.MapExpr1.Unroll(), this.MapExpr2.Unroll(), this.CombinationType);
         }
 
         /// <summary>
-        /// Simplify and create a new ZenDictCombineExpr.
+        /// Simplify and create a new ZenMapCombineExpr.
         /// </summary>
-        /// <param name="dict1">The dictionary expr.</param>
-        /// <param name="dict2">The dictionary expr.</param>
+        /// <param name="map1">The map expr.</param>
+        /// <param name="map2">The map expr.</param>
         /// <param name="combinationType">The combination type.</param>
         /// <returns>The new Zen expr.</returns>
         private static Zen<Map<TKey, SetUnit>> Simplify(
-            Zen<Map<TKey, SetUnit>> dict1,
-            Zen<Map<TKey, SetUnit>> dict2,
+            Zen<Map<TKey, SetUnit>> map1,
+            Zen<Map<TKey, SetUnit>> map2,
             CombineType combinationType)
         {
             // a union a = a
             // a inter a = a
             // a minus a = {}
-            if (dict1.Equals(dict2))
+            if (map1.Equals(map2))
             {
-                return combinationType == CombineType.Difference ? Zen.EmptyDict<TKey, SetUnit>() : dict1;
+                return combinationType == CombineType.Difference ? Zen.EmptyMap<TKey, SetUnit>() : map1;
             }
 
             // {} union a == a
             // {} inter a == {}
             // {} minus a == {}
-            if (dict1 is ZenDictEmptyExpr<TKey, SetUnit>)
+            if (map1 is ZenMapEmptyExpr<TKey, SetUnit>)
             {
-                return combinationType == CombineType.Union ? dict2 : dict1;
+                return combinationType == CombineType.Union ? map2 : map1;
             }
 
             // a union {} == a
             // a inter {} == {}
             // a minus {} == a
-            if (dict2 is ZenDictEmptyExpr<TKey, SetUnit>)
+            if (map2 is ZenMapEmptyExpr<TKey, SetUnit>)
             {
-                return combinationType == CombineType.Intersect ? dict2 : dict1;
+                return combinationType == CombineType.Intersect ? map2 : map1;
             }
 
             // (a union b) union b == (a union b)
             // (a union b) union a == (a union b)
             // (a inter b) inter b == (a inter b)
             // (a inter b) inter a == (a inter b)
-            if (dict1 is ZenDictCombineExpr<TKey> e1 &&
+            if (map1 is ZenMapCombineExpr<TKey> e1 &&
                 e1.CombinationType == combinationType &&
                 combinationType != CombineType.Difference &&
-                (e1.DictExpr1.Equals(dict2) || e1.DictExpr2.Equals(dict2)))
+                (e1.MapExpr1.Equals(map2) || e1.MapExpr2.Equals(map2)))
             {
-                return dict1;
+                return map1;
             }
 
             // a union (a union b) == (a union b)
             // b union (a union b) == (a union b)
             // a inter (a inter b) == (a inter b)
             // b inter (a inter b) == (a inter b)
-            if (dict2 is ZenDictCombineExpr<TKey> e2 &&
+            if (map2 is ZenMapCombineExpr<TKey> e2 &&
                 e2.CombinationType == combinationType &&
                 combinationType != CombineType.Difference &&
-                (e2.DictExpr1.Equals(dict1) || e2.DictExpr2.Equals(dict1)))
+                (e2.MapExpr1.Equals(map1) || e2.MapExpr2.Equals(map1)))
             {
-                return dict2;
+                return map2;
             }
 
             // (a minus b) minus a == {}
             // (a minus b) minus b == a minus b
-            if (dict1 is ZenDictCombineExpr<TKey> e3 && combinationType == CombineType.Difference)
+            if (map1 is ZenMapCombineExpr<TKey> e3 && combinationType == CombineType.Difference)
             {
-                if (e3.CombinationType == CombineType.Difference && e3.DictExpr1.Equals(dict2))
+                if (e3.CombinationType == CombineType.Difference && e3.MapExpr1.Equals(map2))
                 {
-                    return Zen.EmptyDict<TKey, SetUnit>();
+                    return Zen.EmptyMap<TKey, SetUnit>();
                 }
 
-                if (e3.CombinationType == CombineType.Difference && e3.DictExpr2.Equals(dict2))
+                if (e3.CombinationType == CombineType.Difference && e3.MapExpr2.Equals(map2))
                 {
-                    return dict1;
+                    return map1;
                 }
             }
 
-            return new ZenDictCombineExpr<TKey>(dict1, dict2, combinationType);
+            return new ZenMapCombineExpr<TKey>(map1, map2, combinationType);
         }
 
         /// <summary>
-        /// Create a new ZenDictUnionExpr.
+        /// Create a new ZenMapCombineExpr.
         /// </summary>
-        /// <param name="dictExpr1">The first dictionary expr.</param>
-        /// <param name="dictExpr2">The second dictionary expr.</param>
+        /// <param name="mapExpr1">The first map expr.</param>
+        /// <param name="mapExpr2">The second map expr.</param>
         /// <param name="combineType">The combination type.</param>
         /// <returns>The new expr.</returns>
         public static Zen<Map<TKey, SetUnit>> Create(
-            Zen<Map<TKey, SetUnit>> dictExpr1,
-            Zen<Map<TKey, SetUnit>> dictExpr2,
+            Zen<Map<TKey, SetUnit>> mapExpr1,
+            Zen<Map<TKey, SetUnit>> mapExpr2,
             CombineType combineType)
         {
-            CommonUtilities.ValidateNotNull(dictExpr1);
-            CommonUtilities.ValidateNotNull(dictExpr2);
+            CommonUtilities.ValidateNotNull(mapExpr1);
+            CommonUtilities.ValidateNotNull(mapExpr2);
 
-            var k = (dictExpr1.Id, dictExpr2.Id, (int)combineType);
-            hashConsTable.GetOrAdd(k, (dictExpr1, dictExpr2, combineType), createFunc, out var v);
+            var k = (mapExpr1.Id, mapExpr2.Id, (int)combineType);
+            hashConsTable.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), createFunc, out var v);
             return v;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenDictCombineExpr{TKey}"/> class.
+        /// Initializes a new instance of the <see cref="ZenMapCombineExpr{TKey}"/> class.
         /// </summary>
-        /// <param name="dictExpr1">The first dictionary expression.</param>
-        /// <param name="dictExpr2">The second dictionary expression.</param>
+        /// <param name="mapExpr1">The first map expression.</param>
+        /// <param name="mapExpr2">The second map expression.</param>
         /// <param name="combineType">The combination type.</param>
-        private ZenDictCombineExpr(
-            Zen<Map<TKey, SetUnit>> dictExpr1,
-            Zen<Map<TKey, SetUnit>> dictExpr2,
+        private ZenMapCombineExpr(
+            Zen<Map<TKey, SetUnit>> mapExpr1,
+            Zen<Map<TKey, SetUnit>> mapExpr2,
             CombineType combineType)
         {
-            this.DictExpr1 = dictExpr1;
-            this.DictExpr2 = dictExpr2;
+            this.MapExpr1 = mapExpr1;
+            this.MapExpr2 = mapExpr2;
             this.CombinationType = combineType;
         }
 
         /// <summary>
-        /// Gets the first dictionary expr.
+        /// Gets the first map expr.
         /// </summary>
-        public Zen<Map<TKey, SetUnit>> DictExpr1 { get; }
+        public Zen<Map<TKey, SetUnit>> MapExpr1 { get; }
 
         /// <summary>
-        /// Gets the second dictionary expr.
+        /// Gets the second map expr.
         /// </summary>
-        public Zen<Map<TKey, SetUnit>> DictExpr2 { get; }
+        public Zen<Map<TKey, SetUnit>> MapExpr2 { get; }
 
         /// <summary>
         /// Gets the combination type.
@@ -172,11 +172,11 @@ namespace ZenLib
             switch (this.CombinationType)
             {
                 case CombineType.Union:
-                    return $"Union({this.DictExpr1}, {this.DictExpr2})";
+                    return $"Union({this.MapExpr1}, {this.MapExpr2})";
                 case CombineType.Intersect:
-                    return $"Intersect({this.DictExpr1}, {this.DictExpr2})";
+                    return $"Intersect({this.MapExpr1}, {this.MapExpr2})";
                 case CombineType.Difference:
-                    return $"Difference({this.DictExpr1}, {this.DictExpr2})";
+                    return $"Difference({this.MapExpr1}, {this.MapExpr2})";
                 default:
                     throw new ZenUnreachableException();
             }
@@ -193,6 +193,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         internal enum CombineType

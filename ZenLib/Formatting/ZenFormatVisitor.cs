@@ -269,7 +269,7 @@ namespace ZenLib.Generation
             return (new LazyString("[]"), true);
         }
 
-        public (LazyString, bool) Visit<TKey, TValue>(ZenDictEmptyExpr<TKey, TValue> expression, Parameter parameter)
+        public (LazyString, bool) Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Parameter parameter)
         {
             return (new LazyString("{}"), true);
         }
@@ -277,50 +277,65 @@ namespace ZenLib.Generation
         public (LazyString, bool) Visit<T>(ZenListAddFrontExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
-            var e1 = Format(expression.Element, indent);
+            var e1 = Format(expression.ElementExpr, indent);
             var e2 = Format(expression.Expr, indent);
             return FormatFunction(parameter, "Cons", e1, e2);
         }
 
-        public (LazyString, bool) Visit<TKey, TValue>(ZenDictSetExpr<TKey, TValue> expression, Parameter parameter)
+        public (LazyString, bool) Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
-            var e1 = Format(expression.DictExpr, indent);
+            var e1 = Format(expression.MapExpr, indent);
             var e2 = Format(expression.KeyExpr, indent);
             var e3 = Format(expression.ValueExpr, indent);
             return FormatFunction(parameter, "Set", e1, e2, e3);
         }
 
-        public (LazyString, bool) Visit<TKey, TValue>(ZenDictDeleteExpr<TKey, TValue> expression, Parameter parameter)
+        public (LazyString, bool) Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
-            var e1 = Format(expression.DictExpr, indent);
+            var e1 = Format(expression.MapExpr, indent);
             var e2 = Format(expression.KeyExpr, indent);
             return FormatFunction(parameter, "Delete", e1, e2);
         }
 
-        public (LazyString, bool) Visit<TKey, TValue>(ZenDictGetExpr<TKey, TValue> expression, Parameter parameter)
+        public (LazyString, bool) Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
-            var e1 = Format(expression.DictExpr, indent);
+            var e1 = Format(expression.MapExpr, indent);
             var e2 = Format(expression.KeyExpr, indent);
             return FormatFunction(parameter, "Get", e1, e2);
         }
 
-        public (LazyString, bool) Visit<TKey>(ZenDictCombineExpr<TKey> expression, Parameter parameter)
+        public (LazyString, bool) Visit<TKey>(ZenMapCombineExpr<TKey> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
-            var e1 = Format(expression.DictExpr1, indent);
-            var e2 = Format(expression.DictExpr2, indent);
+            var e1 = Format(expression.MapExpr1, indent);
+            var e2 = Format(expression.MapExpr2, indent);
             var op = expression.CombinationType.ToString();
             return FormatFunction(parameter, op, e1, e2);
+        }
+
+        public (LazyString, bool) Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Parameter parameter)
+        {
+            var indent = parameter.Indent();
+            var e1 = Format(expression.MapExpr, indent);
+            var e2 = Format(expression.ValueExpr, indent);
+            return FormatFunction(parameter, "Set", e1, (new LazyString(expression.Key.ToString()), true), e2);
+        }
+
+        public (LazyString, bool) Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Parameter parameter)
+        {
+            var indent = parameter.Indent();
+            var e1 = Format(expression.MapExpr, indent);
+            return FormatFunction(parameter, "Get", e1, (new LazyString(expression.Key.ToString()), true));
         }
 
         public (LazyString, bool) Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ListExpr, indent);
-            var e2 = Format(expression.EmptyCase, indent);
+            var e2 = Format(expression.EmptyExpr, indent);
             return FormatFunction(parameter, "Case", e1, e2, (new LazyString("<lambda>"), true));
         }
 
@@ -412,7 +427,7 @@ namespace ZenLib.Generation
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.Expr, indent);
-            var e3 = Format(expression.FieldValue, indent);
+            var e3 = Format(expression.FieldExpr, indent);
             return FormatFunction(parameter, "WithField", e1, (new LazyString(expression.FieldName), true), e3);
         }
 

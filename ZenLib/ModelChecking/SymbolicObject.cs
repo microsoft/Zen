@@ -41,6 +41,12 @@ namespace ZenLib.ModelChecking
             return visitor.Visit(this, parameter);
         }
 
+        [ExcludeFromCodeCoverage]
+        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
+        {
+            throw new ZenUnreachableException();
+        }
+
         /// <summary>
         /// Merge two symbolic integers together under a guard.
         /// </summary>

@@ -91,10 +91,16 @@ namespace ZenLib
         T VisitString(TParam parameter);
 
         /// <summary>
-        /// Visit the dictionary type.
+        /// Visit the map type.
         /// </summary>
         /// <returns>A value.</returns>
-        T VisitMap(Type dictionaryType, Type keyType, Type valueType, TParam parameter);
+        T VisitMap(Type mapType, Type keyType, Type valueType, TParam parameter);
+
+        /// <summary>
+        /// Visit the const map type.
+        /// </summary>
+        /// <returns>A value.</returns>
+        T VisitConstMap(Type mapType, Type keyType, Type valueType, TParam parameter);
 
         /// <summary>
         /// Visit the sequence type.

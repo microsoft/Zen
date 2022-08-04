@@ -70,16 +70,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Simplify And, Or with empty arguments.
-        /// </summary>
-        [TestMethod]
-        public void TestAndOrEmpty()
-        {
-            Assert.AreEqual(And(new Zen<bool>[] { }), True());
-            Assert.AreEqual(Or(new Zen<bool>[] { }), False());
-        }
-
-        /// <summary>
         /// Simplify or with constants.
         /// </summary>
         [TestMethod]
@@ -467,6 +457,16 @@ namespace ZenLib.Tests
             Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Get(10), Option.Create<int>(11));
             Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Set(10, 12), Map.Empty<int, int>().Set(10, 12));
             Assert.AreEqual(Map.Empty<int, int>().Set(10, 11).Delete(15).Set(15, 10), Map.Empty<int, int>().Set(10, 11).Set(15, 10));
+        }
+
+        /// <summary>
+        /// Test that const map simplification is working.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapSimplification()
+        {
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            Assert.AreEqual(x.Set(1, 2), x.Set(1, 3).Set(1, 2));
         }
 
         /// <summary>

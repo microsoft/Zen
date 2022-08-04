@@ -22,9 +22,14 @@ namespace ZenLib.ModelChecking
         private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// The method for creating the empty list at runtime.
+        /// The method for creating the empty map at runtime.
         /// </summary>
-        private static MethodInfo arbitraryDictMethod = typeof(Zen).GetMethod("ArbitraryDict", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo arbitraryMapMethod = typeof(Zen).GetMethod("ArbitraryMap", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
+        /// The method for creating the empty map at runtime.
+        /// </summary>
+        private static MethodInfo arbitraryConstMapMethod = typeof(Zen).GetMethod("ArbitraryConstMap", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
         /// The method for creating the empty seq at runtime.
@@ -118,9 +123,17 @@ namespace ZenLib.ModelChecking
             return list;
         }
 
-        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, ZenGenerationConfiguration parameter)
+        public object VisitMap(Type mapType, Type keyType, Type valueType, ZenGenerationConfiguration parameter)
         {
-            var method = arbitraryDictMethod.MakeGenericMethod(keyType, valueType);
+            var method = arbitraryMapMethod.MakeGenericMethod(keyType, valueType);
+            var e = method.Invoke(null, new object[] { parameter.Name });
+            this.ArbitraryExpressions.Add(e);
+            return e;
+        }
+
+        public object VisitConstMap(Type mapType, Type keyType, Type valueType, ZenGenerationConfiguration parameter)
+        {
+            var method = arbitraryConstMapMethod.MakeGenericMethod(keyType, valueType);
             var e = method.Invoke(null, new object[] { parameter.Name });
             this.ArbitraryExpressions.Add(e);
             return e;

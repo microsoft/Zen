@@ -1,4 +1,4 @@
-﻿// <copyright file="SymbolicDict.cs" company="Microsoft">
+﻿// <copyright file="SymbolicMap.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -10,9 +10,9 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Representation of a symbolic dictionary value.
     /// </summary>
-    internal class SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
+    internal class SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public SymbolicDict(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver, TArray value) : base(solver)
+        public SymbolicMap(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver, TArray value) : base(solver)
         {
             this.Value = value;
         }
@@ -23,9 +23,16 @@ namespace ZenLib.ModelChecking
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
         {
-            var o = (SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
+            var o = (SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
             var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicDict<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, value);
+            return new SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, value);
+        }
+
+        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
+        {
+            var o = (SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
+            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(this.Value, o.Value));
         }
 
         internal override TReturn Accept<TParam, TReturn>(

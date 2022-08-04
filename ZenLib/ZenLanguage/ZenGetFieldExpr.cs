@@ -46,7 +46,7 @@ namespace ZenLib
             if (type.GetGenericTypeDefinition() == typeof(ZenWithFieldExpr<,>))
             {
                 var fieldNameProperty = type.GetProperty("FieldName");
-                var fieldValueProperty = type.GetProperty("FieldValue");
+                var fieldValueProperty = type.GetProperty("FieldExpr");
                 var exprProperty = type.GetProperty("Expr");
 
                 return ((string)fieldNameProperty.GetValue(expr) == fieldName) ?
@@ -131,6 +131,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

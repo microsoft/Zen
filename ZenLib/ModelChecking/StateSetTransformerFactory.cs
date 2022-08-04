@@ -97,7 +97,7 @@ namespace ZenLib.ModelChecking
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(solver);
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(arguments);
-            var symbolicValue = symbolicEvaluator.Evaluate(newExpression, env);
+            var symbolicValue = symbolicEvaluator.Compute(newExpression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 
@@ -210,7 +210,7 @@ namespace ZenLib.ModelChecking
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(solver);
             var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(arguments);
-            var symbolicValue = symbolicEvaluator.Evaluate(expression, env);
+            var symbolicValue = symbolicEvaluator.Compute(expression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
 

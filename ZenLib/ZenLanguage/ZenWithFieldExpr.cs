@@ -28,7 +28,7 @@ namespace ZenLib
         /// <returns>The unrolled expr.</returns>
         public override Zen<T1> Unroll()
         {
-            return Create(this.Expr.Unroll(), this.FieldName, this.FieldValue.Unroll());
+            return Create(this.Expr.Unroll(), this.FieldName, this.FieldExpr.Unroll());
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace ZenLib
         {
             this.Expr = expr;
             this.FieldName = fieldName;
-            this.FieldValue = fieldValue;
+            this.FieldExpr = fieldValue;
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the field value to set.
         /// </summary>
-        public Zen<T2> FieldValue { get; }
+        public Zen<T2> FieldExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.
@@ -110,7 +110,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"({this.Expr} with {this.FieldName}={this.FieldValue})";
+            return $"({this.Expr} with {this.FieldName}={this.FieldExpr})";
         }
 
         /// <summary>
@@ -124,6 +124,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

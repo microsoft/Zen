@@ -107,7 +107,6 @@ namespace ZenLib.Solver
                 var e1 = Convert(parameter.Args[0], dictionaryType);
                 var e2 = Convert(parameter.Args[1], dictionaryType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
-                Console.WriteLine($"{methodName} of {e1} and {e2}");
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
@@ -133,6 +132,11 @@ namespace ZenLib.Solver
 
                 return dict;
             } */
+        }
+
+        public object VisitConstMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        {
+            throw new NotImplementedException();
         }
 
         private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)

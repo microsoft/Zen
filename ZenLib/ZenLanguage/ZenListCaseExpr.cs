@@ -5,7 +5,6 @@
 namespace ZenLib
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -19,7 +18,7 @@ namespace ZenLib
         /// <returns>The unrolled expression.</returns>
         public override Zen<TResult> Unroll()
         {
-            return Create(this.ListExpr.Unroll(), this.EmptyCase.Unroll(), this.ConsCase, true);
+            return Create(this.ListExpr.Unroll(), this.EmptyExpr.Unroll(), this.ConsCase, true);
         }
 
         /// <summary>
@@ -39,7 +38,7 @@ namespace ZenLib
 
             if (e is ZenListAddFrontExpr<T> l2)
             {
-                return consCase(l2.Element, l2.Expr);
+                return consCase(l2.ElementExpr, l2.Expr);
             }
 
             if (unroll && e is ZenIfExpr<FSeq<T>> l3)
@@ -85,7 +84,7 @@ namespace ZenLib
             Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
             this.ListExpr = listExpr;
-            this.EmptyCase = empty;
+            this.EmptyExpr = empty;
             this.ConsCase = cons;
         }
 
@@ -97,7 +96,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the list expr.
         /// </summary>
-        public Zen<TResult> EmptyCase { get; }
+        public Zen<TResult> EmptyExpr { get; }
 
         /// <summary>
         /// Gets the element to add.
@@ -111,7 +110,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"case({this.ListExpr}, {this.EmptyCase}, {this.ConsCase.GetHashCode()})";
+            return $"Case({this.ListExpr}, {this.EmptyExpr}, {this.ConsCase.GetHashCode()})";
         }
 
         /// <summary>
@@ -125,6 +124,15 @@ namespace ZenLib
         internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
             return visitor.Visit(this, parameter);
+        }
+
+        /// <summary>
+        /// Implementing the visitor interface.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        internal override void Accept(ZenExprActionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

@@ -12,7 +12,9 @@ namespace ZenLib
     using static ZenLib.Zen;
 
     /// <summary>
-    /// A class representing an arbitrary sized map.
+    /// A class representing a map from keys to values that is supported by Zen.
+    /// This class is handled symbolically using the SMT theory of arrays.
+    /// When the keys to the map are constants, take a look at the <see cref="ConstMap{TKey, TValue}"/> class.
     /// </summary>
     public class Map<TKey, TValue> : IEquatable<Map<TKey, TValue>>
     {
@@ -34,6 +36,10 @@ namespace ZenLib
             this.Values = ImmutableDictionary<TKey, TValue>.Empty;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="negated">Whether this map is negated for sets.</param>
         internal Map(bool negated)
         {
             if (negated)
@@ -45,11 +51,20 @@ namespace ZenLib
             this.Negated = negated;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="dictionary">The dictionary of initial values.</param>
         internal Map(ImmutableDictionary<TKey, TValue> dictionary)
         {
             this.Values = dictionary;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Map{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="dictionary">The dictionary of initial values.</param>
+        /// <param name="negated">Whether this map is negated for sets.</param>
         internal Map(ImmutableDictionary<TKey, TValue> dictionary, bool negated)
         {
             if (negated)
@@ -194,7 +209,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Map<TKey, TValue>> Empty<TKey, TValue>()
         {
-            return EmptyDict<TKey, TValue>();
+            return EmptyMap<TKey, TValue>();
         }
 
         /// <summary>
@@ -210,7 +225,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(keyExpr);
             CommonUtilities.ValidateNotNull(valueExpr);
 
-            return DictSet(mapExpr, keyExpr, valueExpr);
+            return MapSet(mapExpr, keyExpr, valueExpr);
         }
 
         /// <summary>
@@ -224,7 +239,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return DictDelete(mapExpr, keyExpr);
+            return MapDelete(mapExpr, keyExpr);
         }
 
         /// <summary>
@@ -238,7 +253,7 @@ namespace ZenLib
             CommonUtilities.ValidateNotNull(mapExpr);
             CommonUtilities.ValidateNotNull(keyExpr);
 
-            return DictGet(mapExpr, keyExpr);
+            return MapGet(mapExpr, keyExpr);
         }
 
         /// <summary>
