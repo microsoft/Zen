@@ -484,5 +484,41 @@ namespace ZenLib.Tests
             Assert.IsTrue(solution.Get(y).Get(1).Values.Contains(3));
             Assert.IsTrue(solution.Get(y).Get(2).Values.Count == 2);
         }
+
+        /// <summary>
+        /// Test maps work in objects.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapInObject()
+        {
+            var x = Zen.Symbolic<TestMapObject>();
+            var f = x.GetField<TestMapObject, ConstMap<int, bool>>("Edges");
+            var solution = f.Get(1).Solve();
+            Assert.IsTrue(solution.Get(x).Edges.Get(1));
+        }
+
+        /// <summary>
+        /// Test maps work do not work with lists.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestConstMapInList()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var i = l.Case(0, (hd, tl) => x.Get(1));
+            (i == 2).Solve();
+        }
+    }
+
+    /// <summary>
+    /// A test object.
+    /// </summary>
+    public class TestMapObject
+    {
+        /// <summary>
+        /// Some edge variables.
+        /// </summary>
+        public ConstMap<int, bool> Edges { get; set; }
     }
 }
