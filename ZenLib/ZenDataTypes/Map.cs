@@ -221,9 +221,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Map<TKey, TValue>> Set<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return MapSet(mapExpr, keyExpr, valueExpr);
         }
@@ -236,8 +236,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Map<TKey, TValue>> Delete<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             return MapDelete(mapExpr, keyExpr);
         }
@@ -250,8 +250,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             return MapGet(mapExpr, keyExpr);
         }
@@ -264,8 +264,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             return Get(mapExpr, keyExpr).IsSome();
         }

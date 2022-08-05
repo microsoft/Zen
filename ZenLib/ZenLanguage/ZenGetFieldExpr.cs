@@ -80,8 +80,8 @@ namespace ZenLib
         /// <returns></returns>
         public static Zen<T2> Create(Zen<T1> expr, string fieldName, bool unroll = false)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(fieldName);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(fieldName);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName, unroll);

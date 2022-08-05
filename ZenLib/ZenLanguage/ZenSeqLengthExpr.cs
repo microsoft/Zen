@@ -50,7 +50,7 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<BigInteger> Create(Zen<Seq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             hashConsTable.GetOrAdd(seqExpr.Id, seqExpr, createFunc, out var v);
             return v;

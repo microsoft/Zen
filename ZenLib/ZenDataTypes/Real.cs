@@ -117,7 +117,7 @@ namespace ZenLib
         /// <param name="denominator">The denominator.</param>
         public Real(BigInteger numerator, BigInteger denominator)
         {
-            CommonUtilities.ValidateIsTrue(denominator != BigInteger.Zero, "denominator can not be zero.");
+            Contract.Assert(denominator != BigInteger.Zero, "denominator can not be zero.");
 
             if (denominator < BigInteger.Zero)
             {

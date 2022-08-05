@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
@@ -17,7 +18,7 @@ namespace ZenLib
         /// <summary>
         /// The visited nodes.
         /// </summary>
-        private ISet<object> visited = new HashSet<object>();
+        private ISet<long> visited = new HashSet<long>();
 
         /// <summary>
         /// The argument mapping.
@@ -39,12 +40,12 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         public void VisitCached<T>(Zen<T> expression)
         {
-            if (this.visited.Contains(expression))
+            if (this.visited.Contains(expression.Id))
             {
                 return;
             }
 
-            this.visited.Add(expression);
+            this.visited.Add(expression.Id);
             expression.Accept(this);
         }
 

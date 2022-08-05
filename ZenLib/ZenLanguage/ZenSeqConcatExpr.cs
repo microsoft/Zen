@@ -62,8 +62,8 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<Seq<T>> Create(Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2)
         {
-            CommonUtilities.ValidateNotNull(seqExpr1);
-            CommonUtilities.ValidateNotNull(seqExpr2);
+            Contract.AssertNotNull(seqExpr1);
+            Contract.AssertNotNull(seqExpr2);
 
             var k = (seqExpr1.Id, seqExpr2.Id);
             hashConsTable.GetOrAdd(k, (seqExpr1, seqExpr2), createFunc, out var v);

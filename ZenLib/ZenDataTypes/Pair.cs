@@ -369,8 +369,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Pair<T1, T2>> Create<T1, T2>(Zen<T1> expr1, Zen<T2> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenCreateObjectExpr<Pair<T1, T2>>.Create(
                 ("Item1", expr1),
@@ -386,9 +386,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Pair<T1, T2, T3>> Create<T1, T2, T3>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.AssertNotNull(expr3);
 
             return ZenCreateObjectExpr<Pair<T1, T2, T3>>.Create(
                 ("Item1", expr1),
@@ -406,9 +406,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Pair<T1, T2, T3, T4>> Create<T1, T2, T3, T4>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.AssertNotNull(expr3);
 
             return ZenCreateObjectExpr<Pair<T1, T2, T3, T4>>.Create(
                 ("Item1", expr1),
@@ -428,9 +428,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Pair<T1, T2, T3, T4, T5>> Create<T1, T2, T3, T4, T5>(Zen<T1> expr1, Zen<T2> expr2, Zen<T3> expr3, Zen<T4> expr4, Zen<T5> expr5)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.AssertNotNull(expr3);
 
             return ZenCreateObjectExpr<Pair<T1, T2, T3, T4, T5>>.Create(
                 ("Item1", expr1),
@@ -447,7 +447,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2>(this Zen<Pair<T1, T2>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2>, T1>("Item1");
         }
@@ -459,7 +459,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3>, T1>("Item1");
         }
@@ -471,7 +471,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4>, T1>("Item1");
         }
@@ -483,7 +483,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> Item1<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4, T5>, T1>("Item1");
         }
@@ -495,7 +495,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2>(this Zen<Pair<T1, T2>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2>, T2>("Item2");
         }
@@ -507,7 +507,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3>, T2>("Item2");
         }
@@ -519,7 +519,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4>, T2>("Item2");
         }
@@ -531,7 +531,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Item2<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4, T5>, T2>("Item2");
         }
@@ -543,7 +543,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T3> Item3<T1, T2, T3>(this Zen<Pair<T1, T2, T3>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3>, T3>("Item3");
         }
@@ -555,7 +555,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T3> Item3<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4>, T3>("Item3");
         }
@@ -567,7 +567,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T3> Item3<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4, T5>, T3>("Item3");
         }
@@ -579,7 +579,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T4> Item4<T1, T2, T3, T4>(this Zen<Pair<T1, T2, T3, T4>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4>, T4>("Item4");
         }
@@ -591,7 +591,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T4> Item4<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4, T5>, T4>("Item4");
         }
@@ -603,7 +603,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T5> Item5<T1, T2, T3, T4, T5>(this Zen<Pair<T1, T2, T3, T4, T5>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Pair<T1, T2, T3, T4, T5>, T5>("Item5");
         }

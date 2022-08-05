@@ -158,89 +158,15 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Validate that an argument is true.
-        /// </summary>
-        /// <param name="obj">The argument.</param>
-        /// <param name="message">The error message.</param>
-        public static void ValidateIsTrue(bool obj, string message)
-        {
-            if (!obj)
-            {
-                throw new ZenException(message);
-            }
-        }
-
-        /// <summary>
-        /// Validate that a cast is valid.
+        /// Check if a cast is valid.
         /// </summary>
         /// <param name="sourceType">The source type.</param>
         /// <param name="targetType">The target type.</param>
-        public static void ValidateIsSafeCast(Type sourceType, Type targetType)
+        public static bool IsSafeCast(Type sourceType, Type targetType)
         {
-            if (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.UnicodeSequenceType)
-            {
-                return;
-            }
-
-            if (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.UnicodeSequenceType)
-            {
-                return;
-            }
-
-            if (ReflectionUtilities.IsFiniteIntegerType(sourceType) && ReflectionUtilities.IsFiniteIntegerType(targetType))
-            {
-                return;
-            }
-
-            throw new ZenException($"Invalid cast from type {sourceType} to type {targetType}.");
-        }
-
-        /// <summary>
-        /// Validate that an argument is not null.
-        /// </summary>
-        /// <param name="obj">The argument.</param>
-        public static void ValidateNotNull(object obj)
-        {
-            if (obj is null)
-            {
-                throw new ZenException($"Invalid null argument");
-            }
-        }
-
-        /// <summary>
-        /// Validate that a type is an arithmetic type.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void ValidateIsArithmeticType(Type type)
-        {
-            if (!ReflectionUtilities.IsArithmeticType(type))
-            {
-                throw new ZenException($"Invalid non-integer type {type} used.");
-            }
-        }
-
-        /// <summary>
-        /// Validate that a type is a finite integer type.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void ValidateIsFiniteIntegerType(Type type)
-        {
-            if (!ReflectionUtilities.IsFiniteIntegerType(type))
-            {
-                throw new ZenException($"Invalid non-finite-integer type {type} used.");
-            }
-        }
-
-        /// <summary>
-        /// Validate that a type is an integer type.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void ValidateIsCharType(Type type)
-        {
-            if (!ReflectionUtilities.IsFiniteIntegerType(type) && type != ReflectionUtilities.CharType && type != typeof(char))
-            {
-                throw new ZenException($"Invalid non-finite-integer type {type} used.");
-            }
+            return (sourceType == ReflectionUtilities.StringType && targetType == ReflectionUtilities.UnicodeSequenceType) ||
+                   (targetType == ReflectionUtilities.StringType && sourceType == ReflectionUtilities.UnicodeSequenceType) ||
+                   (ReflectionUtilities.IsFiniteIntegerType(sourceType) && ReflectionUtilities.IsFiniteIntegerType(targetType));
         }
 
         /// <summary>

@@ -65,9 +65,9 @@ namespace ZenLib
             Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons,
             bool unroll = false)
         {
-            CommonUtilities.ValidateNotNull(listExpr);
-            CommonUtilities.ValidateNotNull(empty);
-            CommonUtilities.ValidateNotNull(cons);
+            Contract.AssertNotNull(listExpr);
+            Contract.AssertNotNull(empty);
+            Contract.AssertNotNull(cons);
 
             return Simplify(listExpr, empty, cons, unroll);
         }

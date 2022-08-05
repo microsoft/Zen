@@ -467,6 +467,15 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Validate that a type is a regex char type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        public static bool IsRegexCharType(Type type)
+        {
+            return (IsFiniteIntegerType(type) || type == typeof(char));
+        }
+
+        /// <summary>
         /// Get the value of a field or property using reflection.
         /// </summary>
         /// <typeparam name="TObject">The object type.</typeparam>

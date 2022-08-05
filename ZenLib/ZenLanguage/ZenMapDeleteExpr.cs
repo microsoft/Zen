@@ -41,8 +41,8 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static ZenMapDeleteExpr<TKey, TValue> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(key);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(key);
 
             var k = (mapExpr.Id, key.Id);
             hashConsTable.GetOrAdd(k, (mapExpr, key), createFunc, out var v);

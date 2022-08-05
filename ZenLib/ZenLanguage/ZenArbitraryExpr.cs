@@ -17,7 +17,7 @@ namespace ZenLib
         /// </summary>
         public ZenArbitraryExpr(string name)
         {
-            CommonUtilities.ValidateNotNull(name);
+            Contract.AssertNotNull(name);
             this.Name = name;
         }
 

@@ -442,7 +442,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Unit<T>(Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(value);
 
             return ZenSeqUnitExpr<T>.Create(value);
         }
@@ -455,8 +455,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Concat<T>(this Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2)
         {
-            CommonUtilities.ValidateNotNull(seqExpr1);
-            CommonUtilities.ValidateNotNull(seqExpr2);
+            Contract.AssertNotNull(seqExpr1);
+            Contract.AssertNotNull(seqExpr2);
 
             return ZenSeqConcatExpr<T>.Create(seqExpr1, seqExpr2);
         }
@@ -469,8 +469,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Add<T>(this Zen<Seq<T>> seqExpr, Zen<T> expr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(expr);
 
             return ZenSeqConcatExpr<T>.Create(seqExpr, Seq.Unit(expr));
         }
@@ -482,7 +482,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Length<T>(this Zen<Seq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return ZenSeqLengthExpr<T>.Create(seqExpr);
         }
@@ -495,8 +495,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> At<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(indexExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(indexExpr);
 
             return ZenSeqAtExpr<T>.Create(seqExpr, indexExpr);
         }
@@ -508,7 +508,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsEmpty<T>(this Zen<Seq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Length() == BigInteger.Zero;
         }
@@ -521,8 +521,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<Seq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return seqExpr.Contains(Seq.Unit(valueExpr));
         }
@@ -535,8 +535,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
 
             return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.Contains);
         }
@@ -549,8 +549,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> StartsWith<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
 
             return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.HasPrefix);
         }
@@ -563,8 +563,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> EndsWith<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
 
             return ZenSeqContainsExpr<T>.Create(seqExpr, subseqExpr, SeqContainmentType.HasSuffix);
         }
@@ -577,8 +577,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> IndexOf<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
 
             return ZenSeqIndexOfExpr<T>.Create(seqExpr, subseqExpr, BigInteger.Zero);
         }
@@ -592,9 +592,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> IndexOf<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr, Zen<BigInteger> offset)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
-            CommonUtilities.ValidateNotNull(offset);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
+            Contract.AssertNotNull(offset);
 
             return ZenSeqIndexOfExpr<T>.Create(seqExpr, subseqExpr, offset);
         }
@@ -608,9 +608,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Slice<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> offset, Zen<BigInteger> length)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(offset);
-            CommonUtilities.ValidateNotNull(length);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(offset);
+            Contract.AssertNotNull(length);
 
             return ZenSeqSliceExpr<T>.Create(seqExpr, offset, length);
         }
@@ -624,9 +624,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> ReplaceFirst<T>(this Zen<Seq<T>> seqExpr, Zen<Seq<T>> subseqExpr, Zen<Seq<T>> replaceExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(subseqExpr);
-            CommonUtilities.ValidateNotNull(replaceExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(subseqExpr);
+            Contract.AssertNotNull(replaceExpr);
 
             return ZenSeqReplaceFirstExpr<T>.Create(seqExpr, subseqExpr, replaceExpr);
         }
@@ -639,8 +639,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> MatchesRegex<T>(this Zen<Seq<T>> seqExpr, Regex<T> regex)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(regex);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(regex);
 
             return ZenSeqRegexExpr<T>.Create(seqExpr, regex);
         }

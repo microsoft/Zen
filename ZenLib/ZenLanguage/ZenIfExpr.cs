@@ -83,9 +83,9 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         public static Zen<T> Create(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
-            CommonUtilities.ValidateNotNull(guardExpr);
-            CommonUtilities.ValidateNotNull(trueExpr);
-            CommonUtilities.ValidateNotNull(falseExpr);
+            Contract.AssertNotNull(guardExpr);
+            Contract.AssertNotNull(trueExpr);
+            Contract.AssertNotNull(falseExpr);
 
             var key = (guardExpr.Id, trueExpr.Id, falseExpr.Id);
             hashConsTable.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), createFunc, out var value);

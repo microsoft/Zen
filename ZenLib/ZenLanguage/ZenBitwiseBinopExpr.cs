@@ -76,9 +76,9 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<T> Create(Zen<T> expr1, Zen<T> expr2, BitwiseOp op)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(T)));
 
             var type = typeof(T);
             var key = (expr1.Id, expr2.Id, (int)op);

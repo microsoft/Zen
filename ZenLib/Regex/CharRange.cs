@@ -37,7 +37,7 @@ namespace ZenLib
         /// </summary>
         public CharRange()
         {
-            CommonUtilities.ValidateIsCharType(typeof(T));
+            Contract.Assert(ReflectionUtilities.IsRegexCharType(typeof(T)));
             Low = min;
             High = max;
         }
@@ -49,7 +49,7 @@ namespace ZenLib
         /// <param name="high">The high value of the range.</param>
         public CharRange(T low, T high)
         {
-            CommonUtilities.ValidateIsCharType(typeof(T));
+            Contract.Assert(ReflectionUtilities.IsRegexCharType(typeof(T)));
             Low = low;
             High = high;
         }

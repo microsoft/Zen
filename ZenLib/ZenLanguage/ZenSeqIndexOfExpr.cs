@@ -53,9 +53,9 @@ namespace ZenLib
         /// <returns></returns>
         public static Zen<BigInteger> Create(Zen<Seq<T>> expr1, Zen<Seq<T>> expr2, Zen<BigInteger> expr3)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateNotNull(expr3);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.AssertNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
             hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);

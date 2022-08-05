@@ -423,12 +423,12 @@ namespace ZenLib.Solver
         {
             if (v is VarBool<T> v1)
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(bool), "Internal type mismatch");
+                Contract.Assert(type == typeof(bool), "Internal type mismatch");
                 return m.Get(v1);
             }
             else if (v is VarInt8<T> v8)
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(byte), "Internal type mismatch");
+                Contract.Assert(type == typeof(byte), "Internal type mismatch");
                 return m.Get(v8);
             }
             else if (v is VarInt16<T> v16)
@@ -441,18 +441,18 @@ namespace ZenLib.Solver
             }
             else if (v is VarInt32<T> v32)
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(int) || type == typeof(uint), "Internal type mismatch");
+                Contract.Assert(type == typeof(int) || type == typeof(uint), "Internal type mismatch");
                 return type == typeof(int) ? m.Get(v32) : (object)(uint)m.Get(v32);
             }
             else if (v is VarInt64<T> v64)
             {
-                CommonUtilities.ValidateIsTrue(type == typeof(long) || type == typeof(ulong), "Internal type mismatch");
+                Contract.Assert(type == typeof(long) || type == typeof(ulong), "Internal type mismatch");
                 return type == typeof(long) ? m.Get(v64) : (object)(ulong)m.Get(v64);
             }
             else
             {
                 // fixed width integer. bits are stored in little endian, need to reverse
-                CommonUtilities.ValidateIsTrue(ReflectionUtilities.IsFixedIntegerType(type), "Internal type mismatch");
+                Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type), "Internal type mismatch");
                 var bytes = m.Get((VarInt<T>)v);
                 var remainder = v.NumBits % 8;
 

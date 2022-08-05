@@ -40,8 +40,8 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static ZenListAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<T> element)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(element);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(element);
 
             var key = (expr.Id, element.Id);
             hashConsTable.GetOrAdd(key, (expr, element), createFunc, out var value);

@@ -51,7 +51,7 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         public static Zen<TObject> Create(params (string, object)[] fields)
         {
-            CommonUtilities.ValidateNotNull(fields);
+            Contract.AssertNotNull(fields);
 
             foreach (var field in fields)
             {

@@ -107,8 +107,8 @@ namespace ZenLib
         /// <returns></returns>
         public static bool operator <=(IntN<T, TSign> left, IntN<T, TSign> right)
         {
-            CommonUtilities.ValidateNotNull(left);
-            CommonUtilities.ValidateNotNull(right);
+            Contract.AssertNotNull(left);
+            Contract.AssertNotNull(right);
 
             return left.LessThanOrEqual(right);
         }
@@ -157,8 +157,8 @@ namespace ZenLib
         /// <returns></returns>
         public static bool operator >=(IntN<T, TSign> left, IntN<T, TSign> right)
         {
-            CommonUtilities.ValidateNotNull(left);
-            CommonUtilities.ValidateNotNull(right);
+            Contract.AssertNotNull(left);
+            Contract.AssertNotNull(right);
 
             return left.GreaterThanOrEqual(right);
         }
@@ -171,8 +171,8 @@ namespace ZenLib
         /// <returns></returns>
         public static bool operator >(IntN<T, TSign> left, IntN<T, TSign> right)
         {
-            CommonUtilities.ValidateNotNull(left);
-            CommonUtilities.ValidateNotNull(right);
+            Contract.AssertNotNull(left);
+            Contract.AssertNotNull(right);
 
             return left.GreaterThan(right);
         }
@@ -185,8 +185,8 @@ namespace ZenLib
         /// <returns></returns>
         public static bool operator <(IntN<T, TSign> left, IntN<T, TSign> right)
         {
-            CommonUtilities.ValidateNotNull(left);
-            CommonUtilities.ValidateNotNull(right);
+            Contract.AssertNotNull(left);
+            Contract.AssertNotNull(right);
 
             return left.LessThan(right);
         }
@@ -327,7 +327,7 @@ namespace ZenLib
         /// <returns></returns>
         public T BitwiseAnd(IntN<T, TSign> other)
         {
-            CommonUtilities.ValidateNotNull(other);
+            Contract.AssertNotNull(other);
 
             var newBytes = new byte[this.Bytes.Length];
             BitwiseAnd(this.Bytes, other.Bytes, newBytes);
@@ -349,7 +349,7 @@ namespace ZenLib
         /// <returns></returns>
         public T BitwiseOr(IntN<T, TSign> other)
         {
-            CommonUtilities.ValidateNotNull(other);
+            Contract.AssertNotNull(other);
 
             var newBytes = new byte[this.Bytes.Length];
             BitwiseOr(this.Bytes, other.Bytes, newBytes);
@@ -371,7 +371,7 @@ namespace ZenLib
         /// <returns></returns>
         public T BitwiseXor(IntN<T, TSign> other)
         {
-            CommonUtilities.ValidateNotNull(other);
+            Contract.AssertNotNull(other);
 
             var newBytes = new byte[this.Bytes.Length];
             BitwiseXor(this.Bytes, other.Bytes, newBytes);
@@ -433,7 +433,7 @@ namespace ZenLib
         /// <returns>The added integer.</returns>
         public T Add(IntN<T, TSign> other)
         {
-            CommonUtilities.ValidateNotNull(other);
+            Contract.AssertNotNull(other);
 
             var newBytes = new byte[this.Bytes.Length];
             Add(this.Bytes, other.Bytes, newBytes, this.Size);
@@ -462,7 +462,7 @@ namespace ZenLib
         /// <returns>The subtracted integer.</returns>
         public T Subtract(IntN<T, TSign> other)
         {
-            CommonUtilities.ValidateNotNull(other);
+            Contract.AssertNotNull(other);
 
             var newBytes = new byte[this.Bytes.Length];
             Subtract(this.Bytes, other.Bytes, newBytes, this.Size);

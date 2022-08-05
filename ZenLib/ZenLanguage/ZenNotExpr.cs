@@ -52,7 +52,7 @@ namespace ZenLib
         /// <returns>The negated expr.</returns>
         public static Zen<bool> Create(Zen<bool> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;

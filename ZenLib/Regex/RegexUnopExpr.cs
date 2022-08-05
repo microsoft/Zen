@@ -83,7 +83,7 @@ namespace ZenLib
         /// <returns>The new Regex expr.</returns>
         public static Regex<T> Create(Regex<T> expr, RegexUnopExprType opType)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             var key = (expr.Id, (int)opType);
             hashConsTable.GetOrAdd(key, (expr, opType), createFunc, out var value);

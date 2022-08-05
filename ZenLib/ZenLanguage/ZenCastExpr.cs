@@ -38,8 +38,8 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<TTarget> Create(Zen<TSource> sourceExpr)
         {
-            CommonUtilities.ValidateNotNull(sourceExpr);
-            CommonUtilities.ValidateIsSafeCast(typeof(TSource), typeof(TTarget));
+            Contract.AssertNotNull(sourceExpr);
+            Contract.Assert(CommonUtilities.IsSafeCast(typeof(TSource), typeof(TTarget)), "Invalid cast");
 
             hashConsTable.GetOrAdd(sourceExpr.Id, sourceExpr, createFunc, out var v);
             return v;

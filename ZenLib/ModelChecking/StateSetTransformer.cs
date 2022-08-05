@@ -87,7 +87,7 @@ namespace ZenLib.ModelChecking
         /// <param name="invariant">The function constraining the inputs.</param>
         public StateSet<T1> InputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant)
         {
-            CommonUtilities.ValidateNotNull(invariant);
+            Contract.AssertNotNull(invariant);
 
             DD set = setTransformer;
             var expr = invariant(this.zenInput, this.zenOutput);
@@ -108,7 +108,7 @@ namespace ZenLib.ModelChecking
         /// <param name="invariant">The invariant constraining the outputs.</param>
         public StateSet<T2> OutputSet(Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant)
         {
-            CommonUtilities.ValidateNotNull(invariant);
+            Contract.AssertNotNull(invariant);
 
             DD set = setTransformer;
             var expr = invariant(this.zenInput, this.zenOutput);

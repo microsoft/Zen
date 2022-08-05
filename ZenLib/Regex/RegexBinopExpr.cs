@@ -200,8 +200,8 @@ namespace ZenLib
         /// <returns>The new Regex expr.</returns>
         public static Regex<T> Create(Regex<T> expr1, Regex<T> expr2, RegexBinopExprType opType)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)opType);
             hashConsTable.GetOrAdd(key, (expr1, expr2, opType), createFunc, out var value);

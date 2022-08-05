@@ -65,9 +65,9 @@ namespace ZenLib
         /// <returns></returns>
         public static Zen<T1> Create(Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(fieldName);
-            CommonUtilities.ValidateNotNull(fieldValue);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(fieldName);
+            Contract.AssertNotNull(fieldValue);
             ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName, fieldValue.Id);

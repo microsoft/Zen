@@ -21,5 +21,17 @@ namespace ZenLib
                 throw new ZenException(msg);
             }
         }
+
+        /// <summary>
+        /// Validate that an argument is not null.
+        /// </summary>
+        /// <param name="obj">The argument.</param>
+        public static void AssertNotNull(object obj)
+        {
+            if (obj is null)
+            {
+                throw new ZenException($"Invalid null argument");
+            }
+        }
     }
 }

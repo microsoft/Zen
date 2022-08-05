@@ -176,7 +176,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ConstSet<T>> Add<T>(this Zen<ConstSet<T>> setExpr, T element)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
+            Contract.AssertNotNull(setExpr);
 
             return Create<ConstSet<T>>(("Map", setExpr.Map().Set(element, true)));
         }
@@ -189,7 +189,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ConstSet<T>> Delete<T>(this Zen<ConstSet<T>> setExpr, T element)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
+            Contract.AssertNotNull(setExpr);
 
             return Create<ConstSet<T>>(("Map", setExpr.Map().Set(element, false)));
         }
@@ -202,7 +202,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<ConstSet<T>> setExpr, T element)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
+            Contract.AssertNotNull(setExpr);
 
             return setExpr.Map().Get(element);
         }

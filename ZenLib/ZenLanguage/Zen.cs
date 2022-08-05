@@ -22,14 +22,9 @@ namespace ZenLib
     public abstract class Zen<T>
     {
         /// <summary>
-        /// The next unique id.
-        /// </summary>
-        private static long nextId = 0;
-
-        /// <summary>
         /// The unique id for the given Zen expression.
         /// </summary>
-        public long Id = Interlocked.Increment(ref nextId);
+        public long Id = Interlocked.Increment(ref IdHolder.NextId);
 
         /// <summary>
         /// Simplify an expression by unrolling.
@@ -244,6 +239,17 @@ namespace ZenLib
     }
 
     /// <summary>
+    /// Class to store a shared id for Zen objects.
+    /// </summary>
+    internal class IdHolder
+    {
+        /// <summary>
+        /// The next id to use.
+        /// </summary>
+        internal static long NextId;
+    }
+
+    /// <summary>
     /// Collection of helper functions for building Zen programs.
     /// </summary>
     public static class Zen
@@ -279,7 +285,7 @@ namespace ZenLib
         /// <param name="x">The value.</param>
         public static Zen<T> Lift<T>(T x)
         {
-            CommonUtilities.ValidateNotNull(x);
+            Contract.AssertNotNull(x);
             return (Zen<T>)ReflectionUtilities.CreateZenConstant(x);
         }
 
@@ -366,9 +372,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Case<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T2>> none, Func<Zen<T1>, Zen<T2>> some)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(none);
-            CommonUtilities.ValidateNotNull(some);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(none);
+            Contract.AssertNotNull(some);
 
             return If(expr.IsSome(), some(expr.Value()), none());
         }
@@ -380,7 +386,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Value<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Option<T>, T>("Value");
         }
@@ -393,8 +399,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> And(Zen<bool> expr1, Zen<bool> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenLogicalBinopExpr.Create(expr1, expr2, ZenLogicalBinopExpr.LogicalOp.And);
         }
@@ -407,8 +413,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Or(Zen<bool> expr1, Zen<bool> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenLogicalBinopExpr.Create(expr1, expr2, ZenLogicalBinopExpr.LogicalOp.Or);
         }
@@ -420,7 +426,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> And(IEnumerable<Zen<bool>> exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return exprs.Aggregate(And);
         }
@@ -432,7 +438,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> And(params Zen<bool>[] exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return And((IEnumerable<Zen<bool>>)exprs);
         }
@@ -444,7 +450,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Or(IEnumerable<Zen<bool>> exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return exprs.Aggregate(Or);
         }
@@ -456,7 +462,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Or(params Zen<bool>[] exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return Or((IEnumerable<Zen<bool>>)exprs);
         }
@@ -468,7 +474,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Not(Zen<bool> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return ZenNotExpr.Create(expr);
         }
@@ -481,8 +487,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Implies(Zen<bool> guardExpr, Zen<bool> thenExpr)
         {
-            CommonUtilities.ValidateNotNull(guardExpr);
-            CommonUtilities.ValidateNotNull(thenExpr);
+            Contract.AssertNotNull(guardExpr);
+            Contract.AssertNotNull(thenExpr);
 
             return Or(Not(guardExpr), thenExpr);
         }
@@ -496,9 +502,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> If<T>(Zen<bool> guardExpr, Zen<T> trueExpr, Zen<T> falseExpr)
         {
-            CommonUtilities.ValidateNotNull(guardExpr);
-            CommonUtilities.ValidateNotNull(trueExpr);
-            CommonUtilities.ValidateNotNull(falseExpr);
+            Contract.AssertNotNull(guardExpr);
+            Contract.AssertNotNull(trueExpr);
+            Contract.AssertNotNull(falseExpr);
 
             return ZenIfExpr<T>.Create(guardExpr, trueExpr, falseExpr);
         }
@@ -511,8 +517,8 @@ namespace ZenLib
         /// <returns>The resulting Zen value.</returns>
         public static Zen<T> Cases<T>(Zen<T> deflt, params (Zen<bool>, Zen<T>)[] cases)
         {
-            CommonUtilities.ValidateNotNull(deflt);
-            CommonUtilities.ValidateNotNull(cases);
+            Contract.AssertNotNull(deflt);
+            Contract.AssertNotNull(cases);
 
             for (int i = cases.Length - 1; i >= 0; i--)
             {
@@ -531,8 +537,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Eq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
             return EqHelper<T>(expr1, expr2);
         }
 
@@ -597,8 +603,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Leq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Leq);
         }
@@ -611,8 +617,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Lt<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Lt);
         }
@@ -625,8 +631,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Gt<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Gt);
         }
@@ -639,8 +645,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Geq<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithComparisonExpr<T>.Create(expr1, expr2, ComparisonType.Geq);
         }
@@ -653,8 +659,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Plus<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Addition);
         }
@@ -667,8 +673,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> Concat(Zen<string> expr1, Zen<string> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             var e1 = Cast<string, Seq<char>>(expr1);
             var e2 = Cast<string, Seq<char>>(expr2);
@@ -683,8 +689,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> StartsWith(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(substr);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(substr);
 
             var e1 = Cast<string, Seq<char>>(str);
             var e2 = Cast<string, Seq<char>>(substr);
@@ -699,8 +705,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> EndsWith(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(substr);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(substr);
 
             var e1 = Cast<string, Seq<char>>(str);
             var e2 = Cast<string, Seq<char>>(substr);
@@ -715,8 +721,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains(this Zen<string> str, Zen<string> substr)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(substr);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(substr);
 
             var e1 = Cast<string, Seq<char>>(str);
             var e2 = Cast<string, Seq<char>>(substr);
@@ -732,9 +738,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> ReplaceFirst(this Zen<string> str, Zen<string> substr, Zen<string> replace)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(substr);
-            CommonUtilities.ValidateNotNull(replace);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(substr);
+            Contract.AssertNotNull(replace);
 
             var e1 = Cast<string, Seq<char>>(str);
             var e2 = Cast<string, Seq<char>>(substr);
@@ -751,9 +757,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> Slice(this Zen<string> str, Zen<BigInteger> offset, Zen<BigInteger> length)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(offset);
-            CommonUtilities.ValidateNotNull(length);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(offset);
+            Contract.AssertNotNull(length);
 
             var e1 = Cast<string, Seq<char>>(str);
             return Cast<Seq<char>, string>(ZenSeqSliceExpr<char>.Create(e1, offset, length));
@@ -767,8 +773,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<string> At(this Zen<string> str, Zen<BigInteger> index)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(index);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(index);
 
             var e1 = Cast<string, Seq<char>>(str);
             return Cast<Seq<char>, string>(ZenSeqAtExpr<char>.Create(e1, index));
@@ -781,7 +787,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Length(this Zen<string> str)
         {
-            CommonUtilities.ValidateNotNull(str);
+            Contract.AssertNotNull(str);
 
             var e1 = Cast<string, Seq<char>>(str);
             return ZenSeqLengthExpr<char>.Create(e1);
@@ -797,9 +803,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> IndexOf(this Zen<string> str, Zen<string> sub, Zen<BigInteger> offset)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(sub);
-            CommonUtilities.ValidateNotNull(offset);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(sub);
+            Contract.AssertNotNull(offset);
 
             var e1 = Cast<string, Seq<char>>(str);
             var e2 = Cast<string, Seq<char>>(sub);
@@ -825,8 +831,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> MatchesRegex(this Zen<string> str, Regex<char> regex)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(regex);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(regex);
 
             return Cast<string, Seq<char>>(str).MatchesRegex(regex);
         }
@@ -839,8 +845,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> MatchesRegex(this Zen<string> str, string regex)
         {
-            CommonUtilities.ValidateNotNull(str);
-            CommonUtilities.ValidateNotNull(regex);
+            Contract.AssertNotNull(str);
+            Contract.AssertNotNull(regex);
 
             return str.MatchesRegex(Regex.Parse(regex));
         }
@@ -852,8 +858,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<TTarget> Cast<TSource, TTarget>(Zen<TSource> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateIsSafeCast(typeof(TSource), typeof(TTarget));
+            Contract.AssertNotNull(expr);
+            Contract.Assert(CommonUtilities.IsSafeCast(typeof(TSource), typeof(TTarget)), "Invalid cast");
 
             return ZenCastExpr<TSource, TTarget>.Create(expr);
         }
@@ -866,8 +872,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Minus<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Subtraction);
         }
@@ -880,8 +886,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> Multiply<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenArithBinopExpr<T>.Create(expr1, expr2, ArithmeticOp.Multiplication);
         }
@@ -894,8 +900,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<byte> Max(Zen<byte> expr1, Zen<byte> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -908,8 +914,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<short> Max(Zen<short> expr1, Zen<short> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -922,8 +928,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Max(Zen<ushort> expr1, Zen<ushort> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -936,8 +942,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<int> Max(Zen<int> expr1, Zen<int> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -950,8 +956,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<uint> Max(Zen<uint> expr1, Zen<uint> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -964,8 +970,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<long> Max(Zen<long> expr1, Zen<long> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -978,8 +984,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Max(Zen<ulong> expr1, Zen<ulong> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -992,8 +998,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Max(Zen<BigInteger> expr1, Zen<BigInteger> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 >= expr2, expr1, expr2);
         }
@@ -1006,8 +1012,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<byte> Min(Zen<byte> expr1, Zen<byte> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1020,8 +1026,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<short> Min(Zen<short> expr1, Zen<short> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1034,8 +1040,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Min(Zen<ushort> expr1, Zen<ushort> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1048,8 +1054,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<int> Min(Zen<int> expr1, Zen<int> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1062,8 +1068,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<uint> Min(Zen<uint> expr1, Zen<uint> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1076,8 +1082,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<long> Min(Zen<long> expr1, Zen<long> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1090,8 +1096,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ulong> Min(Zen<ulong> expr1, Zen<ulong> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1104,8 +1110,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<BigInteger> Min(Zen<BigInteger> expr1, Zen<BigInteger> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return If(expr1 <= expr2, expr1, expr2);
         }
@@ -1118,8 +1124,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseAnd<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseAnd);
         }
@@ -1131,7 +1137,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseAnd<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
             return exprs.Aggregate(BitwiseAnd);
         }
 
@@ -1143,8 +1149,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseOr<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseOr);
         }
@@ -1156,7 +1162,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseOr<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return exprs.Aggregate(BitwiseOr);
         }
@@ -1168,7 +1174,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseNot<T>(Zen<T> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return ZenBitwiseNotExpr<T>.Create(expr);
         }
@@ -1181,8 +1187,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseXor<T>(Zen<T> expr1, Zen<T> expr2)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             return ZenBitwiseBinopExpr<T>.Create(expr1, expr2, BitwiseOp.BitwiseXor);
         }
@@ -1194,7 +1200,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> BitwiseXor<T>(params Zen<T>[] exprs)
         {
-            CommonUtilities.ValidateNotNull(exprs);
+            Contract.AssertNotNull(exprs);
 
             return exprs.Aggregate(BitwiseXor);
         }
@@ -1207,8 +1213,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> GetField<T1, T2>(this Zen<T1> expr, string fieldName)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(fieldName);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(fieldName);
 
             return ZenGetFieldExpr<T1, T2>.Create(expr, fieldName);
         }
@@ -1222,9 +1228,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T1> WithField<T1, T2>(this Zen<T1> expr, string fieldName, Zen<T2> fieldValue)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(fieldName);
-            CommonUtilities.ValidateNotNull(fieldValue);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(fieldName);
+            Contract.AssertNotNull(fieldValue);
 
             return ZenWithFieldExpr<T1, T2>.Create(expr, fieldName, fieldValue);
         }
@@ -1406,7 +1412,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<FSeq<T>> List<T>(params Zen<T>[] elements)
         {
-            CommonUtilities.ValidateNotNull(elements);
+            Contract.AssertNotNull(elements);
 
             Zen<T>[] copy = new Zen<T>[elements.Length];
             Array.Copy(elements, copy, elements.Length);
@@ -1440,7 +1446,7 @@ namespace ZenLib
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
         public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
-            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
             var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
             return new ZenSolution(model);
         }
@@ -1453,7 +1459,7 @@ namespace ZenLib
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
         public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
-            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
             var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
             return new ZenSolution(model);
         }
@@ -1757,7 +1763,8 @@ namespace ZenLib
                 var valueType = kv.Value.GetType();
                 ReflectionUtilities.ValidateIsZenType(keyType);
                 var innerType = keyType.GetGenericArgumentsCached()[0];
-                CommonUtilities.ValidateIsTrue(innerType.IsAssignableFrom(valueType), "Type mismatch in assignment between key and value");
+
+                Contract.Assert(innerType.IsAssignableFrom(valueType), "Type mismatch in assignment between key and value");
                 constraints = Zen.And(constraints, Zen.Eq((dynamic)kv.Key, (dynamic)kv.Value));
             }
 

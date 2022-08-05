@@ -50,7 +50,7 @@ namespace ZenLib
         /// <param name="function">The function.</param>
         public ZenFunction(Func<Zen<T>> function)
         {
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(function);
             this.Function = function;
             this.FunctionBodyExpr = this.Function();
         }
@@ -148,7 +148,7 @@ namespace ZenLib
         /// <param name="function">The function.</param>
         public ZenFunction(Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(function);
             this.Function = function;
             lock (argumentLock)
             {
@@ -354,7 +354,7 @@ namespace ZenLib
         /// <param name="function">The function.</param>
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(function);
             this.Function = function;
             lock (argumentLock)
             {
@@ -588,7 +588,7 @@ namespace ZenLib
         /// <param name="function">The function.</param>
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(function);
             this.Function = function;
             lock (argumentLock)
             {
@@ -844,7 +844,7 @@ namespace ZenLib
         /// <param name="function">The function.</param>
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(function);
             this.Function = function;
             lock (argumentLock)
             {

@@ -123,8 +123,8 @@ namespace ZenLib
             Zen<Map<TKey, SetUnit>> mapExpr2,
             CombineType combineType)
         {
-            CommonUtilities.ValidateNotNull(mapExpr1);
-            CommonUtilities.ValidateNotNull(mapExpr2);
+            Contract.AssertNotNull(mapExpr1);
+            Contract.AssertNotNull(mapExpr2);
 
             var k = (mapExpr1.Id, mapExpr2.Id, (int)combineType);
             hashConsTable.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), createFunc, out var v);

@@ -54,8 +54,8 @@ namespace ZenLib
         /// <returns></returns>
         public static Zen<T> Create(Zen<T> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateIsFiniteIntegerType(typeof(T));
+            Contract.AssertNotNull(expr);
+            Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(T)));
 
             hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;

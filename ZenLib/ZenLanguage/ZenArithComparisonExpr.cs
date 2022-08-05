@@ -124,9 +124,9 @@ namespace ZenLib
         /// <returns>A new Zen expr.</returns>
         public static Zen<bool> Create(Zen<T> expr1, Zen<T> expr2, ComparisonType comparisonType)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
-            CommonUtilities.ValidateIsArithmeticType(typeof(T));
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
+            Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
             hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), createFunc, out var value);

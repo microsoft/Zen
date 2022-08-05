@@ -83,8 +83,8 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         public static Zen<bool> Create(Zen<bool> expr1, Zen<bool> expr2, LogicalOp op)
         {
-            CommonUtilities.ValidateNotNull(expr1);
-            CommonUtilities.ValidateNotNull(expr2);
+            Contract.AssertNotNull(expr1);
+            Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)op);
             hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);

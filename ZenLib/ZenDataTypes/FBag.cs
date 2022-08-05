@@ -285,7 +285,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FBag<T>> Create<T>(params Zen<T>[] elements)
         {
-            CommonUtilities.ValidateNotNull(elements);
+            Contract.AssertNotNull(elements);
 
             var asOptions = elements.Select(Option.Create);
             return FBag.Create(FSeq.Create(asOptions));
@@ -298,7 +298,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<FSeq<Option<T>>> Values<T>(this Zen<FBag<T>> bagExpr)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
+            Contract.AssertNotNull(bagExpr);
 
             return bagExpr.GetField<FBag<T>, FSeq<Option<T>>>("Values");
         }
@@ -311,8 +311,8 @@ namespace ZenLib
         /// <returns>Zen value indicating the containment.</returns>
         public static Zen<bool> Contains<T>(this Zen<FBag<T>> bagExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(value);
 
             return bagExpr.Values().Any(o => And(o.IsSome(), o.Value() == value));
         }
@@ -325,8 +325,8 @@ namespace ZenLib
         /// <returns>The new bag from adding the value.</returns>
         public static Zen<FBag<T>> Add<T>(this Zen<FBag<T>> bagExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(value);
 
             return FBag.Create(bagExpr.Values().AddFront(Option.Create(value)));
         }
@@ -340,8 +340,8 @@ namespace ZenLib
         /// <returns>The new bag from adding the value.</returns>
         public static Zen<FBag<T>> AddIfSpace<T>(this Zen<FBag<T>> bagExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(value);
 
             return FBag.Create(AddIfSpace(bagExpr.Values(), value));
         }
@@ -355,8 +355,8 @@ namespace ZenLib
         /// <returns>The new bag from adding the value.</returns>
         public static Zen<FSeq<Option<T>>> AddIfSpace<T>(this Zen<FSeq<Option<T>>> seqExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(value);
 
             return seqExpr.Case(seqExpr, (hd, tl) =>
                 If(hd.IsSome(), AddIfSpace(tl, value).AddFront(hd), tl.AddFront(Option.Create(value))));
@@ -370,8 +370,8 @@ namespace ZenLib
         /// <returns>The new bag from adding the value..</returns>
         public static Zen<FBag<T>> Remove<T>(this Zen<FBag<T>> bagExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(value);
 
             return FBag.Create(bagExpr.Values().Select(o => If(And(o.IsSome(), o.Value() == value), Option.Null<T>(), o)));
         }
@@ -384,8 +384,8 @@ namespace ZenLib
         /// <returns>The new bag from removing the elements.</returns>
         public static Zen<FBag<T>> Where<T>(this Zen<FBag<T>> bagExpr, Func<Zen<T>, Zen<bool>> function)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(function);
 
             return FBag.Create(bagExpr.Values().Select(x => x.Where(function)));
         }
@@ -398,8 +398,8 @@ namespace ZenLib
         /// <returns>The new bag from mapping over all the elements.</returns>
         public static Zen<FBag<TResult>> Select<T, TResult>(this Zen<FBag<T>> bagExpr, Func<Zen<T>, Zen<TResult>> function)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(function);
 
             return FBag.Create(bagExpr.Values().Select(x => x.Select(function)));
         }
@@ -412,8 +412,8 @@ namespace ZenLib
         /// <returns>A boolean indicating if an element satisfies the predicate.</returns>
         public static Zen<bool> Any<T>(this Zen<FBag<T>> bagExpr, Func<Zen<T>, Zen<bool>> function)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(function);
 
             return bagExpr.Values().Any(x => And(x.IsSome(), function(x.Value())));
         }
@@ -426,8 +426,8 @@ namespace ZenLib
         /// <returns>A boolean indicating if all elements satisfy the predicate.</returns>
         public static Zen<bool> All<T>(this Zen<FBag<T>> bagExpr, Func<Zen<T>, Zen<bool>> function)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(bagExpr);
+            Contract.AssertNotNull(function);
 
             return bagExpr.Values().All(x => Implies(x.IsSome(), function(x.Value())));
         }
@@ -439,7 +439,7 @@ namespace ZenLib
         /// <returns>A boolean indicating if the bag is empty.</returns>
         public static Zen<bool> IsEmpty<T>(this Zen<FBag<T>> bagExpr)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
+            Contract.AssertNotNull(bagExpr);
 
             return bagExpr.Values().All(o => o.IsNone());
         }
@@ -451,7 +451,7 @@ namespace ZenLib
         /// <returns>The new bag from adding the value.</returns>
         public static Zen<ushort> Size<T>(this Zen<FBag<T>> bagExpr)
         {
-            CommonUtilities.ValidateNotNull(bagExpr);
+            Contract.AssertNotNull(bagExpr);
 
             return Size(bagExpr.Values());
         }

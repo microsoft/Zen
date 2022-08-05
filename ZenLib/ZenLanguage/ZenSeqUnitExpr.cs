@@ -38,7 +38,7 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<Seq<T>> Create(Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(valueExpr);
 
             hashConsTable.GetOrAdd(valueExpr.Id, valueExpr, createFunc, out var v);
             return v;

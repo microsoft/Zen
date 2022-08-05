@@ -64,9 +64,9 @@ namespace ZenLib
         /// <returns>The new expr.</returns>
         public static Zen<Map<TKey, TValue>> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key, Zen<TValue> value)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(key);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(key);
+            Contract.AssertNotNull(value);
 
             var k = (mapExpr.Id, key.Id, value.Id);
             hashConsTable.GetOrAdd(k, (mapExpr, key, value), createFunc, out var v);

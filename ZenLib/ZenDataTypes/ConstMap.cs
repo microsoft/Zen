@@ -167,9 +167,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ConstMap<TKey, TValue>> Set<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(key);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(key);
+            Contract.AssertNotNull(valueExpr);
 
             return ConstMapSet(mapExpr, key, valueExpr);
         }
@@ -182,8 +182,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<TValue> Get<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(key);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(key);
 
             return ConstMapGet(mapExpr, key);
         }

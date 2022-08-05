@@ -198,7 +198,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Create<T>(Zen<T> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return Zen.Create<Option<T>>(("HasValue", True()), ("Value", expr));
         }
@@ -211,8 +211,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T2>> Select<T1, T2>(this Zen<Option<T1>> expr, Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(function);
 
             return If(expr.IsSome(), Option.Create(function(expr.Value())), Option.Null<T2>());
         }
@@ -225,8 +225,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Where<T>(this Zen<Option<T>> expr, Func<Zen<T>, Zen<bool>> function)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(function);
 
             return If(And(expr.IsSome(), function(expr.Value())), expr, Option.Null<T>());
         }
@@ -239,8 +239,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T> ValueOrDefault<T>(this Zen<Option<T>> expr, Zen<T> deflt)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(deflt);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(deflt);
 
             return If(expr.IsSome(), expr.Value(), deflt);
         }
@@ -252,7 +252,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsSome<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return expr.GetField<Option<T>, bool>("HasValue");
         }
@@ -264,7 +264,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsNone<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             return Not(expr.IsSome());
         }
@@ -276,7 +276,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> ToSequence<T>(this Zen<Option<T>> expr)
         {
-            CommonUtilities.ValidateNotNull(expr);
+            Contract.AssertNotNull(expr);
 
             var l = FSeq.Empty<T>();
             return If(expr.IsSome(), l.AddFront(expr.Value()), l);

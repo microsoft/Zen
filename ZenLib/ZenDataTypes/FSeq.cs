@@ -173,7 +173,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Create<T>(Zen<T> element)
         {
-            CommonUtilities.ValidateNotNull(element);
+            Contract.AssertNotNull(element);
 
             return FSeq.Empty<T>().AddFront(element);
         }
@@ -185,7 +185,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Create<T>(IEnumerable<Zen<T>> elements)
         {
-            CommonUtilities.ValidateNotNull(elements);
+            Contract.AssertNotNull(elements);
 
             return Zen.List(elements.ToArray());
         }
@@ -198,8 +198,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> AddBack<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return seqExpr.Case(
                 empty: FSeq.Create(valueExpr),
@@ -214,8 +214,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> AddFront<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return ZenListAddFrontExpr<T>.Create(seqExpr, valueExpr);
         }
@@ -232,9 +232,9 @@ namespace ZenLib
             Zen<TResult> empty,
             Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(empty);
-            CommonUtilities.ValidateNotNull(cons);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(empty);
+            Contract.AssertNotNull(cons);
 
             return ZenListCaseExpr<T, TResult>.Create(seqExpr, empty, (hd, tl) => cons(hd, tl));
         }
@@ -247,8 +247,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> Find<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Case(
                 empty: Option.Null<T>(),
@@ -262,7 +262,7 @@ namespace ZenLib
         /// <returns>The head, or the default value if the sequence is empty.</returns>
         public static Zen<T> Head<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(empty: Zen.Default<T>(), cons: (hd, tl) => hd);
         }
@@ -274,7 +274,7 @@ namespace ZenLib
         /// <returns>The tail, empty if the sequence is empty.</returns>
         public static Zen<FSeq<T>> Tail<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => tl);
         }
@@ -286,7 +286,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Length<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(
                 empty: Constant<ushort>(0),
@@ -301,8 +301,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T2>> Select<T1, T2>(this Zen<FSeq<T1>> seqExpr, Func<Zen<T1>, Zen<T2>> function)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(function);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T2>(),
@@ -317,8 +317,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Where<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -336,7 +336,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsEmpty<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(empty: True(), cons: (hd, tl) => False());
         }
@@ -349,8 +349,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<FSeq<T>> seqExpr, Zen<T> element)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(element);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(element);
 
             return seqExpr.Any((x) => Eq(x, element));
         }
@@ -363,8 +363,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Append<T>(this Zen<FSeq<T>> seqExpr1, Zen<FSeq<T>> seqExpr2)
         {
-            CommonUtilities.ValidateNotNull(seqExpr1);
-            CommonUtilities.ValidateNotNull(seqExpr2);
+            Contract.AssertNotNull(seqExpr1);
+            Contract.AssertNotNull(seqExpr2);
 
             return seqExpr1.Case(
                 empty: seqExpr2,
@@ -378,7 +378,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Reverse<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return Reverse(seqExpr, FSeq.Empty<T>());
         }
@@ -398,8 +398,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Intersperse<T>(this Zen<FSeq<T>> seqExpr, Zen<T> element)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(element);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(element);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -414,8 +414,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<ushort> Duplicates<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return seqExpr.Case(
                 empty: Constant<ushort>(0),
@@ -431,8 +431,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> RemoveFirst<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -447,8 +447,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> RemoveAll<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -468,9 +468,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<T2> Fold<T1, T2>(this Zen<FSeq<T1>> seqExpr, Zen<T2> acc, Func<Zen<T1>, Zen<T2>, Zen<T2>> function)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(acc);
-            CommonUtilities.ValidateNotNull(function);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(acc);
+            Contract.AssertNotNull(function);
 
             return seqExpr.Case(
                 empty: acc,
@@ -485,8 +485,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Any<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Fold(False(), (x, y) => Or(predicate(x), y));
         }
@@ -499,8 +499,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> All<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Fold(True(), (x, y) => And(predicate(x), y));
         }
@@ -513,8 +513,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(numElements);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(numElements);
 
             return Take(seqExpr, numElements, 0);
         }
@@ -541,8 +541,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> TakeWhile<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -557,8 +557,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(numElements);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(numElements);
 
             return Drop(seqExpr, numElements, 0);
         }
@@ -585,8 +585,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> DropWhile<T>(this Zen<FSeq<T>> seqExpr, Func<Zen<T>, Zen<bool>> predicate)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(predicate);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(predicate);
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
@@ -601,8 +601,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Pair<FSeq<T>, FSeq<T>>> SplitAt<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(index);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(index);
 
             return SplitAt(seqExpr, index, 0);
         }
@@ -635,8 +635,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(index);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(index);
 
             return At(seqExpr, index, 0);
         }
@@ -664,9 +664,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(index);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(index);
+            Contract.AssertNotNull(value);
 
             return Set(seqExpr, index, value, 0);
         }
@@ -694,8 +694,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<ushort>> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
-            CommonUtilities.ValidateNotNull(value);
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(value);
 
             return seqExpr.IndexOf(value, 0);
         }
@@ -721,7 +721,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsSorted<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(
                 empty: True(),
@@ -737,7 +737,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Sort<T>(this Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => Insert(hd, tl.Sort()));
         }
@@ -750,8 +750,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Insert<T>(Zen<T> element, Zen<FSeq<T>> seqExpr)
         {
-            CommonUtilities.ValidateNotNull(element);
-            CommonUtilities.ValidateNotNull(seqExpr);
+            Contract.AssertNotNull(element);
+            Contract.AssertNotNull(seqExpr);
 
             return seqExpr.Case(
                 empty: FSeq.Create(element),

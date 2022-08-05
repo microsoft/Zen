@@ -227,8 +227,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Add<T>(this Zen<Set<T>> setExpr, Zen<T> elementExpr)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
-            CommonUtilities.ValidateNotNull(elementExpr);
+            Contract.AssertNotNull(setExpr);
+            Contract.AssertNotNull(elementExpr);
 
             return Create<Set<T>>(("Values", setExpr.Values().Set(elementExpr, new SetUnit())));
         }
@@ -241,8 +241,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Delete<T>(this Zen<Set<T>> setExpr, Zen<T> elementExpr)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
-            CommonUtilities.ValidateNotNull(elementExpr);
+            Contract.AssertNotNull(setExpr);
+            Contract.AssertNotNull(elementExpr);
 
             return Create<Set<T>>(("Values", setExpr.Values().Delete(elementExpr)));
         }
@@ -255,8 +255,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> Contains<T>(this Zen<Set<T>> setExpr, Zen<T> elementExpr)
         {
-            CommonUtilities.ValidateNotNull(setExpr);
-            CommonUtilities.ValidateNotNull(elementExpr);
+            Contract.AssertNotNull(setExpr);
+            Contract.AssertNotNull(elementExpr);
             return setExpr.Values().ContainsKey(elementExpr);
         }
 
@@ -268,8 +268,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Union<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
         {
-            CommonUtilities.ValidateNotNull(setExpr1);
-            CommonUtilities.ValidateNotNull(setExpr2);
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
 
             return Create<Set<T>>(("Values", Zen.Union(setExpr1.Values(), setExpr2.Values())));
         }
@@ -282,8 +282,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Intersect<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
         {
-            CommonUtilities.ValidateNotNull(setExpr1);
-            CommonUtilities.ValidateNotNull(setExpr2);
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
 
             return Create<Set<T>>(("Values", Zen.Intersect(setExpr1.Values(), setExpr2.Values())));
         }
@@ -296,8 +296,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Set<T>> Difference<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
         {
-            CommonUtilities.ValidateNotNull(setExpr1);
-            CommonUtilities.ValidateNotNull(setExpr2);
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
 
             return Create<Set<T>>(("Values", Zen.Difference(setExpr1.Values(), setExpr2.Values())));
         }
@@ -310,8 +310,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> IsSubsetOf<T>(this Zen<Set<T>> setExpr1, Zen<Set<T>> setExpr2)
         {
-            CommonUtilities.ValidateNotNull(setExpr1);
-            CommonUtilities.ValidateNotNull(setExpr2);
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
 
             return setExpr1 == setExpr1.Intersect(setExpr2);
         }

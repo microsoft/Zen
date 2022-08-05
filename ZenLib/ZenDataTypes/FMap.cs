@@ -138,9 +138,9 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FMap<TKey, TValue>> Set<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr, Zen<TValue> valueExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
-            CommonUtilities.ValidateNotNull(valueExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
+            Contract.AssertNotNull(valueExpr);
 
             var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
             return Create<FMap<TKey, TValue>>(("Values", l.AddFront(Pair.Create(keyExpr, valueExpr))));
@@ -154,8 +154,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FMap<TKey, TValue>> Delete<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
             return Create<FMap<TKey, TValue>>(("Values", l.Where(x => x.Item1() != keyExpr)));
@@ -169,8 +169,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Option<TValue>> Get<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             var l = mapExpr.GetField<FMap<TKey, TValue>, FSeq<Pair<TKey, TValue>>>("Values");
             return l.SeqGet(keyExpr);
@@ -184,8 +184,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<bool> ContainsKey<TKey, TValue>(this Zen<FMap<TKey, TValue>> mapExpr, Zen<TKey> keyExpr)
         {
-            CommonUtilities.ValidateNotNull(mapExpr);
-            CommonUtilities.ValidateNotNull(keyExpr);
+            Contract.AssertNotNull(mapExpr);
+            Contract.AssertNotNull(keyExpr);
 
             return mapExpr.Get(keyExpr).IsSome();
         }
@@ -198,8 +198,8 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         private static Zen<Option<TValue>> SeqGet<TKey, TValue>(this Zen<FSeq<Pair<TKey, TValue>>> expr, Zen<TKey> key)
         {
-            CommonUtilities.ValidateNotNull(expr);
-            CommonUtilities.ValidateNotNull(key);
+            Contract.AssertNotNull(expr);
+            Contract.AssertNotNull(key);
 
             return expr.Case(
                 empty: Option.Null<TValue>(),
