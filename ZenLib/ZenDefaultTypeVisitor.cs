@@ -118,7 +118,7 @@ namespace ZenLib
             var args = new (string, object)[asList.Length];
             for (int i = 0; i < asList.Length; i++)
             {
-                args[i] = (asList[i].Key, ReflectionUtilities.ApplyTypeVisitor(this, asList[i].Value, new Unit()));
+                args[i] = (asList[i].Key, ReflectionUtilities.ApplyTypeVisitor(this, asList[i].Value, Unit.Instance));
             }
 
             return method.Invoke(null, new object[] { args });

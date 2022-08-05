@@ -532,13 +532,13 @@ namespace ZenLib.ModelChecking
                 {
                     if (!cm1.Value.TryGetValue(key, out var v1))
                     {
-                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), new Unit());
+                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), Unit.Instance);
                         v1 = Evaluate((dynamic)deflt, parameter);
                     }
 
                     if (!cm2.Value.TryGetValue(key, out var v2))
                     {
-                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), new Unit());
+                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), Unit.Instance);
                         v2 = Evaluate((dynamic)deflt, parameter);
                     }
 
@@ -896,7 +896,7 @@ namespace ZenLib.ModelChecking
                 return result;
             }
 
-            dynamic defaultValue = ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), expression.Key.GetType(), new Unit());
+            dynamic defaultValue = ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), expression.Key.GetType(), Unit.Instance);
             return this.Visit(defaultValue, parameter);
         }
 

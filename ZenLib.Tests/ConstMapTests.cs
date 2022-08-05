@@ -402,8 +402,6 @@ namespace ZenLib.Tests
         {
             var x = Zen.Symbolic<ConstMap<int, int>>();
             var solution = (x != new ConstMap<int, int>().Set(0, 1)).Solve();
-
-            Assert.IsTrue(solution.IsSatisfiable());
             var result = solution.Get(x);
             Assert.IsTrue(result.Get(0) != 1);
         }
@@ -412,11 +410,14 @@ namespace ZenLib.Tests
         /// Test maps work with equality.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestConstMapEquality6()
         {
             var x = Zen.Symbolic<ConstMap<int, ConstMap<string, bool>>>();
-            (x == new ConstMap<int, ConstMap<string, bool>>().Set(1, new ConstMap<string, bool>().Set("a", true))).Solve();
+            var solution = (x == new ConstMap<int, ConstMap<string, bool>>().Set(1, new ConstMap<string, bool>().Set("a", true))).Solve();
+            var result = solution.Get(x);
+            Assert.AreEqual(true, result.Get(1).Get("a"));
+            Assert.AreEqual(false, result.Get(1).Get("b"));
+            Assert.AreEqual(false, result.Get(2).Get("a"));
         }
 
         /// <summary>
@@ -424,6 +425,47 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         public void TestConstMapEquality7()
+        {
+            var x = Zen.Symbolic<ConstMap<int, Map<string, bool>>>();
+            var solution = (x == new ConstMap<int, Map<string, bool>>().Set(1, new Map<string, bool>().Set("a", true))).Solve();
+            var result = solution.Get(x);
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, result.Get(1).Count());
+            Assert.AreEqual(true, result.Get(1).Get("a").Value);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality8()
+        {
+            var x = Zen.Symbolic<ConstMap<int, TestHelper.Object2Different>>();
+            var o = new TestHelper.Object2Different { Field1 = 7, Field2 = 9 };
+            var solution = (x == new ConstMap<int, TestHelper.Object2Different>().Set(1, o)).Solve();
+            var result = solution.Get(x);
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(7, result.Get(1).Field1);
+            Assert.AreEqual((short)9, result.Get(1).Field2);
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestConstMapEquality9()
+        {
+            var x = Zen.Symbolic<ConstMap<int, FSeq<int>>>();
+            var l = new FSeq<int>().AddFront(1).AddFront(2);
+            var solution = (x == new ConstMap<int, FSeq<int>>().Set(1, l)).Solve();
+        }
+
+        /// <summary>
+        /// Test maps work with equality.
+        /// </summary>
+        [TestMethod]
+        public void TestConstMapEquality10()
         {
             var x = Zen.Symbolic<ConstMap<int, ConstMap<int, int>>>();
             var y = Zen.Symbolic<ConstMap<int, ConstMap<int, int>>>();
@@ -436,7 +478,7 @@ namespace ZenLib.Tests
         /// Test maps work with equality.
         /// </summary>
         [TestMethod]
-        public void TestConstMapEquality8()
+        public void TestConstMapEquality11()
         {
             var x = Zen.Symbolic<ConstMap<int, int>>();
             var solution = (new ConstMap<int, int>().Set(0, 1) == x.Set(3, 4).Set(1, 2)).Solve();

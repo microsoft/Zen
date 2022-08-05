@@ -28,7 +28,7 @@ namespace ZenLib.Generation
         /// <returns>The expression as a formatted string.</returns>
         public ISet<object> GetReusedSubExpressions<T>(Zen<T> expression)
         {
-            Compute(expression, new Unit());
+            Compute(expression, Unit.Instance);
             return this.reusedSubexpressions;
         }
 

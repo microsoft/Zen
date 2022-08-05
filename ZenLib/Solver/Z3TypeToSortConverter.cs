@@ -42,7 +42,7 @@ namespace ZenLib.Solver
             }
             else
             {
-                result = ReflectionUtilities.ApplyTypeVisitor(this, type, new Unit());
+                result = ReflectionUtilities.ApplyTypeVisitor(this, type, Unit.Instance);
             }
 
             this.typeToSort[type] = result;

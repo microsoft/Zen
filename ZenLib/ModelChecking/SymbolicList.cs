@@ -47,11 +47,15 @@ namespace ZenLib.ModelChecking
             return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
-        [ExcludeFromCodeCoverage]
+        /// <summary>
+        /// Equality of symbolic lists.
+        /// </summary>
+        /// <param name="other">The other list.</param>
+        /// <returns>A symbolic bool.</returns>
         internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
         {
-            throw new ZenUnreachableException();
+            throw new ZenException("Invalid const map or set in list");
         }
 
         /// <summary>

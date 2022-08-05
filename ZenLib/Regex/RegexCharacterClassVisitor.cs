@@ -13,7 +13,7 @@ namespace ZenLib
     {
         public Set<CharRange<T>> Compute(Regex<T> regex)
         {
-            return regex.Accept(this, new Unit());
+            return regex.Accept(this, Unit.Instance);
         }
 
         public Set<CharRange<T>> Visit(RegexBinopExpr<T> expression, Unit parameter)

@@ -9,5 +9,9 @@ namespace ZenLib
     /// </summary>
     public sealed class Unit
     {
+        /// <summary>
+        /// The unit instance.
+        /// </summary>
+        public static Unit Instance = new Unit();
     }
 }

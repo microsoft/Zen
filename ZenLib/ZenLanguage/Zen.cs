@@ -295,7 +295,7 @@ namespace ZenLib
         /// <returns>The default expression.</returns>
         public static Zen<T> Default<T>()
         {
-            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), typeof(T), new Unit());
+            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), typeof(T), Unit.Instance);
         }
 
         /// <summary>

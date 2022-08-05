@@ -19,7 +19,7 @@ namespace ZenLib
         /// <returns>A derivative as a regex.</returns>
         public Regex<T> Compute(Regex<T> regex)
         {
-            return regex.Accept(this, new Unit());
+            return regex.Accept(this, Unit.Instance);
         }
 
         public Regex<T> Visit(RegexBinopExpr<T> expression, Unit parameter)
