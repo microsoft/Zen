@@ -761,7 +761,7 @@ namespace ZenLib.Solver
 
         public SymbolicValue<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> ConvertExprToSymbolicValue(object e, Type type)
         {
-            return this.ExprToSymbolicValueConverter.ConvertExpr((Expr)e, type);
+            return this.ExprToSymbolicValueConverter.Visit(type, (Expr)e);
         }
 
         public Model Solve(BoolExpr x)

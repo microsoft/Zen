@@ -12,14 +12,14 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Class to help generate an empty interleaving set based on a type.
     /// </summary>
-    internal class InterleavingSetEmptyVisitor : ITypeVisitor<InterleavingResult, Unit>
+    internal class InterleavingSetEmptyVisitor : TypeVisitor<InterleavingResult, Unit>
     {
         /// <summary>
         /// Generate an empty set result.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitBigInteger(Unit parameter)
+        public override InterleavingResult VisitBigInteger(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -29,7 +29,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitBool(Unit parameter)
+        public override InterleavingResult VisitBool(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -39,7 +39,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitByte(Unit parameter)
+        public override InterleavingResult VisitByte(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -49,7 +49,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitChar(Unit parameter)
+        public override InterleavingResult VisitChar(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -60,7 +60,7 @@ namespace ZenLib.ModelChecking
         /// <param name="intType">The integer type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitFixedInteger(Type intType, Unit parameter)
+        public override InterleavingResult VisitFixedInteger(Type intType, Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -70,7 +70,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitInt(Unit parameter)
+        public override InterleavingResult VisitInt(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -82,9 +82,9 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The list element type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitList(Type listType, Type innerType, Unit parameter)
+        public override InterleavingResult VisitList(Type listType, Type innerType, Unit parameter)
         {
-            return ReflectionUtilities.ApplyTypeVisitor(this, innerType, parameter);
+            return this.Visit(innerType, parameter);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitLong(Unit parameter)
+        public override InterleavingResult VisitLong(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -106,7 +106,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        public override InterleavingResult VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             throw new ZenException("Maps not supported in BDDs");
         }
@@ -120,7 +120,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        public override InterleavingResult VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             throw new ZenException("Maps not supported in BDDs");
         }
@@ -132,12 +132,12 @@ namespace ZenLib.ModelChecking
         /// <param name="fields">The fields and their types.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitObject(Type objectType, SortedDictionary<string, Type> fields, Unit parameter)
+        public override InterleavingResult VisitObject(Type objectType, SortedDictionary<string, Type> fields, Unit parameter)
         {
             var result = ImmutableDictionary<string, InterleavingResult>.Empty;
             foreach (var kv in fields)
             {
-                result = result.Add(kv.Key, ReflectionUtilities.ApplyTypeVisitor(this, kv.Value, parameter));
+                result = result.Add(kv.Key, this.Visit(kv.Value, parameter));
             }
 
             return new InterleavingClass(result);
@@ -149,7 +149,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitReal(Unit parameter)
+        public override InterleavingResult VisitReal(Unit parameter)
         {
             throw new ZenException("Reals not supported in BDDs");
         }
@@ -162,7 +162,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitSeq(Type sequenceType, Type innerType, Unit parameter)
+        public override InterleavingResult VisitSeq(Type sequenceType, Type innerType, Unit parameter)
         {
             throw new ZenException("Seqs not supported in BDDs");
         }
@@ -172,7 +172,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitShort(Unit parameter)
+        public override InterleavingResult VisitShort(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -183,7 +183,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
         [ExcludeFromCodeCoverage]
-        public InterleavingResult VisitString(Unit parameter)
+        public override InterleavingResult VisitString(Unit parameter)
         {
             throw new ZenException("Strings not supported in BDDs");
         }
@@ -193,7 +193,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitUint(Unit parameter)
+        public override InterleavingResult VisitUint(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -203,7 +203,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitUlong(Unit parameter)
+        public override InterleavingResult VisitUlong(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }
@@ -213,7 +213,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
-        public InterleavingResult VisitUshort(Unit parameter)
+        public override InterleavingResult VisitUshort(Unit parameter)
         {
             return new InterleavingSet(ImmutableHashSet<object>.Empty);
         }

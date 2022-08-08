@@ -15,7 +15,7 @@ namespace ZenLib.Solver
     /// Convert a Z3 Expr to a C# object.
     /// </summary>
     [ExcludeFromCodeCoverage] // Z3 changes its internal representation every version.
-    internal class Z3ExprToObjectConverter : ITypeVisitor<object, Expr>
+    internal class Z3ExprToObjectConverter : TypeVisitor<object, Expr>
     {
         public object Convert(Expr e, Type type)
         {
@@ -24,15 +24,25 @@ namespace ZenLib.Solver
                 return Convert(e.Args[0], type);
             }
 
-            return ReflectionUtilities.ApplyTypeVisitor(this, type, e);
+            return this.Visit(type, e);
         }
 
-        public object VisitBigInteger(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitBigInteger(Expr parameter)
         {
             return BigInteger.Parse(parameter.ToString());
         }
 
-        public object VisitReal(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitReal(Expr parameter)
         {
             Contract.Assert(parameter.IsRatNum);
             var e = (RatNum)parameter;
@@ -41,7 +51,12 @@ namespace ZenLib.Solver
             return new Real(numerator, denominator);
         }
 
-        public object VisitBool(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitBool(Expr parameter)
         {
             if (parameter.IsEq)
             {
@@ -55,12 +70,22 @@ namespace ZenLib.Solver
             }
         }
 
-        public object VisitByte(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitByte(Expr parameter)
         {
             return byte.Parse(parameter.ToString());
         }
 
-        public object VisitChar(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitChar(Expr parameter)
         {
             Contract.Assert(parameter.IsApp && parameter.FuncDecl.Name.ToString() == "Char");
             return (char)parameter.FuncDecl.Parameters[0].Int;
@@ -70,7 +95,15 @@ namespace ZenLib.Solver
             return new ZenLib.Char(int.Parse(parameter.Args[0].ToString())); */
         }
 
-        public object VisitMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitMap(Type mapType, Type keyType, Type valueType, Expr parameter)
         {
             if (parameter.IsConstantArray)
             {
@@ -93,7 +126,7 @@ namespace ZenLib.Solver
                 var arrayExpr = parameter.Args[0];
                 var keyExpr = parameter.Args[1];
                 var valueExpr = parameter.Args[2];
-                var dict = Convert(arrayExpr, dictionaryType);
+                var dict = Convert(arrayExpr, mapType);
                 var key = Convert(keyExpr, keyType);
                 var value = Convert(valueExpr, valueType);
                 return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
@@ -104,8 +137,8 @@ namespace ZenLib.Solver
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "map");
 
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
-                var e1 = Convert(parameter.Args[0], dictionaryType);
-                var e2 = Convert(parameter.Args[1], dictionaryType);
+                var e1 = Convert(parameter.Args[0], mapType);
+                var e2 = Convert(parameter.Args[1], mapType);
                 var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
@@ -134,30 +167,27 @@ namespace ZenLib.Solver
             } */
         }
 
-        public object VisitConstMap(Type dictionaryType, Type keyType, Type valueType, Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        [ExcludeFromCodeCoverage]
+        public override object VisitConstMap(Type mapType, Type keyType, Type valueType, Expr parameter)
         {
-            throw new NotImplementedException();
+            throw new ZenUnreachableException();
         }
 
-        private object AddKeyValuePair(object dict, object key, object value, Type keyType, Type valueType, Expr valueExpr)
-        {
-            // Contract.Assert(!valueExpr.IsFalse);
-            // for sets, don't add the key when the value is false.
-            /* if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
-            {
-                return dict;
-            }
-            else
-            {
-                var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
-                return m.Invoke(dict, new object[] { key, value });
-            } */
-
-            var m = typeof(Map<,>).MakeGenericType(keyType, valueType).GetMethod("Set", new Type[] { keyType, valueType });
-            return m.Invoke(dict, new object[] { key, value });
-        }
-
-        public object VisitFixedInteger(Type intType, Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="intType">The integer type.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitFixedInteger(Type intType, Expr parameter)
         {
             var bytes = BigInteger.Parse(parameter.ToString()).ToByteArray();
             int lastIndex = Array.FindLastIndex(bytes, b => b != 0);
@@ -166,23 +196,47 @@ namespace ZenLib.Solver
             return intType.GetConstructor(new Type[] { typeof(byte[]) }).Invoke(new object[] { bytes });
         }
 
-        public object VisitInt(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitInt(Expr parameter)
         {
             return (int)uint.Parse(parameter.ToString());
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="listType">The list type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
         [ExcludeFromCodeCoverage]
-        public object VisitList(Type listType, Type innerType, Expr parameter)
+        public override object VisitList(Type listType, Type innerType, Expr parameter)
         {
             throw new ZenException("Invalid use of list in map or set type.");
         }
 
-        public object VisitLong(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitLong(Expr parameter)
         {
             return (long)ulong.Parse(parameter.ToString());
         }
 
-        public object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="fields">The fields and their types.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitObject(Type objectType, SortedDictionary<string, Type> fields, Expr parameter)
         {
             var fieldsAndTypes = fields.ToArray();
             var fieldNames = new string[fieldsAndTypes.Length];
@@ -196,33 +250,65 @@ namespace ZenLib.Solver
             return ReflectionUtilities.CreateInstance(objectType, fieldNames, fieldValues);
         }
 
-        public object VisitShort(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitShort(Expr parameter)
         {
             return (short)ushort.Parse(parameter.ToString());
         }
 
-        public object VisitString(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitString(Expr parameter)
         {
             var result = (Seq<char>)Convert(parameter, ReflectionUtilities.UnicodeSequenceType);
             return Seq.AsString(result);
         }
 
-        public object VisitUint(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitUint(Expr parameter)
         {
             return uint.Parse(parameter.ToString());
         }
 
-        public object VisitUlong(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitUlong(Expr parameter)
         {
             return ulong.Parse(parameter.ToString());
         }
 
-        public object VisitUshort(Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitUshort(Expr parameter)
         {
             return ushort.Parse(parameter.ToString());
         }
 
-        public object VisitSeq(Type sequenceType, Type innerType, Expr parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="sequenceType">The sequence type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">The Z3 expression.</param>
+        /// <returns>A C# object.</returns>
+        public override object VisitSeq(Type sequenceType, Type innerType, Expr parameter)
         {
             if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "seq.empty")
             {
@@ -255,6 +341,34 @@ namespace ZenLib.Solver
                 var m = sequenceType.GetMethod("Concat");
                 return m.Invoke(seq1, new object[] { seq2 });
             }
+        }
+
+        /// <summary>
+        /// Add a key value pair to a map.
+        /// </summary>
+        /// <param name="map">The map.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <returns></returns>
+        private object AddKeyValuePair(object map, object key, object value, Type keyType, Type valueType, Expr valueExpr)
+        {
+            // Contract.Assert(!valueExpr.IsFalse);
+            // for sets, don't add the key when the value is false.
+            /* if (valueType == typeof(SetUnit) && valueExpr.IsFalse)
+            {
+                return dict;
+            }
+            else
+            {
+                var m = typeof(ImmutableDictionary<,>).MakeGenericType(keyType, valueType).GetMethod("SetItem", new Type[] { keyType, valueType });
+                return m.Invoke(dict, new object[] { key, value });
+            } */
+
+            var m = typeof(Map<,>).MakeGenericType(keyType, valueType).GetMethod("Set", new Type[] { keyType, valueType });
+            return m.Invoke(map, new object[] { key, value });
         }
     }
 }

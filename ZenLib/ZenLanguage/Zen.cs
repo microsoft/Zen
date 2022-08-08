@@ -295,7 +295,7 @@ namespace ZenLib
         /// <returns>The default expression.</returns>
         public static Zen<T> Default<T>()
         {
-            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), typeof(T), Unit.Instance);
+            return (Zen<T>)new ZenDefaultTypeVisitor().Visit(typeof(T), Unit.Instance);
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace ZenLib
         internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
             var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)), ExhaustiveDepth = exhaustiveDepth };
-            return (Zen<T>)ReflectionUtilities.ApplyTypeVisitor(generator, typeof(T), parameter);
+            return (Zen<T>)generator.Visit(typeof(T), parameter);
         }
 
         [ExcludeFromCodeCoverage]
@@ -1762,7 +1762,7 @@ namespace ZenLib
             {
                 var keyType = kv.Key.GetType();
                 var valueType = kv.Value.GetType();
-                ReflectionUtilities.ValidateIsZenType(keyType);
+                Contract.Assert(ReflectionUtilities.IsZenType(keyType));
                 var innerType = keyType.GetGenericArgumentsCached()[0];
 
                 Contract.Assert(innerType.IsAssignableFrom(valueType), "Type mismatch in assignment between key and value");

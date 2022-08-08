@@ -497,46 +497,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Validates whether the field or property exists.
-        /// </summary>
-        /// <param name="objectType">The object type.</param>
-        /// <param name="fieldType">The field type.</param>
-        /// <param name="fieldOrPropertyName">The field or property name.</param>
-        public static void ValidateFieldOrProperty(Type objectType, Type fieldType, string fieldOrPropertyName)
-        {
-            var p = objectType.GetPropertyCached(fieldOrPropertyName);
-
-            if (p != null && p.PropertyType != fieldType)
-            {
-                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
-            }
-
-            var f = objectType.GetFieldCached(fieldOrPropertyName);
-
-            if (f != null && f.FieldType != fieldType)
-            {
-                throw new ZenException($"Field or property {fieldOrPropertyName} type mismatch with {fieldType} for object with type {objectType}.");
-            }
-
-            if (p == null && f == null)
-            {
-                throw new ZenException($"Invalid field or property {fieldOrPropertyName} for object with type {objectType}");
-            }
-        }
-
-        /// <summary>
-        /// Validates that a type is a Zen type.
-        /// </summary>
-        /// <param name="type">The object type.</param>
-        public static void ValidateIsZenType(Type type)
-        {
-            if (!IsZenType(type))
-            {
-                throw new ZenException($"Attempting to use value of non-Zen type: {type}");
-            }
-        }
-
-        /// <summary>
         /// Set the value of a field or property using reflection.
         /// </summary>
         /// <typeparam name="TObject">The object type.</typeparam>
@@ -805,77 +765,6 @@ namespace ZenLib
             }
 
             return CreateInstance(type, fields.Keys.ToArray(), fields.Values.ToArray());
-        }
-
-        /// <summary>
-        /// Walk over a type to create a value.
-        /// </summary>
-        /// <param name="visitor">The type visitor object.</param>
-        /// <param name="type">The type.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <typeparam name="T">The return type.</typeparam>
-        /// <typeparam name="TParam">The parameter type.</typeparam>
-        /// <returns>A value.</returns>
-        internal static T ApplyTypeVisitor<T, TParam>(ITypeVisitor<T, TParam> visitor, Type type, TParam parameter)
-        {
-            if (type == BoolType)
-                return visitor.VisitBool(parameter);
-            if (type == ByteType)
-                return visitor.VisitByte(parameter);
-            if (type == CharType)
-                return visitor.VisitChar(parameter);
-            if (type == ShortType)
-                return visitor.VisitShort(parameter);
-            if (type == UshortType)
-                return visitor.VisitUshort(parameter);
-            if (type == IntType)
-                return visitor.VisitInt(parameter);
-            if (type == UintType)
-                return visitor.VisitUint(parameter);
-            if (type == LongType)
-                return visitor.VisitLong(parameter);
-            if (type == UlongType)
-                return visitor.VisitUlong(parameter);
-            if (type == BigIntType)
-                return visitor.VisitBigInteger(parameter);
-            if (type == RealType)
-                return visitor.VisitReal(parameter);
-            if (type == StringType)
-                return visitor.VisitString(parameter);
-            if (IsFixedIntegerType(type))
-                return visitor.VisitFixedInteger(type, parameter);
-
-            if (IsSeqType(type))
-            {
-                var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitSeq(type, t, parameter);
-            }
-
-            if (IsMapType(type))
-            {
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                return visitor.VisitMap(type, keyType, valueType, parameter);
-            }
-
-            if (IsConstMapType(type))
-            {
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                return visitor.VisitConstMap(type, keyType, valueType, parameter);
-            }
-
-            if (IsFSeqType(type))
-            {
-                var t = type.GetGenericArgumentsCached()[0];
-                return visitor.VisitList(type, t, parameter);
-            }
-
-            // some class or struct
-            var dict = GetAllFieldAndPropertyTypes(type);
-            return visitor.VisitObject(type, dict, parameter);
         }
 
         /// <summary>

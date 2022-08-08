@@ -82,7 +82,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(expr);
             Contract.AssertNotNull(fieldName);
-            ReflectionUtilities.ValidateFieldOrProperty(typeof(T1), typeof(T2), fieldName);
+            Contract.AssertFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName, unroll);
             hashConsTable.GetOrAdd(key, (expr, fieldName, unroll), createFunc, out var value);

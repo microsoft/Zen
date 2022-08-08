@@ -104,7 +104,7 @@ namespace ZenLib.ModelChecking
         public InterleavingResult Visit<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
         {
             var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            return ReflectionUtilities.ApplyTypeVisitor(emptySetGenerator, typeof(T), Unit.Instance);
+            return emptySetGenerator.Visit(typeof(T), Unit.Instance);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace ZenLib.ModelChecking
         public InterleavingResult Visit<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
             var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            return ReflectionUtilities.ApplyTypeVisitor(emptySetGenerator, typeof(T), Unit.Instance);
+            return emptySetGenerator.Visit(typeof(T), Unit.Instance);
         }
 
         /// <summary>
@@ -328,7 +328,7 @@ namespace ZenLib.ModelChecking
         {
             this.DisjointSets.Add(expression);
             var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            var emptySet = (InterleavingSet)ReflectionUtilities.ApplyTypeVisitor(emptySetGenerator, typeof(T), Unit.Instance);
+            var emptySet = (InterleavingSet)emptySetGenerator.Visit(typeof(T), Unit.Instance);
             var variableSet = emptySet.GetAllVariables().Add(expression);
             return new InterleavingSet(variableSet);
         }

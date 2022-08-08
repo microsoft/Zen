@@ -511,7 +511,7 @@ namespace ZenLib.ModelChecking
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
             var equalityVisitor = new SymbolicEqualityVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
-            var result = ReflectionUtilities.ApplyTypeVisitor(equalityVisitor, typeof(T), (e1, e2));
+            var result = equalityVisitor.Visit(typeof(T), (e1, e2));
             return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
@@ -898,7 +898,7 @@ namespace ZenLib.ModelChecking
                 return result;
             }
 
-            dynamic defaultValue = ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), expression.Key.GetType(), Unit.Instance);
+            dynamic defaultValue = new ZenDefaultTypeVisitor().Visit(typeof(TValue), Unit.Instance);
             return this.Visit(defaultValue, parameter);
         }
 

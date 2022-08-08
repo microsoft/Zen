@@ -13,14 +13,27 @@ namespace ZenLib.Solver
     /// <summary>
     /// Convert a C# type into a Z3 sort.
     /// </summary>
-    internal class Z3TypeToSortConverter : ITypeVisitor<Sort, Unit>
+    internal class Z3TypeToSortConverter : TypeVisitor<Sort, Unit>
     {
+        /// <summary>
+        /// The Z3 solver object.
+        /// </summary>
         private SolverZ3 solver;
 
+        /// <summary>
+        /// A mapping from a C# type to its Z3 sort.
+        /// </summary>
         private Dictionary<Type, Sort> typeToSort;
 
+        /// <summary>
+        /// The object application names.
+        /// </summary>
         public ISet<string> ObjectAppNames;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Z3TypeToSortConverter"/> class.
+        /// </summary>
+        /// <param name="solver">The Z3 solver.</param>
         public Z3TypeToSortConverter(SolverZ3 solver)
         {
             this.solver = solver;
@@ -28,6 +41,11 @@ namespace ZenLib.Solver
             this.typeToSort = new Dictionary<Type, Sort>();
         }
 
+        /// <summary>
+        /// Get a sort for a given type.
+        /// </summary>
+        /// <param name="type">The C# type.</param>
+        /// <returns>The Z3 sort.</returns>
         public Sort GetSortForType(Type type)
         {
             if (this.typeToSort.TryGetValue(type, out var sort))
@@ -42,39 +60,72 @@ namespace ZenLib.Solver
             }
             else
             {
-                result = ReflectionUtilities.ApplyTypeVisitor(this, type, Unit.Instance);
+                result = this.Visit(type, Unit.Instance);
             }
 
             this.typeToSort[type] = result;
             return result;
         }
 
-        public Sort VisitBigInteger(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitBigInteger(Unit parameter)
         {
             return this.solver.BigIntSort;
         }
 
-        public Sort VisitReal(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitReal(Unit parameter)
         {
             return this.solver.RealSort;
         }
 
-        public Sort VisitBool(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitBool(Unit parameter)
         {
             return this.solver.BoolSort;
         }
 
-        public Sort VisitByte(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitByte(Unit parameter)
         {
             return this.solver.ByteSort;
         }
 
-        public Sort VisitChar(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitChar(Unit parameter)
         {
             return this.solver.CharSort;
         }
 
-        public Sort VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             var keySort = this.GetSortForType(keyType);
             var valueSort = this.GetSortForType(valueType);
@@ -87,35 +138,73 @@ namespace ZenLib.Solver
             return SolverZ3.Context.MkArraySort(keySort, valueSort);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
         [ExcludeFromCodeCoverage]
-        public Sort VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
+        public override Sort VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
             throw new ZenException("Can not use a const map in another map.");
         }
 
-        public Sort VisitFixedInteger(Type intType, Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="intType">The integer type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitFixedInteger(Type intType, Unit parameter)
         {
             int size = ((dynamic)Activator.CreateInstance(intType, 0L)).Size;
             return SolverZ3.Context.MkBitVecSort((uint)size);
         }
 
-        public Sort VisitInt(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitInt(Unit parameter)
         {
             return this.solver.IntSort;
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="listType">The list type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
         [ExcludeFromCodeCoverage]
-        public Sort VisitList(Type listType, Type innerType, Unit parameter)
+        public override Sort VisitList(Type listType, Type innerType, Unit parameter)
         {
             throw new ZenException("Can not use finite sequence type in another map.");
         }
 
-        public Sort VisitLong(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitLong(Unit parameter)
         {
             return this.solver.LongSort;
         }
 
-        public Sort VisitObject(Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="objectFields">The fields and their types.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitObject(Type objectType, SortedDictionary<string, Type> objectFields, Unit parameter)
         {
             var fields = objectFields.ToArray();
             var fieldNames = new string[fields.Length];
@@ -131,32 +220,64 @@ namespace ZenLib.Solver
             return SolverZ3.Context.MkDatatypeSort(objectType.ToString(), new Constructor[] { objectConstructor });
         }
 
-        public Sort VisitShort(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitShort(Unit parameter)
         {
             return this.solver.ShortSort;
         }
 
-        public Sort VisitString(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitString(Unit parameter)
         {
             return this.solver.StringSort;
         }
 
-        public Sort VisitUint(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitUint(Unit parameter)
         {
             return this.solver.IntSort;
         }
 
-        public Sort VisitUlong(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitUlong(Unit parameter)
         {
             return this.solver.LongSort;
         }
 
-        public Sort VisitUshort(Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitUshort(Unit parameter)
         {
             return this.solver.ShortSort;
         }
 
-        public Sort VisitSeq(Type sequenceType, Type innerType, Unit parameter)
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="sequenceType">The sequence type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A sort for the type.</returns>
+        public override Sort VisitSeq(Type sequenceType, Type innerType, Unit parameter)
         {
             var valueSort = this.GetSortForType(innerType);
             return SolverZ3.Context.MkSeqSort(valueSort);

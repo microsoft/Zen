@@ -56,8 +56,8 @@ namespace ZenLib
             foreach (var field in fields)
             {
                 var fieldType = field.Item2.GetType();
-                ReflectionUtilities.ValidateIsZenType(fieldType);
-                ReflectionUtilities.ValidateFieldOrProperty(
+                Contract.Assert(ReflectionUtilities.IsZenType(fieldType));
+                Contract.AssertFieldOrProperty(
                     typeof(TObject),
                     fieldType.BaseType.GetGenericArgumentsCached()[0],
                     field.Item1);

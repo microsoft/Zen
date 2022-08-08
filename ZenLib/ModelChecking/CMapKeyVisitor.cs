@@ -74,7 +74,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The set of CMap variables.</returns>
         public override void Visit<T>(ZenConstantExpr<T> expression)
         {
-            ReflectionUtilities.ApplyTypeVisitor(this.valueVisitor, typeof(T), expression.Value);
+            this.valueVisitor.Visit(typeof(T), expression.Value);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace ZenLib.ModelChecking
     /// <summary>
     /// Class to walk over a constant value and pull out the CMap key values.
     /// </summary>
-    internal sealed class CMapValueVisitor : ITypeVisitor<Unit, object>
+    internal sealed class CMapValueVisitor : TypeVisitor<Unit, object>
     {
         /// <summary>
         /// The key visitor.
@@ -118,7 +118,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitBigInteger(object parameter)
+        public override Unit VisitBigInteger(object parameter)
         {
             return Unit.Instance;
         }
@@ -128,7 +128,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitBool(object parameter)
+        public override Unit VisitBool(object parameter)
         {
             return Unit.Instance;
         }
@@ -138,7 +138,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitByte(object parameter)
+        public override Unit VisitByte(object parameter)
         {
             return Unit.Instance;
         }
@@ -148,7 +148,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitChar(object parameter)
+        public override Unit VisitChar(object parameter)
         {
             return Unit.Instance;
         }
@@ -161,21 +161,21 @@ namespace ZenLib.ModelChecking
         /// <param name="valueType">The value type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitConstMap(Type mapType, Type keyType, Type valueType, object parameter)
+        public override Unit VisitConstMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
             var consts = this.GetOrCreate(mapType);
             dynamic value = parameter;
             foreach (var kv in value.Values)
             {
                 consts.Add(kv.Key);
-                ReflectionUtilities.ApplyTypeVisitor(this, keyType, kv.Key);
-                ReflectionUtilities.ApplyTypeVisitor(this, valueType, kv.Value);
+                this.Visit(keyType, kv.Key);
+                this.Visit(valueType, kv.Value);
             }
 
             return Unit.Instance;
         }
 
-        public Unit VisitFixedInteger(Type intType, object parameter)
+        public override Unit VisitFixedInteger(Type intType, object parameter)
         {
             return Unit.Instance;
         }
@@ -185,7 +185,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitInt(object parameter)
+        public override Unit VisitInt(object parameter)
         {
             return Unit.Instance;
         }
@@ -197,7 +197,7 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The inner type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitList(Type listType, Type innerType, object parameter)
+        public override Unit VisitList(Type listType, Type innerType, object parameter)
         {
             // we don't support these in lists anyway
             /* dynamic value = parameter;
@@ -214,7 +214,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitLong(object parameter)
+        public override Unit VisitLong(object parameter)
         {
             return Unit.Instance;
         }
@@ -227,13 +227,13 @@ namespace ZenLib.ModelChecking
         /// <param name="valueType">The value type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitMap(Type mapType, Type keyType, Type valueType, object parameter)
+        public override Unit VisitMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
             dynamic value = parameter;
             foreach (var kv in value.Values)
             {
-                ReflectionUtilities.ApplyTypeVisitor(this, keyType, kv.Key);
-                ReflectionUtilities.ApplyTypeVisitor(this, valueType, kv.Value);
+                this.Visit(keyType, kv.Key);
+                this.Visit(valueType, kv.Value);
             }
 
             return Unit.Instance;
@@ -246,16 +246,16 @@ namespace ZenLib.ModelChecking
         /// <param name="fields">The object fields.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitObject(Type objectType, SortedDictionary<string, Type> fields, object parameter)
+        public override Unit VisitObject(Type objectType, SortedDictionary<string, Type> fields, object parameter)
         {
             foreach (var field in ReflectionUtilities.GetAllFields(objectType))
             {
-                ReflectionUtilities.ApplyTypeVisitor(this, field.FieldType, field.GetValue(parameter));
+                this.Visit(field.FieldType, field.GetValue(parameter));
             }
 
             foreach (var property in ReflectionUtilities.GetAllProperties(objectType))
             {
-                ReflectionUtilities.ApplyTypeVisitor(this, property.PropertyType, property.GetValue(parameter));
+                this.Visit(property.PropertyType, property.GetValue(parameter));
             }
 
             return Unit.Instance;
@@ -266,7 +266,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitReal(object parameter)
+        public override Unit VisitReal(object parameter)
         {
             return Unit.Instance;
         }
@@ -278,12 +278,12 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The inner type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitSeq(Type sequenceType, Type innerType, object parameter)
+        public override Unit VisitSeq(Type sequenceType, Type innerType, object parameter)
         {
             dynamic value = parameter;
             foreach (var v in value.Values)
             {
-                ReflectionUtilities.ApplyTypeVisitor(this, innerType, v);
+                this.Visit(innerType, v);
             }
 
             return Unit.Instance;
@@ -294,7 +294,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitShort(object parameter)
+        public override Unit VisitShort(object parameter)
         {
             return Unit.Instance;
         }
@@ -304,7 +304,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitString(object parameter)
+        public override Unit VisitString(object parameter)
         {
             return Unit.Instance;
         }
@@ -314,7 +314,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitUint(object parameter)
+        public override Unit VisitUint(object parameter)
         {
             return Unit.Instance;
         }
@@ -324,7 +324,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitUlong(object parameter)
+        public override Unit VisitUlong(object parameter)
         {
             return Unit.Instance;
         }
@@ -334,7 +334,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>No value.</returns>
-        public Unit VisitUshort(object parameter)
+        public override Unit VisitUshort(object parameter)
         {
             return Unit.Instance;
         }

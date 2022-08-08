@@ -13,7 +13,7 @@ namespace ZenLib.ModelChecking
     /// symbolic values of the same type.
     /// </summary>
     internal class SymbolicEqualityVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> :
-        ITypeVisitor<TBool,
+        TypeVisitor<TBool,
             (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>,
              SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)>
     {
@@ -51,7 +51,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitBigInteger((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitBigInteger((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -63,7 +63,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitBool((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitBool((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -75,7 +75,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitByte((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitByte((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -85,7 +85,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitChar((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitChar((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -100,7 +100,7 @@ namespace ZenLib.ModelChecking
         /// <param name="valueType">The value type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitConstMap(Type mapType, Type keyType, Type valueType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitConstMap(Type mapType, Type keyType, Type valueType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -115,17 +115,17 @@ namespace ZenLib.ModelChecking
             {
                 if (!v1.Value.TryGetValue(key, out var val1))
                 {
-                    deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), valueType, Unit.Instance);
+                    deflt = deflt ?? new ZenDefaultTypeVisitor().Visit(valueType, Unit.Instance);
                     val1 = this.evaluationVisitor.Evaluate((dynamic)deflt, this.evaluationEnv);
                 }
 
                 if (!v2.Value.TryGetValue(key, out var val2))
                 {
-                    deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), valueType, Unit.Instance);
+                    deflt = deflt ?? new ZenDefaultTypeVisitor().Visit(valueType, Unit.Instance);
                     val2 = this.evaluationVisitor.Evaluate((dynamic)deflt, this.evaluationEnv);
                 }
 
-                var valuesEq = ReflectionUtilities.ApplyTypeVisitor(this, valueType, (val1, val2));
+                var valuesEq = this.Visit(valueType, (val1, val2));
                 result = this.solver.And(result,  valuesEq);
             }
 
@@ -138,7 +138,7 @@ namespace ZenLib.ModelChecking
         /// <param name="intType">The integer type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitFixedInteger(Type intType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitFixedInteger(Type intType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -148,7 +148,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitInt((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitInt((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -160,7 +160,7 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The inner type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitList(Type listType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitList(Type listType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -181,7 +181,7 @@ namespace ZenLib.ModelChecking
                 {
                     var elt1 = groupList1.Values[i];
                     var elt2 = groupList2.Values[i];
-                    var eq = ReflectionUtilities.ApplyTypeVisitor(this, innerType, (elt1, elt2));
+                    var eq = this.Visit(innerType, (elt1, elt2));
                     areEq = this.solver.And(areEq, eq);
                 }
 
@@ -196,7 +196,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitLong((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitLong((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -209,7 +209,7 @@ namespace ZenLib.ModelChecking
         /// <param name="valueType">The value type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitMap(Type mapType, Type keyType, Type valueType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitMap(Type mapType, Type keyType, Type valueType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -223,7 +223,7 @@ namespace ZenLib.ModelChecking
         /// <param name="fields">The field types.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitObject(Type objectType, SortedDictionary<string, Type> fields, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitObject(Type objectType, SortedDictionary<string, Type> fields, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -237,7 +237,7 @@ namespace ZenLib.ModelChecking
                 var fv1 = v1.Fields[fieldName];
                 var fv2 = v2.Fields[fieldName];
 
-                var fieldsEq = ReflectionUtilities.ApplyTypeVisitor(this, fieldType, (fv1, fv2));
+                var fieldsEq = this.Visit(fieldType, (fv1, fv2));
                 result = this.solver.And(result, fieldsEq);
             }
 
@@ -249,7 +249,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitReal((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitReal((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -263,7 +263,7 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The inner type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitSeq(Type sequenceType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitSeq(Type sequenceType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -275,7 +275,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitShort((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitShort((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -285,7 +285,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitString((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitString((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicString<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -297,7 +297,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitUint((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitUint((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -307,7 +307,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitUlong((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitUlong((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
@@ -317,7 +317,7 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        public TBool VisitUshort((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        public override TBool VisitUshort((SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             return BitvecEquality(parameter);
         }
