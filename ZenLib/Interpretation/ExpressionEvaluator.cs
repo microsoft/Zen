@@ -194,27 +194,27 @@ namespace ZenLib.Interpretation
                     if (ReflectionUtilities.IsFixedIntegerType(type))
                         return ((dynamic)e1).BitwiseAnd((dynamic)e2);
                     else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
+                        return ReflectionUtilities.FromLong<T>(ReflectionUtilities.ToLong(e1) & ReflectionUtilities.ToLong(e2));
 
                 case BitwiseOp.BitwiseOr:
                     if (ReflectionUtilities.IsFixedIntegerType(type))
                         return ((dynamic)e1).BitwiseOr((dynamic)e2);
                     else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
+                        return ReflectionUtilities.FromLong<T>(ReflectionUtilities.ToLong(e1) | ReflectionUtilities.ToLong(e2));
 
                 default:
                     Contract.Assert(expression.Operation == BitwiseOp.BitwiseXor);
                     if (ReflectionUtilities.IsFixedIntegerType(type))
                         return ((dynamic)e1).BitwiseXor((dynamic)e2);
                     else
-                        return ReflectionUtilities.Specialize<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
+                        return ReflectionUtilities.FromLong<T>(ReflectionUtilities.ToLong(e1) ^ ReflectionUtilities.ToLong(e2));
             }
         }
 
         public object Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var x = ReflectionUtilities.ToLong(Evaluate(expression.Expr, parameter));
-            return ReflectionUtilities.Specialize<T>(~x);
+            return ReflectionUtilities.FromLong<T>(~x);
         }
 
         public object Visit<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
@@ -591,7 +591,7 @@ namespace ZenLib.Interpretation
             {
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
-                return ReflectionUtilities.CastFiniteInteger<TKey, TValue>((TKey)e);
+                return IntN.CastFiniteInteger<TKey, TValue>((TKey)e);
             }
         }
 

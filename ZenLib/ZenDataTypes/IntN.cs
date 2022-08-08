@@ -614,6 +614,57 @@ namespace ZenLib
     }
 
     /// <summary>
+    /// Static methods for fixed integers.
+    /// </summary>
+    public static class IntN
+    {
+        /// <summary>
+        /// Cast one finite integer to another finite integer type.
+        /// </summary>
+        /// <param name="x">The source finite integer.</param>
+        /// <returns>The resulting finite integer.</returns>
+        public static TTarget CastFiniteInteger<TSource, TTarget>(TSource x)
+        {
+            var b1 = ReflectionUtilities.IsFixedIntegerType(typeof(TSource));
+            var b2 = ReflectionUtilities.IsFixedIntegerType(typeof(TTarget));
+
+            if (!b1 && !b2)
+            {
+                return (TTarget)(dynamic)x;
+            }
+            else if (b1 && !b2)
+            {
+                var result = 0L;
+                byte[] bytes = ((dynamic)x).Bytes;
+                for (int i = 0; i < Math.Min(bytes.Length, 4); i++)
+                {
+                    result <<= 8;
+                    result |= bytes[bytes.Length - 1 - i];
+                }
+
+                return (TTarget)(dynamic)result;
+            }
+            else
+            {
+                byte[] bytes;
+                if (b1)
+                {
+                    bytes = ((dynamic)x).Bytes;
+                }
+                else
+                {
+                    bytes = BitConverter.GetBytes((long)(dynamic)x);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(bytes);
+                }
+
+                var c = typeof(TTarget).GetConstructor(new Type[] { typeof(byte[]) });
+                return (TTarget)c.Invoke(new object[] { bytes });
+            }
+        }
+    }
+
+    /// <summary>
     /// Signed flag type.
     /// </summary>
     public struct Signed { }

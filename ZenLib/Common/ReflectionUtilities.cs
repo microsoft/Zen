@@ -6,10 +6,9 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Numerics;
     using System.Reflection;
-    using static ZenLib.Zen;
+    using ZenLib.ZenLanguage;
 
     /// <summary>
     /// A collection of helper functions for manipulating Zen
@@ -116,53 +115,6 @@ namespace ZenLib
         /// Type of a fixed size integer.
         /// </summary>
         public readonly static Type IntNType = typeof(IntN<,>);
-
-        /// <summary>
-        /// The object creation method.
-        /// </summary>
-        public static MethodInfo CreateMethod = typeof(Zen).GetMethod("Create");
-
-        /// <summary>
-        /// The zen constant list creation method.
-        /// </summary>
-        public static MethodInfo CreateZenSeqConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenSeqConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant list creation method.
-        /// </summary>
-        public static MethodInfo CreateZenListConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenListConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant map creation method.
-        /// </summary>
-        public static MethodInfo CreateZenMapConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenMapConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant map creation method.
-        /// </summary>
-        public static MethodInfo CreateZenConstMapConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenConstMapConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant option creation method.
-        /// </summary>
-        public static MethodInfo CreateZenOptionConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenOptionConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant tuple creation method.
-        /// </summary>
-        public static MethodInfo CreateZenTupleConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenTupleConstant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        /// <summary>
-        /// The zen constant value tuple creation method.
-        /// </summary>
-        public static MethodInfo CreateZenValueTupleConstantMethod =
-            typeof(ReflectionUtilities).GetMethod("CreateZenValueTupleConstant", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// Cache of generic arguments.
@@ -360,6 +312,17 @@ namespace ZenLib
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Check if a type is a primitive integer.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>True or false.</returns>
+        public static bool IsPrimitiveIntegerType(Type type)
+        {
+            return (type == ByteType || type == ShortType || type == UshortType || type == IntType ||
+                    type == UintType || type == LongType || type == UlongType);
         }
 
         /// <summary>
@@ -575,6 +538,13 @@ namespace ZenLib
             return obj;
         }
 
+        /// <summary>
+        /// Find matching parameters for a constructor.
+        /// </summary>
+        /// <param name="c">The constructor.</param>
+        /// <param name="fieldNames">The field names.</param>
+        /// <param name="values">The field values.</param>
+        /// <returns>The parameter match.</returns>
         private static object[] FindMatchingParameters(ConstructorInfo c, string[] fieldNames, object[] values)
         {
             var parameters = c.GetParameters();
@@ -589,7 +559,7 @@ namespace ZenLib
                 var fieldName = fieldNames[i];
                 var value = values[i];
 
-                var parameterIndex = FindMatchingParamter(parameters, fieldName, value.GetType());
+                var parameterIndex = FindMatchingParameter(parameters, fieldName, value.GetType());
                 if (parameterIndex < 0)
                 {
                     return null;
@@ -607,7 +577,14 @@ namespace ZenLib
             return result;
         }
 
-        private static int FindMatchingParamter(ParameterInfo[] parameters, string fieldName, Type fieldType)
+        /// <summary>
+        /// Find matching parameter.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="fieldType">The field type.</param>
+        /// <returns>The index or -1 if none.</returns>
+        private static int FindMatchingParameter(ParameterInfo[] parameters, string fieldName, Type fieldType)
         {
             for (int j = 0; j < parameters.Length; j++)
             {
@@ -688,83 +665,7 @@ namespace ZenLib
         /// <returns>Default value of that type.</returns>
         internal static T GetDefaultValue<T>()
         {
-            return (T)GetDefaultValue(typeof(T));
-        }
-
-        private static object GetDefaultValue(Type type)
-        {
-            if (type == BoolType)
-                return false;
-            if (type == ByteType)
-                return (byte)0;
-            if (type == CharType)
-                return char.MinValue;
-            if (type == ShortType)
-                return (short)0;
-            if (type == UshortType)
-                return (ushort)0;
-            if (type == IntType)
-                return 0;
-            if (type == UintType)
-                return 0U;
-            if (type == LongType)
-                return 0L;
-            if (type == UlongType)
-                return 0UL;
-            if (type == BigIntType)
-                return new BigInteger(0);
-            if (type == RealType)
-                return new Real(0, 1);
-            if (type == StringType)
-                return string.Empty;
-            if (IsFixedIntegerType(type))
-                return type.GetConstructor(new Type[] { typeof(long) }).Invoke(new object[] { 0L });
-
-            if (IsSeqType(type))
-            {
-                var innerType = type.GetGenericArgumentsCached()[0];
-                var c = SeqType.MakeGenericType(innerType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-
-            if (IsMapType(type))
-            {
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                var c = MapType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-
-            if (IsConstMapType(type))
-            {
-                var typeParameters = type.GetGenericArgumentsCached();
-                var keyType = typeParameters[0];
-                var valueType = typeParameters[1];
-                var c = ConstMapType.MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-
-            if (IsFSeqType(type))
-            {
-                var c = type.GetConstructor(new Type[] { });
-                return c.Invoke(CommonUtilities.EmptyArray);
-            }
-
-            // some class or struct
-            var fields = new SortedDictionary<string, object>();
-
-            foreach (var field in GetAllFields(type))
-            {
-                fields[field.Name] = GetDefaultValue(field.FieldType);
-            }
-
-            foreach (var property in GetAllProperties(type))
-            {
-                fields[property.Name] = GetDefaultValue(property.PropertyType);
-            }
-
-            return CreateInstance(type, fields.Keys.ToArray(), fields.Values.ToArray());
+            return (T)new ZenDefaultValueVisitor().Visit(typeof(T), new Unit());
         }
 
         /// <summary>
@@ -790,77 +691,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Create a constant Zen Seq value.
-        /// </summary>
-        /// <param name="value">The seq value.</param>
-        /// <returns>The Zen value representing the seq.</returns>
-        internal static Zen<Seq<T>> CreateZenSeqConstant<T>(Seq<T> value)
-        {
-            if (typeof(T) == typeof(char))
-            {
-                return ZenConstantExpr<Seq<T>>.Create(value);
-            }
-
-            Zen<Seq<T>> seq = ZenSeqEmptyExpr<T>.Instance;
-            foreach (var elt in value.Values)
-            {
-                seq = ZenSeqConcatExpr<T>.Create(seq, ZenSeqUnitExpr<T>.Create(elt));
-            }
-
-            return seq;
-        }
-
-        /// <summary>
-        /// Create a constant Zen list value.
-        /// </summary>
-        /// <param name="value">The list value.</param>
-        /// <returns>The Zen value representing the list.</returns>
-        internal static Zen<FSeq<T>> CreateZenListConstant<T>(FSeq<T> value)
-        {
-            Zen<FSeq<T>> list = ZenListEmptyExpr<T>.Instance;
-            foreach (var elt in value.Values.Reverse())
-            {
-                ReportIfNullConversionError(elt, "element", typeof(FSeq<T>));
-                list = ZenListAddFrontExpr<T>.Create(list, elt);
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// Create a constant Zen list value.
-        /// </summary>
-        /// <param name="value">The list value.</param>
-        /// <returns>The Zen value representing the list.</returns>
-        internal static Zen<Map<TKey, TValue>> CreateZenMapConstant<TKey, TValue>(Map<TKey, TValue> value)
-        {
-            Zen<Map<TKey, TValue>> map = ZenMapEmptyExpr<TKey, TValue>.Instance;
-            foreach (var elt in value.Values)
-            {
-                ReportIfNullConversionError(elt, "element", typeof(Map<TKey, TValue>));
-                map = ZenMapSetExpr<TKey, TValue>.Create(map, elt.Key, elt.Value);
-            }
-
-            return map;
-        }
-
-        /// <summary>
-        /// Create a constant Zen option value.
-        /// </summary>
-        /// <param name="value">The option value.</param>
-        /// <returns>The Zen value representing the option.</returns>
-        internal static Zen<Option<T>> CreateZenOptionConstant<T>(Option<T> value)
-        {
-            if (value.HasValue)
-            {
-                ReportIfNullConversionError(value.Value, "Value", typeof(T));
-                return Option.Create((Zen<T>)CreateZenConstant<T>(value.Value));
-            }
-
-            return Option.Null<T>();
-        }
-
-        /// <summary>
         /// Create a constant Zen value.
         /// </summary>
         /// <param name="value">The type.</param>
@@ -869,92 +699,11 @@ namespace ZenLib
         {
             try
             {
-                var type = typeof(T);
-
-                if (value is bool || value is byte || value is char || value is short || value is ushort ||
-                    value is int  || value is uint || value is long || value is ulong || value is BigInteger ||
-                    value is Real || IsFixedIntegerType(type) || IsConstMapType(type))
-                {
-                    return ZenConstantExpr<T>.Create(value);
-                }
-
-                var typeArgs = type.GetGenericArgumentsCached();
-
-                if (type == StringType)
-                {
-                    var asSeq = (Zen<Seq<char>>)CreateZenConstant(Seq.FromString((string)(object)value));
-                    return ZenCastExpr<Seq<char>, string>.Create(asSeq);
-                }
-
-                if (IsSeqType(type))
-                {
-                    var innerType = typeArgs[0];
-                    return CreateZenSeqConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
-                }
-
-                if (IsFSeqType(type))
-                {
-                    var innerType = typeArgs[0];
-                    return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
-                }
-
-                if (IsMapType(type))
-                {
-                    var keyType = typeArgs[0];
-                    var valueType = typeArgs[1];
-                    return CreateZenMapConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(null, new object[] { value });
-                }
-
-                // option type, we need this separate from classes/structs
-                // because options may create null values for the None case
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Option<>))
-                {
-                    var innerType = typeArgs[0];
-                    return CreateZenOptionConstantMethod.MakeGenericMethod(innerType).Invoke(null, new object[] { value });
-                }
-
-                // some class or struct
-                var fields = new SortedDictionary<string, dynamic>();
-                foreach (var field in GetAllFields(type))
-                {
-                    fields[field.Name] = field.GetValue(value);
-                }
-
-                foreach (var property in GetAllProperties(type))
-                {
-                    fields[property.Name] = property.GetValue(value);
-                }
-
-                var asList = fields.ToArray();
-                var createMethod = CreateMethod.MakeGenericMethod(type);
-
-                var args = new (string, object)[asList.Length];
-                for (int i = 0; i < asList.Length; i++)
-                {
-                    var fieldValue = asList[i].Value;
-                    ReportIfNullConversionError(fieldValue, "field", type);
-                    args[i] = (asList[i].Key, CreateZenConstant(fieldValue));
-                }
-
-                return createMethod.Invoke(null, new object[] { args });
+                return new ZenLiftingVisitor().Visit(typeof(T), value);
             }
             catch (TargetInvocationException e)
             {
                 throw e.InnerException;
-            }
-        }
-
-        /// <summary>
-        ///     Reports a null error in a conversion from a constant to a Zen value.
-        /// </summary>
-        /// <param name="obj">The object that may be null.</param>
-        /// <param name="where">Description of where the error occurs.</param>
-        /// <param name="type">The containing type.</param>
-        private static void ReportIfNullConversionError(object obj, string where, Type type)
-        {
-            if (obj is null)
-            {
-                throw new ZenException($"Null constant in {where} of type {type} can not be converted to a Zen value.");
             }
         }
 
@@ -966,20 +715,11 @@ namespace ZenLib
         /// <returns>A long.</returns>
         public static long? GetConstantIntegerValue<T>(Zen<T> value)
         {
-            if (value is ZenConstantExpr<byte> xb)
-                return xb.Value;
-            if (value is ZenConstantExpr<short> xs)
-                return xs.Value;
-            if (value is ZenConstantExpr<ushort> xus)
-                return xus.Value;
-            if (value is ZenConstantExpr<int> xi)
-                return xi.Value;
-            if (value is ZenConstantExpr<uint> xui)
-                return xui.Value;
-            if (value is ZenConstantExpr<long> xl)
-                return xl.Value;
-            if (value is ZenConstantExpr<ulong> xul)
-                return (long?)xul.Value;
+            if (IsPrimitiveIntegerType(typeof(T)) && value is ZenConstantExpr<T> x)
+            {
+                return (long)(dynamic)x.Value;
+            }
+
             return null;
         }
 
@@ -991,24 +731,7 @@ namespace ZenLib
         /// <returns>A long.</returns>
         public static Zen<T> CreateConstantIntegerValue<T>(long value)
         {
-            var type = typeof(T);
-
-            if (type == BoolType)
-                return (Zen<T>)(object)(value == 0L ? False() : True());
-            if (type == ByteType)
-                return (Zen<T>)(object)ZenConstantExpr<byte>.Create((byte)value);
-            if (type == ShortType)
-                return (Zen<T>)(object)ZenConstantExpr<short>.Create((short)value);
-            if (type == UshortType)
-                return (Zen<T>)(object)ZenConstantExpr<ushort>.Create((ushort)value);
-            if (type == IntType)
-                return (Zen<T>)(object)ZenConstantExpr<int>.Create((int)value);
-            if (type == UintType)
-                return (Zen<T>)(object)ZenConstantExpr<uint>.Create((uint)value);
-            if (type == LongType)
-                return (Zen<T>)(object)ZenConstantExpr<long>.Create(value);
-            Contract.Assert(type == UlongType);
-            return (Zen<T>)(object)ZenConstantExpr<ulong>.Create((ulong)value);
+            return (Zen<T>)(object)ZenConstantExpr<T>.Create((T)FromLong<T>(value));
         }
 
         /// <summary>
@@ -1017,10 +740,11 @@ namespace ZenLib
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The result.</returns>
-        public static object Specialize<T>(long value)
+        public static object FromLong<T>(long value)
         {
             var type = typeof(T);
-
+            if (type == BoolType)
+                return value == 0L ? false : true;
             if (type == ByteType)
                 return (byte)value;
             if (type == ShortType)
@@ -1045,7 +769,6 @@ namespace ZenLib
         public static long ToLong(object value)
         {
             var type = value.GetType();
-
             if (type == ByteType)
                 return (byte)value;
             if (type == ShortType)
@@ -1070,7 +793,6 @@ namespace ZenLib
         public static int GetFiniteIntegerSize<T>()
         {
             var type = typeof(T);
-
             if (type == ByteType)
                 return 8;
             if (type == ShortType || type == UshortType)
@@ -1079,7 +801,6 @@ namespace ZenLib
                 return 32;
             if (type == LongType || type == UlongType)
                 return 64;
-
             Contract.Assert(IsFixedIntegerType(type));
             var c = type.GetConstructor(new Type[] { typeof(long) });
             dynamic obj = (T)c.Invoke(new object[] { 0L });
@@ -1087,56 +808,11 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Cast one finite integer to another finite integer type.
-        /// </summary>
-        /// <param name="x">The source finite integer.</param>
-        /// <returns>The resulting finite integer.</returns>
-        public static TTarget CastFiniteInteger<TSource, TTarget>(TSource x)
-        {
-            var b1 = IsFixedIntegerType(typeof(TSource));
-            var b2 = IsFixedIntegerType(typeof(TTarget));
-
-            if (!b1 && !b2)
-            {
-                return (TTarget)(dynamic)x;
-            }
-            else if (b1 && !b2)
-            {
-                var result = 0L;
-                byte[] bytes = ((dynamic)x).Bytes;
-                for (int i = 0; i < Math.Min(bytes.Length, 4); i++)
-                {
-                    result <<= 8;
-                    result |= bytes[bytes.Length - 1 - i];
-                }
-
-                return (TTarget)(dynamic)result;
-            }
-            else
-            {
-                byte[] bytes;
-                if (b1)
-                {
-                    bytes = ((dynamic)x).Bytes;
-                }
-                else
-                {
-                    bytes = BitConverter.GetBytes((long)(dynamic)x);
-                    if (BitConverter.IsLittleEndian)
-                        Array.Reverse(bytes);
-                }
-
-                var c = typeof(TTarget).GetConstructor(new Type[] { typeof(byte[]) });
-                return (TTarget)c.Invoke(new object[] { bytes });
-            }
-        }
-
-        /// <summary>
         /// Gets the minimum value for a type.
         /// This is a workaround for lack of integer interfaces.
         /// </summary>
         /// <typeparam name="T">The integer type.</typeparam>
-        /// <returns></returns>
+        /// <returns>The minimum value.</returns>
         public static T MinValue<T>()
         {
             var type = typeof(T);
@@ -1170,7 +846,7 @@ namespace ZenLib
         /// This is a workaround for lack of integer interfaces.
         /// </summary>
         /// <typeparam name="T">The integer type.</typeparam>
-        /// <returns></returns>
+        /// <returns>The maximum value.</returns>
         public static T MaxValue<T>()
         {
             var type = typeof(T);
@@ -1204,46 +880,100 @@ namespace ZenLib
             return obj;
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static byte Add(byte x, int i)
         {
             return (byte)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static char Add(char x, int i)
         {
             return (char)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static short Add(short x, int i)
         {
             return (short)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static ushort Add(ushort x, int i)
         {
             return (ushort)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static int Add(int x, int i)
         {
             return (int)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static uint Add(uint x, int i)
         {
             return (uint)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static long Add(long x, int i)
         {
             return (long)(x + i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static ulong Add(ulong x, int i)
         {
             return (ulong)(x + (ulong)i);
         }
 
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static T Add<T, TSign>(IntN<T, TSign> x, int i)
         {
             var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
@@ -1251,46 +981,100 @@ namespace ZenLib
             return x.Add(instance);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static byte Subtract(byte x, int i)
         {
             return (byte)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static char Subtract(char x, int i)
         {
             return (char)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static short Subtract(short x, int i)
         {
             return (short)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static ushort Subtract(ushort x, int i)
         {
             return (ushort)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static int Subtract(int x, int i)
         {
             return (int)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static uint Subtract(uint x, int i)
         {
             return (uint)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static long Subtract(long x, int i)
         {
             return (long)(x - i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static ulong Subtract(ulong x, int i)
         {
             return (ulong)(x - (ulong)i);
         }
 
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
         public static T Subtract<T, TSign>(IntN<T, TSign> x, int i)
         {
             var c = typeof(T).GetConstructor(new Type[] { typeof(long) });

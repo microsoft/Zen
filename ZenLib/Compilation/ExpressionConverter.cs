@@ -746,7 +746,7 @@ namespace ZenLib.Compilation
             {
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
-                var m = typeof(ReflectionUtilities).GetMethodCached("CastFiniteInteger").MakeGenericMethod(typeof(TKey), typeof(TValue));
+                var m = typeof(IntN).GetMethodCached("CastFiniteInteger").MakeGenericMethod(typeof(TKey), typeof(TValue));
                 return Expression.Call(null, m, new Expression[] { e });
             }
         }
