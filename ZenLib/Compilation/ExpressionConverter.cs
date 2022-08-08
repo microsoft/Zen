@@ -108,6 +108,12 @@ namespace ZenLib.Compilation
             return variable;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit(ZenLogicalBinopExpr expression, ExpressionConverterEnvironment parameter)
         {
             var left = CodeGenerator.CompileToBlock(
@@ -134,16 +140,34 @@ namespace ZenLib.Compilation
             }
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(ReflectionUtilities.GetDefaultValue<T>());
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit<T>(ZenArithBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
@@ -161,6 +185,12 @@ namespace ZenLib.Compilation
             }
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit<T>(ZenBitwiseBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
@@ -178,9 +208,612 @@ namespace ZenLib.Compilation
             }
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public Expression Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return BitwiseNot<T>(Convert(expression.Expr, parameter));
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            return Expression.Constant(expression.Value);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
+        {
+            var fieldNames = new List<string>();
+            var parameters = new List<Expression>();
+            foreach (var fieldValuePair in expression.Fields)
+            {
+                var field = fieldValuePair.Key;
+                var value = fieldValuePair.Value;
+                var valueType = value.GetType();
+                var method = convertMethod.MakeGenericMethod(valueType.BaseType.GetGenericArgumentsCached()[0]);
+                var valueResult = (Expression)method.Invoke(this, new object[] { value, parameter });
+                fieldNames.Add(field);
+                parameters.Add(valueResult);
+            }
+
+            return CreateObject<TObject>(parameters.ToArray(), fieldNames.ToArray());
+        }
+
+        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
+        {
+            Expression[] exprs = new Expression[fields.Length + 2];
+
+            // first use new default constructor.
+            var variable = FreshVariable(typeof(TObject));
+            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
+
+            // assign each field
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = Expression.PropertyOrField(variable, fields[i]);
+                exprs[i + 1] = Expression.Assign(field, objects[i]);
+            }
+
+            // return a block with the variable.
+            exprs[fields.Length + 1] = variable;
+            return Expression.Block(new ParameterExpression[] { variable }, exprs);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        {
+            var obj = Convert(expression.Expr, parameter);
+            return Expression.PropertyOrField(obj, expression.FieldName);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var guardExpr = Convert(expression.GuardExpr, parameter);
+
+            var trueExpr = CodeGenerator.CompileToBlock(
+                expression.TrueExpr,
+                parameter,
+                this.SubexpressionCache,
+                this.currentMatchUnrollingDepth,
+                this.maxMatchUnrollingDepth);
+
+            var falseExpr = CodeGenerator.CompileToBlock(
+                expression.FalseExpr,
+                parameter,
+                this.SubexpressionCache,
+                this.currentMatchUnrollingDepth,
+                this.maxMatchUnrollingDepth);
+
+            return Expression.Condition(guardExpr, trueExpr, falseExpr);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.Expr1, parameter);
+            var e2 = Convert(expression.Expr2, parameter);
+
+            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+            {
+                return Expression.Call(e1, typeof(T).GetMethod("Equals", new Type[] { typeof(object) }), e2);
+            }
+
+            return Expression.Equal(e1, e2);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.Expr1, parameter);
+            var e2 = Convert(expression.Expr2, parameter);
+
+            switch (expression.ComparisonType)
+            {
+                case ComparisonType.Geq:
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("GreaterThanOrEqual"), e2);
+                    }
+
+                    return Expression.GreaterThanOrEqual(e1, e2);
+
+                case ComparisonType.Gt:
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("GreaterThan"), e2);
+                    }
+
+                    return Expression.GreaterThan(e1, e2);
+
+                case ComparisonType.Lt:
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("LessThan"), e2);
+                    }
+
+                    return Expression.LessThan(e1, e2);
+
+                default:
+                    Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
+                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
+                    {
+                        return Expression.Call(e1, typeof(T).GetMethodCached("LessThanOrEqual"), e2);
+                    }
+
+                    return Expression.LessThanOrEqual(e1, e2);
+            }
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var list = Convert(expression.Expr, parameter);
+            var element = Convert(expression.ElementExpr, parameter);
+            var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
+            var method = typeof(FSeq<T>).GetMethodCached("AddFront");
+            return Expression.Call(fseqExpr, method, element);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
+            return Expression.New(c);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
+        {
+            var fseqType = typeof(FSeq<TList>);
+
+            // compile the list expression
+            var listExpr = Convert(expression.ListExpr, parameter);
+            var fseqExpr = Expression.Convert(listExpr, typeof(FSeq<TList>));
+
+            var fseqVariable = FreshVariable(fseqType);
+            this.Variables.Add(fseqVariable);
+            this.BlockExpressions.Add(Expression.Assign(fseqVariable, fseqExpr));
+
+            // check if list is empty, if so return the empty case
+            var isEmptyMethod = typeof(FSeq<TList>).GetMethodCached("IsEmpty");
+            var isEmptyExpr = Expression.Call(fseqVariable, isEmptyMethod);
+
+            // call SplitHead to get the tuple result.
+            var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
+            var splitExpr = Expression.Call(splitMethod, fseqVariable);
+            var splitVariable = FreshVariable(typeof(ValueTuple<TList, FSeq<TList>>));
+
+            // extract the head and tail
+            var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
+            var tlExpr = Expression.PropertyOrField(splitVariable, "Item2");
+
+            // compile the empty expression
+            var emptyExpr = Convert(expression.EmptyExpr, parameter);
+
+            // run the cons lambda
+            var runMethod = typeof(Interpreter)
+                .GetMethodCached("CompileRunHelper")
+                .MakeGenericMethod(typeof(TList), typeof(FSeq<TList>), typeof(TResult));
+
+            // create the bound arguments by constructing the immutable list
+            var dictType = typeof(ImmutableDictionary<long, object>);
+            var dictField = dictType.GetFieldCached("Empty");
+            Expression argsExpr = Expression.Field(null, dictField);
+            var dictAddMethod = dictType.GetMethodCached("Add");
+
+            foreach (var kv in parameter.ArgumentAssignment)
+            {
+                argsExpr = Expression.Call(
+                    argsExpr,
+                    dictAddMethod,
+                    Expression.Constant(kv.Key),
+                    Expression.Convert(kv.Value, typeof(object)));
+            }
+
+            // either unroll the match one level, or hand off the the interpreter.
+            Expression consExpr;
+            if (this.currentMatchUnrollingDepth == this.maxMatchUnrollingDepth)
+            {
+                var function = Expression.Constant(expression.ConsCase);
+                consExpr = Expression.Call(runMethod, function, hdExpr, tlExpr, argsExpr);
+            }
+            else
+            {
+                var newAssignment = parameter.ArgumentAssignment;
+
+                var argHd = new ZenArgumentExpr<TList>();
+                newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
+                var argTl = new ZenArgumentExpr<FSeq<TList>>();
+                newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
+
+                var zenConsExpr = expression.ConsCase(argHd, argTl);
+
+                consExpr = CodeGenerator.CompileToBlock(
+                    zenConsExpr,
+                    new ExpressionConverterEnvironment(newAssignment),
+                    this.SubexpressionCache,
+                    this.currentMatchUnrollingDepth + 1,
+                    this.maxMatchUnrollingDepth);
+            }
+
+            var nonEmptyBlock = Expression.Block(
+                new List<ParameterExpression> { splitVariable },
+                Expression.Assign(splitVariable, splitExpr),
+                consExpr);
+
+            return Expression.Condition(isEmptyExpr, emptyExpr, nonEmptyBlock);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
+        {
+            return Expression.Not(Convert(expression.Expr, parameter));
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        {
+            var obj = Convert(expression.Expr, parameter);
+            var value = Convert(expression.FieldExpr, parameter);
+            return WithField<T1>(obj, expression.FieldName, value);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
+            return Expression.New(c);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Convert(expression.KeyExpr, parameter);
+            var value = Convert(expression.ValueExpr, parameter);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Set");
+            return Expression.Call(mapExpr, method, key, value);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Convert(expression.KeyExpr, parameter);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Delete");
+            return Expression.Call(mapExpr, method, key);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Convert(expression.KeyExpr, parameter);
+            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
+            var method = typeof(Map<TKey, TValue>).GetMethodCached("Get");
+            return Expression.Call(mapExpr, method, key);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        {
+            MethodInfo method;
+            switch (expression.CombinationType)
+            {
+                case ZenMapCombineExpr<TKey>.CombineType.Union:
+                    method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
+                    break;
+                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
+                    method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
+                    break;
+                default:
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
+                    method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
+                    break;
+            }
+
+            var dict1 = Convert(expression.MapExpr1, parameter);
+            var dict2 = Convert(expression.MapExpr2, parameter);
+            var mapExpr1 = Expression.Convert(dict1, typeof(Map<TKey, SetUnit>));
+            var mapExpr2 = Expression.Convert(dict2, typeof(Map<TKey, SetUnit>));
+            return Expression.Call(null, method, mapExpr1, mapExpr2);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Expression.Constant(expression.Key);
+            var value = Convert(expression.ValueExpr, parameter);
+            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
+            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Set");
+            return Expression.Call(mapExpr, method, key, value);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var dict = Convert(expression.MapExpr, parameter);
+            var key = Expression.Constant(expression.Key);
+            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
+            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Get");
+            return Expression.Call(mapExpr, method, key);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var c = typeof(Seq<T>).GetConstructor(new Type[] { });
+            return Expression.New(c);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });
+            var e = Convert(expression.ValueExpr, parameter);
+            return Expression.New(c, new Expression[] { e });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var l = Convert(expression.SeqExpr1, parameter);
+            var r = Convert(expression.SeqExpr2, parameter);
+            var m = typeof(Seq<T>).GetMethod("Concat");
+            return Expression.Call(l, m, new Expression[] { r });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var s = Convert(expression.SeqExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("Length");
+            var e = Expression.Call(s, m);
+            var c = typeof(BigInteger).GetConstructor(new Type[] { typeof(int) });
+            return Expression.New(c, e);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.IndexExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("AtBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+            return Expression.Call(e1, m, new Expression[] { e2 });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.SubseqExpr, parameter);
+
+            switch (expression.ContainmentType)
+            {
+                case SeqContainmentType.HasPrefix:
+                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { e2 });
+                case SeqContainmentType.HasSuffix:
+                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { e2 });
+                default:
+                    Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
+                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
+            }
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.SubseqExpr, parameter);
+            var e3 = Convert(expression.OffsetExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("IndexOfBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+            return Expression.Call(e1, m, new Expression[] { e2, e3 });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.OffsetExpr, parameter);
+            var e3 = Convert(expression.LengthExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("SliceBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+            return Expression.Call(e1, m, new Expression[] { e2, e3 });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.SubseqExpr, parameter);
+            var e3 = Convert(expression.ReplaceExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("ReplaceFirst");
+            return Expression.Call(e1, m, new Expression[] { e2, e3 });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e = Convert(expression.SourceExpr, parameter);
+
+            if (typeof(TKey) == ReflectionUtilities.StringType)
+            {
+                var m = typeof(Seq).GetMethodCached("FromString");
+                return Expression.Call(null, m, new Expression[] { e });
+            }
+            else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
+            {
+                var m = typeof(Seq).GetMethodCached("AsString");
+                return Expression.Call(null, m, new Expression[] { e });
+            }
+            else
+            {
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
+                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
+                var m = typeof(IntN).GetMethodCached("CastFiniteInteger").MakeGenericMethod(typeof(TKey), typeof(TValue));
+                return Expression.Call(null, m, new Expression[] { e });
+            }
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public Expression Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e = Convert(expression.SeqExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("MatchesRegex");
+            return Expression.Call(e, m, new Expression[] { Expression.Constant(expression.Regex) });
         }
 
         private Expression WrapMathUnary<T>(Expression input, Func<Expression, Expression> f)
@@ -285,240 +918,6 @@ namespace ZenLib.Compilation
             return WrapMathBinary<T, T>(left, right, Expression.Subtract);
         }
 
-        public Expression Visit<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Constant(expression.Value);
-        }
-
-        public Expression Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
-        {
-            var fieldNames = new List<string>();
-            var parameters = new List<Expression>();
-            foreach (var fieldValuePair in expression.Fields)
-            {
-                var field = fieldValuePair.Key;
-                var value = fieldValuePair.Value;
-                var valueType = value.GetType();
-                var method = convertMethod.MakeGenericMethod(valueType.BaseType.GetGenericArgumentsCached()[0]);
-                var valueResult = (Expression)method.Invoke(this, new object[] { value, parameter });
-                fieldNames.Add(field);
-                parameters.Add(valueResult);
-            }
-
-            return CreateObject<TObject>(parameters.ToArray(), fieldNames.ToArray());
-        }
-
-        private Expression CreateObject<TObject>(Expression[] objects, string[] fields)
-        {
-            Expression[] exprs = new Expression[fields.Length + 2];
-
-            // first use new default constructor.
-            var variable = FreshVariable(typeof(TObject));
-            exprs[0] = Expression.Assign(variable, Expression.New(typeof(TObject)));
-
-            // assign each field
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var field = Expression.PropertyOrField(variable, fields[i]);
-                exprs[i + 1] = Expression.Assign(field, objects[i]);
-            }
-
-            // return a block with the variable.
-            exprs[fields.Length + 1] = variable;
-            return Expression.Block(new ParameterExpression[] { variable }, exprs);
-        }
-
-        public Expression Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
-        {
-            var obj = Convert(expression.Expr, parameter);
-            return Expression.PropertyOrField(obj, expression.FieldName);
-        }
-
-        public Expression Visit<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var guardExpr = Convert(expression.GuardExpr, parameter);
-
-            var trueExpr = CodeGenerator.CompileToBlock(
-                expression.TrueExpr,
-                parameter,
-                this.SubexpressionCache,
-                this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth);
-
-            var falseExpr = CodeGenerator.CompileToBlock(
-                expression.FalseExpr,
-                parameter,
-                this.SubexpressionCache,
-                this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth);
-
-            return Expression.Condition(guardExpr, trueExpr, falseExpr);
-        }
-
-        public Expression Visit<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.Expr1, parameter);
-            var e2 = Convert(expression.Expr2, parameter);
-
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                return Expression.Call(e1, typeof(T).GetMethod("Equals", new Type[] { typeof(object) }), e2);
-            }
-
-            return Expression.Equal(e1, e2);
-        }
-
-        public Expression Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.Expr1, parameter);
-            var e2 = Convert(expression.Expr2, parameter);
-
-            switch (expression.ComparisonType)
-            {
-                case ComparisonType.Geq:
-                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                    {
-                        return Expression.Call(e1, typeof(T).GetMethodCached("GreaterThanOrEqual"), e2);
-                    }
-
-                    return Expression.GreaterThanOrEqual(e1, e2);
-
-                case ComparisonType.Gt:
-                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                    {
-                        return Expression.Call(e1, typeof(T).GetMethodCached("GreaterThan"), e2);
-                    }
-
-                    return Expression.GreaterThan(e1, e2);
-
-                case ComparisonType.Lt:
-                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                    {
-                        return Expression.Call(e1, typeof(T).GetMethodCached("LessThan"), e2);
-                    }
-
-                    return Expression.LessThan(e1, e2);
-
-                default:
-                    Contract.Assert(expression.ComparisonType == ComparisonType.Leq);
-                    if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-                    {
-                        return Expression.Call(e1, typeof(T).GetMethodCached("LessThanOrEqual"), e2);
-                    }
-
-                    return Expression.LessThanOrEqual(e1, e2);
-            }
-        }
-
-        public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var list = Convert(expression.Expr, parameter);
-            var element = Convert(expression.ElementExpr, parameter);
-            var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
-            var method = typeof(FSeq<T>).GetMethodCached("AddFront");
-            return Expression.Call(fseqExpr, method, element);
-        }
-
-        public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
-        {
-            var fseqType = typeof(FSeq<TList>);
-
-            // compile the list expression
-            var listExpr = Convert(expression.ListExpr, parameter);
-            var fseqExpr = Expression.Convert(listExpr, typeof(FSeq<TList>));
-
-            var fseqVariable = FreshVariable(fseqType);
-            this.Variables.Add(fseqVariable);
-            this.BlockExpressions.Add(Expression.Assign(fseqVariable, fseqExpr));
-
-            // check if list is empty, if so return the empty case
-            var isEmptyMethod = typeof(FSeq<TList>).GetMethodCached("IsEmpty");
-            var isEmptyExpr = Expression.Call(fseqVariable, isEmptyMethod);
-
-            // call SplitHead to get the tuple result.
-            var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
-            var splitExpr = Expression.Call(splitMethod, fseqVariable);
-            var splitVariable = FreshVariable(typeof(ValueTuple<TList, FSeq<TList>>));
-
-            // extract the head and tail
-            var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
-            var tlExpr = Expression.PropertyOrField(splitVariable, "Item2");
-
-            // compile the empty expression
-            var emptyExpr = Convert(expression.EmptyExpr, parameter);
-
-            // run the cons lambda
-            var runMethod = typeof(Interpreter)
-                .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(TList), typeof(FSeq<TList>), typeof(TResult));
-
-            // create the bound arguments by constructing the immutable list
-            var dictType = typeof(ImmutableDictionary<long, object>);
-            var dictField = dictType.GetFieldCached("Empty");
-            Expression argsExpr = Expression.Field(null, dictField);
-            var dictAddMethod = dictType.GetMethodCached("Add");
-
-            foreach (var kv in parameter.ArgumentAssignment)
-            {
-                argsExpr = Expression.Call(
-                    argsExpr,
-                    dictAddMethod,
-                    Expression.Constant(kv.Key),
-                    Expression.Convert(kv.Value, typeof(object)));
-            }
-
-            // either unroll the match one level, or hand off the the interpreter.
-            Expression consExpr;
-            if (this.currentMatchUnrollingDepth == this.maxMatchUnrollingDepth)
-            {
-                var function = Expression.Constant(expression.ConsCase);
-                consExpr = Expression.Call(runMethod, function, hdExpr, tlExpr, argsExpr);
-            }
-            else
-            {
-                var newAssignment = parameter.ArgumentAssignment;
-
-                var argHd = new ZenArgumentExpr<TList>();
-                newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
-                var argTl = new ZenArgumentExpr<FSeq<TList>>();
-                newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
-
-                var zenConsExpr = expression.ConsCase(argHd, argTl);
-
-                consExpr = CodeGenerator.CompileToBlock(
-                    zenConsExpr,
-                    new ExpressionConverterEnvironment(newAssignment),
-                    this.SubexpressionCache,
-                    this.currentMatchUnrollingDepth + 1,
-                    this.maxMatchUnrollingDepth);
-            }
-
-            var nonEmptyBlock = Expression.Block(
-                new List<ParameterExpression> { splitVariable },
-                Expression.Assign(splitVariable, splitExpr),
-                consExpr);
-
-            return Expression.Condition(isEmptyExpr, emptyExpr, nonEmptyBlock);
-        }
-
-        public Expression Visit(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
-        {
-            return Expression.Not(Convert(expression.Expr, parameter));
-        }
-
-        public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
-        {
-            var obj = Convert(expression.Expr, parameter);
-            var value = Convert(expression.FieldExpr, parameter);
-            return WithField<T1>(obj, expression.FieldName, value);
-        }
-
         private Expression WithField<TObject>(Expression obj, string modifyField, Expression value)
         {
             var fields = ReflectionUtilities.GetAllFields(typeof(TObject));
@@ -564,198 +963,9 @@ namespace ZenLib.Compilation
             }
         }
 
-        public Expression Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        public Expression Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var dict = Convert(expression.MapExpr, parameter);
-            var key = Convert(expression.KeyExpr, parameter);
-            var value = Convert(expression.ValueExpr, parameter);
-            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
-            var method = typeof(Map<TKey, TValue>).GetMethodCached("Set");
-            return Expression.Call(mapExpr, method, key, value);
-        }
-
-        public Expression Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var dict = Convert(expression.MapExpr, parameter);
-            var key = Convert(expression.KeyExpr, parameter);
-            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
-            var method = typeof(Map<TKey, TValue>).GetMethodCached("Delete");
-            return Expression.Call(mapExpr, method, key);
-        }
-
-        public Expression Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var dict = Convert(expression.MapExpr, parameter);
-            var key = Convert(expression.KeyExpr, parameter);
-            var mapExpr = Expression.Convert(dict, typeof(Map<TKey, TValue>));
-            var method = typeof(Map<TKey, TValue>).GetMethodCached("Get");
-            return Expression.Call(mapExpr, method, key);
-        }
-
-        public Expression Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
-        {
-            MethodInfo method;
-            switch (expression.CombinationType)
-            {
-                case ZenMapCombineExpr<TKey>.CombineType.Union:
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
-                    break;
-                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
-                    break;
-                default:
-                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
-                    break;
-            }
-
-            var dict1 = Convert(expression.MapExpr1, parameter);
-            var dict2 = Convert(expression.MapExpr2, parameter);
-            var mapExpr1 = Expression.Convert(dict1, typeof(Map<TKey, SetUnit>));
-            var mapExpr2 = Expression.Convert(dict2, typeof(Map<TKey, SetUnit>));
-            return Expression.Call(null, method, mapExpr1, mapExpr2);
-        }
-
-        public Expression Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var dict = Convert(expression.MapExpr, parameter);
-            var key = Expression.Constant(expression.Key);
-            var value = Convert(expression.ValueExpr, parameter);
-            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
-            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Set");
-            return Expression.Call(mapExpr, method, key, value);
-        }
-
-        public Expression Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var dict = Convert(expression.MapExpr, parameter);
-            var key = Expression.Constant(expression.Key);
-            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
-            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Get");
-            return Expression.Call(mapExpr, method, key);
-        }
-
-        public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Seq<T>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        public Expression Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });
-            var e = Convert(expression.ValueExpr, parameter);
-            return Expression.New(c, new Expression[] { e });
-        }
-
-        public Expression Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var l = Convert(expression.SeqExpr1, parameter);
-            var r = Convert(expression.SeqExpr2, parameter);
-            var m = typeof(Seq<T>).GetMethod("Concat");
-            return Expression.Call(l, m, new Expression[] { r });
-        }
-
-        public Expression Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var s = Convert(expression.SeqExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("Length");
-            var e = Expression.Call(s, m);
-            var c = typeof(BigInteger).GetConstructor(new Type[] { typeof(int) });
-            return Expression.New(c, e);
-        }
-
-        public Expression Visit<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.SeqExpr, parameter);
-            var e2 = Convert(expression.IndexExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("AtBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
-            return Expression.Call(e1, m, new Expression[] { e2 });
-        }
-
-        public Expression Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.SeqExpr, parameter);
-            var e2 = Convert(expression.SubseqExpr, parameter);
-
-            switch (expression.ContainmentType)
-            {
-                case SeqContainmentType.HasPrefix:
-                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasPrefix"), new Expression[] { e2 });
-                case SeqContainmentType.HasSuffix:
-                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("HasSuffix"), new Expression[] { e2 });
-                default:
-                    Contract.Assert(expression.ContainmentType == SeqContainmentType.Contains);
-                    return Expression.Call(e1, typeof(Seq<T>).GetMethodCached("Contains"), new Expression[] { e2 });
-            }
-        }
-
-        public Expression Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.SeqExpr, parameter);
-            var e2 = Convert(expression.SubseqExpr, parameter);
-            var e3 = Convert(expression.OffsetExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("IndexOfBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
-            return Expression.Call(e1, m, new Expression[] { e2, e3 });
-        }
-
-        public Expression Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.SeqExpr, parameter);
-            var e2 = Convert(expression.OffsetExpr, parameter);
-            var e3 = Convert(expression.LengthExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("SliceBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
-            return Expression.Call(e1, m, new Expression[] { e2, e3 });
-        }
-
         private ParameterExpression FreshVariable(Type type)
         {
             return Expression.Variable(type, "v" + nextVariableId++);
-        }
-
-        public Expression Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e1 = Convert(expression.SeqExpr, parameter);
-            var e2 = Convert(expression.SubseqExpr, parameter);
-            var e3 = Convert(expression.ReplaceExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("ReplaceFirst");
-            return Expression.Call(e1, m, new Expression[] { e2, e3 });
-        }
-
-        public Expression Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e = Convert(expression.SourceExpr, parameter);
-
-            if (typeof(TKey) == ReflectionUtilities.StringType)
-            {
-                var m = typeof(Seq).GetMethodCached("FromString");
-                return Expression.Call(null, m, new Expression[] { e });
-            }
-            else if (typeof(TKey) == ReflectionUtilities.UnicodeSequenceType)
-            {
-                var m = typeof(Seq).GetMethodCached("AsString");
-                return Expression.Call(null, m, new Expression[] { e });
-            }
-            else
-            {
-                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
-                Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
-                var m = typeof(IntN).GetMethodCached("CastFiniteInteger").MakeGenericMethod(typeof(TKey), typeof(TValue));
-                return Expression.Call(null, m, new Expression[] { e });
-            }
-        }
-
-        public Expression Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var e = Convert(expression.SeqExpr, parameter);
-            var m = typeof(Seq<T>).GetMethod("MatchesRegex");
-            return Expression.Call(e, m, new Expression[] { Expression.Constant(expression.Regex) });
         }
     }
 }

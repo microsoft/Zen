@@ -51,56 +51,122 @@ namespace ZenLib.ZenLanguage
         public static MethodInfo CreateZenOptionConstantMethod =
             typeof(ZenLiftingVisitor).GetMethod("CreateZenOptionConstant", BindingFlags.NonPublic | BindingFlags.Instance);
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitBigInteger(object parameter)
         {
             return ZenConstantExpr<BigInteger>.Create((BigInteger)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitBool(object parameter)
         {
             return ZenConstantExpr<bool>.Create((bool)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitByte(object parameter)
         {
             return ZenConstantExpr<byte>.Create((byte)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitChar(object parameter)
         {
             return ZenConstantExpr<char>.Create((char)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitConstMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
             return typeof(ZenConstantExpr<>).MakeGenericType(mapType).GetMethod("Create").Invoke(null, new object[] { parameter });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="intType">The integer type.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitFixedInteger(Type intType, object parameter)
         {
             return typeof(ZenConstantExpr<>).MakeGenericType(intType).GetMethod("Create").Invoke(null, new object[] { parameter });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitInt(object parameter)
         {
             return ZenConstantExpr<int>.Create((int)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="listType">The list type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitList(Type listType, Type innerType, object parameter)
         {
             return CreateZenListConstantMethod.MakeGenericMethod(innerType).Invoke(this, new object[] { parameter });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitLong(object parameter)
         {
             return ZenConstantExpr<long>.Create((long)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="mapType">The map type.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
             return CreateZenMapConstantMethod.MakeGenericMethod(keyType, valueType).Invoke(this, new object[] { parameter });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="fields">The fields and their types.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitObject(Type objectType, SortedDictionary<string, Type> fields, object parameter)
         {
             // option type, we need this separate from classes/structs
@@ -137,37 +203,74 @@ namespace ZenLib.ZenLanguage
             return createMethod.Invoke(null, new object[] { args });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitReal(object parameter)
         {
             return ZenConstantExpr<Real>.Create((Real)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="sequenceType">The sequence type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitSeq(Type sequenceType, Type innerType, object parameter)
         {
             return CreateZenSeqConstantMethod.MakeGenericMethod(innerType).Invoke(this, new object[] { parameter });
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitShort(object parameter)
         {
             return ZenConstantExpr<short>.Create((short)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitString(object parameter)
         {
             var asSeq = (Zen<Seq<char>>)Visit(typeof(Seq<char>), Seq.FromString((string)parameter));
             return ZenCastExpr<Seq<char>, string>.Create(asSeq);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitUint(object parameter)
         {
             return ZenConstantExpr<uint>.Create((uint)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitUlong(object parameter)
         {
             return ZenConstantExpr<ulong>.Create((ulong)parameter);
         }
 
+        /// <summary>
+        /// Visit a type.
+        /// </summary>
+        /// <param name="parameter">A C# constant.</param>
+        /// <returns>A Zen constant.</returns>
         public override object VisitUshort(object parameter)
         {
             return ZenConstantExpr<ushort>.Create((ushort)parameter);
