@@ -258,9 +258,9 @@ namespace ZenLib
         /// <typeparam name="TParam">The visitor parameter type.</typeparam>
         /// <typeparam name="TReturn">The visitor return type.</typeparam>
         /// <returns>A return value.</returns>
-        internal override TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
+        internal override TReturn Accept<TParam, TReturn>(ZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.Visit(this, parameter);
+            return visitor.VisitArithBinop(this, parameter);
         }
 
         /// <summary>

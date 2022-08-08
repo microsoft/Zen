@@ -156,7 +156,7 @@ namespace ZenLib.ModelChecking
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
             var interpreter = new ExpressionEvaluator(false);
-            return (T)interpreter.Evaluate(this.ZenExpression, interpreterEnv);
+            return (T)interpreter.Visit(this.ZenExpression, interpreterEnv);
         }
 
         /// <summary>

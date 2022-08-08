@@ -36,7 +36,7 @@ namespace ZenLib
         /// Accept a visitor for the ZenExpr object.
         /// </summary>
         /// <returns>A value of the return type.</returns>
-        internal abstract TReturn Accept<TParam, TReturn>(IZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
+        internal abstract TReturn Accept<TParam, TReturn>(ZenExprVisitor<TParam, TReturn> visitor, TParam parameter);
 
         /// <summary>
         /// Accept a visitor for the ZenExpr object.
@@ -1772,7 +1772,7 @@ namespace ZenLib
             var solution = constraints.Solve();
             var environment = new ExpressionEvaluatorEnvironment(solution.VariableAssignment);
             var interpreter = new ExpressionEvaluator(false);
-            return (T)interpreter.Evaluate(expr, environment);
+            return (T)interpreter.Visit(expr, environment);
         }
 
         /// <summary>

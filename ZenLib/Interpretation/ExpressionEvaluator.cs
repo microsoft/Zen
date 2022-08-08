@@ -4,23 +4,20 @@
 
 namespace ZenLib.Interpretation
 {
-    using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Numerics;
     using System.Reflection;
     using ZenLib.SymbolicExecution;
-    using static ZenLib.Zen;
 
     /// <summary>
     /// Interpret a Zen expression.
     /// </summary>
-    internal sealed class ExpressionEvaluator : IZenExprVisitor<ExpressionEvaluatorEnvironment, object>
+    internal sealed class ExpressionEvaluator : ZenExprVisitor<ExpressionEvaluatorEnvironment, object>
     {
         /// <summary>
         /// Evaluate method reference.
         /// </summary>
-        private static MethodInfo evaluateMethod = typeof(ExpressionEvaluator).GetMethod("Evaluate");
+        private static MethodInfo evaluateMethod = typeof(ExpressionEvaluator).GetMethod("Visit");
 
         /// <summary>
         /// Whether to track covered branches.
@@ -38,11 +35,6 @@ namespace ZenLib.Interpretation
         public Dictionary<long, object> PathConstraintSymbolicEnvironment { get; set; }
 
         /// <summary>
-        /// Cache of inputs and results.
-        /// </summary>
-        private Dictionary<object, object> cache = new Dictionary<object, object>();
-
-        /// <summary>
         /// Create a new instance of the <see cref="ExpressionEvaluator"/> class.
         /// </summary>
         /// <param name="trackBranches">Whether to track branches during execution.</param>
@@ -58,30 +50,12 @@ namespace ZenLib.Interpretation
         }
 
         /// <summary>
-        /// Evaluate an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The evaluation environment.</param>
-        /// <returns>The resulting C# object.</returns>
-        public object Evaluate<T>(Zen<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            if (this.cache.TryGetValue(expression, out var value))
-            {
-                return value;
-            }
-
-            var result = expression.Accept(this, parameter);
-            this.cache[expression] = result;
-            return result;
-        }
-
-        /// <summary>
         /// Visit a Zen expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitArbitrary<T>(ZenArbitraryExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             if (parameter.ArbitraryAssignment == null)
                 return ReflectionUtilities.GetDefaultValue<T>();
@@ -96,10 +70,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit(ZenLogicalBinopExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitLogicalBinop(ZenLogicalBinopExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (bool)Evaluate(expression.Expr1, parameter);
-            var e2 = (bool)Evaluate(expression.Expr2, parameter);
+            var e1 = (bool)this.Visit(expression.Expr1, parameter);
+            var e2 = (bool)this.Visit(expression.Expr2, parameter);
 
             switch (expression.Operation)
             {
@@ -117,7 +91,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitArgument<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
@@ -128,10 +102,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenArithBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitArithBinop<T>(ZenArithBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = Evaluate(expression.Expr1, parameter);
-            var e2 = Evaluate(expression.Expr2, parameter);
+            var e1 = this.Visit(expression.Expr1, parameter);
+            var e2 = this.Visit(expression.Expr2, parameter);
             var type = typeof(T);
 
             switch (expression.Operation)
@@ -218,10 +192,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenBitwiseBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = Evaluate(expression.Expr1, parameter);
-            var e2 = Evaluate(expression.Expr2, parameter);
+            var e1 = this.Visit(expression.Expr1, parameter);
+            var e2 = this.Visit(expression.Expr2, parameter);
             var type = typeof(T);
 
             switch (expression.Operation)
@@ -253,9 +227,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitBitwiseNot<T>(ZenBitwiseNotExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var x = ReflectionUtilities.ToLong(Evaluate(expression.Expr, parameter));
+            var x = ReflectionUtilities.ToLong(this.Visit(expression.Expr, parameter));
             return ReflectionUtilities.FromLong<T>(~x);
         }
 
@@ -265,7 +239,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitConstant<T>(ZenConstantExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return expression.Value;
         }
@@ -276,7 +250,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitCreateObject<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var fieldNames = new List<string>();
             var parameters = new List<object>();
@@ -300,9 +274,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitGetField<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (T1)Evaluate(expression.Expr, parameter);
+            var e = (T1)this.Visit(expression.Expr, parameter);
             return ReflectionUtilities.GetFieldOrProperty<T1, T2>(e, expression.FieldName);
         }
 
@@ -312,9 +286,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitIf<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (bool)Evaluate(expression.GuardExpr, parameter);
+            var e1 = (bool)this.Visit(expression.GuardExpr, parameter);
 
             if (e1)
             {
@@ -323,7 +297,7 @@ namespace ZenLib.Interpretation
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
 
-                return (T)Evaluate(expression.TrueExpr, parameter);
+                return (T)this.Visit(expression.TrueExpr, parameter);
             }
             else
             {
@@ -332,7 +306,7 @@ namespace ZenLib.Interpretation
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
 
-                return (T)Evaluate(expression.FalseExpr, parameter);
+                return (T)this.Visit(expression.FalseExpr, parameter);
             }
         }
 
@@ -342,10 +316,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenEqualityExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitEquality<T>(ZenEqualityExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = Evaluate(expression.Expr1, parameter);
-            var e2 = Evaluate(expression.Expr2, parameter);
+            var e1 = this.Visit(expression.Expr1, parameter);
+            var e2 = this.Visit(expression.Expr2, parameter);
             return ((T)e1).Equals((T)e2);
         }
 
@@ -355,10 +329,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitArithComparison<T>(ZenArithComparisonExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = Evaluate(expression.Expr1, parameter);
-            var e2 = Evaluate(expression.Expr2, parameter);
+            var e1 = this.Visit(expression.Expr1, parameter);
+            var e2 = this.Visit(expression.Expr2, parameter);
             var type = typeof(T);
 
             switch (expression.ComparisonType)
@@ -472,7 +446,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitListEmpty<T>(ZenListEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return new FSeq<T>();
         }
@@ -483,10 +457,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitListAdd<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (FSeq<T>)Evaluate(expression.Expr, parameter);
-            var e2 = (T)Evaluate(expression.ElementExpr, parameter);
+            var e1 = (FSeq<T>)this.Visit(expression.Expr, parameter);
+            var e2 = (T)this.Visit(expression.ElementExpr, parameter);
             return e1.AddFront(e2);
         }
 
@@ -496,9 +470,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitListCase<T, TResult>(ZenListCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (FSeq<T>)Evaluate(expression.ListExpr, parameter);
+            var e = (FSeq<T>)this.Visit(expression.ListExpr, parameter);
 
             if (e.Count() == 0)
             {
@@ -507,7 +481,7 @@ namespace ZenLib.Interpretation
                     this.PathConstraint.Add(expression.ListExpr.IsEmpty());
                 }
 
-                return Evaluate(expression.EmptyExpr, parameter);
+                return this.Visit(expression.EmptyExpr, parameter);
             }
             else
             {
@@ -525,7 +499,7 @@ namespace ZenLib.Interpretation
                 }
 
                 var c = expression.ConsCase.Invoke(argHd, argTl);
-                return (TResult)Evaluate(c, parameter);
+                return (TResult)this.Visit(c, parameter);
             }
         }
 
@@ -535,9 +509,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitNot(ZenNotExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return !(bool)Evaluate(expression.Expr, parameter);
+            return !(bool)this.Visit(expression.Expr, parameter);
         }
 
         /// <summary>
@@ -546,10 +520,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (T1)Evaluate(expression.Expr, parameter);
-            var e2 = (T2)Evaluate(expression.FieldExpr, parameter);
+            var e1 = (T1)this.Visit(expression.Expr, parameter);
+            var e2 = (T2)this.Visit(expression.FieldExpr, parameter);
             return ReflectionUtilities.WithField<T1>(e1, expression.FieldName, e2);
         }
 
@@ -559,7 +533,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return new Map<TKey, TValue>();
         }
@@ -570,11 +544,11 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
-            var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
-            var e3 = (TValue)Evaluate(expression.ValueExpr, parameter);
+            var e1 = (Map<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
+            var e2 = (TKey)this.Visit(expression.KeyExpr, parameter);
+            var e3 = (TValue)this.Visit(expression.ValueExpr, parameter);
             return e1.Set(e2, e3);
         }
 
@@ -584,10 +558,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitMapDelete<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
-            var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
+            var e1 = (Map<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
+            var e2 = (TKey)this.Visit(expression.KeyExpr, parameter);
             return e1.Delete(e2);
         }
 
@@ -597,10 +571,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitMapGet<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
-            var e2 = (TKey)Evaluate(expression.KeyExpr, parameter);
+            var e1 = (Map<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
+            var e2 = (TKey)this.Visit(expression.KeyExpr, parameter);
             return e1.Get(e2);
         }
 
@@ -610,10 +584,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitMapCombine<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Map<TKey, SetUnit>)Evaluate(expression.MapExpr1, parameter);
-            var e2 = (Map<TKey, SetUnit>)Evaluate(expression.MapExpr2, parameter);
+            var e1 = (Map<TKey, SetUnit>)this.Visit(expression.MapExpr1, parameter);
+            var e2 = (Map<TKey, SetUnit>)this.Visit(expression.MapExpr2, parameter);
 
             switch (expression.CombinationType)
             {
@@ -633,10 +607,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitConstMapSet<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (CMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
-            var e2 = (TValue)Evaluate(expression.ValueExpr, parameter);
+            var e1 = (CMap<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
+            var e2 = (TValue)this.Visit(expression.ValueExpr, parameter);
             return e1.Set(expression.Key, e2);
         }
 
@@ -646,9 +620,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (CMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
+            var e1 = (CMap<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
             return e1.Get(expression.Key);
         }
 
@@ -658,7 +632,7 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             return new Seq<T>();
         }
@@ -669,10 +643,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr1, parameter);
-            var e2 = (Seq<T>)Evaluate(expression.SeqExpr2, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr1, parameter);
+            var e2 = (Seq<T>)this.Visit(expression.SeqExpr2, parameter);
             return e1.Concat(e2);
         }
 
@@ -682,9 +656,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (T)Evaluate(expression.ValueExpr, parameter);
+            var e1 = (T)this.Visit(expression.ValueExpr, parameter);
             return new Seq<T>(e1);
         }
 
@@ -694,9 +668,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqLength<T>(ZenSeqLengthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
+            var e = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
             return new BigInteger(e.Length());
         }
 
@@ -706,10 +680,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqAtExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqAt<T>(ZenSeqAtExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
-            var e2 = (BigInteger)Evaluate(expression.IndexExpr, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (BigInteger)this.Visit(expression.IndexExpr, parameter);
             return e1.AtBigInteger(e2);
         }
 
@@ -719,10 +693,10 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
-            var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (Seq<T>)this.Visit(expression.SubseqExpr, parameter);
 
             switch (expression.ContainmentType)
             {
@@ -742,11 +716,11 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqIndexOf<T>(ZenSeqIndexOfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
-            var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
-            var e3 = (BigInteger)Evaluate(expression.OffsetExpr, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (Seq<T>)this.Visit(expression.SubseqExpr, parameter);
+            var e3 = (BigInteger)this.Visit(expression.OffsetExpr, parameter);
             return e1.IndexOfBigInteger(e2, e3);
         }
 
@@ -756,11 +730,11 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqSlice<T>(ZenSeqSliceExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
-            var e2 = (BigInteger)Evaluate(expression.OffsetExpr, parameter);
-            var e3 = (BigInteger)Evaluate(expression.LengthExpr, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (BigInteger)this.Visit(expression.OffsetExpr, parameter);
+            var e3 = (BigInteger)this.Visit(expression.LengthExpr, parameter);
             return e1.SliceBigInteger(e2, e3);
         }
 
@@ -770,11 +744,11 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqReplaceFirst<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
-            var e2 = (Seq<T>)Evaluate(expression.SubseqExpr, parameter);
-            var e3 = (Seq<T>)Evaluate(expression.ReplaceExpr, parameter);
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (Seq<T>)this.Visit(expression.SubseqExpr, parameter);
+            var e3 = (Seq<T>)this.Visit(expression.ReplaceExpr, parameter);
             return e1.ReplaceFirst(e2, e3);
         }
 
@@ -784,9 +758,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = Evaluate(expression.SourceExpr, parameter);
+            var e = this.Visit(expression.SourceExpr, parameter);
 
             if (typeof(TKey) == ReflectionUtilities.StringType)
             {
@@ -811,9 +785,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public object Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitSeqRegex<T>(ZenSeqRegexExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e = (Seq<T>)Evaluate(expression.SeqExpr, parameter);
+            var e = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
             return e.MatchesRegex(expression.Regex);
         }
     }

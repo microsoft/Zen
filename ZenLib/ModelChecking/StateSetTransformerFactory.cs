@@ -62,7 +62,7 @@ namespace ZenLib.ModelChecking
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
-            var mustInterleave = heuristic.Compute(newExpression, arguments);
+            var mustInterleave = heuristic.GetInterleavedVariables(newExpression, arguments);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,
@@ -192,7 +192,7 @@ namespace ZenLib.ModelChecking
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristic();
-            var mustInterleave = heuristic.Compute(expression, arguments);
+            var mustInterleave = heuristic.GetInterleavedVariables(expression, arguments);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // if we already have canonical values for this type, we should use those.

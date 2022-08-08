@@ -29,7 +29,7 @@ namespace ZenLib.Compilation
     /// the match statements to native code and then fall back to interpreting the expression
     /// when we exceed some threshold.
     /// </summary>
-    internal class ExpressionConverter : IZenExprVisitor<ExpressionConverterEnvironment, Expression>
+    internal class ExpressionConverter : ZenExprVisitor<ExpressionConverterEnvironment, Expression>
     {
         /// <summary>
         /// The convert method.
@@ -114,7 +114,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit(ZenLogicalBinopExpr expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitLogicalBinop(ZenLogicalBinopExpr expression, ExpressionConverterEnvironment parameter)
         {
             var left = CodeGenerator.CompileToBlock(
                 expression.Expr1,
@@ -146,7 +146,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitArbitrary<T>(ZenArbitraryExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(ReflectionUtilities.GetDefaultValue<T>());
         }
@@ -157,7 +157,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitArgument<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return parameter.ArgumentAssignment[expression.ArgumentId];
         }
@@ -168,7 +168,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenArithBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitArithBinop<T>(ZenArithBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
@@ -191,7 +191,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenBitwiseBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
@@ -214,7 +214,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitBitwiseNot<T>(ZenBitwiseNotExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return BitwiseNot<T>(Convert(expression.Expr, parameter));
         }
@@ -225,7 +225,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitConstant<T>(ZenConstantExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Constant(expression.Value);
         }
@@ -236,7 +236,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitCreateObject<TObject>(ZenCreateObjectExpr<TObject> expression, ExpressionConverterEnvironment parameter)
         {
             var fieldNames = new List<string>();
             var parameters = new List<Expression>();
@@ -280,7 +280,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitGetField<T1, T2>(ZenGetFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             var obj = Convert(expression.Expr, parameter);
             return Expression.PropertyOrField(obj, expression.FieldName);
@@ -292,7 +292,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitIf<T>(ZenIfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var guardExpr = Convert(expression.GuardExpr, parameter);
 
@@ -319,7 +319,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitEquality<T>(ZenEqualityExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
@@ -338,7 +338,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenArithComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitArithComparison<T>(ZenArithComparisonExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
@@ -386,7 +386,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitListAdd<T>(ZenListAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var list = Convert(expression.Expr, parameter);
             var element = Convert(expression.ElementExpr, parameter);
@@ -401,7 +401,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitListEmpty<T>(ZenListEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
             return Expression.New(c);
@@ -413,7 +413,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
             var fseqType = typeof(FSeq<TList>);
 
@@ -501,7 +501,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitNot(ZenNotExpr expression, ExpressionConverterEnvironment parameter)
         {
             return Expression.Not(Convert(expression.Expr, parameter));
         }
@@ -512,7 +512,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, ExpressionConverterEnvironment parameter)
         {
             var obj = Convert(expression.Expr, parameter);
             var value = Convert(expression.FieldExpr, parameter);
@@ -525,7 +525,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
             return Expression.New(c);
@@ -537,7 +537,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
@@ -553,7 +553,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitMapDelete<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
@@ -568,7 +568,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitMapGet<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Convert(expression.KeyExpr, parameter);
@@ -583,7 +583,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitMapCombine<TKey>(ZenMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
         {
             MethodInfo method;
             switch (expression.CombinationType)
@@ -613,7 +613,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitConstMapSet<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Expression.Constant(expression.Key);
@@ -629,7 +629,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Expression.Constant(expression.Key);
@@ -644,7 +644,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(Seq<T>).GetConstructor(new Type[] { });
             return Expression.New(c);
@@ -656,7 +656,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });
             var e = Convert(expression.ValueExpr, parameter);
@@ -669,7 +669,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var l = Convert(expression.SeqExpr1, parameter);
             var r = Convert(expression.SeqExpr2, parameter);
@@ -683,7 +683,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqLength<T>(ZenSeqLengthExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var s = Convert(expression.SeqExpr, parameter);
             var m = typeof(Seq<T>).GetMethod("Length");
@@ -698,7 +698,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqAt<T>(ZenSeqAtExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
             var e2 = Convert(expression.IndexExpr, parameter);
@@ -712,7 +712,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
             var e2 = Convert(expression.SubseqExpr, parameter);
@@ -735,7 +735,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqIndexOf<T>(ZenSeqIndexOfExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
             var e2 = Convert(expression.SubseqExpr, parameter);
@@ -750,7 +750,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqSlice<T>(ZenSeqSliceExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
             var e2 = Convert(expression.OffsetExpr, parameter);
@@ -765,7 +765,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqReplaceFirst<T>(ZenSeqReplaceFirstExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
             var e2 = Convert(expression.SubseqExpr, parameter);
@@ -780,7 +780,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var e = Convert(expression.SourceExpr, parameter);
 
@@ -809,7 +809,7 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public Expression Visit<T>(ZenSeqRegexExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitSeqRegex<T>(ZenSeqRegexExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e = Convert(expression.SeqExpr, parameter);
             var m = typeof(Seq<T>).GetMethod("MatchesRegex");

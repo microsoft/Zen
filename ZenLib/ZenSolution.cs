@@ -50,7 +50,7 @@ namespace ZenLib
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(this.VariableAssignment);
             var interpreter = new ExpressionEvaluator(false);
-            return (T)interpreter.Evaluate(expr, interpreterEnv);
+            return (T)interpreter.Visit(expr, interpreterEnv);
         }
     }
 }

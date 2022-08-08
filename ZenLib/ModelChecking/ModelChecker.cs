@@ -172,7 +172,7 @@ namespace ZenLib.ModelChecking
                 {
                     var environment = new ExpressionEvaluatorEnvironment(assignment);
                     var interpreter = new ExpressionEvaluator(false);
-                    var ret = interpreter.Evaluate((dynamic)constant.Value, environment);
+                    var ret = interpreter.Visit((dynamic)constant.Value, environment);
                     result = result.Set((dynamic)constant.Key, (dynamic)ret);
                     assignment[arbitrary] = result;
                 }

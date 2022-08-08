@@ -9,7 +9,7 @@ namespace ZenLib.Generation
     /// <summary>
     /// Class to identify sub-expressions that are repeated more than once.
     /// </summary>
-    internal class ExpressionReuseVisitor : IZenExprVisitor<Unit, Unit>
+    internal class ExpressionReuseVisitor : ZenExprVisitor<Unit, Unit>
     {
         /// <summary>
         /// The subexpressions in the expression.
@@ -47,20 +47,20 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit(ZenLogicalBinopExpr expression, Unit parameter)
+        public override Unit VisitLogicalBinop(ZenLogicalBinopExpr expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);
             return parameter;
         }
 
-        public Unit Visit(ZenNotExpr expression, Unit parameter)
+        public override Unit VisitNot(ZenNotExpr expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenIfExpr<T> expression, Unit parameter)
+        public override Unit VisitIf<T>(ZenIfExpr<T> expression, Unit parameter)
         {
             Compute(expression.GuardExpr, parameter);
             Compute(expression.TrueExpr, parameter);
@@ -68,49 +68,49 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<T>(ZenConstantExpr<T> expression, Unit parameter)
+        public override Unit VisitConstant<T>(ZenConstantExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<T>(ZenArithBinopExpr<T> expression, Unit parameter)
+        public override Unit VisitArithBinop<T>(ZenArithBinopExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)
+        public override Unit VisitBitwiseNot<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenBitwiseBinopExpr<T> expression, Unit parameter)
+        public override Unit VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenListEmptyExpr<T> expression, Unit parameter)
+        public override Unit VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<T>(ZenListAddFrontExpr<T> expression, Unit parameter)
+        public override Unit VisitListAdd<T>(ZenListAddFrontExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
             Compute(expression.ElementExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
@@ -118,86 +118,86 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitMapDelete<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitMapGet<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.MapExpr, parameter);
             Compute(expression.KeyExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey>(ZenMapCombineExpr<TKey> expression, Unit parameter)
+        public override Unit VisitMapCombine<TKey>(ZenMapCombineExpr<TKey> expression, Unit parameter)
         {
             Compute(expression.MapExpr1, parameter);
             Compute(expression.MapExpr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitConstMapSet<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.MapExpr, parameter);
             Compute(expression.ValueExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.MapExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
+        public override Unit VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
         {
             Compute(expression.ListExpr, parameter);
             Compute(expression.EmptyExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqEmptyExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqUnitExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, Unit parameter)
         {
             Compute(expression.ValueExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqConcatExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr1, parameter);
             Compute(expression.SeqExpr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqLengthExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqLength<T>(ZenSeqLengthExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqAtExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqAt<T>(ZenSeqAtExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             Compute(expression.IndexExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqContainsExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             Compute(expression.SubseqExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqIndexOfExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqIndexOf<T>(ZenSeqIndexOfExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             Compute(expression.SubseqExpr, parameter);
@@ -205,7 +205,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqSliceExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqSlice<T>(ZenSeqSliceExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             Compute(expression.OffsetExpr, parameter);
@@ -213,7 +213,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqReplaceFirstExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqReplaceFirst<T>(ZenSeqReplaceFirstExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             Compute(expression.SubseqExpr, parameter);
@@ -221,26 +221,26 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<T>(ZenSeqRegexExpr<T> expression, Unit parameter)
+        public override Unit VisitSeqRegex<T>(ZenSeqRegexExpr<T> expression, Unit parameter)
         {
             Compute(expression.SeqExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Unit parameter)
+        public override Unit VisitGetField<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
             return parameter;
         }
 
-        public Unit Visit<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Unit parameter)
+        public override Unit VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Unit parameter)
         {
             Compute(expression.Expr, parameter);
             Compute(expression.FieldExpr, parameter);
             return parameter;
         }
 
-        public Unit Visit<TObject>(ZenCreateObjectExpr<TObject> expression, Unit parameter)
+        public override Unit VisitCreateObject<TObject>(ZenCreateObjectExpr<TObject> expression, Unit parameter)
         {
             foreach (var fieldValuePair in expression.Fields)
             {
@@ -251,31 +251,31 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public Unit Visit<T>(ZenEqualityExpr<T> expression, Unit parameter)
+        public override Unit VisitEquality<T>(ZenEqualityExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenArithComparisonExpr<T> expression, Unit parameter)
+        public override Unit VisitArithComparison<T>(ZenArithComparisonExpr<T> expression, Unit parameter)
         {
             Compute(expression.Expr1, parameter);
             Compute(expression.Expr2, parameter);
             return parameter;
         }
 
-        public Unit Visit<T>(ZenArgumentExpr<T> expression, Unit parameter)
+        public override Unit VisitArgument<T>(ZenArgumentExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<T>(ZenArbitraryExpr<T> expression, Unit parameter)
+        public override Unit VisitArbitrary<T>(ZenArbitraryExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
-        public Unit Visit<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Unit parameter)
+        public override Unit VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Unit parameter)
         {
             Compute(expression.SourceExpr, parameter);
             return parameter;

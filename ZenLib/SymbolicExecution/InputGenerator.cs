@@ -42,7 +42,7 @@ namespace ZenLib.SymbolicExecution
                 var assignment = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, null, emptyArguments).ModelCheck(input == e, emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T2)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
+                return ((T2)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
             Option<T1> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input, backend);
@@ -76,7 +76,7 @@ namespace ZenLib.SymbolicExecution
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T3)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
+                return ((T3)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
             Option<(T1, T2)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, backend);
@@ -112,7 +112,7 @@ namespace ZenLib.SymbolicExecution
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T4)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
+                return ((T4)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
             Option<(T1, T2, T3)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, backend);
@@ -150,7 +150,7 @@ namespace ZenLib.SymbolicExecution
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), emptyArguments);
                 var evaluator = new ExpressionEvaluator(true);
                 var env = new ExpressionEvaluatorEnvironment(assignment);
-                return ((T5)evaluator.Evaluate(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
+                return ((T5)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
             Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, input4, backend);
