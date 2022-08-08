@@ -491,14 +491,14 @@ namespace ZenLib.Interpretation
 
         public object Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ConstMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
+            var e1 = (CMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
             var e2 = (TValue)Evaluate(expression.ValueExpr, parameter);
             return e1.Set(expression.Key, e2);
         }
 
         public object Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (ConstMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
+            var e1 = (CMap<TKey, TValue>)Evaluate(expression.MapExpr, parameter);
             return e1.Get(expression.Key);
         }
 

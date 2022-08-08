@@ -1,4 +1,4 @@
-﻿// <copyright file="ConstSetTests.cs" company="Microsoft">
+﻿// <copyright file="CSetTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -14,32 +14,32 @@ namespace ZenLib.Tests
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class ConstSetTests
+    public class CSetTests
     {
         /// <summary>
         /// Test set evaluation.
         /// </summary>
         [TestMethod]
-        public void TestConstSetEvaluate()
+        public void TestCSetEvaluate()
         {
-            var zf = new ZenFunction<ConstSet<int>, ConstSet<int>>(d => d.Add(1).Delete(2));
+            var zf = new ZenFunction<CSet<int>, CSet<int>>(d => d.Add(1).Delete(2));
 
-            var d = zf.Evaluate(new ConstSet<int>(2, 3));
+            var d = zf.Evaluate(new CSet<int>(2, 3));
             Assert.AreEqual(2, d.Count());
             Assert.IsTrue(d.Contains(1));
             Assert.IsTrue(d.Contains(3));
 
-            d = zf.Evaluate(new ConstSet<int>(2));
+            d = zf.Evaluate(new CSet<int>(2));
             Assert.AreEqual(1, d.Count());
             Assert.IsTrue(d.Contains(1));
 
             zf.Compile();
-            d = zf.Evaluate(new ConstSet<int>(2, 3));
+            d = zf.Evaluate(new CSet<int>(2, 3));
             Assert.AreEqual(2, d.Count());
             Assert.IsTrue(d.Contains(1));
             Assert.IsTrue(d.Contains(3));
 
-            d = zf.Evaluate(new ConstSet<int>(2));
+            d = zf.Evaluate(new CSet<int>(2));
             Assert.AreEqual(1, d.Count());
             Assert.IsTrue(d.Contains(1));
         }
@@ -48,29 +48,29 @@ namespace ZenLib.Tests
         /// Test set implementation.
         /// </summary>
         [TestMethod]
-        public void TestConstSetImplementation()
+        public void TestCSetImplementation()
         {
-            Assert.IsFalse(new ConstSet<int>().Contains(1));
-            Assert.IsTrue(new ConstSet<int>(1).Contains(1));
-            Assert.IsTrue(new ConstSet<int>(1, 2).Contains(1));
-            Assert.IsFalse(new ConstSet<int>(1, 2).Contains(3));
-            Assert.IsTrue(new ConstSet<int>(1).Add(2).Contains(2));
-            Assert.IsFalse(new ConstSet<int>(1).Delete(1).Contains(2));
-            Assert.IsFalse(new ConstSet<int>(1).Delete(1).Contains(1));
-            Assert.IsTrue(new ConstSet<int>(1) == new ConstSet<int>().Add(1));
-            Assert.IsTrue(new ConstSet<int>(1).Equals((object)new ConstSet<int>().Add(1)));
-            Assert.IsTrue(new ConstSet<int>(1).GetHashCode() == new ConstSet<int>().Add(1).GetHashCode());
-            Assert.IsTrue(new ConstSet<int>(1) != new ConstSet<int>().Add(2));
-            Assert.IsFalse(new ConstSet<int>().Equals(new object()));
+            Assert.IsFalse(new CSet<int>().Contains(1));
+            Assert.IsTrue(new CSet<int>(1).Contains(1));
+            Assert.IsTrue(new CSet<int>(1, 2).Contains(1));
+            Assert.IsFalse(new CSet<int>(1, 2).Contains(3));
+            Assert.IsTrue(new CSet<int>(1).Add(2).Contains(2));
+            Assert.IsFalse(new CSet<int>(1).Delete(1).Contains(2));
+            Assert.IsFalse(new CSet<int>(1).Delete(1).Contains(1));
+            Assert.IsTrue(new CSet<int>(1) == new CSet<int>().Add(1));
+            Assert.IsTrue(new CSet<int>(1).Equals((object)new CSet<int>().Add(1)));
+            Assert.IsTrue(new CSet<int>(1).GetHashCode() == new CSet<int>().Add(1).GetHashCode());
+            Assert.IsTrue(new CSet<int>(1) != new CSet<int>().Add(2));
+            Assert.IsFalse(new CSet<int>().Equals(new object()));
         }
 
         /// <summary>
         /// Test sets work with solve.
         /// </summary>
         [TestMethod]
-        public void TestConstSetSolve()
+        public void TestCSetSolve()
         {
-            var x = Zen.Symbolic<ConstSet<int>>();
+            var x = Zen.Symbolic<CSet<int>>();
             var solution = x.Contains(3).Solve();
             var result = solution.Get(x);
             Assert.IsTrue(result.Contains(3));
@@ -80,10 +80,10 @@ namespace ZenLib.Tests
         /// Test sets work with solve.
         /// </summary>
         [TestMethod]
-        public void TestConstSetAddDelete()
+        public void TestCSetAddDelete()
         {
-            var x = Zen.Symbolic<ConstSet<int>>();
-            var y = Zen.Symbolic<ConstSet<int>>();
+            var x = Zen.Symbolic<CSet<int>>();
+            var y = Zen.Symbolic<CSet<int>>();
             var solution = Zen.And(x.Add(1).Add(2) == y, x.Contains(3)).Solve();
             var resx = solution.Get(x);
             var resy = solution.Get(y);

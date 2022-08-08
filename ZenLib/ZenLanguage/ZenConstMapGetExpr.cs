@@ -15,7 +15,7 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<ConstMap<TKey, TValue>>, TKey), Zen<TValue>> createFunc = (v) =>
+        private static Func<(Zen<CMap<TKey, TValue>>, TKey), Zen<TValue>> createFunc = (v) =>
             Simplify(v.Item1, v.Item2);
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace ZenLib
         /// <param name="map">The map expr.</param>
         /// <param name="key">The key.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<TValue> Simplify(Zen<ConstMap<TKey, TValue>> map, TKey key)
+        private static Zen<TValue> Simplify(Zen<CMap<TKey, TValue>> map, TKey key)
         {
             if (map is ZenConstMapSetExpr<TKey, TValue> e2 && e2.Key.Equals(key))
             {
@@ -55,7 +55,7 @@ namespace ZenLib
         /// <param name="mapExpr">The map expr.</param>
         /// <param name="key">The key.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<TValue> Create(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
+        public static Zen<TValue> Create(Zen<CMap<TKey, TValue>> mapExpr, TKey key)
         {
             Contract.AssertNotNull(mapExpr);
             Contract.AssertNotNull(key);
@@ -70,7 +70,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="mapExpr">The map expression.</param>
         /// <param name="key">The key to add a value for.</param>
-        private ZenConstMapGetExpr(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
+        private ZenConstMapGetExpr(Zen<CMap<TKey, TValue>> mapExpr, TKey key)
         {
             this.MapExpr = mapExpr;
             this.Key = key;
@@ -79,7 +79,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the map expr.
         /// </summary>
-        public Zen<ConstMap<TKey, TValue>> MapExpr { get; }
+        public Zen<CMap<TKey, TValue>> MapExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.

@@ -19,17 +19,6 @@ namespace ZenLibBench
         {
             ZenSettings.UseLargeStack = true;
 
-            var x = Zen.Symbolic<int>();
-            var m1 = Zen.Symbolic<ConstMap<string, int>>();
-            var m2 = Zen.Symbolic<ConstMap<string, int>>();
-
-            var c1 = m1.Get("a") == Zen.If(x < 10, x + 1, x + 2);
-            var c2 = m2 == m1.Set("b", x);
-            var solution = Zen.And(c1, c2).Solve();
-            Console.WriteLine(solution.Get(x));
-            Console.WriteLine(solution.Get(m1));
-            Console.WriteLine(solution.Get(m2));
-
             // BenchmarkSets();
             // BenchmarkComparisons();
             // BenchmarkTransformers();
@@ -56,9 +45,9 @@ namespace ZenLibBench
                 (s == Set.Empty<string>()).Solve();
             });
 
-            Benchmark("BenchmarkConstSets", 10, () =>
+            Benchmark("BenchmarkCSets", 10, () =>
             {
-                var s = Zen.Symbolic<ConstSet<string>>();
+                var s = Zen.Symbolic<CSet<string>>();
 
                 for (int i = 0; i < 50; i++)
                 {

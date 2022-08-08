@@ -38,7 +38,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenFunction<Option<Seq<bool>>>(() => Option.Null<Seq<bool>>()).Assert(v => v.Value() == new Seq<bool>()));
             Assert.IsTrue(new ZenFunction<Option<FSeq<bool>>>(() => Option.Null<FSeq<bool>>()).Assert(v => v.Value().IsEmpty()));
             Assert.IsTrue(new ZenFunction<Option<FMap<bool, bool>>>(() => Option.Null<FMap<bool, bool>>()).Assert(v => v.Value().Get(true).IsSome() == false));
-            Assert.IsTrue(new ZenFunction<Option<ConstMap<bool, bool>>>(() => Option.Null<ConstMap<bool, bool>>()).Assert(v => v.Value().Get(true) == false));
+            Assert.IsTrue(new ZenFunction<Option<CMap<bool, bool>>>(() => Option.Null<CMap<bool, bool>>()).Assert(v => v.Value().Get(true) == false));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace ZenLib.Tests
             CheckDefault<Real>(new Real(0));
             CheckDefault<Pair<int, int>>(new Pair<int, int> { Item1 = 0, Item2 = 0 });
             CheckDefault<Option<int>>(Option.None<int>());
-            CheckDefault<ConstMap<int, int>>(new ConstMap<int, int>());
+            CheckDefault<CMap<int, int>>(new CMap<int, int>());
 
             var o = ReflectionUtilities.GetDefaultValue<Object2>();
             Assert.AreEqual(o.Field1, 0);

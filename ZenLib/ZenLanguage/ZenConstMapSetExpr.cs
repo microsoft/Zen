@@ -10,25 +10,25 @@ namespace ZenLib
     /// <summary>
     /// Class representing a map set expression.
     /// </summary>
-    internal sealed class ZenConstMapSetExpr<TKey, TValue> : Zen<ConstMap<TKey, TValue>>
+    internal sealed class ZenConstMapSetExpr<TKey, TValue> : Zen<CMap<TKey, TValue>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<ConstMap<TKey, TValue>>, TKey, Zen<TValue>), Zen<ConstMap<TKey, TValue>>> createFunc = (v) =>
+        private static Func<(Zen<CMap<TKey, TValue>>, TKey, Zen<TValue>), Zen<CMap<TKey, TValue>>> createFunc = (v) =>
             Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenConstMapSetExpr.
         /// </summary>
-        private static HashConsTable<(long, TKey, long), Zen<ConstMap<TKey, TValue>>> hashConsTable =
-            new HashConsTable<(long, TKey, long), Zen<ConstMap<TKey, TValue>>>();
+        private static HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>> hashConsTable =
+            new HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>>();
 
         /// <summary>
         /// Unroll a ZenConstMapSetExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
-        public override Zen<ConstMap<TKey, TValue>> Unroll()
+        public override Zen<CMap<TKey, TValue>> Unroll()
         {
             return Create(this.MapExpr.Unroll(), this.Key, this.ValueExpr.Unroll());
         }
@@ -40,7 +40,7 @@ namespace ZenLib
         /// <param name="key">The key expr.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<ConstMap<TKey, TValue>> Simplify(Zen<ConstMap<TKey, TValue>> map, TKey key, Zen<TValue> value)
+        private static Zen<CMap<TKey, TValue>> Simplify(Zen<CMap<TKey, TValue>> map, TKey key, Zen<TValue> value)
         {
             if (map is ZenConstMapSetExpr<TKey, TValue> e1 && e1.Key.Equals(key))
             {
@@ -57,7 +57,7 @@ namespace ZenLib
         /// <param name="key">The key.</param>
         /// <param name="value">The value expr.</param>
         /// <returns>The new expr.</returns>
-        public static Zen<ConstMap<TKey, TValue>> Create(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> value)
+        public static Zen<CMap<TKey, TValue>> Create(Zen<CMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> value)
         {
             Contract.AssertNotNull(mapExpr);
             Contract.AssertNotNull(key);
@@ -74,7 +74,7 @@ namespace ZenLib
         /// <param name="mapExpr">The map expression.</param>
         /// <param name="key">The key to add a value for.</param>
         /// <param name="valueExpr">The expression for the value.</param>
-        private ZenConstMapSetExpr(Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
+        private ZenConstMapSetExpr(Zen<CMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
         {
             this.MapExpr = mapExpr;
             this.Key = key;
@@ -84,7 +84,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the map expr.
         /// </summary>
-        public Zen<ConstMap<TKey, TValue>> MapExpr { get; }
+        public Zen<CMap<TKey, TValue>> MapExpr { get; }
 
         /// <summary>
         /// Gets the key to add the value for.

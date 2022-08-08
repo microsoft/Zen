@@ -35,13 +35,6 @@ namespace ZenLib.ModelChecking
             return visitor.Visit(this, parameter);
         }
 
-        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
-        {
-            var o = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
-            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.Eq(this.Value, o.Value));
-        }
-
         /// <summary>
         /// Convert the object to a string.
         /// </summary>

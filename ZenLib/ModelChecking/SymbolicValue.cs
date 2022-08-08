@@ -22,9 +22,6 @@ namespace ZenLib.ModelChecking
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other);
 
-        internal abstract SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other);
-
         internal abstract TReturn Accept<TParam, TReturn>(
             ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
             TParam parameter);

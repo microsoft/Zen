@@ -105,7 +105,7 @@ namespace ZenLib
         /// <summary>
         /// The type of map values.
         /// </summary>
-        public readonly static Type ConstMapType = typeof(ConstMap<,>);
+        public readonly static Type ConstMapType = typeof(CMap<,>);
 
         /// <summary>
         /// The type of fseq values.

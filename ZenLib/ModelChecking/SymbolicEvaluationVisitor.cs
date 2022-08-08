@@ -69,7 +69,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Compute<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var constantMapKeyVisitor = new ConstantMapKeyVisitor(parameter.ArgumentsToExpr);
+            var constantMapKeyVisitor = new CMapKeyVisitor(parameter.ArgumentsToExpr);
             this.mapConstants = constantMapKeyVisitor.Compute(expression);
             return Evaluate(expression, parameter);
         }
@@ -80,7 +80,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The symbolic value.</returns>
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Evaluate<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        internal SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Evaluate<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             if (this.Cache.TryGetValue(expression, out var value))
             {
@@ -510,10 +510,12 @@ namespace ZenLib.ModelChecking
         {
             var e1 = Evaluate(expression.Expr1, parameter);
             var e2 = Evaluate(expression.Expr2, parameter);
-            return Equals(typeof(T), e1, e2, parameter);
+            var equalityVisitor = new SymbolicEqualityVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
+            var result = ReflectionUtilities.ApplyTypeVisitor(equalityVisitor, typeof(T), (e1, e2));
+            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
-        public SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Equals(
+        /* public SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Equals(
             Type type,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value1,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value2,
@@ -551,7 +553,7 @@ namespace ZenLib.ModelChecking
             {
                 return value1.Eq(value2);
             }
-        }
+        } */
 
         /// <summary>
         /// Visit the expression.

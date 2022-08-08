@@ -627,8 +627,8 @@ namespace ZenLib.Compilation
             var dict = Convert(expression.MapExpr, parameter);
             var key = Expression.Constant(expression.Key);
             var value = Convert(expression.ValueExpr, parameter);
-            var mapExpr = Expression.Convert(dict, typeof(ConstMap<TKey, TValue>));
-            var method = typeof(ConstMap<TKey, TValue>).GetMethodCached("Set");
+            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
+            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Set");
             return Expression.Call(mapExpr, method, key, value);
         }
 
@@ -636,8 +636,8 @@ namespace ZenLib.Compilation
         {
             var dict = Convert(expression.MapExpr, parameter);
             var key = Expression.Constant(expression.Key);
-            var mapExpr = Expression.Convert(dict, typeof(ConstMap<TKey, TValue>));
-            var method = typeof(ConstMap<TKey, TValue>).GetMethodCached("Get");
+            var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
+            var method = typeof(CMap<TKey, TValue>).GetMethodCached("Get");
             return Expression.Call(mapExpr, method, key);
         }
 

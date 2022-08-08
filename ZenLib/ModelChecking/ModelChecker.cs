@@ -163,7 +163,7 @@ namespace ZenLib.ModelChecking
                 var types = arbitrary.GetType().GetGenericArgumentsCached()[0].GetGenericArgumentsCached();
                 var keyType = types[0];
                 var valueType = types[1];
-                dynamic result = typeof(ConstMap<,>)
+                dynamic result = typeof(CMap<,>)
                     .MakeGenericType(keyType, valueType)
                     .GetConstructor(new Type[] { })
                     .Invoke(CommonUtilities.EmptyArray);

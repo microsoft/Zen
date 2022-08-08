@@ -1,4 +1,4 @@
-﻿// <copyright file="ConstSet.cs" company="Microsoft">
+﻿// <copyright file="CSet.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -16,34 +16,34 @@ namespace ZenLib
     /// and can not be general Zen expressions. It may offer better performance than
     /// the more general Set type.
     /// </summary>
-    public class ConstSet<T> : IEquatable<ConstSet<T>>
+    public class CSet<T> : IEquatable<CSet<T>>
     {
         /// <summary>
         /// Gets the underlying values of the map.
         /// </summary>
-        public ConstMap<T, bool> Map { get; set; }
+        public CMap<T, bool> Map { get; set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstSet{T}"/> class.
+        /// Creates a new instance of the <see cref="CSet{T}"/> class.
         /// </summary>
-        public ConstSet()
+        public CSet()
         {
-            this.Map = new ConstMap<T, bool>();
+            this.Map = new CMap<T, bool>();
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstSet{TKey}"/> class.
+        /// Creates a new instance of the <see cref="CSet{TKey}"/> class.
         /// </summary>
-        public ConstSet(params T[] values) : this((IEnumerable<T>)values)
+        public CSet(params T[] values) : this((IEnumerable<T>)values)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstSet{TKey}"/> class.
+        /// Creates a new instance of the <see cref="CSet{TKey}"/> class.
         /// </summary>
-        public ConstSet(IEnumerable<T> values)
+        public CSet(IEnumerable<T> values)
         {
-            this.Map = new ConstMap<T, bool>();
+            this.Map = new CMap<T, bool>();
             foreach (var value in values)
             {
                 this.Map = this.Map.Set(value, true);
@@ -51,10 +51,10 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstSet{T}"/> class.
+        /// Creates a new instance of the <see cref="CSet{T}"/> class.
         /// </summary>
         /// <param name="map">The map of values.</param>
-        internal ConstSet(ConstMap<T, bool> map)
+        internal CSet(CMap<T, bool> map)
         {
             this.Map = map;
         }
@@ -68,18 +68,18 @@ namespace ZenLib
         /// Add an element to the set.
         /// </summary>
         /// <param name="element">The element to add.</param>
-        public ConstSet<T> Add(T element)
+        public CSet<T> Add(T element)
         {
-            return new ConstSet<T>(this.Map.Set(element, true));
+            return new CSet<T>(this.Map.Set(element, true));
         }
 
         /// <summary>
         /// Delete an element from the set.
         /// </summary>
         /// <param name="element">The element to add.</param>
-        public ConstSet<T> Delete(T element)
+        public CSet<T> Delete(T element)
         {
-            return new ConstSet<T>(this.Map.Set(element, false));
+            return new CSet<T>(this.Map.Set(element, false));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is ConstSet<T> o && Equals(o);
+            return obj is CSet<T> o && Equals(o);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other map.</param>
         /// <returns>True or false.</returns>
-        public bool Equals(ConstSet<T> other)
+        public bool Equals(CSet<T> other)
         {
             return this.Map.Equals(other.Map);
         }
@@ -136,7 +136,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator ==(ConstSet<T> left, ConstSet<T> right)
+        public static bool operator ==(CSet<T> left, CSet<T> right)
         {
             return left.Equals(right);
         }
@@ -147,7 +147,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator !=(ConstSet<T> left, ConstSet<T> right)
+        public static bool operator !=(CSet<T> left, CSet<T> right)
         {
             return !(left == right);
         }
@@ -156,16 +156,16 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for set Zen objects.
     /// </summary>
-    public static class ConstSet
+    public static class CSet
     {
         /// <summary>
         /// The underlying map for the set.
         /// </summary>
         /// <param name="setExpr">The set expr.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<ConstMap<T, bool>> Map<T>(this Zen<ConstSet<T>> setExpr)
+        internal static Zen<CMap<T, bool>> Map<T>(this Zen<CSet<T>> setExpr)
         {
-            return setExpr.GetField<ConstSet<T>, ConstMap<T, bool>>("Map");
+            return setExpr.GetField<CSet<T>, CMap<T, bool>>("Map");
         }
 
         /// <summary>
@@ -174,11 +174,11 @@ namespace ZenLib
         /// <param name="setExpr">Zen set expression.</param>
         /// <param name="element">The element to add.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ConstSet<T>> Add<T>(this Zen<ConstSet<T>> setExpr, T element)
+        public static Zen<CSet<T>> Add<T>(this Zen<CSet<T>> setExpr, T element)
         {
             Contract.AssertNotNull(setExpr);
 
-            return Create<ConstSet<T>>(("Map", setExpr.Map().Set(element, true)));
+            return Create<CSet<T>>(("Map", setExpr.Map().Set(element, true)));
         }
 
         /// <summary>
@@ -187,11 +187,11 @@ namespace ZenLib
         /// <param name="setExpr">Zen set expression.</param>
         /// <param name="element">The element to remove.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ConstSet<T>> Delete<T>(this Zen<ConstSet<T>> setExpr, T element)
+        public static Zen<CSet<T>> Delete<T>(this Zen<CSet<T>> setExpr, T element)
         {
             Contract.AssertNotNull(setExpr);
 
-            return Create<ConstSet<T>>(("Map", setExpr.Map().Set(element, false)));
+            return Create<CSet<T>>(("Map", setExpr.Map().Set(element, false)));
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace ZenLib
         /// <param name="setExpr">Zen set expression.</param>
         /// <param name="element">The element to check for.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<bool> Contains<T>(this Zen<ConstSet<T>> setExpr, T element)
+        public static Zen<bool> Contains<T>(this Zen<CSet<T>> setExpr, T element)
         {
             Contract.AssertNotNull(setExpr);
 

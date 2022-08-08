@@ -463,9 +463,9 @@ namespace ZenLib.Tests
         /// Test that const map simplification is working.
         /// </summary>
         [TestMethod]
-        public void TestConstMapSimplification()
+        public void TestCMapSimplification()
         {
-            var x = Zen.Symbolic<ConstMap<int, int>>();
+            var x = Zen.Symbolic<CMap<int, int>>();
             Assert.AreEqual(x.Set(1, 2), x.Set(1, 3).Set(1, 2));
         }
 

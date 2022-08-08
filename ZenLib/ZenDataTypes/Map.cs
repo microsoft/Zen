@@ -14,7 +14,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a map from keys to values that is supported by Zen.
     /// This class is handled symbolically using the SMT theory of arrays.
-    /// When the keys to the map are constants, take a look at the <see cref="ConstMap{TKey, TValue}"/> class.
+    /// When the keys to the map are constants, take a look at the <see cref="CMap{TKey, TValue}"/> class.
     /// </summary>
     public class Map<TKey, TValue> : IEquatable<Map<TKey, TValue>>
     {

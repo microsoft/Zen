@@ -1,4 +1,4 @@
-﻿// <copyright file="ConstMap.cs" company="Microsoft">
+﻿// <copyright file="CMap.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -17,7 +17,7 @@ namespace ZenLib
     /// default for that type (e.g., 0 for int, false for bool). Because these are total
     /// maps, there is no notion of deleting an element or an empty map.
     /// </summary>
-    public class ConstMap<TKey, TValue> : IEquatable<ConstMap<TKey, TValue>>
+    public class CMap<TKey, TValue> : IEquatable<CMap<TKey, TValue>>
     {
         /// <summary>
         /// The default value of the given type.
@@ -30,18 +30,18 @@ namespace ZenLib
         public IDictionary<TKey, TValue> Values { get; set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstMap{TKey, TValue}"/> class.
+        /// Creates a new instance of the <see cref="CMap{TKey, TValue}"/> class.
         /// </summary>
-        public ConstMap()
+        public CMap()
         {
             this.Values = ImmutableDictionary<TKey, TValue>.Empty;
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstMap{TKey, TValue}"/> class.
+        /// Creates a new instance of the <see cref="CMap{TKey, TValue}"/> class.
         /// </summary>
         /// <param name="dictionary">The dictionary of initial values.</param>
-        internal ConstMap(ImmutableDictionary<TKey, TValue> dictionary)
+        internal CMap(ImmutableDictionary<TKey, TValue> dictionary)
         {
             this.Values = dictionary;
         }
@@ -56,11 +56,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="key">The key to add.</param>
         /// <param name="value">The value to add.</param>
-        public ConstMap<TKey, TValue> Set(TKey key, TValue value)
+        public CMap<TKey, TValue> Set(TKey key, TValue value)
         {
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
             d = value.Equals(defaultValue) ? d.Remove(key) : d.SetItem(key, value);
-            return new ConstMap<TKey, TValue>(d);
+            return new CMap<TKey, TValue>(d);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public override bool Equals(object obj)
         {
-            return obj is ConstMap<TKey, TValue> o && Equals(o);
+            return obj is CMap<TKey, TValue> o && Equals(o);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The other map.</param>
         /// <returns>True or false.</returns>
-        public bool Equals(ConstMap<TKey, TValue> other)
+        public bool Equals(CMap<TKey, TValue> other)
         {
             var count = this.Count();
             var otherCount = other.Count();
@@ -136,7 +136,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator ==(ConstMap<TKey, TValue> left, ConstMap<TKey, TValue> right)
+        public static bool operator ==(CMap<TKey, TValue> left, CMap<TKey, TValue> right)
         {
             return left.Equals(right);
         }
@@ -147,7 +147,7 @@ namespace ZenLib
         /// <param name="left">The left map.</param>
         /// <param name="right">The right map.</param>
         /// <returns>True or false.</returns>
-        public static bool operator !=(ConstMap<TKey, TValue> left, ConstMap<TKey, TValue> right)
+        public static bool operator !=(CMap<TKey, TValue> left, CMap<TKey, TValue> right)
         {
             return !(left == right);
         }
@@ -156,7 +156,7 @@ namespace ZenLib
     /// <summary>
     /// Static factory class for map Zen objects.
     /// </summary>
-    public static class ConstMap
+    public static class CMap
     {
         /// <summary>
         /// Add a value to a Zen map.
@@ -165,7 +165,7 @@ namespace ZenLib
         /// <param name="key">The key.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ConstMap<TKey, TValue>> Set<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
+        public static Zen<CMap<TKey, TValue>> Set<TKey, TValue>(this Zen<CMap<TKey, TValue>> mapExpr, TKey key, Zen<TValue> valueExpr)
         {
             Contract.AssertNotNull(mapExpr);
             Contract.AssertNotNull(key);
@@ -180,7 +180,7 @@ namespace ZenLib
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="key">Zen key expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<TValue> Get<TKey, TValue>(this Zen<ConstMap<TKey, TValue>> mapExpr, TKey key)
+        public static Zen<TValue> Get<TKey, TValue>(this Zen<CMap<TKey, TValue>> mapExpr, TKey key)
         {
             Contract.AssertNotNull(mapExpr);
             Contract.AssertNotNull(key);

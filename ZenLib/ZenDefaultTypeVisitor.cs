@@ -80,7 +80,7 @@ namespace ZenLib
 
         public object VisitConstMap(Type mapType, Type keyType, Type valueType, Unit parameter)
         {
-            var emptyMap = typeof(ConstMap<,>)
+            var emptyMap = typeof(CMap<,>)
                 .MakeGenericType(keyType, valueType)
                 .GetConstructor(new Type[] { })
                 .Invoke(CommonUtilities.EmptyArray);

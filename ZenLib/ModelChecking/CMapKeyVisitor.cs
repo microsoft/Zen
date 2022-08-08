@@ -1,4 +1,4 @@
-﻿// <copyright file="ConstantMapKeyVisitor.cs" company="Microsoft">
+﻿// <copyright file="CMapKeyVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,29 +8,29 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
 
     /// <summary>
-    /// Class to trace the set of constants that can be used as keys for ConstMap
+    /// Class to trace the set of constants that can be used as keys for CMap
     /// for each Arbitrary expression.
     /// </summary>
-    internal sealed class ConstantMapKeyVisitor : ZenExprActionVisitor
+    internal sealed class CMapKeyVisitor : ZenExprActionVisitor
     {
         /// <summary>
-        /// Mapping from each ConstMap type to the set of constants used.
+        /// Mapping from each CMap type to the set of constants used.
         /// </summary>
         public Dictionary<Type, ISet<object>> Constants;
 
         /// <summary>
         /// The value visitor.
         /// </summary>
-        private ConstantMapValueVisitor valueVisitor;
+        private CMapValueVisitor valueVisitor;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstantMapKeyVisitor"/> class.
+        /// Creates a new instance of the <see cref="CMapKeyVisitor"/> class.
         /// </summary>
         /// <param name="arguments"></param>
-        public ConstantMapKeyVisitor(Dictionary<long, object> arguments = null) : base(arguments)
+        public CMapKeyVisitor(Dictionary<long, object> arguments = null) : base(arguments)
         {
             this.Constants = new Dictionary<Type, ISet<object>>();
-            this.valueVisitor = new ConstantMapValueVisitor(this);
+            this.valueVisitor = new CMapValueVisitor(this);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ZenLib.ModelChecking
         /// Visit an expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        /// <returns>The set of ConstMap variables.</returns>
+        /// <returns>The set of CMap variables.</returns>
         public override void Visit<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression)
         {
             this.VisitCached(expression.MapExpr);
@@ -60,7 +60,7 @@ namespace ZenLib.ModelChecking
         /// Visit an expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        /// <returns>The set of ConstMap variables.</returns>
+        /// <returns>The set of CMap variables.</returns>
         public override void Visit<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression)
         {
             this.VisitCached(expression.MapExpr);
@@ -71,7 +71,7 @@ namespace ZenLib.ModelChecking
         /// Visit an expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        /// <returns>The set of ConstMap variables.</returns>
+        /// <returns>The set of CMap variables.</returns>
         public override void Visit<T>(ZenConstantExpr<T> expression)
         {
             ReflectionUtilities.ApplyTypeVisitor(this.valueVisitor, typeof(T), expression.Value);
@@ -83,7 +83,7 @@ namespace ZenLib.ModelChecking
         /// <param name="constant">The constant.</param>
         private void AddConstant<TKey, TValue>(object constant)
         {
-            var type = typeof(ConstMap<TKey, TValue>);
+            var type = typeof(CMap<TKey, TValue>);
             if (!this.Constants.TryGetValue(type, out var result))
             {
                 result = new HashSet<object>();
@@ -95,20 +95,20 @@ namespace ZenLib.ModelChecking
     }
 
     /// <summary>
-    /// Class to walk over a constant value and pull out the ConstMap key values.
+    /// Class to walk over a constant value and pull out the CMap key values.
     /// </summary>
-    internal sealed class ConstantMapValueVisitor : ITypeVisitor<Unit, object>
+    internal sealed class CMapValueVisitor : ITypeVisitor<Unit, object>
     {
         /// <summary>
         /// The key visitor.
         /// </summary>
-        private ConstantMapKeyVisitor keyVisitor;
+        private CMapKeyVisitor keyVisitor;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ConstantMapValueVisitor"/> class.
+        /// Creates a new instance of the <see cref="CMapValueVisitor"/> class.
         /// </summary>
         /// <param name="keyVisitor">The key visitor.</param>
-        public ConstantMapValueVisitor(ConstantMapKeyVisitor keyVisitor)
+        public CMapValueVisitor(CMapKeyVisitor keyVisitor)
         {
             this.keyVisitor = keyVisitor;
         }

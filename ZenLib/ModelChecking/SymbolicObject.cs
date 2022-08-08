@@ -63,22 +63,6 @@ namespace ZenLib.ModelChecking
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.ObjectType, this.Solver, newValue);
         }
 
-        internal override SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Eq(SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
-        {
-            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
-
-            var result = this.Solver.True();
-            foreach (var kv in this.Fields)
-            {
-                var field = kv.Key;
-                var v1 = kv.Value;
-                var v2 = o.Fields[field];
-                result = this.Solver.And(result, v1.Eq(v2).Value);
-            }
-
-            return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
-        }
-
         /// <summary>
         /// Convert the object to a string.
         /// </summary>

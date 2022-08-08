@@ -195,9 +195,9 @@ namespace ZenLib.Tests
         /// Test that formatting an expression works.
         /// </summary>
         [TestMethod]
-        public void TestFormatConstMap()
+        public void TestFormatCMap()
         {
-            var a = Zen.Symbolic<ConstMap<string, int>>("map");
+            var a = Zen.Symbolic<CMap<string, int>>("map");
             Console.WriteLine(a.Set("a", 1).Get("b").Format());
         }
 
