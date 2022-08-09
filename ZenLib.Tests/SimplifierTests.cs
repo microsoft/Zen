@@ -503,6 +503,21 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify equality conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestEqualsSimplification()
+        {
+            var f = Constant(false);
+            var t = Constant(true);
+            var b = Symbolic<bool>();
+            Assert.AreEqual(b, b == t);
+            Assert.AreEqual(b, t == b);
+            Assert.AreEqual(Zen.Not(b), b == f);
+            Assert.AreEqual(Zen.Not(b), f == b);
+        }
+
+        /// <summary>
         /// Simplify get field.
         /// </summary>
         [TestMethod]

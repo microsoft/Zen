@@ -50,6 +50,16 @@ namespace ZenLib
                 return Zen.Constant(ue1.Value == ue2.Value);
             }
 
+            if (e1 is ZenConstantExpr<bool> b1)
+            {
+                return b1.Value ? (Zen<bool>)(object)e2 : Zen.Not((Zen<bool>)(object)e2);
+            }
+
+            if (e2 is ZenConstantExpr<bool> b2)
+            {
+                return b2.Value ? (Zen<bool>)(object)e1 : Zen.Not((Zen<bool>)(object)e1);
+            }
+
             var x = ReflectionUtilities.GetConstantIntegerValue(e1);
             var y = ReflectionUtilities.GetConstantIntegerValue(e2);
             if (x.HasValue && y.HasValue)
