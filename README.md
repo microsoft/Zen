@@ -411,9 +411,9 @@ var solution = And(c1, c2, c3, c4).Solve(); // s = "a", s1 = {b, a}, s2 = {b}, s
 <a name="constant-sets-maps"></a>
 ## Constant Sets and Maps
 
-Arbitrary sets and maps described above are compiled to the SMT solver theory of Arrays. While this theory is quite general, it has known performance limitations, particularly for sets/maps that contain many elements. As a lightweight alternative, Zen provides the `CMap<T1, T2>` and `CSet<T>` classes that offer similar APIs but with the restriction that any maps keys or set elements must be C# constant values and are not themselves arbitrary Zen expressions. Zen will compile these sets and maps by expanding fresh variables for all possible constants used by the user for these types, which can lead to an efficient encoding.
+Arbitrary sets and maps described above are compiled to the SMT solver theory of Arrays. While this theory is quite general, it has known performance limitations. As a lightweight alternative, Zen provides the `CMap<T1, T2>` and `CSet<T>` classes that offer similar APIs but with the restriction that any map keys or set elements must be C# constant values and not Zen expressions. Zen will compile these sets and maps by creating fresh variables for all possible constants used by the user for these types.
 
-Constant maps are useful for managing a finite number of unknown variables that should be indexed to some data (e.g., a symbolic boolean variable for every edge in a C# graph).
+Constant maps are useful for managing a finite number of unknown variables that should be indexed to some data (e.g., a symbolic boolean variable for every edge in a C# graph), and may have better performance in many cases.
 
 `CMap<T1, T2>` represents a total map from keys of type `T1` to values of type `T2`. When a key is not explicitly added to the map, the resulting value will be the Zen default value for the type `T2` (e.g., `0` for integers, `false` for booleans). `CSet<T>` is simply implemented as a `CMap<T, bool>` that says for each key, if the element is in the set. Any example use is shown below:
 
