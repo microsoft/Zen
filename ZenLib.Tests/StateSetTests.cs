@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib;
     using ZenLib.ModelChecking;
     using ZenLib.Tests.Network;
     using static ZenLib.Zen;

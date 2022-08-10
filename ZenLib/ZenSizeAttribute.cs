@@ -20,8 +20,8 @@ namespace ZenLib
         /// <param name="enumerationType">The exhaustiveness of the depth parameter..</param>
         public ZenSizeAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User)
         {
-            this.Depth = depth;
-            this.EnumerationType = enumerationType;
+            Depth = depth;
+            EnumerationType = enumerationType;
         }
 
         /// <summary>

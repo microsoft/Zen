@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -151,7 +152,7 @@ namespace ZenLib.Tests
         public void TestConvertNullDictionaryValue()
         {
             FMap<int, Object1> o = new FMap<int, Object1>();
-            o.Set(1, null);
+            o = o.Set(1, null);
             var _ = Constant(o);
         }
 

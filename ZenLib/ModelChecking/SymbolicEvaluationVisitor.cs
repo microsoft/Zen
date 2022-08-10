@@ -512,46 +512,6 @@ namespace ZenLib.ModelChecking
             return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
         }
 
-        /* public SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Equals(
-            Type type,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value1,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> value2,
-            SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
-        {
-            if (value1 is SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> cm1 &&
-                value2 is SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> cm2)
-            {
-                var keys1 = new HashSet<object>(cm1.Value.Keys);
-                var keys2 = new HashSet<object>(cm2.Value.Keys);
-                keys1.UnionWith(keys2);
-                var result = this.Solver.True();
-                object deflt = null;
-
-                foreach (var key in keys1)
-                {
-                    if (!cm1.Value.TryGetValue(key, out var v1))
-                    {
-                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), Unit.Instance);
-                        v1 = this.Visit((dynamic)deflt, parameter);
-                    }
-
-                    if (!cm2.Value.TryGetValue(key, out var v2))
-                    {
-                        deflt = deflt ?? ReflectionUtilities.ApplyTypeVisitor(new ZenDefaultTypeVisitor(), key.GetType(), Unit.Instance);
-                        v2 = this.Visit((dynamic)deflt, parameter);
-                    }
-
-                    result = this.Solver.And(result, Equals(type, v1, v2, parameter).Value);
-                }
-
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
-            }
-            else
-            {
-                return value1.Eq(value2);
-            }
-        } */
-
         /// <summary>
         /// Visit the expression.
         /// </summary>
@@ -895,8 +855,7 @@ namespace ZenLib.ModelChecking
                 return result;
             }
 
-            dynamic defaultValue = new ZenDefaultTypeVisitor().Visit(typeof(TValue), Unit.Instance);
-            return this.Visit(defaultValue, parameter);
+            return this.Visit(Zen.Default<TValue>(), parameter);
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using ZenLib;
     using static ZenLib.Zen;
 
     /// <summary>

@@ -10,6 +10,7 @@ namespace ZenLib
     using System.Linq;
     using System.Text;
     using System.Threading;
+    using ZenLib;
 
     /// <summary>
     /// A collection of common utility functions.

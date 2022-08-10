@@ -51,7 +51,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The default value.</returns>
         public override object VisitChar(Unit parameter)
         {
-            return char.MinValue;
+            return '0';
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ namespace ZenLib.Tests
     using System.Linq;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using ZenLib;
     using ZenLib.Tests.Network;
     using static ZenLib.Tests.TestHelper;
     using static ZenLib.Zen;

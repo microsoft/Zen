@@ -665,7 +665,17 @@ namespace ZenLib
         /// <returns>Default value of that type.</returns>
         internal static T GetDefaultValue<T>()
         {
-            return (T)new ZenDefaultValueVisitor().Visit(typeof(T), new Unit());
+            return (T)GetDefaultValue(typeof(T));
+        }
+
+        /// <summary>
+        /// Get a default value of a given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>Default value of that type.</returns>
+        internal static object GetDefaultValue(Type type)
+        {
+            return new ZenDefaultValueVisitor().Visit(type, new Unit());
         }
 
         /// <summary>
@@ -695,11 +705,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="value">The type.</param>
         /// <returns>The Zen value representing the constant.</returns>
-        internal static object CreateZenConstant<T>(T value)
+        internal static object CreateZenConstant(object value)
         {
             try
             {
-                return new ZenLiftingVisitor().Visit(typeof(T), value);
+                return new ZenLiftingVisitor().Visit(value.GetType(), value);
             }
             catch (TargetInvocationException e)
             {

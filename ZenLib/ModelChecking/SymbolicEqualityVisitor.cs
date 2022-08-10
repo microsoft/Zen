@@ -115,13 +115,13 @@ namespace ZenLib.ModelChecking
             {
                 if (!v1.Value.TryGetValue(key, out var val1))
                 {
-                    deflt = deflt ?? new ZenDefaultTypeVisitor().Visit(valueType, Unit.Instance);
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
                     val1 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
                 }
 
                 if (!v2.Value.TryGetValue(key, out var val2))
                 {
-                    deflt = deflt ?? new ZenDefaultTypeVisitor().Visit(valueType, Unit.Instance);
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
                     val2 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
                 }
 

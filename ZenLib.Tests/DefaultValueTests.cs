@@ -4,8 +4,6 @@
 
 namespace ZenLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -49,7 +47,7 @@ namespace ZenLib.Tests
         {
             CheckDefault<bool>(false);
             CheckDefault<byte>((byte)0);
-            CheckDefault<char>(char.MinValue);
+            CheckDefault<char>('0');
             CheckDefault<short>((short)0);
             CheckDefault<ushort>((ushort)0);
             CheckDefault<int>(0);
