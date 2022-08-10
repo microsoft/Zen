@@ -176,7 +176,7 @@ namespace ZenLib.Solver
         TBool And(TBool x, TBool y);
 
         /// <summary>
-        /// The 'Or' of two expressions.
+        /// The 'Iff' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
         /// <param name="y">The second expression.</param>
@@ -184,7 +184,6 @@ namespace ZenLib.Solver
         TBool Iff(TBool x, TBool y);
 
         /// <summary>
-        /// The 'Or' of two expressions.
         /// The 'Or' of two expressions.
         /// </summary>
         /// <param name="x">The first expression.</param>
@@ -319,7 +318,7 @@ namespace ZenLib.Solver
         TSeq SeqEmpty(Type type);
 
         /// <summary>
-        /// The 'EmptySeq' for a given type.
+        /// The 'SeqUnit' for a given type.
         /// </summary>
         /// <param name="valueExpr">The value expression.</param>
         /// <param name="type">The type of the sequence.</param>
@@ -428,7 +427,7 @@ namespace ZenLib.Solver
         TArray DictSet(TArray arrayExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> keyExpr, SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> valueExpr, Type keyType, Type valueType);
 
         /// <summary>
-        /// The result of setting a key to a value for an array.
+        /// The result of deleting a key from an array.
         /// </summary>
         /// <param name="arrayExpr">The array expression.</param>
         /// <param name="keyExpr">The key value.</param>
@@ -742,25 +741,25 @@ namespace ZenLib.Solver
         TModel Maximize(TReal objective, TBool subjectTo);
 
         /// <summary>
-        /// Maximize an objective subject to constraints.
+        /// Minimize an objective subject to constraints.
         /// </summary>
-        /// <param name="objective">The maximize objective.</param>
+        /// <param name="objective">The minimize objective.</param>
         /// <param name="subjectTo">The constraints expression.</param>
         /// <returns>An optimal model, if satisfiable.</returns>
         TModel Minimize(TBitvec objective, TBool subjectTo);
 
         /// <summary>
-        /// Maximize an objective subject to constraints.
+        /// Minimize an objective subject to constraints.
         /// </summary>
-        /// <param name="objective">The maximize objective.</param>
+        /// <param name="objective">The minimize objective.</param>
         /// <param name="subjectTo">The constraints expression.</param>
         /// <returns>An optimal model, if satisfiable.</returns>
         TModel Minimize(TInteger objective, TBool subjectTo);
 
         /// <summary>
-        /// Maximize an objective subject to constraints.
+        /// Minimize an objective subject to constraints.
         /// </summary>
-        /// <param name="objective">The maximize objective.</param>
+        /// <param name="objective">The minimize objective.</param>
         /// <param name="subjectTo">The constraints expression.</param>
         /// <returns>An optimal model, if satisfiable.</returns>
         TModel Minimize(TReal objective, TBool subjectTo);
@@ -777,8 +776,8 @@ namespace ZenLib.Solver
         /// <summary>
         /// Convert a value back into a symbolic value.
         /// </summary>
-        /// <param name="e"></param>
-        /// <param name="type"></param>
+        /// <param name="e">The value.</param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
         SymbolicValue<TModel, TVariable, TBool, TBitvec, TInteger, TSeq, TArray, TChar, TReal> ConvertExprToSymbolicValue(object e, Type type);
     }

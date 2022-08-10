@@ -14,7 +14,7 @@ namespace ZenLib.Solver
     /// <summary>
     /// Convert a Z3 Expr to a C# object.
     /// </summary>
-    [ExcludeFromCodeCoverage] // Z3 changes its internal representation every version.
+    [ExcludeFromCodeCoverage] // Z3 changes its internal representation frequently.
     internal class Z3ExprToObjectConverter : TypeVisitor<object, Expr>
     {
         public object Convert(Expr e, Type type)

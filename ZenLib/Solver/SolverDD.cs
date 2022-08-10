@@ -199,102 +199,217 @@ namespace ZenLib.Solver
             this.ExistingAssignment[zenArbitraryExpr] = variable;
         }
 
+        /// <summary>
+        /// The false expression.
+        /// </summary>
+        /// <returns>The expression.</returns>
         public DD False()
         {
             return this.Manager.False();
         }
 
+        /// <summary>
+        /// The true expression.
+        /// </summary>
+        /// <returns>The expression.</returns>
         public DD True()
         {
             return this.Manager.True();
         }
 
+        /// <summary>
+        /// The 'Iff' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD Iff(DD x, DD y)
         {
             return this.Manager.Iff(x, y);
         }
 
+        /// <summary>
+        /// The 'And' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD And(DD x, DD y)
         {
             return this.Manager.And(x, y);
         }
 
+        /// <summary>
+        /// The 'BitwiseAnd' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public BitVector<T> BitwiseAnd(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.And(x, y);
         }
 
+        /// <summary>
+        /// The 'BitwiseNot' of an expression.
+        /// </summary>
+        /// <param name="x">The expression.</param>
+        /// <returns></returns>
         public BitVector<T> BitwiseNot(BitVector<T> x)
         {
             return this.Manager.Not(x);
         }
 
+        /// <summary>
+        /// The 'BitwiseOr' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public BitVector<T> BitwiseOr(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Or(x, y);
         }
 
+        /// <summary>
+        /// The 'BitwiseXor' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public BitVector<T> BitwiseXor(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Xor(x, y);
         }
 
+        /// <summary>
+        /// The 'Add' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public BitVector<T> Add(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Add(x, y);
         }
 
+        /// <summary>
+        /// The 'Subtract' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public BitVector<T> Subtract(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Subtract(x, y);
         }
 
+        /// <summary>
+        /// The 'LessThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD LessThanOrEqual(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.LessOrEqual(x, y);
         }
 
+        /// <summary>
+        /// The 'LessThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD LessThan(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Less(x, y);
         }
 
+        /// <summary>
+        /// The 'LessThanOrEqualSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD LessThanOrEqualSigned(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.LessOrEqualSigned(x, y);
         }
 
+        /// <summary>
+        /// The 'LessThanSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD LessThanSigned(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.And(this.Manager.Not(this.Manager.Eq(x, y)), this.Manager.LessOrEqualSigned(x, y));
         }
 
+        /// <summary>
+        /// The 'GreaterThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD GreaterThanOrEqual(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.GreaterOrEqual(x, y);
         }
 
+        /// <summary>
+        /// The 'GreaterThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD GreaterThan(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Greater(x, y);
         }
 
+        /// <summary>
+        /// The 'GreaterThanSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD GreaterThanSigned(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.And(this.Manager.Not(this.Manager.Eq(x, y)), this.Manager.GreaterOrEqualSigned(x, y));
         }
 
+        /// <summary>
+        /// The 'GreaterThanOrEqualSigned' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD GreaterThanOrEqualSigned(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.GreaterOrEqualSigned(x, y);
         }
 
+        /// <summary>
+        /// The 'Resize' of a bitvec expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="sourceSize">The source bitwidth.</param>
+        /// <param name="targetSize">The target bitwidth.</param>
+        /// <returns></returns>
         public BitVector<T> Resize(BitVector<T> x, int sourceSize, int targetSize)
         {
             var newBits = CommonUtilities.CopyBigEndian(x.GetBits(), Manager.False(), targetSize);
             return this.Manager.CreateBitvector(newBits);
         }
 
+        /// <summary>
+        /// Create a new boolean expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         public (Variable<T>, DD) CreateBoolVar(object e)
         {
             if (!this.ExistingAssignment.TryGetValue(e, out var variable))
@@ -308,6 +423,11 @@ namespace ZenLib.Solver
             return (variable, varbool.Id());
         }
 
+        /// <summary>
+        /// Create a new byte expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateByteVar(object e)
         {
@@ -321,11 +441,20 @@ namespace ZenLib.Solver
             return (variable, this.Manager.CreateBitvector(variable));
         }
 
+        /// <summary>
+        /// Create a byte constant.
+        /// </summary>
+        /// <returns></returns>
         public BitVector<T> CreateByteConst(byte b)
         {
             return this.Manager.CreateBitvector(b);
         }
 
+        /// <summary>
+        /// Create a new short expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateShortVar(object e)
         {
@@ -339,11 +468,20 @@ namespace ZenLib.Solver
             return (variable, this.Manager.CreateBitvector(variable));
         }
 
+        /// <summary>
+        /// Create a short constant.
+        /// </summary>
+        /// <returns></returns>
         public BitVector<T> CreateShortConst(short s)
         {
             return this.Manager.CreateBitvector(s);
         }
 
+        /// <summary>
+        /// Create a new int expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateIntVar(object e)
         {
@@ -357,11 +495,20 @@ namespace ZenLib.Solver
             return (variable, this.Manager.CreateBitvector(variable));
         }
 
+        /// <summary>
+        /// Create an integer constant.
+        /// </summary>
+        /// <returns></returns>
         public BitVector<T> CreateIntConst(int i)
         {
             return this.Manager.CreateBitvector(i);
         }
 
+        /// <summary>
+        /// Create a new long expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateLongVar(object e)
         {
@@ -375,11 +522,21 @@ namespace ZenLib.Solver
             return (variable, this.Manager.CreateBitvector(variable));
         }
 
+        /// <summary>
+        /// Create a long constant.
+        /// </summary>
+        /// <returns></returns>
         public BitVector<T> CreateLongConst(long l)
         {
             return this.Manager.CreateBitvector(l);
         }
 
+        /// <summary>
+        /// Create a bitvector variable.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <param name="size">The size of the bitvector.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, BitVector<T>) CreateBitvecVar(object e, uint size)
         {
@@ -396,6 +553,11 @@ namespace ZenLib.Solver
             }
         }
 
+        /// <summary>
+        /// Create a bitvector constant.
+        /// </summary>
+        /// <param name="bits">The bits.</param>
+        /// <returns>A bitvector expression.</returns>
         public BitVector<T> CreateBitvecConst(bool[] bits)
         {
             var dds = new DD[bits.Length];
@@ -408,17 +570,24 @@ namespace ZenLib.Solver
             return this.Manager.CreateBitvector(dds);
         }
 
+        /// <summary>
+        /// The 'Equal' of two integers.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         public DD Eq(BitVector<T> x, BitVector<T> y)
         {
             return this.Manager.Eq(x, y);
         }
 
-        [ExcludeFromCodeCoverage]
-        public (Variable<T>, Unit) CreateDictVar(object e)
-        {
-            throw new ZenException("Decision diagram backend does not support dictionary operations. Use Z3 backend.");
-        }
-
+        /// <summary>
+        /// Get the value for a variable in a model.
+        /// </summary>
+        /// <param name="m">The model.</param>
+        /// <param name="v">The variable.</param>
+        /// <param name="type">The C# type to coerce the result to.</param>
+        /// <returns>The value.</returns>
         public object Get(Assignment<T> m, Variable<T> v, Type type)
         {
             if (v is VarBool<T> v1)
@@ -465,6 +634,13 @@ namespace ZenLib.Solver
             }
         }
 
+        /// <summary>
+        /// The 'Ite' of a guard and two integers.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
         public DD Ite(DD g, DD t, DD f)
         {
             if (t.Equals(this.Manager.True()))
@@ -490,157 +666,366 @@ namespace ZenLib.Solver
             return this.Manager.Ite(g, t, f);
         }
 
+        /// <summary>
+        /// The 'Ite' of a guard and two integers.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
         public BitVector<T> Ite(DD g, BitVector<T> t, BitVector<T> f)
         {
             return this.Manager.Ite(g, t, f);
         }
 
+        /// <summary>
+        /// The 'Not' of an expression.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <returns></returns>
+        public DD Not(DD x)
+        {
+            return this.Manager.Not(x);
+        }
+
+        /// <summary>
+        /// The 'Or' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        public DD Or(DD x, DD y)
+        {
+            return this.Manager.Or(x, y);
+        }
+
+        /// <summary>
+        /// Check whether a boolean expression is satisfiable.
+        /// </summary>
+        /// <param name="x">The expression.</param>
+        /// <returns>A model, if satisfiable.</returns>
+        public Assignment<T> Solve(DD x)
+        {
+            return this.Manager.Sat(x);
+        }
+
+        /// <summary>
+        /// The 'Ite' of a guard and two integers.
+        /// </summary>
+        /// <param name="g">The guard expression.</param>
+        /// <param name="t">The true expression.</param>
+        /// <param name="f">The false expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit Ite(DD g, Unit t, Unit f)
         {
             throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
         }
 
-        public DD Not(DD x)
+        /// <summary>
+        /// Create a new dictionary expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateDictVar(object e)
         {
-            return this.Manager.Not(x);
+            throw new ZenException("Decision diagram backend does not support dictionary operations. Use Z3 backend.");
         }
 
-        public DD Or(DD x, DD y)
+        /// <summary>
+        /// Create a new sequence expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
+        [ExcludeFromCodeCoverage]
+        public (Variable<T>, Unit) CreateSeqVar(object e)
         {
-            return this.Manager.Or(x, y);
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
 
-        public Assignment<T> Solve(DD x)
+        /// <summary>
+        /// The 'EmptySeq' for a given type.
+        /// </summary>
+        /// <param name="type">The type of the sequence.</param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage]
+        public Unit SeqEmpty(Type type)
         {
-            return this.Manager.Sat(x);
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
 
-        public BitVector<T> Multiply(BitVector<T> x, BitVector<T> y)
+        /// <summary>
+        /// The 'SeqUnit' for a given type.
+        /// </summary>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <param name="type">The type of the sequence.</param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage]
+        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> valueExpr, Type type)
         {
-            throw new ZenException("Decision diagram backend does not support multiplication");
+            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Concat' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqConcat(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'PrefixOf' of two expressions.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD SeqPrefixOf(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'SuffixOf' of two expressions.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD SeqSuffixOf(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Contains' of two expressions.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD SeqContains(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The seq 'Replace' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
+        /// <param name="z">The replacement expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqReplaceFirst(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The seq 'Slice' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The offset expression.</param>
+        /// <param name="z">The length expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqSlice(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The seq 'At' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqAt(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The seq 'Length' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqLength(Unit x)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The seq 'IndexOf' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The subseq expression.</param>
+        /// <param name="z">The offset expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit SeqIndexOf(Unit x, Unit y, Unit z)
         {
             throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Equal' of two integers.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD Eq(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support this operation. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a new big integer expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateBigIntegerVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a big integer constant.
+        /// </summary>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit CreateBigIntegerConst(BigInteger b)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Add' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit Add(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Subtract' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit Subtract(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'Multiply' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
+        public BitVector<T> Multiply(BitVector<T> x, BitVector<T> y)
+        {
+            throw new ZenException("Decision diagram backend does not support multiplication");
+        }
+
+        /// <summary>
+        /// The 'Multiply' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit Multiply(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'LessThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD LessThan(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'LessThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD LessThanOrEqual(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'GreaterThan' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD GreaterThan(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The 'GreaterThanOrEqual' of two expressions.
+        /// </summary>
+        /// <param name="x">The first expression.</param>
+        /// <param name="y">The second expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD GreaterThanOrEqual(Unit x, Unit y)
         {
             throw new ZenException("Decision diagram backend does not support BigInteger operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The empty dictionary.
+        /// </summary>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictEmpty(Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The result of setting a key to a value for an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key value.</param>
+        /// <param name="valueExpr">The value expression.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictSet(
             Unit arrayExpr,
@@ -650,118 +1035,192 @@ namespace ZenLib.Solver
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The result of deleting a key from an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key value.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictDelete(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The result of getting a value for a key from an array.
+        /// </summary>
+        /// <param name="arrayExpr">The array expression.</param>
+        /// <param name="keyExpr">The key value.</param>
+        /// <param name="keyType">The key type.</param>
+        /// <param name="valueType">The value type.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public (DD, object) DictGet(Unit arrayExpr, SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> keyExpr, Type keyType, Type valueType)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
-        [ExcludeFromCodeCoverage]
-        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
-        {
-            throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
-        }
-
+        /// <summary>
+        /// The result of unioning two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictUnion(Unit arrayExpr1, Unit arrayExpr2)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The result of intersecting two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictIntersect(Unit arrayExpr1, Unit arrayExpr2)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// The result of differencing two arrays.
+        /// </summary>
+        /// <param name="arrayExpr1">The array expression.</param>
+        /// <param name="arrayExpr2">The array value.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit DictDifference(Unit arrayExpr1, Unit arrayExpr2)
         {
             throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
 
-        [ExcludeFromCodeCoverage]
-        public (Variable<T>, Unit) CreateSeqVar(object e)
-        {
-            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit SeqEmpty(Type type)
-        {
-            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
-        }
-
-        [ExcludeFromCodeCoverage]
-        public Unit SeqUnit(SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> valueExpr, Type type)
-        {
-            throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
-        }
-
+        /// <summary>
+        /// The seq 'Regex' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The regex expression.</param>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public DD SeqRegex<T1>(Unit x, Regex<T1> y)
         {
             throw new ZenException("Decision diagram backend does not support Seq operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a new char expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateCharVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a char constant.
+        /// </summary>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit CreateCharConst(char c)
         {
             throw new ZenException("Decision diagram backend does not support Char operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a char constant.
+        /// </summary>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit CreateStringConst(string s)
         {
             throw new ZenException("Decision diagram backend does not support String operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a new real expression.
+        /// </summary>
+        /// <param name="e">Zen arbitrary expr.</param>
+        /// <returns>The expression.</returns>
         [ExcludeFromCodeCoverage]
         public (Variable<T>, Unit) CreateRealVar(object e)
         {
             throw new ZenException("Decision diagram backend does not support Real operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Create a real constant.
+        /// </summary>
+        /// <returns></returns>
         [ExcludeFromCodeCoverage]
         public Unit CreateRealConst(Real r)
         {
             throw new ZenException("Decision diagram backend does not support Real operations. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
         [ExcludeFromCodeCoverage]
         public Assignment<T> Maximize(BitVector<T> objective, DD subjectTo)
         {
             throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Maximize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The maximize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
         [ExcludeFromCodeCoverage]
         public Assignment<T> Maximize(Unit objective, DD subjectTo)
         {
             throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Minimize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The minimize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
         [ExcludeFromCodeCoverage]
         public Assignment<T> Minimize(BitVector<T> objective, DD subjectTo)
         {
             throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
         }
 
+        /// <summary>
+        /// Minimize an objective subject to constraints.
+        /// </summary>
+        /// <param name="objective">The minimize objective.</param>
+        /// <param name="subjectTo">The constraints expression.</param>
+        /// <returns>An optimal model, if satisfiable.</returns>
         [ExcludeFromCodeCoverage]
         public Assignment<T> Minimize(Unit objective, DD subjectTo)
         {
             throw new ZenException("Decision diagram backend does not support Optimization. Use Z3 backend.");
+        }
+
+        /// <summary>
+        /// Convert a value back into a symbolic value.
+        /// </summary>
+        /// <param name="e">The value.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage]
+        public SymbolicValue<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit> ConvertExprToSymbolicValue(object e, Type type)
+        {
+            throw new ZenException("Decision diagram backend does not support Map operations. Use Z3 backend.");
         }
     }
 }
