@@ -2,9 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib
+namespace ZenLib.ModelChecking
 {
     using System.Collections.Generic;
+    using ZenLib;
     using ZenLib.Interpretation;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace ZenLib
         /// <param name="arbitraryAssignment">The arbitrary assignment.</param>
         internal ZenSolution(Dictionary<object, object> arbitraryAssignment)
         {
-            this.VariableAssignment = arbitraryAssignment;
+            VariableAssignment = arbitraryAssignment;
         }
 
         /// <summary>
@@ -43,12 +44,12 @@ namespace ZenLib
         /// <returns>The C# value associated with the expression.</returns>
         public T Get<T>(Zen<T> expr)
         {
-            if (this.VariableAssignment != null && this.VariableAssignment.TryGetValue(expr, out var value))
+            if (VariableAssignment != null && VariableAssignment.TryGetValue(expr, out var value))
             {
                 return (T)value;
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(this.VariableAssignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment(VariableAssignment);
             var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, interpreterEnv);
         }
