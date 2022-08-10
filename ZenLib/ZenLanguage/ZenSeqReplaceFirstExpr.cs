@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long, long), Zen<Seq<T>>>();
 
         /// <summary>
+        /// Gets the seq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SeqExpr { get; }
+
+        /// <summary>
+        /// Gets the subseq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SubseqExpr { get; }
+
+        /// <summary>
+        /// Gets the replacement expression.
+        /// </summary>
+        internal Zen<Seq<T>> ReplaceExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqReplaceFirstExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -73,21 +88,6 @@ namespace ZenLib
             this.SubseqExpr = expr2;
             this.ReplaceExpr = expr3;
         }
-
-        /// <summary>
-        /// Gets the seq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SeqExpr { get; }
-
-        /// <summary>
-        /// Gets the subseq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SubseqExpr { get; }
-
-        /// <summary>
-        /// Gets the replacement expression.
-        /// </summary>
-        internal Zen<Seq<T>> ReplaceExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

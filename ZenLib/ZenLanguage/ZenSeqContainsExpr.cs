@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
 
         /// <summary>
+        /// Gets the seq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SeqExpr { get; }
+
+        /// <summary>
+        /// Gets the subseq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SubseqExpr { get; }
+
+        /// <summary>
+        /// Gets the containment type.
+        /// </summary>
+        internal SeqContainmentType ContainmentType { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqContainsExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -72,21 +87,6 @@ namespace ZenLib
             this.SubseqExpr = subseqExpr;
             this.ContainmentType = containmentType;
         }
-
-        /// <summary>
-        /// Gets the seq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SeqExpr { get; }
-
-        /// <summary>
-        /// Gets the subseq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SubseqExpr { get; }
-
-        /// <summary>
-        /// Gets the containment type.
-        /// </summary>
-        internal SeqContainmentType ContainmentType { get; }
 
         /// <summary>
         /// Convert the expression to a string.

@@ -23,6 +23,11 @@ namespace ZenLib
         private static HashConsTable<long, Zen<TTarget>> hashConsTable = new HashConsTable<long, Zen<TTarget>>();
 
         /// <summary>
+        /// Gets the source expr.
+        /// </summary>
+        public Zen<TSource> SourceExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenCastExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -53,11 +58,6 @@ namespace ZenLib
         {
             this.SourceExpr = sourceExpr;
         }
-
-        /// <summary>
-        /// Gets the source expr.
-        /// </summary>
-        public Zen<TSource> SourceExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

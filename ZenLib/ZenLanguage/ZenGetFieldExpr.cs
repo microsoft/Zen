@@ -23,6 +23,16 @@ namespace ZenLib
         private static HashConsTable<(long, string, bool), Zen<T2>> hashConsTable = new HashConsTable<(long, string, bool), Zen<T2>>();
 
         /// <summary>
+        /// Gets the expression.
+        /// </summary>
+        public Zen<T1> Expr { get; }
+
+        /// <summary>
+        /// Gets the field name.
+        /// </summary>
+        public string FieldName { get; }
+
+        /// <summary>
         /// Unroll a ZenGetFieldExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -99,16 +109,6 @@ namespace ZenLib
             this.Expr = expr;
             this.FieldName = fieldName;
         }
-
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        public Zen<T1> Expr { get; }
-
-        /// <summary>
-        /// Gets the field name.
-        /// </summary>
-        public string FieldName { get; }
 
         /// <summary>
         /// Convert the expression to a string.

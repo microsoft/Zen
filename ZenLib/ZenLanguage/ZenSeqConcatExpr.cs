@@ -25,6 +25,16 @@ namespace ZenLib
             new HashConsTable<(long, long), Zen<Seq<T>>>();
 
         /// <summary>
+        /// Gets the first seq expr.
+        /// </summary>
+        public Zen<Seq<T>> SeqExpr1 { get; }
+
+        /// <summary>
+        /// Gets the second seq expr.
+        /// </summary>
+        public Zen<Seq<T>> SeqExpr2 { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqConcatExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -80,16 +90,6 @@ namespace ZenLib
             this.SeqExpr1 = seqExpr1;
             this.SeqExpr2 = seqExpr2;
         }
-
-        /// <summary>
-        /// Gets the first seq expr.
-        /// </summary>
-        public Zen<Seq<T>> SeqExpr1 { get; }
-
-        /// <summary>
-        /// Gets the second seq expr.
-        /// </summary>
-        public Zen<Seq<T>> SeqExpr2 { get; }
 
         /// <summary>
         /// Convert the expression to a string.

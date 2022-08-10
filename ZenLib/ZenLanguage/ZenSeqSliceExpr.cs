@@ -24,6 +24,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long, long), Zen<Seq<T>>>();
 
         /// <summary>
+        /// Gets the seq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SeqExpr { get; }
+
+        /// <summary>
+        /// Gets the offset expression.
+        /// </summary>
+        internal Zen<BigInteger> OffsetExpr { get; }
+
+        /// <summary>
+        /// Gets the length expression.
+        /// </summary>
+        internal Zen<BigInteger> LengthExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqSliceExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -74,21 +89,6 @@ namespace ZenLib
             this.OffsetExpr = expr2;
             this.LengthExpr = expr3;
         }
-
-        /// <summary>
-        /// Gets the seq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SeqExpr { get; }
-
-        /// <summary>
-        /// Gets the offset expression.
-        /// </summary>
-        internal Zen<BigInteger> OffsetExpr { get; }
-
-        /// <summary>
-        /// Gets the length expression.
-        /// </summary>
-        internal Zen<BigInteger> LengthExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

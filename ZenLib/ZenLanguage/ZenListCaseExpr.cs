@@ -13,6 +13,21 @@ namespace ZenLib
     internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
     {
         /// <summary>
+        /// Gets the list expr.
+        /// </summary>
+        public Zen<FSeq<T>> ListExpr { get; }
+
+        /// <summary>
+        /// Gets the list expr.
+        /// </summary>
+        public Zen<TResult> EmptyExpr { get; }
+
+        /// <summary>
+        /// Gets the element to add.
+        /// </summary>
+        public Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
+
+        /// <summary>
         /// Unroll the ZenListCaseExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -87,21 +102,6 @@ namespace ZenLib
             this.EmptyExpr = empty;
             this.ConsCase = cons;
         }
-
-        /// <summary>
-        /// Gets the list expr.
-        /// </summary>
-        public Zen<FSeq<T>> ListExpr { get; }
-
-        /// <summary>
-        /// Gets the list expr.
-        /// </summary>
-        public Zen<TResult> EmptyExpr { get; }
-
-        /// <summary>
-        /// Gets the element to add.
-        /// </summary>
-        public Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
 
         /// <summary>
         /// Convert the expression to a string.

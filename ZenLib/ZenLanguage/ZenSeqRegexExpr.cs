@@ -23,6 +23,16 @@ namespace ZenLib
         private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
 
         /// <summary>
+        /// Gets the seq expression.
+        /// </summary>
+        internal Zen<Seq<T>> SeqExpr { get; }
+
+        /// <summary>
+        /// Gets the Regex expression.
+        /// </summary>
+        internal Regex<T> Regex { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqContainsExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -68,16 +78,6 @@ namespace ZenLib
             this.SeqExpr = seqExpr;
             this.Regex = regex;
         }
-
-        /// <summary>
-        /// Gets the seq expression.
-        /// </summary>
-        internal Zen<Seq<T>> SeqExpr { get; }
-
-        /// <summary>
-        /// Gets the Regex expression.
-        /// </summary>
-        internal Regex<T> Regex { get; }
 
         /// <summary>
         /// Convert the expression to a string.

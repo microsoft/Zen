@@ -25,6 +25,11 @@ namespace ZenLib
             new HashConsTable<long, Zen<BigInteger>>();
 
         /// <summary>
+        /// Gets the seq expr.
+        /// </summary>
+        public Zen<Seq<T>> SeqExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqLengthExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -64,11 +69,6 @@ namespace ZenLib
         {
             this.SeqExpr = seqExpr;
         }
-
-        /// <summary>
-        /// Gets the seq expr.
-        /// </summary>
-        public Zen<Seq<T>> SeqExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

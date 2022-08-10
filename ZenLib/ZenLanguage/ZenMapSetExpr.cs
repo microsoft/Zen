@@ -25,6 +25,21 @@ namespace ZenLib
             new HashConsTable<(long, long, long), Zen<Map<TKey, TValue>>>();
 
         /// <summary>
+        /// Gets the map expr.
+        /// </summary>
+        public Zen<Map<TKey, TValue>> MapExpr { get; }
+
+        /// <summary>
+        /// Gets the key to add the value for.
+        /// </summary>
+        public Zen<TKey> KeyExpr { get; }
+
+        /// <summary>
+        /// Gets the value to add.
+        /// </summary>
+        public Zen<TValue> ValueExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenMapSetExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -85,21 +100,6 @@ namespace ZenLib
             this.KeyExpr = keyExpr;
             this.ValueExpr = valueExpr;
         }
-
-        /// <summary>
-        /// Gets the map expr.
-        /// </summary>
-        public Zen<Map<TKey, TValue>> MapExpr { get; }
-
-        /// <summary>
-        /// Gets the key to add the value for.
-        /// </summary>
-        public Zen<TKey> KeyExpr { get; }
-
-        /// <summary>
-        /// Gets the value to add.
-        /// </summary>
-        public Zen<TValue> ValueExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

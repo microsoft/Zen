@@ -25,6 +25,16 @@ namespace ZenLib
             new HashConsTable<(long, long), ZenMapDeleteExpr<TKey, TValue>>();
 
         /// <summary>
+        /// Gets the map expr.
+        /// </summary>
+        public Zen<Map<TKey, TValue>> MapExpr { get; }
+
+        /// <summary>
+        /// Gets the key to add the value for.
+        /// </summary>
+        public Zen<TKey> KeyExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenMapDeleteExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -59,16 +69,6 @@ namespace ZenLib
             this.MapExpr = mapExpr;
             this.KeyExpr = keyExpr;
         }
-
-        /// <summary>
-        /// Gets the map expr.
-        /// </summary>
-        public Zen<Map<TKey, TValue>> MapExpr { get; }
-
-        /// <summary>
-        /// Gets the key to add the value for.
-        /// </summary>
-        public Zen<TKey> KeyExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

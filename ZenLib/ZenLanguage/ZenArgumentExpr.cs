@@ -14,6 +14,11 @@ namespace ZenLib
     internal sealed class ZenArgumentExpr<T> : Zen<T>
     {
         /// <summary>
+        /// Gets the unique id for the object.
+        /// </summary>
+        public long ArgumentId { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ZenArgumentExpr{T}"/> class.
         /// </summary>
         public ZenArgumentExpr()
@@ -29,11 +34,6 @@ namespace ZenLib
         {
             return this;
         }
-
-        /// <summary>
-        /// Gets the unique id for the object.
-        /// </summary>
-        public long ArgumentId { get; }
 
         /// <summary>
         /// Convert the expression to a string.

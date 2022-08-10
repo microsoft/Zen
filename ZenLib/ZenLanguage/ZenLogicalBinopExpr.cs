@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
 
         /// <summary>
+        /// Gets the first expression.
+        /// </summary>
+        internal Zen<bool> Expr1 { get; }
+
+        /// <summary>
+        /// Gets the second expression.
+        /// </summary>
+        internal Zen<bool> Expr2 { get; }
+
+        /// <summary>
+        /// Gets the operation.
+        /// </summary>
+        internal LogicalOp Operation { get; }
+
+        /// <summary>
         /// Unroll a ZenAndExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -103,21 +118,6 @@ namespace ZenLib
             this.Expr2 = expr2;
             this.Operation = op;
         }
-
-        /// <summary>
-        /// Gets the first expression.
-        /// </summary>
-        internal Zen<bool> Expr1 { get; }
-
-        /// <summary>
-        /// Gets the second expression.
-        /// </summary>
-        internal Zen<bool> Expr2 { get; }
-
-        /// <summary>
-        /// Gets the operation.
-        /// </summary>
-        internal LogicalOp Operation { get; }
 
         /// <summary>
         /// Convert the expression to a string.

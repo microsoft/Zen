@@ -17,6 +17,11 @@ namespace ZenLib
         private static HashConsTable<long, Zen<bool>> hashConsTable = new HashConsTable<long, Zen<bool>>();
 
         /// <summary>
+        /// Gets the expression.
+        /// </summary>
+        internal Zen<bool> Expr { get; }
+
+        /// <summary>
         /// Unroll a ZenNotExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -66,11 +71,6 @@ namespace ZenLib
         {
             this.Expr = expr;
         }
-
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        internal Zen<bool> Expr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

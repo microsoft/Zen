@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, long), Zen<T>> hashConsTable = new HashConsTable<(long, long, long), Zen<T>>();
 
         /// <summary>
+        /// Gets the guard expression.
+        /// </summary>
+        internal Zen<bool> GuardExpr { get; }
+
+        /// <summary>
+        /// Gets the true expression.
+        /// </summary>
+        internal Zen<T> TrueExpr { get; }
+
+        /// <summary>
+        /// Gets the false expression.
+        /// </summary>
+        internal Zen<T> FalseExpr { get; }
+
+        /// <summary>
         /// Unroll the ZenIfExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -104,21 +119,6 @@ namespace ZenLib
             this.TrueExpr = trueExpr;
             this.FalseExpr = falseExpr;
         }
-
-        /// <summary>
-        /// Gets the guard expression.
-        /// </summary>
-        internal Zen<bool> GuardExpr { get; }
-
-        /// <summary>
-        /// Gets the true expression.
-        /// </summary>
-        internal Zen<T> TrueExpr { get; }
-
-        /// <summary>
-        /// Gets the false expression.
-        /// </summary>
-        internal Zen<T> FalseExpr { get; }
 
         /// <summary>
         /// Convert the condition to a string.

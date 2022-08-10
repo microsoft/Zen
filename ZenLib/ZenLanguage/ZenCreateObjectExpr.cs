@@ -25,6 +25,11 @@ namespace ZenLib
         private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
 
         /// <summary>
+        /// The fields of the object.
+        /// </summary>
+        public SortedDictionary<string, object> Fields { get; }
+
+        /// <summary>
         /// Unroll a ZenCreateObjectExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -107,8 +112,6 @@ namespace ZenLib
                 this.Fields[field] = value;
             }
         }
-
-        public SortedDictionary<string, object> Fields { get; }
 
         /// <summary>
         /// Convert the expression to a string.

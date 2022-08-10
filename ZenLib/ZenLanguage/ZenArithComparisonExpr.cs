@@ -73,6 +73,21 @@ namespace ZenLib
         };
 
         /// <summary>
+        /// Gets the first expression.
+        /// </summary>
+        internal Zen<T> Expr1 { get; }
+
+        /// <summary>
+        /// Gets the second expression.
+        /// </summary>
+        internal Zen<T> Expr2 { get; }
+
+        /// <summary>
+        /// Gets the comparison type.
+        /// </summary>
+        internal ComparisonType ComparisonType { get; }
+
+        /// <summary>
         /// Unroll a ZenComparisonExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -147,21 +162,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Gets the first expression.
-        /// </summary>
-        internal Zen<T> Expr1 { get; }
-
-        /// <summary>
-        /// Gets the second expression.
-        /// </summary>
-        internal Zen<T> Expr2 { get; }
-
-        /// <summary>
-        /// Gets the comparison type.
-        /// </summary>
-        internal ComparisonType ComparisonType { get; }
-
-        /// <summary>
         /// Convert the expression to a string.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -194,11 +194,29 @@ namespace ZenLib
         }
     }
 
+    /// <summary>
+    /// The comparison type.
+    /// </summary>
     internal enum ComparisonType
     {
+        /// <summary>
+        /// Greater than or equal to.
+        /// </summary>
         Geq,
+
+        /// <summary>
+        /// Less than or equal to.
+        /// </summary>
         Leq,
+
+        /// <summary>
+        /// Greater than.
+        /// </summary>
         Gt,
+
+        /// <summary>
+        /// Less than.
+        /// </summary>
         Lt,
     }
 }

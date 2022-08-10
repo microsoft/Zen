@@ -15,14 +15,27 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<CMap<TKey, TValue>>, TKey, Zen<TValue>), Zen<CMap<TKey, TValue>>> createFunc = (v) =>
-            Simplify(v.Item1, v.Item2, v.Item3);
+        private static Func<(Zen<CMap<TKey, TValue>>, TKey, Zen<TValue>), Zen<CMap<TKey, TValue>>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
 
         /// <summary>
         /// Hash cons table for ZenConstMapSetExpr.
         /// </summary>
-        private static HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>> hashConsTable =
-            new HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>>();
+        private static HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>> hashConsTable = new HashConsTable<(long, TKey, long), Zen<CMap<TKey, TValue>>>();
+
+        /// <summary>
+        /// Gets the map expr.
+        /// </summary>
+        public Zen<CMap<TKey, TValue>> MapExpr { get; }
+
+        /// <summary>
+        /// Gets the key to add the value for.
+        /// </summary>
+        public TKey Key { get; }
+
+        /// <summary>
+        /// Gets the value to add.
+        /// </summary>
+        public Zen<TValue> ValueExpr { get; }
 
         /// <summary>
         /// Unroll a ZenConstMapSetExpr.
@@ -80,21 +93,6 @@ namespace ZenLib
             this.Key = key;
             this.ValueExpr = valueExpr;
         }
-
-        /// <summary>
-        /// Gets the map expr.
-        /// </summary>
-        public Zen<CMap<TKey, TValue>> MapExpr { get; }
-
-        /// <summary>
-        /// Gets the key to add the value for.
-        /// </summary>
-        public TKey Key { get; }
-
-        /// <summary>
-        /// Gets the value to add.
-        /// </summary>
-        public Zen<TValue> ValueExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

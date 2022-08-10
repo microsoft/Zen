@@ -13,6 +13,11 @@ namespace ZenLib
     internal sealed class ZenArbitraryExpr<T> : Zen<T>
     {
         /// <summary>
+        /// The name, if any, for the expression.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ZenArbitraryExpr{T}"/> class.
         /// </summary>
         public ZenArbitraryExpr(string name)
@@ -25,11 +30,6 @@ namespace ZenLib
         {
             return this;
         }
-
-        /// <summary>
-        /// The name, if any, for the expression.
-        /// </summary>
-        public string Name { get; }
 
         /// <summary>
         /// Convert the expression to a string.

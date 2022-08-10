@@ -25,6 +25,21 @@ namespace ZenLib
             new HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>>();
 
         /// <summary>
+        /// Gets the first map expr.
+        /// </summary>
+        public Zen<Map<TKey, SetUnit>> MapExpr1 { get; }
+
+        /// <summary>
+        /// Gets the second map expr.
+        /// </summary>
+        public Zen<Map<TKey, SetUnit>> MapExpr2 { get; }
+
+        /// <summary>
+        /// Gets the combination type.
+        /// </summary>
+        public CombineType CombinationType { get; }
+
+        /// <summary>
         /// Unroll a ZenMapCombineExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -146,21 +161,6 @@ namespace ZenLib
             this.MapExpr2 = mapExpr2;
             this.CombinationType = combineType;
         }
-
-        /// <summary>
-        /// Gets the first map expr.
-        /// </summary>
-        public Zen<Map<TKey, SetUnit>> MapExpr1 { get; }
-
-        /// <summary>
-        /// Gets the second map expr.
-        /// </summary>
-        public Zen<Map<TKey, SetUnit>> MapExpr2 { get; }
-
-        /// <summary>
-        /// Gets the combination type.
-        /// </summary>
-        public CombineType CombinationType { get; }
 
         /// <summary>
         /// Convert the expression to a string.

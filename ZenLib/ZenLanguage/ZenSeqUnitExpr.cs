@@ -23,6 +23,11 @@ namespace ZenLib
         private static HashConsTable<long, Zen<Seq<T>>> hashConsTable = new HashConsTable<long, Zen<Seq<T>>>();
 
         /// <summary>
+        /// Gets the value expr.
+        /// </summary>
+        public Zen<T> ValueExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenSeqUnitExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -52,11 +57,6 @@ namespace ZenLib
         {
             this.ValueExpr = valueExpr;
         }
-
-        /// <summary>
-        /// Gets the value expr.
-        /// </summary>
-        public Zen<T> ValueExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

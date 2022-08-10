@@ -24,6 +24,16 @@ namespace ZenLib
         private static HashConsTable<(long, long), ZenListAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenListAddFrontExpr<T>>();
 
         /// <summary>
+        /// Gets the list expr.
+        /// </summary>
+        public Zen<FSeq<T>> Expr { get; }
+
+        /// <summary>
+        /// Gets the element to add.
+        /// </summary>
+        public Zen<T> ElementExpr { get; }
+
+        /// <summary>
         /// Unroll a ZenListAddFrontExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -58,16 +68,6 @@ namespace ZenLib
             this.Expr = expr;
             this.ElementExpr = element;
         }
-
-        /// <summary>
-        /// Gets the list expr.
-        /// </summary>
-        public Zen<FSeq<T>> Expr { get; }
-
-        /// <summary>
-        /// Gets the element to add.
-        /// </summary>
-        public Zen<T> ElementExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

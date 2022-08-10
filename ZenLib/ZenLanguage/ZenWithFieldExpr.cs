@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, string, long), Zen<T1>> hashConsTable = new HashConsTable<(long, string, long), Zen<T1>>();
 
         /// <summary>
+        /// Gets the expression.
+        /// </summary>
+        public Zen<T1> Expr { get; }
+
+        /// <summary>
+        /// Gets the field name.
+        /// </summary>
+        public string FieldName { get; }
+
+        /// <summary>
+        /// Gets the field value to set.
+        /// </summary>
+        public Zen<T2> FieldExpr { get; }
+
+        /// <summary>
         /// Unroll the ZenWithFieldExpr.
         /// </summary>
         /// <returns>The unrolled expr.</returns>
@@ -87,21 +102,6 @@ namespace ZenLib
             this.FieldName = fieldName;
             this.FieldExpr = fieldValue;
         }
-
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        public Zen<T1> Expr { get; }
-
-        /// <summary>
-        /// Gets the field name.
-        /// </summary>
-        public string FieldName { get; }
-
-        /// <summary>
-        /// Gets the field value to set.
-        /// </summary>
-        public Zen<T2> FieldExpr { get; }
 
         /// <summary>
         /// Convert the expression to a string.

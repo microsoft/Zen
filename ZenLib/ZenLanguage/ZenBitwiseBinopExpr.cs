@@ -38,6 +38,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Zen<T>> hashConsTable = new HashConsTable<(long, long, int), Zen<T>>();
 
         /// <summary>
+        /// Gets the first expression.
+        /// </summary>
+        internal Zen<T> Expr1 { get; }
+
+        /// <summary>
+        /// Gets the second expression.
+        /// </summary>
+        internal Zen<T> Expr2 { get; }
+
+        /// <summary>
+        /// Gets the operation.
+        /// </summary>
+        internal BitwiseOp Operation { get; }
+
+        /// <summary>
         /// Unroll the ZenBitwiseBinopExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -98,21 +113,6 @@ namespace ZenLib
             this.Expr2 = expr2;
             this.Operation = op;
         }
-
-        /// <summary>
-        /// Gets the first expression.
-        /// </summary>
-        internal Zen<T> Expr1 { get; }
-
-        /// <summary>
-        /// Gets the second expression.
-        /// </summary>
-        internal Zen<T> Expr2 { get; }
-
-        /// <summary>
-        /// Gets the operation.
-        /// </summary>
-        internal BitwiseOp Operation { get; }
 
         /// <summary>
         /// Convert the expression to a string.

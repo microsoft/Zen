@@ -17,6 +17,11 @@ namespace ZenLib
         private static HashConsTable<long, Zen<T>> hashConsTable = new HashConsTable<long, Zen<T>>();
 
         /// <summary>
+        /// Gets the expression.
+        /// </summary>
+        internal Zen<T> Expr { get; }
+
+        /// <summary>
         /// Unroll a ZenBitwiseNotExpr.
         /// </summary>
         /// <returns>The unrolled expression.</returns>
@@ -69,11 +74,6 @@ namespace ZenLib
         {
             this.Expr = expr;
         }
-
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        internal Zen<T> Expr { get; }
 
         /// <summary>
         /// Convert the expression to a string.
