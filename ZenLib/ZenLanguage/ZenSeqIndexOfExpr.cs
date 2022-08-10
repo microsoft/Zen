@@ -39,15 +39,6 @@ namespace ZenLib
         internal Zen<BigInteger> OffsetExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqIndexOfExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<BigInteger> Unroll()
-        {
-            return Create(this.SeqExpr.Unroll(), this.SubseqExpr.Unroll(), this.OffsetExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenSeqIndexOfExpr.
         /// </summary>
         /// <param name="e1">The seq expr.</param>

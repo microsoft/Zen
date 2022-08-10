@@ -130,10 +130,13 @@ namespace ZenLib.Tests
                 y = Zen.If(x >= i, i, y);
             }
 
-            y.Flatten();
+            y.Format();
             ZenSettings.UseLargeStack = false;
         }
 
+        /// <summary>
+        /// Test struct.
+        /// </summary>
         private struct Test
         {
             public int Field { get; set; }

@@ -22,15 +22,6 @@ namespace ZenLib
         internal Zen<T> Expr { get; }
 
         /// <summary>
-        /// Unroll a ZenBitwiseNotExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.Expr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenBitwiseNot expr.
         /// </summary>
         /// <param name="e">The expr to bitwise negate.</param>

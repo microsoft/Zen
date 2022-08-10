@@ -35,15 +35,6 @@ namespace ZenLib
         public Zen<TKey> KeyExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenMapGetExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<Option<TValue>> Unroll()
-        {
-            return Create(this.MapExpr.Unroll(), this.KeyExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenMapGetExpr.
         /// </summary>
         /// <param name="map">The map expr.</param>

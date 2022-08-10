@@ -88,15 +88,6 @@ namespace ZenLib
         internal ComparisonType ComparisonType { get; }
 
         /// <summary>
-        /// Unroll a ZenComparisonExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.ComparisonType);
-        }
-
-        /// <summary>
         /// Simplify and create a ZenComparisonExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

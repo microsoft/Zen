@@ -86,7 +86,7 @@ namespace ZenLib.Tests
 
         private static Zen<T> Flatten<T>(Zen<T> expr, TestParameter p)
         {
-            return p.Simplify ? expr.Flatten() : expr;
+            return expr;
         }
 
         private static TestParameter[] GetBoundedParameters(int bddListSize, bool runBdds)

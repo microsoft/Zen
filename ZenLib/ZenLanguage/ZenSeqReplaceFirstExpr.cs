@@ -38,15 +38,6 @@ namespace ZenLib
         internal Zen<Seq<T>> ReplaceExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqReplaceFirstExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return Create(this.SeqExpr.Unroll(), this.SubseqExpr.Unroll(), this.ReplaceExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenSeqReplaceFirstExpr.
         /// </summary>
         /// <param name="e1">The seq expr.</param>

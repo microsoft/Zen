@@ -28,15 +28,6 @@ namespace ZenLib
         public Zen<TSource> SourceExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenCastExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<TTarget> Unroll()
-        {
-            return Create(this.SourceExpr.Unroll());
-        }
-
-        /// <summary>
         /// Create a new ZenCastExpr.
         /// </summary>
         /// <param name="sourceExpr">The source expr.</param>

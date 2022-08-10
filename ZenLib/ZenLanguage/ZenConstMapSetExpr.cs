@@ -38,15 +38,6 @@ namespace ZenLib
         public Zen<TValue> ValueExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenConstMapSetExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<CMap<TKey, TValue>> Unroll()
-        {
-            return Create(this.MapExpr.Unroll(), this.Key, this.ValueExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenMapSetExpr.
         /// </summary>
         /// <param name="map">The map expr.</param>

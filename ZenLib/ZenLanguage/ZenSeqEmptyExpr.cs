@@ -17,15 +17,6 @@ namespace ZenLib
         public static ZenSeqEmptyExpr<T> Instance = new ZenSeqEmptyExpr<T>();
 
         /// <summary>
-        /// Unroll the expression.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ZenSeqEmptyExpr{T}"/> class.
         /// </summary>
         private ZenSeqEmptyExpr()

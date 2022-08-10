@@ -35,15 +35,6 @@ namespace ZenLib
         public Zen<Seq<T>> SeqExpr2 { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqConcatExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return Create(this.SeqExpr1.Unroll(), this.SeqExpr2.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenSeqConcatExpr.
         /// </summary>
         /// <param name="seqExpr1">The seq expr.</param>

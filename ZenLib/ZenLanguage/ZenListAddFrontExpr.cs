@@ -34,15 +34,6 @@ namespace ZenLib
         public Zen<T> ElementExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenListAddFrontExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<FSeq<T>> Unroll()
-        {
-            return Create(this.Expr.Unroll(), this.ElementExpr.Unroll());
-        }
-
-        /// <summary>
         /// Create a new ZenListAddFrontExpr.
         /// </summary>
         /// <param name="expr">The list expr.</param>

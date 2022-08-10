@@ -28,15 +28,6 @@ namespace ZenLib
         internal T Value { get; }
 
         /// <summary>
-        /// Unroll the expression.
-        /// </summary>
-        /// <returns>The new unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Create a new ZenConstantExpr.
         /// </summary>
         /// <param name="value">The constant value.</param>

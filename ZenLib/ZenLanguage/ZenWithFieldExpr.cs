@@ -38,15 +38,6 @@ namespace ZenLib
         public Zen<T2> FieldExpr { get; }
 
         /// <summary>
-        /// Unroll the ZenWithFieldExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<T1> Unroll()
-        {
-            return Create(this.Expr.Unroll(), this.FieldName, this.FieldExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenWithFieldExpr.
         /// </summary>
         /// <param name="objectExpr">The object expr.</param>

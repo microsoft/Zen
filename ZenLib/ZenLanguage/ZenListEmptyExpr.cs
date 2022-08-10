@@ -17,15 +17,6 @@ namespace ZenLib
         public static ZenListEmptyExpr<T> Instance = new ZenListEmptyExpr<T>();
 
         /// <summary>
-        /// Unroll the expression.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<FSeq<T>> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ZenListEmptyExpr{T}"/> class.
         /// </summary>
         private ZenListEmptyExpr()

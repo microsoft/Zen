@@ -26,11 +26,6 @@ namespace ZenLib
             this.Name = name;
         }
 
-        public override Zen<T> Unroll()
-        {
-            return this;
-        }
-
         /// <summary>
         /// Convert the expression to a string.
         /// </summary>

@@ -38,15 +38,6 @@ namespace ZenLib
         internal Zen<T> FalseExpr { get; }
 
         /// <summary>
-        /// Unroll the ZenIfExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.GuardExpr.Unroll(), this.TrueExpr.Unroll(), this.FalseExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenIfExpr.
         /// </summary>
         /// <param name="g">The guard expr.</param>

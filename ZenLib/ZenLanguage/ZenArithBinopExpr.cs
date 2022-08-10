@@ -74,15 +74,6 @@ namespace ZenLib
         internal ArithmeticOp Operation { get; }
 
         /// <summary>
-        /// Unroll the ZenArithBinopExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenArithBinopExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

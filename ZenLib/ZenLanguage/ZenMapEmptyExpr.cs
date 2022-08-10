@@ -17,15 +17,6 @@ namespace ZenLib
         public static ZenMapEmptyExpr<TKey, TValue> Instance = new ZenMapEmptyExpr<TKey, TValue>();
 
         /// <summary>
-        /// Unroll the expression.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<Map<TKey, TValue>> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ZenMapEmptyExpr{TKey, TValue}"/> class.
         /// </summary>
         private ZenMapEmptyExpr()

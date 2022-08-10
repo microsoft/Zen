@@ -30,15 +30,6 @@ namespace ZenLib
         public Zen<Seq<T>> SeqExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqLengthExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<BigInteger> Unroll()
-        {
-            return Create(this.SeqExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenSeqLengthExpr.
         /// </summary>
         /// <param name="seqExpr">The seq expr.</param>

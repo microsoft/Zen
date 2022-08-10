@@ -28,15 +28,6 @@ namespace ZenLib
         public Zen<T> ValueExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqUnitExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return Create(this.ValueExpr.Unroll());
-        }
-
-        /// <summary>
         /// Create a new ZenSeqUnitExpr.
         /// </summary>
         /// <param name="valueExpr">The value expr.</param>

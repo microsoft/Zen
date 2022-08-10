@@ -27,12 +27,6 @@ namespace ZenLib
         public long Id = Interlocked.Increment(ref IdHolder.NextId);
 
         /// <summary>
-        /// Simplify an expression by unrolling.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Zen<T> Unroll();
-
-        /// <summary>
         /// Accept a visitor for the ZenExpr object.
         /// </summary>
         /// <returns>A value of the return type.</returns>
@@ -1895,16 +1889,6 @@ namespace ZenLib
         public static StateSetTransformer<Pair<T1, T2, T3, T4>, T5> Transformer<T1, T2, T3, T4, T5>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function, StateSetTransformerManager manager = null)
         {
             return new ZenFunction<T1, T2, T3, T4, T5>(function).Transformer(manager);
-        }
-
-        /// <summary>
-        /// Flattens an expression recursively by removing list operations.
-        /// Note: this can explode the size of the expression.
-        /// </summary>
-        /// <returns>The resulting expression.</returns>
-        public static Zen<T> Flatten<T>(this Zen<T> expression)
-        {
-            return CommonUtilities.RunWithLargeStack(() => expression.Unroll());
         }
     }
 }

@@ -101,7 +101,7 @@ namespace ZenLibBench
                 });
 
                 var zf1 = new ZenFunction<TestObject, bool>(p => f(p).IsSome());
-                var zf2 = new ZenFunction<TestObject, TestObject>(p => f(p).Value().Unroll());
+                var zf2 = new ZenFunction<TestObject, TestObject>(p => f(p).Value());
                 var full = new ZenFunction<TestObject, bool>(x => true).StateSet();
 
                 var rnd = new Random(0);

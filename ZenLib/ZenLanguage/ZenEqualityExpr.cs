@@ -34,15 +34,6 @@ namespace ZenLib
         internal Zen<T> Expr2 { get; }
 
         /// <summary>
-        /// Unroll a ZenEqualityExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenEqualityExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

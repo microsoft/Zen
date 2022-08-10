@@ -40,15 +40,6 @@ namespace ZenLib
         public CombineType CombinationType { get; }
 
         /// <summary>
-        /// Unroll a ZenMapCombineExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<Map<TKey, SetUnit>> Unroll()
-        {
-            return Create(this.MapExpr1.Unroll(), this.MapExpr2.Unroll(), this.CombinationType);
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenMapCombineExpr.
         /// </summary>
         /// <param name="map1">The map expr.</param>

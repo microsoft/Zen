@@ -22,15 +22,6 @@ namespace ZenLib
         internal Zen<bool> Expr { get; }
 
         /// <summary>
-        /// Unroll a ZenNotExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenNotExpr.
         /// </summary>
         /// <param name="e">The expr.</param>

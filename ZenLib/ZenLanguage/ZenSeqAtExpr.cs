@@ -34,15 +34,6 @@ namespace ZenLib
         internal Zen<BigInteger> IndexExpr { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqAtExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<Seq<T>> Unroll()
-        {
-            return Create(this.SeqExpr.Unroll(), this.IndexExpr.Unroll());
-        }
-
-        /// <summary>
         /// Simplify and create a ZenSeqAtExpr.
         /// </summary>
         /// <param name="e1">The seq expr.</param>

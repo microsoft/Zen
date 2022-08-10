@@ -53,15 +53,6 @@ namespace ZenLib
         internal BitwiseOp Operation { get; }
 
         /// <summary>
-        /// Unroll the ZenBitwiseBinopExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
-        }
-
-        /// <summary>
         /// Simplify and create a new ZenBitwiseBinopExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

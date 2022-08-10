@@ -38,15 +38,6 @@ namespace ZenLib
         internal LogicalOp Operation { get; }
 
         /// <summary>
-        /// Unroll a ZenAndExpr.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.Expr1.Unroll(), this.Expr2.Unroll(), this.Operation);
-        }
-
-        /// <summary>
         /// Simplify a new ZenAndExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>

@@ -38,15 +38,6 @@ namespace ZenLib
         internal SeqContainmentType ContainmentType { get; }
 
         /// <summary>
-        /// Unroll a ZenSeqContainsExpr.
-        /// </summary>
-        /// <returns>The unrolled expr.</returns>
-        public override Zen<bool> Unroll()
-        {
-            return Create(this.SeqExpr.Unroll(), this.SubseqExpr.Unroll(), this.ContainmentType);
-        }
-
-        /// <summary>
         /// Simplify and create a ZenSeqContainsExpr.
         /// </summary>
         /// <param name="e1">The seq expr.</param>

@@ -27,15 +27,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Unroll this expression.
-        /// </summary>
-        /// <returns>The unrolled expression.</returns>
-        public override Zen<T> Unroll()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Convert the expression to a string.
         /// </summary>
         /// <returns>The string representation.</returns>
