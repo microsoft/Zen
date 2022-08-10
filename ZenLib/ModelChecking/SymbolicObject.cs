@@ -15,15 +15,6 @@ namespace ZenLib.ModelChecking
     /// </summary>
     internal class SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> : SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>
     {
-        public SymbolicObject(
-            Type objectType,
-            ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver,
-            ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> value) : base(solver)
-        {
-            this.ObjectType = objectType;
-            this.Fields = value;
-        }
-
         /// <summary>
         /// Gets the type of the object it represents.
         /// </summary>
@@ -34,19 +25,27 @@ namespace ZenLib.ModelChecking
         /// </summary>
         public ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> Fields { get; set; }
 
-        internal override TReturn Accept<TParam, TReturn>(
-            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
-            TParam parameter)
+        /// <summary>
+        /// Creates a new instance of the <see cref="SymbolicObject{TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal}"/> class.
+        /// </summary>
+        /// <param name="objectType">The object type.</param>
+        /// <param name="solver">The solver.</param>
+        /// <param name="value">The symbolic values.</param>
+        public SymbolicObject(
+            Type objectType,
+            ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver,
+            ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> value) : base(solver)
         {
-            return visitor.Visit(this, parameter);
+            this.ObjectType = objectType;
+            this.Fields = value;
         }
 
         /// <summary>
-        /// Merge two symbolic integers together under a guard.
+        /// Merge another symbolic value with respect to a guard.
         /// </summary>
         /// <param name="guard">The guard.</param>
-        /// <param name="other">The other integer.</param>
-        /// <returns>A new symbolic integer.</returns>
+        /// <param name="other">The other symbolic value.</param>
+        /// <returns>A merged symbolic value.</returns>
         internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
@@ -61,6 +60,19 @@ namespace ZenLib.ModelChecking
             }
 
             return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.ObjectType, this.Solver, newValue);
+        }
+
+        /// <summary>
+        /// Accept a visitor.
+        /// </summary>
+        /// <param name="visitor">The visitor object.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The return value.</returns>
+        internal override TReturn Accept<TParam, TReturn>(
+            ISymbolicValueVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal, TReturn, TParam> visitor,
+            TParam parameter)
+        {
+            return visitor.Visit(this, parameter);
         }
 
         /// <summary>
