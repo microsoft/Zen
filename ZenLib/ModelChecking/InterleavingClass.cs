@@ -57,5 +57,21 @@ namespace ZenLib.ModelChecking
 
             return new InterleavingClass(result);
         }
+
+        /// <summary>
+        /// Combine variables.
+        /// </summary>
+        /// <param name="other">The other result.</param>
+        /// <param name="objects">The interleaved objects.</param>
+        public override void Combine(InterleavingResult other, UnionFind<object> objects)
+        {
+            var o = (InterleavingClass)other;
+            foreach (var field in this.Fields)
+            {
+                var r1 = field.Value;
+                var r2 = o.Fields[field.Key];
+                r1.Combine(r2, objects);
+            }
+        }
     }
 }

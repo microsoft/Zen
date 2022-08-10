@@ -1,4 +1,4 @@
-﻿// <copyright file="Compiler.cs" company="Microsoft">
+﻿// <copyright file="ExpressionConverterVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -29,12 +29,12 @@ namespace ZenLib.Compilation
     /// the match statements to native code and then fall back to interpreting the expression
     /// when we exceed some threshold.
     /// </summary>
-    internal class ExpressionConverter : ZenExprVisitor<ExpressionConverterEnvironment, Expression>
+    internal class ExpressionConverterVisitor : ZenExprVisitor<ExpressionConverterEnvironment, Expression>
     {
         /// <summary>
         /// The convert method.
         /// </summary>
-        private static MethodInfo convertMethod = typeof(ExpressionConverter).GetMethodCached("Convert");
+        private static MethodInfo convertMethod = typeof(ExpressionConverterVisitor).GetMethodCached("Convert");
 
         /// <summary>
         /// Variable id used for easier debugging of compiled code.
@@ -42,12 +42,12 @@ namespace ZenLib.Compilation
         private int nextVariableId = 0;
 
         /// <summary>
-        /// Create an instance of the <see cref="ExpressionConverter"/> class.
+        /// Create an instance of the <see cref="ExpressionConverterVisitor"/> class.
         /// </summary>
         /// <param name="subexpressionCache">In scope zen expression to variable cache.</param>
         /// <param name="currentMatchUnrollingDepth">The current unrolling depth.</param>
         /// <param name="maxMatchUnrollingDepth">The maximum allowed unrolling depth.</param>
-        public ExpressionConverter(
+        public ExpressionConverterVisitor(
             ImmutableDictionary<object, Expression> subexpressionCache,
             int currentMatchUnrollingDepth,
             int maxMatchUnrollingDepth)
@@ -323,13 +323,7 @@ namespace ZenLib.Compilation
         {
             var e1 = Convert(expression.Expr1, parameter);
             var e2 = Convert(expression.Expr2, parameter);
-
-            if (ReflectionUtilities.IsFixedIntegerType(typeof(T)))
-            {
-                return Expression.Call(e1, typeof(T).GetMethod("Equals", new Type[] { typeof(object) }), e2);
-            }
-
-            return Expression.Equal(e1, e2);
+            return Expression.Call(e1, typeof(T).GetMethod("Equals", new Type[] { typeof(T) }), e2);
         }
 
         /// <summary>

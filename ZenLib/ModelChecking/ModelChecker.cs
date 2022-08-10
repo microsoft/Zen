@@ -171,7 +171,7 @@ namespace ZenLib.ModelChecking
                 foreach (var constant in constants)
                 {
                     var environment = new ExpressionEvaluatorEnvironment(assignment);
-                    var interpreter = new ExpressionEvaluator(false);
+                    var interpreter = new ExpressionEvaluatorVisitor(false);
                     var ret = interpreter.Visit((dynamic)constant.Value, environment);
                     result = result.Set((dynamic)constant.Key, (dynamic)ret);
                     assignment[arbitrary] = result;

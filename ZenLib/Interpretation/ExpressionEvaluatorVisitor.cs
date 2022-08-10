@@ -1,4 +1,4 @@
-﻿// <copyright file="ExpressionEvaluator.cs" company="Microsoft">
+﻿// <copyright file="ExpressionEvaluatorVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -12,12 +12,12 @@ namespace ZenLib.Interpretation
     /// <summary>
     /// Interpret a Zen expression.
     /// </summary>
-    internal sealed class ExpressionEvaluator : ZenExprVisitor<ExpressionEvaluatorEnvironment, object>
+    internal sealed class ExpressionEvaluatorVisitor : ZenExprVisitor<ExpressionEvaluatorEnvironment, object>
     {
         /// <summary>
         /// Evaluate method reference.
         /// </summary>
-        private static MethodInfo evaluateMethod = typeof(ExpressionEvaluator).GetMethod("Visit");
+        private static MethodInfo evaluateMethod = typeof(ExpressionEvaluatorVisitor).GetMethod("Visit");
 
         /// <summary>
         /// Whether to track covered branches.
@@ -35,10 +35,10 @@ namespace ZenLib.Interpretation
         public Dictionary<long, object> PathConstraintSymbolicEnvironment { get; set; }
 
         /// <summary>
-        /// Create a new instance of the <see cref="ExpressionEvaluator"/> class.
+        /// Create a new instance of the <see cref="ExpressionEvaluatorVisitor"/> class.
         /// </summary>
         /// <param name="trackBranches">Whether to track branches during execution.</param>
-        public ExpressionEvaluator(bool trackBranches)
+        public ExpressionEvaluatorVisitor(bool trackBranches)
         {
             this.trackBranches = trackBranches;
 

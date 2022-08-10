@@ -40,7 +40,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A model checker.</returns>
         private static IModelChecker CreateModelCheckerDD(Zen<bool> expression, Dictionary<long, object> arguments)
         {
-            var heuristic = new InterleavingHeuristic();
+            var heuristic = new InterleavingHeuristicVisitor();
             var mustInterleave = heuristic.GetInterleavedVariables(expression, arguments);
             var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);

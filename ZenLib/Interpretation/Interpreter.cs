@@ -25,7 +25,7 @@ namespace ZenLib.Interpretation
         public static (T, PathConstraint) Run<T>(Zen<T> expression, Dictionary<long, object> args, bool trackBranches = false)
         {
             var environment = new ExpressionEvaluatorEnvironment(args);
-            var interpreter = new ExpressionEvaluator(trackBranches);
+            var interpreter = new ExpressionEvaluatorVisitor(trackBranches);
             var result = (T)interpreter.Visit(expression, environment);
             return (result, interpreter.PathConstraint);
         }

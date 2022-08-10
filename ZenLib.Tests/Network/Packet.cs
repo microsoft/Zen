@@ -4,6 +4,8 @@
 
 namespace ZenLib.Tests.Network
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib;
     using static ZenLib.Zen;
@@ -12,7 +14,7 @@ namespace ZenLib.Tests.Network
     /// Packet struct that contains IP headers.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public struct Packet
+    public struct Packet : IEquatable<Packet>
     {
         /// <summary>
         /// The overlay header.
@@ -37,6 +39,36 @@ namespace ZenLib.Tests.Network
             return Zen.Create<Packet>(
                 ("OverlayHeader", overlayHeader),
                 ("UnderlayHeader", underlayHeader));
+        }
+
+        /// <summary>
+        /// Equality for packets.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            return obj is Packet packet && Equals(packet);
+        }
+
+        /// <summary>
+        /// Equality for packets.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Packet other)
+        {
+            return EqualityComparer<IpHeader>.Default.Equals(OverlayHeader, other.OverlayHeader) &&
+                   UnderlayHeader.Equals(other.UnderlayHeader);
+        }
+
+        /// <summary>
+        /// Hashcode for packets.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(OverlayHeader, UnderlayHeader);
         }
 
         /// <summary>

@@ -131,7 +131,7 @@ namespace ZenLib.Compilation
             int currentMatchUnrollingDepth,
             int maxMatchUnrollingDepth)
         {
-            var converter = new ExpressionConverter(subexpressionCache, currentMatchUnrollingDepth, maxMatchUnrollingDepth);
+            var converter = new ExpressionConverterVisitor(subexpressionCache, currentMatchUnrollingDepth, maxMatchUnrollingDepth);
             var expr = converter.Convert(zenExpression, env);
             converter.BlockExpressions.Add(expr);
             return Expression.Block(converter.Variables, converter.BlockExpressions.ToArray());

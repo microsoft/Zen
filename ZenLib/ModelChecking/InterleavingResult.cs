@@ -22,5 +22,12 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <returns>A new interleaving result.</returns>
         public abstract InterleavingResult Union(InterleavingResult other);
+
+        /// <summary>
+        /// Combine variables.
+        /// </summary>
+        /// <param name="other">The other result.</param>
+        /// <param name="objects">The interleaved objects.</param>
+        public abstract void Combine(InterleavingResult other, UnionFind<object> objects);
     }
 }

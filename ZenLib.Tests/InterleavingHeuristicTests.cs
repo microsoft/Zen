@@ -28,7 +28,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<int>();
             var b = Arbitrary<int>();
             var expr = (a == b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -44,7 +44,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<int>();
             var b = Arbitrary<int>();
             var expr = (a + b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -60,7 +60,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<int>();
             var b = Arbitrary<int>();
             var expr = (a - b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -76,7 +76,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<int>();
             var b = Arbitrary<int>();
             var expr = (a ^ b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -92,7 +92,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<char>();
             var b = Arbitrary<char>();
             var expr = (a == b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -108,7 +108,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<int>();
             var b = Arbitrary<int>();
             var expr = (a & b);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -125,7 +125,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var c = Arbitrary<ushort>();
             var expr = And(a == 1, Or(b == 2, c == 3));
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(3, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
@@ -143,7 +143,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var c = Arbitrary<ushort>();
             var expr = If(c == 2, And(a == b), Not(a == 3));
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
 
             Assert.AreEqual(2, disjointSets.Count);
@@ -162,7 +162,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var c = Arbitrary<int>();
             var expr = If(c == 2, a, b) == If(c == 3, b, a);
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(2, disjointSets.Count);
             Assert.IsTrue(disjointSets[1].Contains(a));
@@ -179,7 +179,7 @@ namespace ZenLib.Tests
             var a = Arbitrary<Object2>();
             var b = Arbitrary<Object2>();
             var expr = a == b;
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
 
             Assert.AreEqual(2, disjointSets.Count);
@@ -202,7 +202,7 @@ namespace ZenLib.Tests
             var c = Arbitrary<bool>();
             var d = Arbitrary<int>();
             var expr = If(c, a, b).GetField<Object2, int>("Field2") == d;
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
             Assert.AreEqual(4, disjointSets.Count);
             Assert.AreEqual(3, disjointSets[2].Count);
@@ -218,12 +218,27 @@ namespace ZenLib.Tests
             var a = Arbitrary<bool>();
             var b = Arbitrary<int>();
             var expr = (b == 3) == a;
-            var i = new InterleavingHeuristic();
+            var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
 
             Assert.AreEqual(2, disjointSets.Count);
             Assert.IsTrue(disjointSets[1].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
+        }
+
+        /// <summary>
+        /// Test that the heuristic works for if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestHeuristicWithConstants()
+        {
+            var c = Arbitrary<char>();
+            var expr = (c == 'a');
+            var i = new InterleavingHeuristicVisitor();
+            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(c));
         }
     }
 }

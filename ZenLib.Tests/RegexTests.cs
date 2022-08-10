@@ -395,7 +395,6 @@ namespace ZenLib.Tests
             var r1 = Regex.Concat(Regex.Star(Regex.Dot<int>()), Regex.Char(1));
             var r2 = Regex.Concat(Regex.Star(Regex.Dot<int>()), Regex.Char(2));
             var a = Regex.Intersect(r1, r2).ToAutomaton();
-            Console.WriteLine(a);
             Assert.IsTrue(a.FinalStates.Count == 0);
         }
 
@@ -558,7 +557,6 @@ namespace ZenLib.Tests
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
-            Console.WriteLine(r);
             var a = r.ToAutomaton();
             var bytes = input.ToCharArray().Select(c => (byte)c);
             Assert.AreEqual(expected, r.IsMatch(bytes));

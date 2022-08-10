@@ -382,5 +382,19 @@ namespace ZenLib.Tests
             var sat = f.Find((d, allowed) => allowed);
             Assert.IsTrue(sat.Value.Get(1).HasValue);
         }
+
+        /// <summary>
+        /// Test that the map equality and hashcode works.
+        /// </summary>
+        [TestMethod]
+        public void TestMapEqualsHashCode()
+        {
+            var m1 = new FMap<int, int>().Set(1, 2);
+            Assert.IsTrue(m1.Equals(m1));
+            Assert.IsFalse(m1.Equals(new object()));
+            Assert.IsFalse(m1.Equals(null));
+            Assert.IsFalse(m1.Equals(new FMap<int, int>()));
+            Assert.AreEqual(m1.GetHashCode(), m1.GetHashCode());
+        }
     }
 }

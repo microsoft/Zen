@@ -4,6 +4,8 @@
 
 namespace ZenLib
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -12,7 +14,7 @@ namespace ZenLib
     /// <summary>
     /// A class representing a simple finite list-backed map.
     /// </summary>
-    public class FMap<TKey, TValue>
+    public class FMap<TKey, TValue> : IEquatable<FMap<TKey, TValue>>
     {
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
@@ -112,6 +114,40 @@ namespace ZenLib
         public override string ToString()
         {
             return "{" + string.Join(", ", this.Values.Values.Select(kv => $"{kv.Item1} => {kv.Item2}")) + "}";
+        }
+
+        /// <summary>
+        /// Equality for FMap objects.
+        /// </summary>
+        /// <param name="obj">The other object.</param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as FMap<TKey, TValue>);
+        }
+
+        /// <summary>
+        /// Equality for FMap objects.
+        /// </summary>
+        /// <param name="other">The other object.</param>
+        /// <returns></returns>
+        public bool Equals(FMap<TKey, TValue> other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            return this.Values.Equals(other.Values);
+        }
+
+        /// <summary>
+        /// Hashcode for the FMap object.
+        /// </summary>
+        /// <returns>An integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            return this.Values.GetHashCode();
         }
     }
 

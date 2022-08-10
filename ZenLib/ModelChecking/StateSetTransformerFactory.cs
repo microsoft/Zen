@@ -61,7 +61,7 @@ namespace ZenLib.ModelChecking
             Zen<bool> newExpression = (expression == output);
 
             // initialize the decision diagram solver
-            var heuristic = new InterleavingHeuristic();
+            var heuristic = new InterleavingHeuristicVisitor();
             var mustInterleave = heuristic.GetInterleavedVariables(newExpression, arguments);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
@@ -191,7 +191,7 @@ namespace ZenLib.ModelChecking
             var expression = function(input);
 
             // initialize the decision diagram solver
-            var heuristic = new InterleavingHeuristic();
+            var heuristic = new InterleavingHeuristicVisitor();
             var mustInterleave = heuristic.GetInterleavedVariables(expression, arguments);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 

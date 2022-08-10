@@ -75,7 +75,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var interpreter = new ExpressionEvaluator(false);
+            var interpreter = new ExpressionEvaluatorVisitor(false);
             var result = (T)interpreter.Visit(input, interpreterEnv);
             return Option.Some(result);
         }
@@ -106,7 +106,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var interpreter = new ExpressionEvaluator(false);
+            var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);
             return Option.Some((result1, result2));
@@ -139,7 +139,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var interpreter = new ExpressionEvaluator(false);
+            var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);
             var result3 = (T3)interpreter.Visit(input3, interpreterEnv);
@@ -175,7 +175,7 @@ namespace ZenLib.ModelChecking
             }
 
             var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
-            var interpreter = new ExpressionEvaluator(false);
+            var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);
             var result3 = (T3)interpreter.Visit(input3, interpreterEnv);

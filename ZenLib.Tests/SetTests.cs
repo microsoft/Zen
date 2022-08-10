@@ -592,7 +592,6 @@ namespace ZenLib.Tests
 
             var r1 = solution.Get(s1);
             var r2 = solution.Get(s2);
-            Console.WriteLine(r1 + ", " + r2);
 
             Assert.IsTrue(r2.Contains(3));
             Assert.AreEqual(0, r1.Difference(r2).Count());
@@ -795,29 +794,6 @@ namespace ZenLib.Tests
             Assert.AreEqual(1, result.Value.Count());
             Assert.AreEqual("{[Set={1}]}", result.Value.ToString());
         }
-
-        /* /// <summary>
-        /// Test that adding many elements to a set works.
-        /// </summary>
-        [TestMethod]
-        public void TestSetPerformance()
-        {
-            var x = Zen.Symbolic<Set<string>>();
-            var set = x;
-
-            for (int i = 0; i < 100; i++)
-            {
-                set = set.Add(i.ToString());
-            }
-
-            for (int i = 0; i < 100; i++)
-            {
-                set = set.Delete(i.ToString());
-            }
-
-            var solution = (set == Set.Empty<string>()).Solve();
-            Console.WriteLine(solution.Get(x));
-        } */
 
         /// <summary>
         /// Object with a set field.

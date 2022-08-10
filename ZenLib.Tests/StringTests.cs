@@ -467,7 +467,6 @@ namespace ZenLib.Tests
 
             foreach (var example in examples)
             {
-                Console.WriteLine(example);
                 Assert.IsTrue(r.IsMatch(Seq.FromString(example).Values));
             }
 
@@ -528,7 +527,6 @@ namespace ZenLib.Tests
         public void TestCharSeqWorks()
         {
             var s = Zen.Constraint<Seq<char>>(s => s.Contains((char)70)).Find();
-            Console.WriteLine(s.Value);
             Assert.AreEqual("[F]", s.Value.ToString());
         }
 

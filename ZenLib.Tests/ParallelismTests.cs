@@ -31,7 +31,6 @@ namespace ZenLib.Tests
             Parallel.For(0, numIterations, (i) =>
             {
                 var zf = new ZenConstraint<int>(x => x == i);
-                // Console.WriteLine(zf.FunctionBodyExpr);
                 var result = zf.Find();
                 Assert.AreEqual(i, result.Value);
             });
@@ -46,7 +45,6 @@ namespace ZenLib.Tests
             Parallel.For(0, numIterations, (i) =>
             {
                 var zf = new ZenConstraint<int>(x => Zen.Or(x == i, x == i + 1));
-                // Console.WriteLine(zf.FunctionBodyExpr);
                 var result = zf.FindAll().ToList();
                 Assert.AreEqual(2, result.Count);
             });

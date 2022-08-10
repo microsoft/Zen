@@ -1,26 +1,31 @@
-﻿// <copyright file="InterleavingHeuristic.cs" company="Microsoft">
+﻿// <copyright file="InterleavingHeuristicVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
-    using ZenLib.Generation;
 
     /// <summary>
     /// Class to conservatively estimate which variables
     /// must be interleaved to avoid exponential blowup in the BDD encoding.
     /// </summary>
-    internal sealed class InterleavingHeuristic : ZenExprVisitor<Dictionary<long, object>, InterleavingResult>
+    internal sealed class InterleavingHeuristicVisitor : ZenExprVisitor<Dictionary<long, object>, InterleavingResult>
     {
         /// <summary>
         /// Set of disjoint variable sets to track must-interleave dependencies, implemented as a union find.
         /// </summary>
         public UnionFind<object> DisjointSets { get; } = new UnionFind<object>();
+
+        /// <summary>
+        /// The empty set visitor.
+        /// </summary>
+        private InterleavingSetEmptyVisitor emptySetVisitor = new InterleavingSetEmptyVisitor();
 
         /// <summary>
         /// Computes the variable ordering requirements for the expression.
@@ -80,8 +85,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The interleaving result.</returns>
         public override InterleavingResult VisitConstant<T>(ZenConstantExpr<T> expression, Dictionary<long, object> parameter)
         {
-            var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            return emptySetGenerator.Visit(typeof(T), Unit.Instance);
+            return emptySetVisitor.Visit(typeof(T), Unit.Instance);
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace ZenLib.ModelChecking
         {
             var x = this.Visit(expression.Expr1, parameter);
             var y = this.Visit(expression.Expr2, parameter);
-            this.Combine(x, y);
+            x.Combine(y, this.DisjointSets);
             return x.Union(y);
         }
 
@@ -113,7 +117,7 @@ namespace ZenLib.ModelChecking
             {
                 case BitwiseOp.BitwiseAnd:
                 case BitwiseOp.BitwiseXor:
-                    this.Combine(x, y);
+                    x.Combine(y, this.DisjointSets);
                     return x.Union(y);
                 default:
                     Contract.Assert(expression.Operation == BitwiseOp.BitwiseOr);
@@ -140,8 +144,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The interleaving result.</returns>
         public override InterleavingResult VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
-            var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            return emptySetGenerator.Visit(typeof(T), Unit.Instance);
+            return emptySetVisitor.Visit(typeof(T), Unit.Instance);
         }
 
         /// <summary>
@@ -224,7 +227,7 @@ namespace ZenLib.ModelChecking
                 {
                     var valueType = fieldValuePair.Value.GetType();
                     var innerType = valueType.BaseType.GetGenericArgumentsCached()[0];
-                    var evaluateMethod = typeof(InterleavingHeuristic)
+                    var evaluateMethod = typeof(InterleavingHeuristicVisitor)
                         .GetMethodCached("Visit")
                         .MakeGenericMethod(innerType);
                     valueResult = (InterleavingResult)evaluateMethod.Invoke(this, new object[] { fieldValuePair.Value, parameter });
@@ -250,8 +253,8 @@ namespace ZenLib.ModelChecking
         {
             var x = this.Visit(expression.Expr1, parameter);
             var y = this.Visit(expression.Expr2, parameter);
-            this.Combine(x, y);
-            return x.Union(y);
+            x.Combine(y, this.DisjointSets);
+            return new InterleavingSet(x.GetAllVariables().Union(y.GetAllVariables()));
         }
 
         /// <summary>
@@ -264,7 +267,7 @@ namespace ZenLib.ModelChecking
         {
             var x = this.Visit(expression.Expr1, parameter);
             var y = this.Visit(expression.Expr2, parameter);
-            this.Combine(x, y);
+            x.Combine(y, this.DisjointSets);
             return x.Union(y);
         }
 
@@ -281,7 +284,7 @@ namespace ZenLib.ModelChecking
             {
                 var expr = parameter[expression.ArgumentId];
                 var type = expr.GetType().BaseType.GetGenericArgumentsCached()[0];
-                var evaluateMethod = typeof(InterleavingHeuristic)
+                var evaluateMethod = typeof(InterleavingHeuristicVisitor)
                     .GetMethodCached("Visit")
                     .MakeGenericMethod(type);
                 return (InterleavingResult)evaluateMethod.Invoke(this, new object[] { expr, parameter });
@@ -301,51 +304,7 @@ namespace ZenLib.ModelChecking
         public override InterleavingResult VisitArbitrary<T>(ZenArbitraryExpr<T> expression, Dictionary<long, object> parameter)
         {
             this.DisjointSets.Add(expression);
-            var emptySetGenerator = new InterleavingSetEmptyVisitor();
-            var emptySet = (InterleavingSet)emptySetGenerator.Visit(typeof(T), Unit.Instance);
-            var variableSet = emptySet.GetAllVariables().Add(expression);
-            return new InterleavingSet(variableSet);
-        }
-
-        /// <summary>
-        /// Determines if a set of variables is comprised only of boolean values, which do not need interleaving.
-        /// </summary>
-        /// <param name="variableSet">The set of variables.</param>
-        /// <returns>True or false.</returns>
-        private bool IsBoolVariableSet(ImmutableHashSet<object> variableSet)
-        {
-            return variableSet.All(x => typeof(Zen<bool>).IsAssignableFrom(x.GetType()));
-        }
-
-        /// <summary>
-        /// Combines two results to indicate that they depend on each other.
-        /// Should replace this with a proper union-find data structure later.
-        /// </summary>
-        /// <param name="result1">The first result.</param>
-        /// <param name="result2">The second result.</param>
-        private void Combine(InterleavingResult result1, InterleavingResult result2)
-        {
-            var variableSet1 = result1.GetAllVariables();
-            var variableSet2 = result2.GetAllVariables();
-
-            if (IsBoolVariableSet(variableSet1) || IsBoolVariableSet(variableSet2))
-            {
-                return;
-            }
-
-            foreach (var variable1 in variableSet1)
-            {
-                foreach (var variable2 in variableSet2)
-                {
-                    var type1 = variable1.GetType().GetGenericArgumentsCached()[0];
-                    var type2 = variable2.GetType().GetGenericArgumentsCached()[0];
-
-                    if (type1 == type2)
-                    {
-                        this.DisjointSets.Union(variable1, variable2);
-                    }
-                }
-            }
+            return new InterleavingSet(ImmutableHashSet<object>.Empty.Add(expression));
         }
 
         /// <summary>

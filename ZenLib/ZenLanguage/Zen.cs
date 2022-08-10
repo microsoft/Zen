@@ -539,61 +539,8 @@ namespace ZenLib
         {
             Contract.AssertNotNull(expr1);
             Contract.AssertNotNull(expr2);
-            return EqHelper<T>(expr1, expr2);
-        }
 
-        private static Zen<bool> EqLists<T>(Zen<FSeq<T>> expr1, Zen<FSeq<T>> expr2)
-        {
-            return ZenListCaseExpr<T, bool>.Create(
-                expr1,
-                ZenListCaseExpr<T, bool>.Create(expr2, True(), (hd, tl) => False()),
-                (hd1, tl1) => ZenListCaseExpr<T, bool>.Create(expr2, False(), (hd2, tl2) => And(hd1 == hd2, EqLists(tl1, tl2))));
-        }
-
-        private static Zen<bool> EqHelper<T>(object expr1, object expr2)
-        {
-            var type = typeof(T);
-
-            if (type == ReflectionUtilities.BoolType ||
-                type == ReflectionUtilities.CharType ||
-                type == ReflectionUtilities.StringType ||
-                ReflectionUtilities.IsArithmeticType(type) ||
-                ReflectionUtilities.IsMapType(type) ||
-                ReflectionUtilities.IsConstMapType(type) ||
-                ReflectionUtilities.IsSeqType(type))
-            {
-                return ZenEqualityExpr<T>.Create((dynamic)expr1, (dynamic)expr2);
-            }
-
-            // expand out list and class/struct types to help the BDD backend.
-            if (ReflectionUtilities.IsFSeqType(type))
-            {
-                var innerType = type.GetGenericArgumentsCached()[0];
-                var method = eqListsMethod.MakeGenericMethod(innerType);
-                return (Zen<bool>)method.Invoke(null, new object[] { expr1, expr2 });
-            }
-
-            // some class or struct
-            var acc = True();
-            foreach (var field in ReflectionUtilities.GetAllFields(type))
-            {
-                var method = getFieldMethod.MakeGenericMethod(typeof(T), field.FieldType);
-                object field1 = method.Invoke(null, new object[] { expr1, field.Name });
-                object field2 = method.Invoke(null, new object[] { expr2, field.Name });
-                var emethod = eqMethod.MakeGenericMethod(field.FieldType);
-                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { field1, field2 }));
-            }
-
-            foreach (var property in ReflectionUtilities.GetAllProperties(type))
-            {
-                var method = getFieldMethod.MakeGenericMethod(typeof(T), property.PropertyType);
-                object prop1 = method.Invoke(null, new object[] { expr1, property.Name });
-                object prop2 = method.Invoke(null, new object[] { expr2, property.Name });
-                var emethod = eqMethod.MakeGenericMethod(property.PropertyType);
-                acc = And(acc, (Zen<bool>)emethod.Invoke(null, new object[] { prop1, prop2 }));
-            }
-
-            return acc;
+            return ZenEqualityExpr<T>.Create(expr1, expr2);
         }
 
         /// <summary>
@@ -1771,7 +1718,7 @@ namespace ZenLib
 
             var solution = constraints.Solve();
             var environment = new ExpressionEvaluatorEnvironment(solution.VariableAssignment);
-            var interpreter = new ExpressionEvaluator(false);
+            var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, environment);
         }
 

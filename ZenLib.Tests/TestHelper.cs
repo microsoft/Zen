@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -435,11 +436,28 @@ namespace ZenLib.Tests
         /// <summary>
         /// An object with two fields.
         /// </summary>
-        internal class Object2
+        internal class Object2 : IEquatable<Object2>
         {
             public int Field1 { get; set; }
 
             public int Field2;
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as Object2);
+            }
+
+            public bool Equals(Object2 other)
+            {
+                return other is not null &&
+                       Field1 == other.Field1 &&
+                       Field2 == other.Field2;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Field1, Field2);
+            }
         }
 
         /// <summary>
@@ -563,9 +581,25 @@ namespace ZenLib.Tests
         /// <summary>
         /// An object with eight fields.
         /// </summary>
-        internal class ObjectField1
+        internal class ObjectField1 : IEquatable<ObjectField1>
         {
             public int Field1;
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as ObjectField1);
+            }
+
+            public bool Equals(ObjectField1 other)
+            {
+                return other is not null &&
+                       Field1 == other.Field1;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Field1);
+            }
         }
 
         internal class ObjectWithInt
