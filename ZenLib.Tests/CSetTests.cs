@@ -92,5 +92,87 @@ namespace ZenLib.Tests
             Assert.IsTrue(resy.Contains(2));
             Assert.IsTrue(resy.Contains(3));
         }
+
+        /// <summary>
+        /// Test sets work with if.
+        /// </summary>
+        [TestMethod]
+        public void TestCSetIf1()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<TestClass>();
+            var f = x.GetField<TestClass, CSet<string>>("Strings");
+            var e = Zen.If(b, x.WithField("Strings", f.Add("a").Delete("c")), x.WithField("Strings", f.Add("b").Delete("d")));
+            var solution = (e == new TestClass { Strings = new CSet<string>("a", "b") }).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsFalse(solution.Get(b));
+            Assert.AreEqual(new CSet<string>("a"), solution.Get(x).Strings);
+        }
+
+        /// <summary>
+        /// Test sets work with if.
+        /// </summary>
+        [TestMethod]
+        public void TestCSetIf2()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<TestClass>();
+            var f = x.GetField<TestClass, CSet<string>>("Strings");
+            var e = Zen.If(b, x.WithField("Strings", f.Add("a").Delete("b")), x.WithField("Strings", f.Add("b").Delete("d")));
+            var g = e.GetField<TestClass, CSet<string>>("Strings");
+            var expr = Zen.If<int>(g.Contains("b"), 1, 3);
+            var solution = (expr == 1).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsFalse(solution.Get(b));
+        }
+
+        /// <summary>
+        /// Test sets work with if.
+        /// </summary>
+        [TestMethod]
+        public void TestCSetIf3()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<TestClass>();
+            var f = x.GetField<TestClass, CSet<string>>("Strings");
+            var e = Zen.If(b, x.WithField("Strings", f.Add("a").Delete("b")), x.WithField("Strings", f.Add("b").Delete("d")));
+            var g = e.GetField<TestClass, CSet<string>>("Strings");
+            var expr = Zen.If<int>(g.Contains("b"), 1, 3);
+            var solution = (expr == 1).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsFalse(solution.Get(b));
+        }
+
+        /// <summary>
+        /// Test sets work with if.
+        /// </summary>
+        [TestMethod]
+        public void TestCSetIf4()
+        {
+            var x = Zen.Symbolic<TestClass>();
+            var y = Zen.Symbolic<TestClass>();
+            var fx = x.GetField<TestClass, CSet<string>>("Strings");
+            var fy = y.GetField<TestClass, CSet<string>>("Strings");
+            var e = Zen.If<int>(fx == fy, 1, 2);
+            var solution = Zen.And(fx.Contains("a"), Zen.Not(fx.Contains("b")), e == 1).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.AreEqual(new CSet<string>("a"), solution.Get(x).Strings);
+            Assert.AreEqual(new CSet<string>("a"), solution.Get(y).Strings);
+        }
+
+        /// <summary>
+        /// A test class.
+        /// </summary>
+        public class TestClass
+        {
+            /// <summary>
+            /// The string values.
+            /// </summary>
+            public CSet<string> Strings;
+        }
     }
 }
