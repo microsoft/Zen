@@ -550,6 +550,22 @@ namespace ZenLib.Tests
             var i = l.Case(0, (hd, tl) => x.Get(1));
             (i == 2).Solve();
         }
+
+        /// <summary>
+        /// Test maps work in if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestCMapInIf()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<CMap<string, int>>();
+            var expr = Zen.If(b, x.Set("c", 3), new CMap<string, int>().Set("a", 1).Set("b", 2)).Get("a") == 4;
+            var solution = expr.Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Console.WriteLine(solution.Get(b));
+            Console.WriteLine(solution.Get(x));
+        }
     }
 
     /// <summary>

@@ -4,6 +4,8 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using ZenLib.Solver;
@@ -45,6 +47,7 @@ namespace ZenLib.ModelChecking
             var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
             foreach (var kv in this.Value)
             {
+                Console.WriteLine($"Got value: {kv.Key}");
                 var v1 = kv.Value;
                 var v2 = o.Value[kv.Key];
                 result = result.Add(kv.Key, v1.Merge(guard, v2));
