@@ -600,6 +600,41 @@ namespace ZenLib.Tests
             Assert.IsTrue(solution.Get(b));
             Assert.AreEqual(1, solution.Get(x).Get("a").Field1);
         }
+
+        /// <summary>
+        /// Test maps work in if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestCMapInIf4()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<TestMapObject>();
+            var o = new TestMapObject { Edges = new CMap<int, bool>().Set(1, true) };
+            var expr = Zen.If(b, o, x);
+            var solution = Zen.Not(expr.GetField<TestMapObject, CMap<int, bool>>("Edges").Get(1)).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsFalse(solution.Get(b));
+            Assert.IsFalse(solution.Get(x).Edges.Get(1));
+        }
+
+        /// <summary>
+        /// Test maps work when there are no constants.
+        /// </summary>
+        [TestMethod]
+        public void TestCMapNoConstants()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<CMap<int, bool>>();
+            var y = Zen.Symbolic<CMap<int, bool>>();
+            var e = Zen.If(b, Create<TestMapObject>(("Edges", x), ("Field", Zen.True())), Create<TestMapObject>(("Edges", y), ("Field", Zen.False())));
+            var solution = e.GetField<TestMapObject, bool>("Field").Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Console.WriteLine(solution.Get(b));
+            Console.WriteLine(solution.Get(x));
+            Console.WriteLine(solution.Get(y));
+        }
     }
 
     /// <summary>
@@ -607,6 +642,11 @@ namespace ZenLib.Tests
     /// </summary>
     public class TestMapObject
     {
+        /// <summary>
+        /// A field.
+        /// </summary>
+        public bool Field { get; set; }
+
         /// <summary>
         /// Some edge variables.
         /// </summary>

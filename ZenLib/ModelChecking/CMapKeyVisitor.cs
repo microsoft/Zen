@@ -78,19 +78,40 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Visit an ArbitraryExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public override void Visit<T>(ZenArbitraryExpr<T> expression)
+        {
+            this.GetOrCreate(typeof(T));
+        }
+
+        /// <summary>
         /// Add a constant to the constants.
         /// </summary>
         /// <param name="constant">The constant.</param>
         private void AddConstant<TKey, TValue>(object constant)
         {
             var type = typeof(CMap<TKey, TValue>);
-            if (!this.Constants.TryGetValue(type, out var result))
+            var result = this.GetOrCreate(type);
+            result.Add(constant);
+        }
+
+        /// <summary>
+        /// Get or add the constants for a type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The set of constants.</returns>
+        internal ISet<object> GetOrCreate(Type type)
+        {
+            if (!this.Constants.TryGetValue(type, out var consts))
             {
-                result = new HashSet<object>();
-                this.Constants[type] = result;
+                consts = new HashSet<object>();
+                this.Constants.Add(type, consts);
             }
 
-            result.Add(constant);
+            return consts;
         }
     }
 
@@ -163,7 +184,7 @@ namespace ZenLib.ModelChecking
         /// <returns>No value.</returns>
         public override Unit VisitConstMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
-            var consts = this.GetOrCreate(mapType);
+            var consts = this.keyVisitor.GetOrCreate(mapType);
             dynamic value = parameter;
             foreach (var kv in value.Values)
             {
@@ -337,22 +358,6 @@ namespace ZenLib.ModelChecking
         public override Unit VisitUshort(object parameter)
         {
             return Unit.Instance;
-        }
-
-        /// <summary>
-        /// Get or add the constants for a type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The set of constants.</returns>
-        private ISet<object> GetOrCreate(Type type)
-        {
-            if (!this.keyVisitor.Constants.TryGetValue(type, out var consts))
-            {
-                consts = new HashSet<object>();
-                this.keyVisitor.Constants.Add(type, consts);
-            }
-
-            return consts;
         }
     }
 }

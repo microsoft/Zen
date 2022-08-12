@@ -1,4 +1,4 @@
-﻿// <copyright file="ModelChecker.cs" company="Microsoft">
+﻿// <copyright file="SymbolicEvaluationVisitor.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,7 +8,6 @@ namespace ZenLib.ModelChecking
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
-    using System.Numerics;
     using System.Reflection;
     using ZenLib.Solver;
 
@@ -197,7 +196,7 @@ namespace ZenLib.ModelChecking
             {
                 if (!this.mapConstants.TryGetValue(type, out var constants))
                 {
-                    throw new ZenException("Unsuppoted const map operation detected");
+                    throw new ZenException("Unsupported const map operation detected");
                 }
 
                 var valueType = type.GetGenericArgumentsCached()[1];
@@ -372,85 +371,6 @@ namespace ZenLib.ModelChecking
         {
             var visitor = new SymbolicConstantVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
             return visitor.Visit(typeof(T), expression.Value);
-
-            /* if (type == ReflectionUtilities.BigIntType)
-            {
-                var bi = this.Solver.CreateBigIntegerConst((BigInteger)(object)expression.Value);
-                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bi);
-            }
-            else if (type == ReflectionUtilities.RealType)
-            {
-                var bi = this.Solver.CreateRealConst((Real)(object)expression.Value);
-                return new SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bi);
-            }
-            else if (type == ReflectionUtilities.BoolType)
-            {
-                var b = (bool)(object)expression.Value ? this.Solver.True() : this.Solver.False();
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, b);
-            }
-            else if (type == ReflectionUtilities.ByteType)
-            {
-                var bv = this.Solver.CreateByteConst((byte)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.CharType)
-            {
-                var c = this.Solver.CreateCharConst((char)(object)expression.Value);
-                return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, c);
-            }
-            else if (type == ReflectionUtilities.ShortType)
-            {
-                var bv = this.Solver.CreateShortConst((short)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.UshortType)
-            {
-                var bv = this.Solver.CreateShortConst((short)(ushort)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.IntType)
-            {
-                var bv = this.Solver.CreateIntConst((int)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.UintType)
-            {
-                var bv = this.Solver.CreateIntConst((int)(uint)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.LongType)
-            {
-                var bv = this.Solver.CreateLongConst((long)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (type == ReflectionUtilities.UlongType)
-            {
-                var bv = this.Solver.CreateLongConst((long)(ulong)(object)expression.Value);
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else if (ReflectionUtilities.IsConstMapType(type))
-            {
-                var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-                dynamic constant = expression.Value;
-                foreach (var kv in constant.Values)
-                {
-                    result = result.SetItem(kv.Key, this.Visit(Zen.Constant(kv.Value), parameter));
-                }
-
-                return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
-            }
-            else if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var bv = this.Solver.CreateBitvecConst(((dynamic)expression.Value).GetBits());
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bv);
-            }
-            else
-            {
-                Contract.Assert(type == typeof(Seq<char>));
-                var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<char>)(object)expression.Value);
-                var s = this.Solver.CreateStringConst(escapedString);
-                return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, s);
-            } */
         }
 
         /// <summary>
