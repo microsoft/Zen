@@ -370,9 +370,10 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitConstant<T>(ZenConstantExpr<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var type = typeof(T);
+            var visitor = new SymbolicConstantVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
+            return visitor.Visit(typeof(T), expression.Value);
 
-            if (type == ReflectionUtilities.BigIntType)
+            /* if (type == ReflectionUtilities.BigIntType)
             {
                 var bi = this.Solver.CreateBigIntegerConst((BigInteger)(object)expression.Value);
                 return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, bi);
@@ -449,7 +450,7 @@ namespace ZenLib.ModelChecking
                 var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<char>)(object)expression.Value);
                 var s = this.Solver.CreateStringConst(escapedString);
                 return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, s);
-            }
+            } */
         }
 
         /// <summary>
@@ -660,6 +661,12 @@ namespace ZenLib.ModelChecking
             return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, listGroup);
         }
 
+        /// <summary>
+        /// Visit the expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListEmpty<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
@@ -718,6 +725,28 @@ namespace ZenLib.ModelChecking
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Merge two symbolic values in a list.
+        /// </summary>
+        /// <param name="listType">The list type.</param>
+        /// <param name="guard">The symbolic guard.</param>
+        /// <param name="v1">The first symbolic value.</param>
+        /// <param name="v2">The second symbolic value.</param>
+        /// <returns>The symbolic value resulting from the merge.</returns>
+        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
+            Type listType,
+            TBool guard,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v1,
+            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v2)
+        {
+            if (v2 == null)
+            {
+                return v1;
+            }
+
+            return this.mergeVisitor.Visit(listType, (guard, v1, v2));
         }
 
         /// <summary>
@@ -929,20 +958,6 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.SeqExpr, parameter);
             var v2 = (SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.IndexExpr, parameter);
             return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.SeqAt(v1.Value, v2.Value));
-        }
-
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            Type listType,
-            TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v1,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v2)
-        {
-            if (v2 == null)
-            {
-                return v1;
-            }
-
-            return this.mergeVisitor.Visit(listType, (guard, v1, v2));
         }
 
         /// <summary>

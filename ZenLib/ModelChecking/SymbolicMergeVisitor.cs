@@ -10,8 +10,9 @@ namespace ZenLib.ModelChecking
     using ZenLib.Solver;
 
     /// <summary>
-    /// A class to derive an equality expression for two
-    /// symbolic values of the same type.
+    /// A class to perform a join of two symbolic values with a guard.
+    /// The visitor takes a symbolic guard and two symbolic values and merges them into a new symbolic value.
+    /// The type visitor is used to keep track of the type of each the symbolic value.
     /// </summary>
     internal class SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> :
         TypeVisitor<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>,
@@ -138,16 +139,6 @@ namespace ZenLib.ModelChecking
             }
 
             return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
-
-            /* var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            foreach (var kv in v1.Value)
-            {
-                var x1 = kv.Value;
-                var x2 = v2.Value[kv.Key];
-                result = result.Add(kv.Key, this.Visit(valueType, (guard, x1, x2)));
-            }
-
-            return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result); */
         }
 
         /// <summary>
