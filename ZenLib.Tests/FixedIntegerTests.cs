@@ -661,6 +661,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test integer in if condition.
+        /// </summary>
+        [TestMethod]
+        public void TestIntegerInIf()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<UInt2>();
+            var e = Zen.If(b, x, new UInt2(0));
+            var solution = (e == new UInt2(1)).Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsTrue(solution.Get(b));
+            Assert.AreEqual(new UInt2(1), solution.Get(x));
+        }
+
+        /// <summary>
         /// Test that backends agree on semantics.
         /// </summary>
         [TestMethod]

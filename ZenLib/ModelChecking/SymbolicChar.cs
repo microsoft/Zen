@@ -29,21 +29,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Merge another symbolic value with respect to a guard.
-        /// </summary>
-        /// <param name="guard">The guard.</param>
-        /// <param name="other">The other symbolic value.</param>
-        /// <returns>A merged symbolic value.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
-        {
-            var o = (SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
-            var value = this.Solver.Ite(guard, this.Value, o.Value);
-            return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, value);
-        }
-
-        /// <summary>
         /// Accept a visitor.
         /// </summary>
         /// <param name="visitor">The visitor object.</param>

@@ -46,10 +46,19 @@ namespace ZenLib.ModelChecking
         public Dictionary<object, Dictionary<object, object>> ConstMapAssignment { get; private set; }
 
         /// <summary>
+        /// A visitor to perform merges.
+        /// </summary>
+        private SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> mergeVisitor;
+
+        /// <summary>
         /// The map constants for the ConstMap type.
         /// </summary>
         private Dictionary<Type, ISet<object>> mapConstants;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal}"/> class.
+        /// </summary>
+        /// <param name="solver">The solver.</param>
         public SymbolicEvaluationVisitor(ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver)
         {
             this.Solver = solver;
@@ -66,6 +75,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Compute<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
+            this.mergeVisitor = new SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
             var constantMapKeyVisitor = new CMapKeyVisitor(parameter.ArgumentsToExpr);
             this.mapConstants = constantMapKeyVisitor.Compute(expression);
             return this.Visit(expression, parameter);
@@ -494,7 +504,7 @@ namespace ZenLib.ModelChecking
             var v = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.GuardExpr, parameter);
             var vtrue = this.Visit(expression.TrueExpr, parameter);
             var vfalse = this.Visit(expression.FalseExpr, parameter);
-            return vtrue.Merge(v.Value, vfalse);
+            return this.mergeVisitor.Visit(typeof(T1), (v.Value, vtrue, vfalse));
         }
 
         /// <summary>
@@ -680,7 +690,7 @@ namespace ZenLib.ModelChecking
                 if (values.IsEmpty)
                 {
                     var r = this.Visit(expression.EmptyExpr, parameter);
-                    result = Merge(guard, r, result);
+                    result = Merge(typeof(TResult), guard, r, result);
                 }
                 else
                 {
@@ -703,7 +713,7 @@ namespace ZenLib.ModelChecking
 
                     // model check the resulting value using the computed values for the placeholders.
                     var r =  this.Visit(newExpression, newEnv);
-                    result = Merge(guard, r, result);
+                    result = Merge(typeof(TResult), guard, r, result);
                 }
             }
 
@@ -922,6 +932,7 @@ namespace ZenLib.ModelChecking
         }
 
         private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
+            Type listType,
             TBool guard,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v1,
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v2)
@@ -931,7 +942,7 @@ namespace ZenLib.ModelChecking
                 return v1;
             }
 
-            return v1.Merge(guard, v2);
+            return this.mergeVisitor.Visit(listType, (guard, v1, v2));
         }
 
         /// <summary>

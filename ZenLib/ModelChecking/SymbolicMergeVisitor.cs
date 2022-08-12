@@ -114,7 +114,32 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
             var v2 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item3;
 
+            var keys1 = new HashSet<object>(v1.Value.Keys);
+            var keys2 = new HashSet<object>(v2.Value.Keys);
+            keys1.UnionWith(keys2);
+            object deflt = null;
+
             var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
+            foreach (var key in keys1)
+            {
+                if (!v1.Value.TryGetValue(key, out var val1))
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
+                    val1 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
+                }
+
+                if (!v2.Value.TryGetValue(key, out var val2))
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
+                    val2 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
+                }
+
+                result = result.Add(key, this.Visit(valueType, (guard, val1, val2)));
+            }
+
+            return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
+
+            /* var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
             foreach (var kv in v1.Value)
             {
                 var x1 = kv.Value;
@@ -122,7 +147,7 @@ namespace ZenLib.ModelChecking
                 result = result.Add(kv.Key, this.Visit(valueType, (guard, x1, x2)));
             }
 
-            return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
+            return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result); */
         }
 
         /// <summary>

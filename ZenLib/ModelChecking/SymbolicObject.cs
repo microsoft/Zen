@@ -41,28 +41,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Merge another symbolic value with respect to a guard.
-        /// </summary>
-        /// <param name="guard">The guard.</param>
-        /// <param name="other">The other symbolic value.</param>
-        /// <returns>A merged symbolic value.</returns>
-        internal override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other)
-        {
-            var o = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)other;
-            var newValue = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            foreach (var kv in this.Fields)
-            {
-                var value1 = kv.Value;
-                var value2 = o.Fields[kv.Key];
-                newValue = newValue.Add(kv.Key, value1.Merge(guard, value2));
-            }
-
-            return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.ObjectType, this.Solver, newValue);
-        }
-
-        /// <summary>
         /// Accept a visitor.
         /// </summary>
         /// <param name="visitor">The visitor object.</param>

@@ -555,7 +555,7 @@ namespace ZenLib.Tests
         /// Test maps work in if conditions.
         /// </summary>
         [TestMethod]
-        public void TestCMapInIf()
+        public void TestCMapInIf1()
         {
             var b = Zen.Symbolic<bool>();
             var x = Zen.Symbolic<CMap<string, int>>();
@@ -563,8 +563,42 @@ namespace ZenLib.Tests
             var solution = expr.Solve();
 
             Assert.IsTrue(solution.IsSatisfiable());
-            Console.WriteLine(solution.Get(b));
-            Console.WriteLine(solution.Get(x));
+            Assert.IsTrue(solution.Get(b));
+            Assert.AreEqual(4, solution.Get(x).Get("a"));
+        }
+
+        /// <summary>
+        /// Test maps work in if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestCMapInIf2()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<CMap<string, int>>();
+            var expr = Zen.If(b, new CMap<string, int>().Set("a", 1).Set("b", 2), x.Set("c", 3)).Get("a") == 4;
+            var solution = expr.Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsFalse(solution.Get(b));
+            Assert.AreEqual(4, solution.Get(x).Get("a"));
+        }
+
+        /// <summary>
+        /// Test maps work in if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestCMapInIf3()
+        {
+            var b = Zen.Symbolic<bool>();
+            var x = Zen.Symbolic<CMap<string, TestHelper.Object2>>();
+            var o1 = new TestHelper.Object2 { Field1 = 1, Field2 = 2 };
+            var o2 = new TestHelper.Object2 { Field1 = 3, Field2 = 4 };
+            var expr = Zen.If(b, x.Set("c", o1), new CMap<string, TestHelper.Object2>().Set("a", o2).Set("b", o2)).Get("a").GetField<Object2, int>("Field1") == 1;
+            var solution = expr.Solve();
+
+            Assert.IsTrue(solution.IsSatisfiable());
+            Assert.IsTrue(solution.Get(b));
+            Assert.AreEqual(1, solution.Get(x).Get("a").Field1);
         }
     }
 

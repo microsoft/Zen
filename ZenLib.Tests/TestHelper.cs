@@ -436,17 +436,33 @@ namespace ZenLib.Tests
         /// <summary>
         /// An object with two fields.
         /// </summary>
-        internal class Object2 : IEquatable<Object2>
+        public class Object2 : IEquatable<Object2>
         {
+            /// <summary>
+            /// Field 1.
+            /// </summary>
             public int Field1 { get; set; }
 
+            /// <summary>
+            /// Field 2.
+            /// </summary>
             public int Field2;
 
+            /// <summary>
+            /// Equality.
+            /// </summary>
+            /// <param name="obj"></param>
+            /// <returns></returns>
             public override bool Equals(object obj)
             {
                 return Equals(obj as Object2);
             }
 
+            /// <summary>
+            /// Equality.
+            /// </summary>
+            /// <param name="other"></param>
+            /// <returns></returns>
             public bool Equals(Object2 other)
             {
                 return other is not null &&
@@ -454,6 +470,10 @@ namespace ZenLib.Tests
                        Field2 == other.Field2;
             }
 
+            /// <summary>
+            /// Hash code.
+            /// </summary>
+            /// <returns></returns>
             public override int GetHashCode()
             {
                 return HashCode.Combine(Field1, Field2);

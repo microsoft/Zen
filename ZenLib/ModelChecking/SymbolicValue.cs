@@ -26,16 +26,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Merge another symbolic value with respect to a guard.
-        /// </summary>
-        /// <param name="guard">The guard.</param>
-        /// <param name="other">The other symbolic value.</param>
-        /// <returns>A merged symbolic value.</returns>
-        internal abstract SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> other);
-
-        /// <summary>
         /// Accept a visitor.
         /// </summary>
         /// <param name="visitor">The visitor object.</param>
