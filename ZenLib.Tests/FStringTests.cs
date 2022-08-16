@@ -343,10 +343,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestPrefixImpliesContains()
         {
-            var f = new ZenFunction<FString, FString, bool>(
-                (fs1, fs2) => Implies(fs2.StartsWith(fs1), fs2.Contains(fs1)));
-
-            var ex = f.Find((fs1, fs2, b) => Not(b));
+            var ex = Zen.Find<FString, FString>((fs1, fs2) => Zen.Not(Implies(fs2.StartsWith(fs1), fs2.Contains(fs1))));
             Assert.IsFalse(ex.HasValue);
         }
 
@@ -395,10 +392,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestConcatContains()
         {
-            var f = new ZenFunction<FString, FString, FString, bool>(
-                (fs1, fs2, fs3) => Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3)));
-
-            var ex = f.Find((fs1, fs2, fs3, b) => Not(b), depth: 4, exhaustiveDepth: true);
+            var ex = Zen.Find<FString, FString, FString>(
+                (fs1, fs2, fs3) => Zen.Not(Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3))), depth: 4, exhaustiveDepth: true);
             Assert.IsFalse(ex.HasValue);
         }
     }

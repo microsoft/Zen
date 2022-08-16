@@ -345,12 +345,26 @@ namespace ZenLib
             return Arbitrary<T>(generator, name, depth, exhaustiveDepth);
         }
 
+        /// <summary>
+        /// A Zen object representing some arbitrary value.
+        /// </summary>
+        /// <param name="generator">The generator.</param>
+        /// <param name="name">An optional name of the expression.</param>
+        /// <param name="depth">Depth bound on the size of the object.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
+        /// <returns></returns>
         internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
         {
             var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)), ExhaustiveDepth = exhaustiveDepth };
             return (Zen<T>)generator.Visit(typeof(T), parameter);
         }
 
+        /// <summary>
+        /// Get a name for a given type.
+        /// </summary>
+        /// <param name="name">The base name.</param>
+        /// <param name="type">The type of the expression assocaited with the name.</param>
+        /// <returns>A descriptive name with the type attached.</returns>
         [ExcludeFromCodeCoverage]
         internal static string GetName(string name, Type type)
         {
@@ -1614,6 +1628,94 @@ namespace ZenLib
             var zf = new ZenFunction<T1, T2, T3, T4, T5>(f);
             zf.Compile();
             return zf.Evaluate;
+        }
+
+        /// <summary>
+        /// Find an input satisfying the invariant.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input">The input.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public static Option<T1> Find<T1>(
+            Func<Zen<T1>, Zen<bool>> invariant,
+            Zen<T1> input = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return Zen.Constraint<T1>(invariant).Find(input, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Find an input satisfying the invariant.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public static Option<(T1, T2)> Find<T1, T2>(
+            Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Find an input satisfying the invariant.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <param name="input3">The third input.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, exhaustiveDepth, backend);
+        }
+
+        /// <summary>
+        /// Find an input satisfying the invariant.
+        /// </summary>
+        /// <param name="invariant">The invariant.</param>
+        /// <param name="input1">The first input.</param>
+        /// <param name="input2">The second input.</param>
+        /// <param name="input3">The third input.</param>
+        /// <param name="input4">The fourth input.</param>
+        /// <param name="depth">The maximum depth of elements to consider in an input.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
+        /// <param name="backend">The backend.</param>
+        /// <returns>An input if one exists satisfying the constraints.</returns>
+        public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
+            Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> invariant,
+            Zen<T1> input1 = null,
+            Zen<T2> input2 = null,
+            Zen<T3> input3 = null,
+            Zen<T4> input4 = null,
+            int depth = 5,
+            bool exhaustiveDepth = true,
+            Backend backend = Backend.Z3)
+        {
+            return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, exhaustiveDepth, backend);
         }
 
         /// <summary>

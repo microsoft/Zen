@@ -25,8 +25,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestNegatives()
         {
-            var f = new ZenFunction<short, bool>(x => -2 > -1);
-            var result = f.Find((i, o) => o, backend: Backend.DecisionDiagrams);
+            var result = Zen.Find<short>(x => -2 > -1, backend: Backend.DecisionDiagrams);
             Assert.IsFalse(result.HasValue);
         }
 

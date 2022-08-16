@@ -42,17 +42,17 @@ namespace ZenLib
         /// Find all inputs that solve the constraint.
         /// </summary>
         /// <param name="input">Default input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T> FindAll(
             Zen<T> input = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return this.FindAll((i, o) => o, input, listSize, checkSmallerLists, backend);
+            return this.FindAll((i, o) => o, input, depth, exhaustiveDepth, backend);
         }
 
         /// <summary>
@@ -102,18 +102,18 @@ namespace ZenLib
         /// </summary>
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> FindAll(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return this.FindAll((i1, i2, o) => o, input1, input2, listSize, checkSmallerLists, backend);
+            return this.FindAll((i1, i2, o) => o, input1, input2, depth, exhaustiveDepth, backend);
         }
 
         /// <summary>
@@ -166,19 +166,19 @@ namespace ZenLib
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> FindAll(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return this.FindAll((i1, i2, i3, o) => o, input1, input2, input3, listSize, checkSmallerLists, backend);
+            return this.FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, exhaustiveDepth, backend);
         }
 
         /// <summary>
@@ -211,8 +211,8 @@ namespace ZenLib
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="input4">Fourth input that captures structural constraints.</param>
-        /// <param name="listSize">The maximum number of elements to consider in an input list.</param>
-        /// <param name="checkSmallerLists">Whether to check smaller list sizes as well.</param>
+        /// <param name="depth">The maximum depth of elements to consider.</param>
+        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3, T4)> Find(
@@ -220,11 +220,11 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int listSize = 5,
-            bool checkSmallerLists = true,
+            int depth = 5,
+            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return this.Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, listSize, checkSmallerLists, backend);
+            return this.Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, exhaustiveDepth, backend);
         }
 
         /// <summary>

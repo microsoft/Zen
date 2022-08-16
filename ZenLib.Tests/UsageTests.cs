@@ -1447,6 +1447,15 @@ namespace ZenLib.Tests
         /// Pass explicit input.
         /// </summary>
         [TestMethod]
+        public void TestInvalidSymbolicInputs5()
+        {
+            Zen.Find<int, int, int, int>((i1, i2, i3, i4) => true, Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
+        }
+
+        /// <summary>
+        /// Pass explicit input.
+        /// </summary>
+        [TestMethod]
         public void TestExactSeqs()
         {
             var f = new ZenFunction<FSeq<int>, ushort>(l => l.Length());
