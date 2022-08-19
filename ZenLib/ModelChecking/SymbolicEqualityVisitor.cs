@@ -162,30 +162,41 @@ namespace ZenLib.ModelChecking
         /// <returns>The result.</returns>
         public override TBool VisitList(Type listType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
-            var v1 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
-            var v2 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
+            var v1 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
+            var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
 
-            var result = this.solver.False();
-            foreach (var kv in v1.GuardedListGroup.Mapping)
+            var result = this.solver.True();
+            object deflt = null;
+
+            for (int i = 0; i < Math.Max(v1.Value.Count, v2.Value.Count); i++)
             {
-                var groupList1 = kv.Value;
-                if (!v2.GuardedListGroup.Mapping.TryGetValue(kv.Key, out var groupList2))
+                (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt1;
+                (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt2;
+
+                if (i < v1.Value.Count)
                 {
-                    continue;
+                    elt1 = v1.Value[i];
+                }
+                else
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
+                    elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                Contract.Assert(groupList1.Values.Count == groupList2.Values.Count);
-                var areEq = this.solver.And(groupList1.Guard, groupList2.Guard);
-
-                for (int i = 0; i < groupList1.Values.Count; i++)
+                if (i >= v2.Value.Count)
                 {
-                    var elt1 = groupList1.Values[i];
-                    var elt2 = groupList2.Values[i];
-                    var eq = this.Visit(innerType, (elt1, elt2));
-                    areEq = this.solver.And(areEq, eq);
+                    elt2 = v2.Value[i];
+                }
+                else
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
+                    elt2 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                result = this.solver.Or(result, areEq);
+                var eqEnabled = this.solver.Iff(elt1.Item1, elt2.Item1);
+                var eqValues = this.Visit(innerType, (elt1.Item2, elt2.Item2));
+                var eqElements = this.solver.And(eqEnabled, eqValues);
+                result = this.solver.And(result, eqElements);
             }
 
             return result;

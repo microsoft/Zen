@@ -566,19 +566,10 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListAdd<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var v = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.Expr, parameter);
+            var v = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.Expr, parameter);
             var elt = this.Visit(expression.ElementExpr, parameter);
-
-            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            foreach (var kv in v.GuardedListGroup.Mapping)
-            {
-                var guard = kv.Value.Guard;
-                var values = kv.Value.Values.Insert(0, elt);
-                mapping = mapping.Add(kv.Key + 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(guard, values));
-            }
-
-            var listGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(mapping);
-            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, listGroup);
+            var newList = v.Value.Add((this.Solver.True(), elt));
+            return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, newList);
         }
 
         /// <summary>
@@ -589,11 +580,8 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListEmpty<T1>(ZenListEmptyExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var mapping = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            var list = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            mapping = mapping.Add(0, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver.True(), list));
-            var guardedListGroup = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(mapping);
-            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, guardedListGroup);
+            var list = ImmutableList<(TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)>.Empty;
+            return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, list);
         }
 
         /// <summary>
@@ -604,69 +592,35 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var list = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ListExpr, parameter);
+            var list = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ListExpr, parameter);
 
             SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> result = null;
 
-            foreach (var kv in list.GuardedListGroup.Mapping)
+            // if the list is empty, evaluate the empty case.
+            if (list.Value.Count == 0)
             {
-                var length = kv.Key;
-                var guard = kv.Value.Guard;
-                var values = kv.Value.Values;
-
-                if (values.IsEmpty)
-                {
-                    var r = this.Visit(expression.EmptyExpr, parameter);
-                    result = Merge(typeof(TResult), guard, r, result);
-                }
-                else
-                {
-                    // split the symbolic list
-                    var (hd, tl) = CommonUtilities.SplitHeadHelper(values);
-                    var tlImmutable = (ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>)tl;
-
-                    // push the guard into the tail of the list
-                    var map = ImmutableDictionary<int, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-                    map = map.Add(length - 1, new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver.True(), tlImmutable));
-                    var group = new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(map);
-                    var rest = new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, group);
-
-                    // execute the cons case with placeholder values to get a new Zen value.
-                    var arg1 = new ZenArgumentExpr<TList>();
-                    var arg2 = new ZenArgumentExpr<FSeq<TList>>();
-                    var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd).Add(arg2.ArgumentId, rest);
-                    var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
-                    var newExpression = expression.ConsCase(arg1, arg2);
-
-                    // model check the resulting value using the computed values for the placeholders.
-                    var r =  this.Visit(newExpression, newEnv);
-                    result = Merge(typeof(TResult), guard, r, result);
-                }
+                return this.Visit(expression.EmptyExpr, parameter);
             }
+
+            // split the symbolic list
+            var (hd, tl) = CommonUtilities.SplitHeadHelper(list.Value);
+
+            // get the symbolic value for the tail.
+            var rest = new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, tl);
+
+            // there are two cases: either the hd has an element or it doesn't.
+
+            // execute the cons case with placeholder values to get a new Zen value.
+            var arg1 = new ZenArgumentExpr<TList>();
+            var arg2 = new ZenArgumentExpr<FSeq<TList>>();
+            var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd.Item2).Add(arg2.ArgumentId, rest);
+            var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
+            var newExpression = expression.ConsCase(arg1, arg2);
+
+            // model check the resulting value using the computed values for the placeholders.
+            var r = this.Visit(newExpression, newEnv);
 
             return result;
-        }
-
-        /// <summary>
-        /// Merge two symbolic values in a list.
-        /// </summary>
-        /// <param name="listType">The list type.</param>
-        /// <param name="guard">The symbolic guard.</param>
-        /// <param name="v1">The first symbolic value.</param>
-        /// <param name="v2">The second symbolic value.</param>
-        /// <returns>The symbolic value resulting from the merge.</returns>
-        private SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            Type listType,
-            TBool guard,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v1,
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v2)
-        {
-            if (v2 == null)
-            {
-                return v1;
-            }
-
-            return this.mergeVisitor.Visit(listType, (guard, v1, v2));
         }
 
         /// <summary>

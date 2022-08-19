@@ -172,77 +172,43 @@ namespace ZenLib.ModelChecking
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitList(Type listType, Type innerType, (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var guard = parameter.Item1;
-            var v1 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
-            var v2 = (SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item3;
-            var result = Merge(innerType, guard, v1.GuardedListGroup, v2.GuardedListGroup);
-            return new SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
-        }
+            var v1 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
+            var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item3;
 
-        /// <summary>
-        /// Merge two groups of guarded lists together.
-        /// </summary>
-        /// <param name="elementType">The element type.</param>
-        /// <param name="guard">The guard.</param>
-        /// <param name="lists1">The first lists.</param>
-        /// <param name="lists2">The second lists.</param>
-        /// <returns>A new guarded group of lists.</returns>
-        private GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            Type elementType,
-            TBool guard,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> lists1,
-            GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> lists2)
-        {
-            var result = CommonUtilities.Merge(lists1.Mapping, lists2.Mapping, (len, list1, list2) =>
+            var result = ImmutableList<(TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)>.Empty;
+            object deflt = null;
+
+            for (int i = 0; i < Math.Max(v1.Value.Count, v2.Value.Count); i++)
             {
-                if (list1.HasValue && !list2.HasValue)
+                (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt1;
+                (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt2;
+
+                if (i < v1.Value.Count)
                 {
-                    var newList = MapGuard(guard, list1.Value);
-                    return Option.Some(newList);
+                    elt1 = v1.Value[i];
+                }
+                else
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
+                    elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                if (!list1.HasValue && list2.HasValue)
+                if (i >= v2.Value.Count)
                 {
-                    var newList = MapGuard(this.solver.Not(guard), list2.Value);
-                    return Option.Some(newList);
+                    elt2 = v2.Value[i];
+                }
+                else
+                {
+                    deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
+                    elt2 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                var merged = Merge(elementType, guard, list1.Value, list2.Value);
-
-                /* if (merged.Guard.Equals(this.Solver.False()))
-                {
-                    return Option.None<GuardedList<TModel, TVar, TBool, TInt, TSeq, TArray, TChar, TReal>>();
-                } */
-
-                return Option.Some(merged);
-            });
-
-            return new GuardedListGroup<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(result);
-        }
-
-        /// <summary>
-        /// Merge two guarded lists together.
-        /// </summary>
-        /// <param name="elementType">The element type.</param>
-        /// <param name="guard">The guard.</param>
-        /// <param name="list1">The first list.</param>
-        /// <param name="list2">The second list.</param>
-        /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Merge(
-            Type elementType,
-            TBool guard,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list1,
-            GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list2)
-        {
-            var newGuard = this.solver.Ite(guard, list1.Guard, list2.Guard);
-            var newValues = ImmutableList<SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-            for (int i = 0; i < list1.Values.Count; i++)
-            {
-                var v1 = list1.Values[i];
-                var v2 = list2.Values[i];
-                newValues = newValues.Add(this.Visit(elementType, (guard, v1, v2)));
+                var enabled = this.solver.Ite(guard, elt1.Item1, elt2.Item1);
+                var value = this.Visit(innerType, (guard, elt1.Item2, elt2.Item2));
+                result = result.Add((enabled, value));
             }
 
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(newGuard, newValues);
+            return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
         }
 
         /// <summary>
