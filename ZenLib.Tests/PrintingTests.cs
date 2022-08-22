@@ -188,7 +188,7 @@ namespace ZenLib.Tests
             Console.WriteLine(Zen.Symbolic<FSeq<int>>("x").Format());
 
             var l = Zen.Symbolic<FSeq<byte>>(depth: 3, exhaustiveDepth: false);
-            Console.WriteLine(l.Sort().Format());
+            Console.WriteLine(l.Select(x => x + 1).Format());
         }
 
         /// <summary>

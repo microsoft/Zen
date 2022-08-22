@@ -24,7 +24,7 @@ namespace ZenLib.Tests
         /// Test that converting a sequence to and from an array works.
         /// </summary>
         [TestMethod]
-        public void TestSeqToArray()
+        public void TestFSeqToArray()
         {
             var a1 = new int[] { 1, 2, 3, 4 };
             var s = FSeq.FromRange(a1);
@@ -35,6 +35,240 @@ namespace ZenLib.Tests
             {
                 Assert.AreEqual(a1[i], a2[i]);
             }
+        }
+
+        /// <summary>
+        /// Test FSeq append.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAppendEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>, FSeq<int>>((l1, l2) => l1.Append(l2));
+            Assert.AreEqual(new FSeq<int>(1, 2, 3, 4), zf.Evaluate(new FSeq<int>(1, 2), new FSeq<int>(3, 4)));
+            Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), new FSeq<int>()));
+            Assert.AreEqual(new FSeq<int>(3, 4), zf.Evaluate(new FSeq<int>(), new FSeq<int>(3, 4)));
+        }
+
+        /// <summary>
+        /// Test FSeq length.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqLengthEval()
+        {
+            var zf = Zen.Function<FSeq<int>, ushort>(l => l.Length());
+            Assert.AreEqual(2, zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1)));
+            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>()));
+        }
+
+        /// <summary>
+        /// Test FSeq select.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqSelectEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.Select(x => x + 1));
+            Assert.AreEqual(new FSeq<int>(2, 3), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1)));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>()));
+        }
+
+        /// <summary>
+        /// Test FSeq where.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqWhereEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.Where(x => x > 2));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(new FSeq<int>(3), zf.Evaluate(new FSeq<int>(2, 3)));
+            Assert.AreEqual(new FSeq<int>(3, 4), zf.Evaluate(new FSeq<int>(3, 4)));
+        }
+
+        /// <summary>
+        /// Test FSeq isempty.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqIsEmptyEval()
+        {
+            var zf = Zen.Function<FSeq<int>, bool>(l => l.IsEmpty());
+            Assert.AreEqual(false, zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(false, zf.Evaluate(new FSeq<int>(2)));
+            Assert.AreEqual(true, zf.Evaluate(new FSeq<int>()));
+        }
+
+        /// <summary>
+        /// Test FSeq contains.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqContainsEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int, bool>((l, x) => l.Contains(x));
+            Assert.AreEqual(true, zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(true, zf.Evaluate(new FSeq<int>(1, 2), 2));
+            Assert.AreEqual(false, zf.Evaluate(new FSeq<int>(1, 2), 0));
+        }
+
+        /// <summary>
+        /// Test FSeq reverse.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqReverseEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.Reverse());
+            Assert.AreEqual(new FSeq<int>(2, 1), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(new FSeq<int>(1), zf.Evaluate(new FSeq<int>(1)));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>()));
+        }
+
+        /// <summary>
+        /// Test FSeq removeall.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqRemoveAllEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int, FSeq<int>>((l, x) => l.RemoveAll(x));
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(new FSeq<int>(1), zf.Evaluate(new FSeq<int>(1, 2), 2));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 1, 1), 1));
+            Assert.AreEqual(new FSeq<int>(1, 2, 1), zf.Evaluate(new FSeq<int>(1, 2, 1), 3));
+        }
+
+        /// <summary>
+        /// Test FSeq removeall.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAddBackEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int, FSeq<int>>((l, x) => l.AddBack(x));
+            Assert.AreEqual(new FSeq<int>(1, 2, 1), zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(), 2));
+            Assert.AreEqual(new FSeq<int>(1, 3), zf.Evaluate(new FSeq<int>(1), 3));
+        }
+
+        /// <summary>
+        /// Test FSeq find.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqFindEval()
+        {
+            var zf = Zen.Function<FSeq<int>, Option<int>>(l => l.Find(x => x == 4));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(new FSeq<int>()));
+            Assert.AreEqual(Option.Some(4), zf.Evaluate(new FSeq<int>(1, 4)));
+        }
+
+        /// <summary>
+        /// Test FSeq head.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqHeadEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int>(l => l.Head());
+            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>()));
+            Assert.AreEqual(3, zf.Evaluate(new FSeq<int>(3, 4, 5)));
+        }
+
+        /// <summary>
+        /// Test FSeq tail.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqTailEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.Tail());
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>()));
+            Assert.AreEqual(new FSeq<int>(4, 5), zf.Evaluate(new FSeq<int>(3, 4, 5)));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(3)));
+        }
+
+        /// <summary>
+        /// Test FSeq indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqIndexOfEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int, short>((l, x) => l.IndexOf(x));
+            Assert.AreEqual(-1, zf.Evaluate(new FSeq<int>(1, 2), 3));
+            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2), 2));
+        }
+
+        /// <summary>
+        /// Test FSeq duplicates.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqDuplicatesEval()
+        {
+            var zf = Zen.Function<FSeq<int>, int, ushort>((l, x) => l.Duplicates(x));
+            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>(1, 2), 3));
+            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(2, zf.Evaluate(new FSeq<int>(1, 2, 1), 1));
+        }
+
+        /// <summary>
+        /// Test FSeq take.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqTakeEval()
+        {
+            var zf = Zen.Function<FSeq<int>, ushort, FSeq<int>>((l, x) => l.Take(x));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 2), 0));
+            Assert.AreEqual(new FSeq<int>(1), zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(new FSeq<int>(1, 1), zf.Evaluate(new FSeq<int>(1, 1, 2), 2));
+            Assert.AreEqual(new FSeq<int>(1, 1, 2), zf.Evaluate(new FSeq<int>(1, 1, 2), 3));
+            Assert.AreEqual(new FSeq<int>(1, 1, 2), zf.Evaluate(new FSeq<int>(1, 1, 2), 4));
+        }
+
+        /// <summary>
+        /// Test FSeq takewhile.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqTakeWhileEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.TakeWhile(x => x <= 2));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(3, 4)));
+            Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2, 3)));
+            Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2)));
+        }
+
+        /// <summary>
+        /// Test FSeq drop.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqDropEval()
+        {
+            var zf = Zen.Function<FSeq<int>, ushort, FSeq<int>>((l, x) => l.Drop(x));
+            Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), 0));
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 1, 2), 2));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 1, 2), 3));
+            Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 1, 2), 4));
+        }
+
+        /// <summary>
+        /// Test FSeq at.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAtEval()
+        {
+            var zf = Zen.Function<FSeq<int>, ushort, Option<int>>((l, x) => l.At(x));
+            Assert.AreEqual(Option.Some(1), zf.Evaluate(new FSeq<int>(1, 2), 0));
+            Assert.AreEqual(Option.Some(2), zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(new FSeq<int>(1, 2), 2));
+        }
+
+        /// <summary>
+        /// Test FSeq set.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqSetEval()
+        {
+            var zf = Zen.Function<FSeq<int>, ushort, int, FSeq<int>>((l, x, y) => l.Set(x, y));
+            Assert.AreEqual(new FSeq<int>(3, 2), zf.Evaluate(new FSeq<int>(1, 2), 0, 3));
+            Assert.AreEqual(new FSeq<int>(1, 3), zf.Evaluate(new FSeq<int>(1, 2), 1, 3));
+            Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), 2, 3));
         }
 
         /// <summary>
@@ -127,7 +361,7 @@ namespace ZenLib.Tests
         public void TestSeqIndexOf()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x).IsSome())));
+                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x) >= 0)));
         }
 
         /// <summary>
@@ -178,39 +412,12 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq sort.
-        /// </summary>
-        [TestMethod]
-        public void TestSeqSort()
-        {
-            CheckAgreement<FSeq<int>>(l => l.Sort().IsSorted(), bddListSize: 1);
-        }
-
-        /// <summary>
         /// Test Seq reverse.
         /// </summary>
         [TestMethod]
         public void TestSeqReverse()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Reverse().Contains(x)));
-        }
-
-        /// <summary>
-        /// Test Seq intersperse.
-        /// </summary>
-        [TestMethod]
-        public void TestSeqIntersperse()
-        {
-            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Intersperse(Constant<int>(x)).Contains(3)));
-        }
-
-        /// <summary>
-        /// Test Seq split at.
-        /// </summary>
-        [TestMethod]
-        public void TestSeqSplitAt()
-        {
-            CheckAgreement<FSeq<int>>(l => l.SplitAt(2).Item1().Length() == 1);
         }
 
         /// <summary>
@@ -238,7 +445,7 @@ namespace ZenLib.Tests
         public void TestSeqRemoveFirstCount()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(
-                l => Implies(l.Contains(x), l.RemoveFirst(x).Duplicates(x) != l.Duplicates(x))));
+                l => Implies(l.Contains(x), l.RemoveAll(x).Duplicates(x) != l.Duplicates(x))));
         }
 
         /// <summary>
