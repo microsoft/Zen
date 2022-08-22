@@ -87,17 +87,6 @@ namespace ZenLib.Tests
         /// Test symbolic execution for lists.
         /// </summary>
         [TestMethod]
-        public void TestSymbolicExecutionListSorting()
-        {
-            var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Sort());
-            Assert.AreEqual(6, f.GenerateInputs(depth: 3, exhaustiveDepth: false).Count());
-            Assert.AreEqual(10, f.GenerateInputs(depth: 3, exhaustiveDepth: true).Count());
-        }
-
-        /// <summary>
-        /// Test symbolic execution for lists.
-        /// </summary>
-        [TestMethod]
         public void TestSymbolicExecutionListFilter()
         {
             var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
@@ -275,9 +264,9 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionPrecondition()
         {
-            var f = new ZenFunction<FSeq<byte>, bool>(l => l.IsSorted());
+            var f = new ZenFunction<FSeq<byte>, bool>(l => l.Contains(3));
             var f1 = new ZenFunction<FSeq<byte>, bool>(l1 => l1.Contains(2));
-            Assert.IsTrue(f1.GenerateInputs(precondition: l => l.IsSorted()).All(i => f.Evaluate(i)));
+            Assert.IsTrue(f1.GenerateInputs(precondition: l => l.Contains(3)).All(i => f.Evaluate(i)));
         }
 
         /// <summary>

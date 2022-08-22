@@ -211,7 +211,7 @@ namespace ZenLib.Tests
         public void TestEvaluateList()
         {
             var a = Arbitrary<FSeq<int>>();
-            var expr = a.Sort();
+            var expr = a.Contains(3);
 
             var assignment = new Dictionary<object, object>
             {
@@ -220,10 +220,7 @@ namespace ZenLib.Tests
 
             var l = expr.Evaluate(assignment);
 
-            Assert.AreEqual(3, l.Values.Count);
-            Assert.AreEqual(1, l.Values[0]);
-            Assert.AreEqual(2, l.Values[1]);
-            Assert.AreEqual(3, l.Values[2]);
+            Assert.IsTrue(l);
         }
 
         /// <summary>
@@ -301,7 +298,7 @@ namespace ZenLib.Tests
         public void TestEvaluateWrongTypes3()
         {
             var a = Arbitrary<FSeq<int>>();
-            var expr = a.Sort();
+            var expr = a.Select(x => x + 1);
 
             var assignment = new Dictionary<object, object>
             {
