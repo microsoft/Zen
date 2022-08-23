@@ -84,7 +84,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestEmptyString()
         {
-            CheckValid<FString>(fs => (fs.Length() == 0) == (fs == new FString("")));
+            // CheckValid<FString>(fs => (fs.Length() == 0) == (fs == new FString("")));
             CheckValid<FString>(fs => (fs == new FString("")) == fs.IsEmpty());
         }
 
@@ -239,40 +239,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test string indexof.
-        /// </summary>
-        [TestMethod]
-        [DataRow("abc", "bc", 0, 1)]
-        [DataRow("abc", "a", 0, 0)]
-        [DataRow("abc", "d", 0, -1)]
-        [DataRow("hello", "ll", 1, 2)]
-        [DataRow("lllll", "l", 1, 1)]
-        [DataRow("abcde", "ab", 3, -1)]
-        public void TestIndexOf(string s, string sub, int offset, int expected)
-        {
-            var f = new ZenFunction<FString, Option<ushort>>(fs => fs.IndexOf(new FString(sub), (ushort)offset));
-            var idx = f.Evaluate(s);
-            var actual = idx.HasValue ? (int)idx.Value : -1;
-            Assert.AreEqual(expected, actual);
-        }
-
-        /// <summary>
-        /// Test string indexof.
-        /// </summary>
-        [TestMethod]
-        public void TestIndexOfRandom()
-        {
-            RandomStrings(s =>
-            {
-                var f = new ZenFunction<FString, Option<ushort>>(fs => fs.IndexOf(new FString(s)));
-                var ex = f.Find((fs, i) => i.IsSome()).Value.ToString();
-                var idx = f.Evaluate(ex);
-                Assert.IsTrue(ex.Contains(s));
-                Assert.AreEqual(idx.Value, ex.IndexOf(s, StringComparison.Ordinal));
-            });
-        }
-
-        /// <summary>
         /// Test string substring.
         /// </summary>
         [TestMethod]
@@ -377,23 +343,10 @@ namespace ZenLib.Tests
         /// Test index of not null implies contains.
         /// </summary>
         [TestMethod]
-        public void TestIndexOfImpliesContains()
-        {
-            var f = new ZenFunction<FString, FString, bool>(
-                (fs1, fs2) => Implies(fs1.Contains(fs2), fs1.IndexOf(fs2).IsSome()));
-
-            var ex = f.Find((fs1, fs2, b) => Not(b));
-            Assert.IsFalse(ex.HasValue);
-        }
-
-        /// <summary>
-        /// Test index of not null implies contains.
-        /// </summary>
-        [TestMethod]
         public void TestConcatContains()
         {
             var ex = Zen.Find<FString, FString, FString>(
-                (fs1, fs2, fs3) => Zen.Not(Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3))), depth: 4, exhaustiveDepth: true);
+                (fs1, fs2, fs3) => Zen.Not(Implies(fs1.Contains(fs3), fs1.Concat(fs2).Contains(fs3))), depth: 4);
             Assert.IsFalse(ex.HasValue);
         }
     }

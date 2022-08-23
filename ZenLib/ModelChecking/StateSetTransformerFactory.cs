@@ -47,14 +47,14 @@ namespace ZenLib.ModelChecking
         {
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputVisitor();
-            var input = Zen.Arbitrary<T1>(generator, depth: 0, exhaustiveDepth: false);
+            var input = Zen.Arbitrary<T1>(generator, depth: 0);
             var arbitrariesForInput = generator.ArbitraryExpressions;
 
             var expression = function(input);
 
             // create an arbitrary output value
             generator = new SymbolicInputVisitor();
-            var output = Zen.Arbitrary<T2>(generator, depth: 0, exhaustiveDepth: false);
+            var output = Zen.Arbitrary<T2>(generator, depth: 0);
             var arbitrariesForOutput = generator.ArbitraryExpressions;
 
             // create an expression relating input and output.
@@ -185,7 +185,7 @@ namespace ZenLib.ModelChecking
         {
             // create an arbitrary input and invoke the function
             var generator = new SymbolicInputVisitor();
-            var input = Zen.Arbitrary<T>(generator, depth: 0, exhaustiveDepth: false);
+            var input = Zen.Arbitrary<T>(generator, depth: 0);
             var arbitrariesForInput = generator.ArbitraryExpressions;
 
             var expression = function(input);

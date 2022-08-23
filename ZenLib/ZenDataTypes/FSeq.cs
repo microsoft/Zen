@@ -313,6 +313,28 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Match and deconstruct a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">The sequence expression.</param>
+        /// <param name="empty">The empty case.</param>
+        /// <param name="cons">The cons case.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<TResult> CaseStrict<T, TResult>(
+            this Zen<FSeq<T>> seqExpr,
+            Zen<TResult> empty,
+            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(empty);
+            Contract.AssertNotNull(cons);
+
+            return seqExpr.Case(empty, (hd, tl) =>
+            {
+                return If(hd.IsSome(), cons(hd.Value(), tl), tl.CaseStrict(empty, cons));
+            });
+        }
+
+        /// <summary>
         /// Find an element that satisfies a predicate.
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
@@ -323,7 +345,9 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(predicate);
 
-            return seqExpr.Fold(Option.Null<T>(), (x, acc) => If(predicate(x), Option.Create(x), acc));
+            return seqExpr.Case(
+                empty: Option.Null<T>(),
+                cons: (hd, tl) => If(And(hd.IsSome(), predicate(hd.Value())), hd, tl.Find(predicate)));
         }
 
         /// <summary>
@@ -359,7 +383,9 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            return seqExpr.Fold(Constant<ushort>(0), (x, acc) => acc + 1);
+            return seqExpr.Case(
+                empty: Constant<ushort>(0),
+                cons: (hd, tl) => tl.Length() + If<ushort>(hd.IsSome(), 1, 0));
         }
 
         /// <summary>
@@ -401,7 +427,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            return seqExpr.Case(empty: True(), (hd, tl) => False());
+            return seqExpr.Case(empty: True(), (hd, tl) => And(hd.IsNone(), tl.IsEmpty()));
         }
 
         /// <summary>
@@ -468,7 +494,9 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(valueExpr);
 
-            return seqExpr.Fold(Constant<ushort>(0), (x, acc) => If(x == valueExpr, acc + 1, acc));
+            return seqExpr.Case(
+                empty: Constant<ushort>(0),
+                cons: (hd, tl) => tl.Duplicates(valueExpr) + If<ushort>(And(hd.IsSome(), hd.Value() == valueExpr), 1, 0));
         }
 
         /// <summary>
@@ -541,7 +569,6 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             return seqExpr.Case(empty: False(), (hd, tl) => Or(And(hd.IsSome(), predicate(hd.Value())), tl.Any(predicate)));
-            // return seqExpr.Fold(False(), (x, y) => Or(predicate(x), y));
         }
 
         /// <summary>
@@ -634,7 +661,7 @@ namespace ZenLib
         {
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
-                cons: (hd, tl) => If(i == numElements, seqExpr, tl.Drop(numElements, If<ushort>(hd.IsNone(), i, i + 1))));
+                cons: (hd, tl) => If(i == numElements, seqExpr, tl.Drop(numElements, If(hd.IsNone(), i, i + 1))));
         }
 
         /// <summary>
@@ -650,7 +677,7 @@ namespace ZenLib
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
-                cons: (hd, tl) => If(Or(hd.IsNone(), predicate(hd.Value())), tl.DropWhile(predicate), tl));
+                cons: (hd, tl) => If(Or(hd.IsNone(), predicate(hd.Value())), tl.DropWhile(predicate), seqExpr));
         }
 
         /// <summary>
@@ -723,9 +750,23 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(value);
 
-            var init = Pair.Create<short, short>(-1, 0);
-            return seqExpr.FoldLeft(init, (acc, x) =>
-                Pair.Create(If(And(acc.Item1() == -1, value == x), acc.Item2(), acc.Item1()), acc.Item2() + 1)).Item1();
+            return IndexOf(seqExpr, value, 0);
+        }
+
+        /// <summary>
+        /// Get the value of a sequence at an index.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="value">Zen value expression.</param>
+        /// <param name="i">The current index.</param>
+        /// <returns>Zen value.</returns>
+        private static Zen<short> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value, Zen<short> i)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(value);
+            Contract.AssertNotNull(i);
+
+            return seqExpr.Case(-1, (hd, tl) => If<short>(hd == Option.Create(value), i, tl.IndexOf(value, If(hd.IsNone(), i, i + 1))));
         }
     }
 }

@@ -79,7 +79,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListContains()
         {
             ZenSettings.PreserveBranches = true;
-            Assert.AreEqual(6, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
+            Assert.AreEqual(1, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
             ZenSettings.PreserveBranches = false;
         }
 
@@ -90,8 +90,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionListFilter()
         {
             var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
-            Assert.AreEqual(8, f.GenerateInputs(depth: 3, exhaustiveDepth: false).Count());
-            Assert.AreEqual(15, f.GenerateInputs(depth: 3, exhaustiveDepth: true).Count());
+            Assert.AreEqual(8, f.GenerateInputs(depth: 3).Count());
         }
 
         /// <summary>

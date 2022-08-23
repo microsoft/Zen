@@ -205,10 +205,10 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that evaluate works as expected for booleans.
+        /// Test that evaluate works as expected for lists.
         /// </summary>
         [TestMethod]
-        public void TestEvaluateList()
+        public void TestEvaluateFSeq()
         {
             var a = Arbitrary<FSeq<int>>();
             var expr = a.Contains(3);

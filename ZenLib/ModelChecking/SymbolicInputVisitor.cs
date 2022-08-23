@@ -10,18 +10,12 @@ namespace ZenLib.ModelChecking
     using System.Numerics;
     using System.Reflection;
     using ZenLib;
-    using static ZenLib.Zen;
 
     /// <summary>
     /// Class to help generate a symbolic input.
     /// </summary>
     internal class SymbolicInputVisitor : TypeVisitor<object, ZenGenerationConfiguration>
     {
-        /// <summary>
-        /// The method for creating the empty list at runtime.
-        /// </summary>
-        private static MethodInfo emptyListMethod = typeof(Zen).GetMethod("EmptyList", BindingFlags.Static | BindingFlags.NonPublic);
-
         /// <summary>
         /// The method for creating the empty map at runtime.
         /// </summary>
@@ -147,7 +141,6 @@ namespace ZenLib.ModelChecking
                 var arg = this.Visit(optionType, new ZenGenerationConfiguration
                 {
                     Depth = parameter.Depth,
-                    ExhaustiveDepth = parameter.ExhaustiveDepth,
                     Name = parameter.Name + $"_elt_{i + 1}",
                 });
                 args[i] = arg;
@@ -327,15 +320,11 @@ namespace ZenLib.ModelChecking
         {
             if (attribute == null)
             {
-                return new ZenGenerationConfiguration { Depth = config.Depth, ExhaustiveDepth = config.ExhaustiveDepth, Name = config.Name };
+                return new ZenGenerationConfiguration { Depth = config.Depth, Name = config.Name };
             }
 
             var depth = attribute.Depth > 0 ? attribute.Depth : config.Depth;
-            var exhaustive = attribute.EnumerationType == EnumerationType.User ?
-                config.ExhaustiveDepth :
-                attribute.EnumerationType == EnumerationType.Exhaustive;
-
-            return new ZenGenerationConfiguration { Depth = depth, ExhaustiveDepth = exhaustive, Name = config.Name };
+            return new ZenGenerationConfiguration { Depth = depth, Name = config.Name };
         }
 
         /// <summary>

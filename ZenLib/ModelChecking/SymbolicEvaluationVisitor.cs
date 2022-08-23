@@ -206,7 +206,7 @@ namespace ZenLib.ModelChecking
                 var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
                 foreach (var constant in constants)
                 {
-                    var newArbitrary = arbitraryMethod.Invoke(null, new object[] { "k!", 5, true });
+                    var newArbitrary = arbitraryMethod.Invoke(null, new object[] { "k!", 5 });
                     var symbolicValue = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit((dynamic)newArbitrary, parameter);
                     result = result.Add(constant, symbolicValue);
                     assignment[constant] = newArbitrary;
@@ -569,7 +569,7 @@ namespace ZenLib.ModelChecking
             var v = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.Expr, parameter);
             var elt = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ElementExpr, parameter);
             var hasValue = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)elt.Fields["HasValue"];
-            var newList = v.Value.Add((hasValue.Value, elt.Fields["Value"]));
+            var newList = v.Value.Insert(0, (hasValue.Value, elt.Fields["Value"]));
             return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, newList);
         }
 
@@ -591,7 +591,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The symbolic value.</returns>
-        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListCase<T, TResult>(ZenListCaseExpr<T, TResult> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             var list = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ListExpr, parameter);
 
@@ -608,12 +608,12 @@ namespace ZenLib.ModelChecking
             var rest = new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, tl);
 
             // execute the cons case with placeholder values to get a new Zen value.
-            var arg1 = new ZenArgumentExpr<Option<TList>>();
-            var arg2 = new ZenArgumentExpr<FSeq<TList>>();
+            var arg1 = new ZenArgumentExpr<Option<T>>();
+            var arg2 = new ZenArgumentExpr<FSeq<T>>();
             var mapping = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty
                 .Add("HasValue", new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, hd.Item1))
                 .Add("Value", hd.Item2);
-            var hdArg = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<TList>), this.Solver, mapping);
+            var hdArg = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<T>), this.Solver, mapping);
             var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hdArg).Add(arg2.ArgumentId, rest);
             var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
             var newExpression = expression.ConsCase(arg1, arg2);

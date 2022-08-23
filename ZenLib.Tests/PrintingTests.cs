@@ -26,7 +26,7 @@ namespace ZenLib.Tests
             // expressions
             Assert.AreEqual("1", Zen.Constant(1).ToString());
             Assert.AreEqual("[]", FSeq.Empty<int>().ToString());
-            Assert.AreEqual("Cons(1, [])", FSeq.Empty<int>().AddBack(1).ToString());
+            Assert.AreEqual("Cons(new Option`1(HasValue=True, Value=1), [])", FSeq.Empty<int>().AddBack(1).ToString());
             Assert.AreEqual("new Set`1(Values=Set({}, 1, new SetUnit()))", Set.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Unit(1)", Seq.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Concat(Unit(1), Unit(2))", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
@@ -186,7 +186,7 @@ namespace ZenLib.Tests
             Console.WriteLine(Zen.Arbitrary<Option<int>>("x").Format());
             Console.WriteLine(Zen.Symbolic<FSeq<int>>("x").Format());
 
-            var l = Zen.Symbolic<FSeq<byte>>(depth: 3, exhaustiveDepth: false);
+            var l = Zen.Symbolic<FSeq<byte>>(depth: 3);
             Console.WriteLine(l.Select(x => x + 1).Format());
         }
 

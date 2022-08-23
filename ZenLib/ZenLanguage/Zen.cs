@@ -325,11 +325,10 @@ namespace ZenLib
         /// </summary>
         /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Symbolic<T>(string name = "k!", int depth = 5, bool exhaustiveDepth = true)
+        public static Zen<T> Symbolic<T>(string name = "k!", int depth = 5)
         {
-            return Arbitrary<T>(name, depth, exhaustiveDepth);
+            return Arbitrary<T>(name, depth);
         }
 
         /// <summary>
@@ -337,12 +336,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 5, bool exhaustiveDepth = true)
+        public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 5)
         {
             var generator = new SymbolicInputVisitor();
-            return Arbitrary<T>(generator, name, depth, exhaustiveDepth);
+            return Arbitrary<T>(generator, name, depth);
         }
 
         /// <summary>
@@ -351,11 +349,10 @@ namespace ZenLib
         /// <param name="generator">The generator.</param>
         /// <param name="name">An optional name of the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <returns></returns>
-        internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5, bool exhaustiveDepth = true)
+        internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5)
         {
-            var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)), ExhaustiveDepth = exhaustiveDepth };
+            var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)) };
             return (Zen<T>)generator.Visit(typeof(T), parameter);
         }
 
@@ -1636,17 +1633,15 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">The input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<T1> Find<T1>(
             Func<Zen<T1>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return Zen.Constraint<T1>(invariant).Find(input, depth, exhaustiveDepth, backend);
+            return Zen.Constraint<T1>(invariant).Find(input, depth, backend);
         }
 
         /// <summary>
@@ -1656,7 +1651,6 @@ namespace ZenLib
         /// <param name="input1">The first input.</param>
         /// <param name="input2">The second input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
@@ -1664,10 +1658,9 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, exhaustiveDepth, backend);
+            return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, backend);
         }
 
         /// <summary>
@@ -1678,7 +1671,6 @@ namespace ZenLib
         /// <param name="input2">The second input.</param>
         /// <param name="input3">The third input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
@@ -1687,10 +1679,9 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, exhaustiveDepth, backend);
+            return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, backend);
         }
 
         /// <summary>
@@ -1702,7 +1693,6 @@ namespace ZenLib
         /// <param name="input3">The third input.</param>
         /// <param name="input4">The fourth input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes as well.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
@@ -1712,10 +1702,9 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, exhaustiveDepth, backend);
+            return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, backend);
         }
 
         /// <summary>
@@ -1724,17 +1713,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
         /// <param name="backend">The backend solver.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<T1> GenerateInputs<T1, T2>(
             Func<Zen<T1>, Zen<T2>> f,
             Func<Zen<T1>, Zen<bool>> precondition = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, exhaustiveDepth, backend);
+            return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, backend);
         }
 
         /// <summary>
@@ -1743,17 +1730,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
         /// <param name="backend">The backend solver.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>> f,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, exhaustiveDepth, backend);
+            return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, backend);
         }
 
         /// <summary>
@@ -1762,17 +1747,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
         /// <param name="backend">The backend solver.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, exhaustiveDepth, backend);
+            return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, backend);
         }
 
         /// <summary>
@@ -1781,17 +1764,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="exhaustiveDepth">Whether to exhastively enumerate FSeq depth.</param>
         /// <param name="backend">The backend solver.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int depth = 5,
-            bool exhaustiveDepth = true,
             Backend backend = Backend.Z3)
         {
-            return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, exhaustiveDepth, backend);
+            return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, backend);
         }
 
         /// <summary>
@@ -1806,8 +1787,7 @@ namespace ZenLib
                 var keyType = kv.Key.GetType();
                 var valueType = kv.Value.GetType();
                 Contract.Assert(ReflectionUtilities.IsZenType(keyType));
-                var innerType = keyType.GetGenericArgumentsCached()[0];
-
+                var innerType = keyType.BaseType.GetGenericArgumentsCached()[0];
                 Contract.Assert(innerType.IsAssignableFrom(valueType), "Type mismatch in assignment between key and value");
                 constraints = Zen.And(constraints, Zen.Eq((dynamic)kv.Key, (dynamic)kv.Value));
             }

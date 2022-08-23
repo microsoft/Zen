@@ -217,11 +217,11 @@ namespace ZenLib
         /// <returns></returns>
         private static Zen<bool> StartsWith(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> pre)
         {
-            return pre.Case(
+            return pre.CaseStrict(
                 empty: true,
-                cons: (hd1, tl1) => s.Case(
+                cons: (hd1, tl1) => s.CaseStrict(
                     empty: false,
-                    cons: (hd2, tl2) => AndIf(hd1 == hd2, StartsWith(tl2, tl1))));
+                    cons: (hd2, tl2) => And(hd1 == hd2, StartsWith(tl2, tl1))));
         }
 
         /// <summary>
@@ -274,44 +274,17 @@ namespace ZenLib
             return Contains(s.GetCharacters(), sub.GetCharacters());
         }
 
+        /// <summary>
+        /// Check if one sequence contains another.
+        /// </summary>
+        /// <param name="s">The sequence.</param>
+        /// <param name="sub">The subsequence.</param>
+        /// <returns></returns>
         private static Zen<bool> Contains(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> sub)
         {
             return s.Case(
                 empty: sub.IsEmpty(),
-                cons: (hd, tl) => OrIf(StartsWith(s, sub), Contains(tl, sub)));
-        }
-
-        /// <summary>
-        /// Gets the first index of a substring in a string.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="sub">The substring.</param>
-        /// <returns>An index.</returns>
-        public static Zen<Option<ushort>> IndexOf(this Zen<FString> s, Zen<FString> sub)
-        {
-            return IndexOf(s.GetCharacters(), sub.GetCharacters(), 0);
-        }
-
-        private static Zen<Option<ushort>> IndexOf(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> sub, int current)
-        {
-            return s.Case(
-                empty: If(sub.IsEmpty(), Option.Create<ushort>((ushort)current), Option.Null<ushort>()),
-                cons: (hd, tl) => If(StartsWith(s, sub), Option.Create<ushort>((ushort)current), IndexOf(tl, sub, current + 1)));
-        }
-
-        /// <summary>
-        /// Gets the first index of a substring in a
-        /// string starting at an offset.
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="sub">The substring.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns>An index.</returns>
-        public static Zen<Option<ushort>> IndexOf(this Zen<FString> s, Zen<FString> sub, Zen<ushort> offset)
-        {
-            var trimmed = s.GetCharacters().Drop(offset);
-            var idx = IndexOf(trimmed, sub.GetCharacters(), 0);
-            return If(idx.IsSome(), Option.Create(idx.Value() + offset), idx);
+                cons: (hd, tl) => Or(StartsWith(s, sub), Contains(tl, sub)));
         }
 
         /// <summary>

@@ -248,6 +248,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test FSeq dropwhile.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqDropWhileEval()
+        {
+            var zf = Zen.Function<FSeq<byte>, FSeq<byte>>(l => l.DropWhile(x => x > 0));
+            Assert.AreEqual(new FSeq<byte>(), zf.Evaluate(new FSeq<byte>(1, 2)));
+            Assert.AreEqual(new FSeq<byte>(0), zf.Evaluate(new FSeq<byte>(1, 2, 0)));
+            Assert.AreEqual(new FSeq<byte>(0, 1), zf.Evaluate(new FSeq<byte>(1, 2, 0, 1)));
+            Assert.AreEqual(new FSeq<byte>(0, 0), zf.Evaluate(new FSeq<byte>(0, 0)));
+        }
+
+        /// <summary>
         /// Test FSeq at.
         /// </summary>
         [TestMethod]
@@ -302,18 +315,53 @@ namespace ZenLib.Tests
         public void TestFSeqDropSolve()
         {
             var l = Zen.Symbolic<FSeq<int>>();
-            Console.WriteLine((l.Drop(1) == new FSeq<int>(1, 2)).Format());
             var sol = (l.Drop(1) == new FSeq<int>(1, 2)).Solve();
             Assert.IsTrue(sol.IsSatisfiable());
-            Console.WriteLine(sol.Get(l));
-            // Assert.IsTrue(sol.Get(l).ToList().All(x => x == 4));
+            Assert.IsTrue(sol.Get(l).ToList()[1] == 1);
+            Assert.IsTrue(sol.Get(l).ToList()[2] == 2);
+        }
+
+        /// <summary>
+        /// Test FSeq At.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAtSolve()
+        {
+            var zf = Zen.Function<FSeq<byte>, bool>(l => l.At(1) == Option.Some((byte)1));
+            var result = zf.Find((i, o) => o, depth: 2);
+            Assert.IsTrue(result.HasValue);
+            Assert.AreEqual(1, result.Value.ToList()[1]);
+        }
+
+        /// <summary>
+        /// Test FSeq At.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAt2Solve()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            var sol = (l.At(1) == Option.Some(1)).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList()[1] == 1);
+        }
+
+        /// <summary>
+        /// Test FSeq At.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAt3Solve()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            var sol = (l.At(0) == Option.None<int>()).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).Count() == 0);
         }
 
         /// <summary>
         /// Test List contains.
         /// </summary>
         [TestMethod]
-        public void TestSeqContains()
+        public void TestFSeqContains()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => And(l.Contains(x), l.Contains(7))));
         }
@@ -322,7 +370,7 @@ namespace ZenLib.Tests
         /// Test Seq contains.
         /// </summary>
         [TestMethod]
-        public void TestSeqContainsVariable()
+        public void TestFSeqContainsVariable()
         {
             CheckAgreement<FSeq<byte>, byte>((l, x) => l.Contains(x), bddListSize: 2);
         }
@@ -331,7 +379,7 @@ namespace ZenLib.Tests
         /// Test Seq all.
         /// </summary>
         [TestMethod]
-        public void TestSeqAll()
+        public void TestFSeqAll()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.All(e => e == x)));
         }
@@ -340,7 +388,7 @@ namespace ZenLib.Tests
         /// Test Seq any.
         /// </summary>
         [TestMethod]
-        public void TestSeqAny()
+        public void TestFSeqAny()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Any(e => e >= x)));
         }
@@ -349,7 +397,7 @@ namespace ZenLib.Tests
         /// Test Seq any.
         /// </summary>
         [TestMethod]
-        public void TestSeqAnyObjects()
+        public void TestFSeqAnyObjects()
         {
             var f1 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
             var f2 = new ZenFunction<FSeq<Object2>, bool>(l => l.Any(e => e.GetField<Object2, int>("Field1") == 7));
@@ -368,7 +416,7 @@ namespace ZenLib.Tests
         /// Test Seq map.
         /// </summary>
         [TestMethod]
-        public void TestSeqMap()
+        public void TestFSeqMap()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Select(e => e + 1).Contains(x)));
         }
@@ -377,7 +425,7 @@ namespace ZenLib.Tests
         /// Test Seq filter.
         /// </summary>
         [TestMethod]
-        public void TestSeqFilter()
+        public void TestFSeqFilter()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Where(e => e < (x + 1)).Contains(x)));
         }
@@ -386,7 +434,7 @@ namespace ZenLib.Tests
         /// Test Seq find implies contains.
         /// </summary>
         [TestMethod]
-        public void TestSeqContainsFind()
+        public void TestFSeqContainsFind()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
                 Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).IsSome())));
@@ -396,7 +444,7 @@ namespace ZenLib.Tests
         /// Test Seq index of.
         /// </summary>
         [TestMethod]
-        public void TestSeqIndexOf()
+        public void TestFSeqIndexOf()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
                 Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x) >= 0)));
@@ -406,7 +454,7 @@ namespace ZenLib.Tests
         /// Test Seq at.
         /// </summary>
         [TestMethod]
-        public void TestSeqAt()
+        public void TestFSeqAt()
         {
             CheckValid<FSeq<byte>>(l =>
                 Implies(l.Length() >= 2, l.At(1).IsSome()));
@@ -419,7 +467,7 @@ namespace ZenLib.Tests
         /// Test Seq set.
         /// </summary>
         [TestMethod]
-        public void TestSeqSet()
+        public void TestFSeqSet()
         {
             CheckValid<FSeq<byte>>(l =>
                 Implies(l.Length() >= 2, l.Set(1, 7).Contains(7)));
@@ -435,7 +483,7 @@ namespace ZenLib.Tests
         /// Test Seq length.
         /// </summary>
         [TestMethod]
-        public void TestSeqLength()
+        public void TestFSeqLength()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.AddFront(x).Length() > 0));
         }
@@ -444,7 +492,7 @@ namespace ZenLib.Tests
         /// Test Seq length.
         /// </summary>
         [TestMethod]
-        public void TestSeqLength2()
+        public void TestFSeqLength2()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.AddBack(x).Length() > 0));
         }
@@ -453,7 +501,7 @@ namespace ZenLib.Tests
         /// Test Seq reverse.
         /// </summary>
         [TestMethod]
-        public void TestSeqReverse()
+        public void TestFSeqReverse()
         {
             RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Reverse().Contains(x)));
         }
@@ -462,7 +510,7 @@ namespace ZenLib.Tests
         /// Test that Seq remove all does not contain that element.
         /// </summary>
         [TestMethod]
-        public void TestSeqRemoveAllNotContains()
+        public void TestFSeqRemoveAllNotContains()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(l => Not(l.RemoveAll(Constant<int>(x)).Contains(x))));
         }
@@ -471,7 +519,7 @@ namespace ZenLib.Tests
         /// Test Seq remove all results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestSeqRemoveAllSmaller()
+        public void TestFSeqRemoveAllSmaller()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(l => l.RemoveAll(x).Length() <= l.Length()));
         }
@@ -480,7 +528,7 @@ namespace ZenLib.Tests
         /// Test Seq remove first.
         /// </summary>
         [TestMethod]
-        public void TestSeqRemoveFirstCount()
+        public void TestFSeqRemoveFirstCount()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(
                 l => Implies(l.Contains(x), l.RemoveAll(x).Duplicates(x) != l.Duplicates(x))));
@@ -490,7 +538,7 @@ namespace ZenLib.Tests
         /// Test that Seq take results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestSeqTakeSmaller()
+        public void TestFSeqTakeSmaller()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(l => l.Take(x).Length() <= l.Length()));
         }
@@ -499,7 +547,7 @@ namespace ZenLib.Tests
         /// Test Seq take.
         /// </summary>
         [TestMethod]
-        public void TestSeqTakeExact()
+        public void TestFSeqTakeExact()
         {
             RandomBytes(x =>
             {
@@ -513,7 +561,7 @@ namespace ZenLib.Tests
         /// Test that Seq drop results in a smaller Seq.
         /// </summary>
         [TestMethod]
-        public void TestSeqDropSmaller()
+        public void TestFSeqDropSmaller()
         {
             RandomBytes(x => CheckValid<FSeq<int>>(l =>
                 l.Drop(x).Length() <= l.Length()));
@@ -523,7 +571,7 @@ namespace ZenLib.Tests
         /// Test Seq drop.
         /// </summary>
         [TestMethod]
-        public void TestSeqDropExact()
+        public void TestFSeqDropExact()
         {
             CheckValid<FSeq<byte>>(l =>
                 Implies(l.Length() >= 2, l.At(1).Value() == l.Drop(1).At(0).Value()));
@@ -533,7 +581,7 @@ namespace ZenLib.Tests
         /// Test Seq drop while.
         /// </summary>
         [TestMethod]
-        public void TestDropWhile()
+        public void TestFSeqDropWhile()
         {
             CheckValid<FSeq<byte>>(l =>
             {
@@ -547,7 +595,7 @@ namespace ZenLib.Tests
         /// Test Seq take while.
         /// </summary>
         [TestMethod]
-        public void TestTakeWhile()
+        public void TestFSeqTakeWhile()
         {
             CheckValid<FSeq<byte>>(l =>
             {
@@ -561,7 +609,7 @@ namespace ZenLib.Tests
         /// Test Seq append.
         /// </summary>
         [TestMethod]
-        public void TestSeqAppend()
+        public void TestFSeqAppend()
         {
             CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l1.Length());
             CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l2.Length());
@@ -571,7 +619,7 @@ namespace ZenLib.Tests
         /// Test Seq arbitrary.
         /// </summary>
         [TestMethod]
-        public void TestSeqArbitrary()
+        public void TestFSeqArbitrary()
         {
             var f = new ZenFunction<FSeq<int>, bool>(l => And(l.Contains(1), l.Contains(2)));
             var arbitrarySeq = FSeq.Empty<int>().AddFront(Arbitrary<int>()).AddFront(Arbitrary<int>());
@@ -580,11 +628,11 @@ namespace ZenLib.Tests
             Assert.IsTrue(input.Value.ToList().Contains(2));
         }
 
-        /* /// <summary>
+        /// <summary>
         /// Test Seq reverse and append.
         /// </summary>
         [TestMethod]
-        public void TestSeqReverseAppend()
+        public void TestFSeqReverseAppend()
         {
             CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) =>
             {
@@ -592,13 +640,13 @@ namespace ZenLib.Tests
                 var l4 = l1.Append(l2);
                 return Implies(Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
             });
-        } */
+        }
 
         /// <summary>
         /// Test that size constraints are enforced correctly.
         /// </summary>
         [TestMethod]
-        public void TestSeqSizeConstraints()
+        public void TestFSeqSizeConstraints()
         {
             var zf = new ZenFunction<FSeq<byte>, bool>(l => l.Length() == 4);
             var example1 = zf.Find((l, b) => b, depth: 3);
@@ -613,7 +661,7 @@ namespace ZenLib.Tests
         /// Test equality and hashcode for FSeq.
         /// </summary>
         [TestMethod]
-        public void TestSeqEqualsHashCode()
+        public void TestFSeqEqualsHashCode()
         {
             var s1 = FSeq.FromRange(new List<int> { 1, 1, 2, 3, 5 });
             var s2 = FSeq.FromRange(new List<int> { 1, 2, 3, 5 });

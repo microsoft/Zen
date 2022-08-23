@@ -91,7 +91,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Case({this.ListExpr}, {this.EmptyExpr}, {this.ConsCase.GetHashCode()})";
+            return $"Case({this.ListExpr}, {this.EmptyExpr}, <lambda>)";
         }
 
         /// <summary>

@@ -539,16 +539,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test maps work do not work with lists.
+        /// Test maps work with lists.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestCMapInList()
+        public void TestCMapInFSeq()
         {
             var l = Zen.Symbolic<FSeq<int>>();
             var x = Zen.Symbolic<CMap<int, int>>();
-            var i = l.Case(0, (hd, tl) => x.Get(1));
-            (i == 2).Solve();
+            var i = Zen.If(l.IsEmpty(), 0, x.Get(1));
+            var sol = (i == 2).Solve();
+            Console.WriteLine(sol.Get(l));
+            Console.WriteLine(sol.Get(x));
+            Assert.IsTrue(sol.Get(l).Count() > 0);
         }
 
         /// <summary>

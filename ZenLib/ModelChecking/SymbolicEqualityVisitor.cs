@@ -165,11 +165,8 @@ namespace ZenLib.ModelChecking
             var v1 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
 
-            var result = this.solver.True();
             object deflt = null;
-
-            Console.WriteLine(v1.Value.Count);
-            Console.WriteLine(v2.Value.Count);
+            var result = this.solver.True();
 
             for (int i = 0; i < Math.Max(v1.Value.Count, v2.Value.Count); i++)
             {
@@ -198,7 +195,7 @@ namespace ZenLib.ModelChecking
 
                 var eqEnabled = this.solver.Iff(elt1.Item1, elt2.Item1);
                 var eqValues = this.Visit(innerType, (elt1.Item2, elt2.Item2));
-                var eqElements = this.solver.And(eqEnabled, eqValues);
+                var eqElements = this.solver.And(eqEnabled, this.solver.Or(this.solver.Not(elt1.Item1), eqValues));
                 result = this.solver.And(result, eqElements);
             }
 

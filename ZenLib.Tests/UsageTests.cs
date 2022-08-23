@@ -1289,7 +1289,7 @@ namespace ZenLib.Tests
         public void TestExactSeqs()
         {
             var f = new ZenFunction<FSeq<int>, ushort>(l => l.Length());
-            f.Find((i, o) => true, exhaustiveDepth: false);
+            f.Find((i, o) => true);
         }
 
         /// <summary>

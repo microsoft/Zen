@@ -17,42 +17,14 @@ namespace ZenLib
         /// Initializes a new instance of the <see cref="ZenSizeAttribute"/> class.
         /// </summary>
         /// <param name="depth">The depth for this field.</param>
-        /// <param name="enumerationType">The exhaustiveness of the depth parameter..</param>
-        public ZenSizeAttribute(int depth = -1, EnumerationType enumerationType = EnumerationType.User)
+        public ZenSizeAttribute(int depth = -1)
         {
             Depth = depth;
-            EnumerationType = enumerationType;
         }
 
         /// <summary>
         /// Gets the size depth for the field or property.
         /// </summary>
         public int Depth { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to generate exhaustive depth objects.
-        /// </summary>
-        public EnumerationType EnumerationType { get; }
-    }
-
-    /// <summary>
-    /// The enumeration type of generation.
-    /// </summary>
-    public enum EnumerationType
-    {
-        /// <summary>
-        /// Will generate exhaustive depths.
-        /// </summary>
-        Exhaustive,
-
-        /// <summary>
-        /// Will not generate exhaustive depths.
-        /// </summary>
-        FixedSize,
-
-        /// <summary>
-        /// Will defer to the user.
-        /// </summary>
-        User,
     }
 }

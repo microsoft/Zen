@@ -53,6 +53,12 @@ namespace ZenLib
                 return ce.Value ? t : f;
             }
 
+            // if not e then x else y = if e then y else x
+            if (g is ZenNotExpr ne)
+            {
+                return new ZenIfExpr<T>(ne.Expr, f, t);
+            }
+
             if (!ZenSettings.PreserveBranches)
             {
                 // if g then e else e = e
