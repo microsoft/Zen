@@ -193,7 +193,7 @@ namespace ZenLib.ModelChecking
                     elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                if (i >= v2.Value.Count)
+                if (i < v2.Value.Count)
                 {
                     elt2 = v2.Value[i];
                 }

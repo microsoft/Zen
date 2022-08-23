@@ -183,7 +183,7 @@ namespace ZenLib.Generation
 
             exprs.AddRange(stack);
             var arguments = exprs.Select(e => Format(e, indent)).ToArray();
-            return FormatFunction(parameter, "And", arguments);
+            return FormatFunction(parameter, expression.Operation.ToString(), arguments);
         }
 
         public override (LazyString, bool) VisitNot(ZenNotExpr expression, Parameter parameter)

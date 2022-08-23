@@ -25,7 +25,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the element to add.
         /// </summary>
-        public Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
+        public Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
 
         /// <summary>
         /// Simplify and create a new ZenListCaseExpr.
@@ -34,9 +34,9 @@ namespace ZenLib
         /// <param name="emptyCase">The empty case.</param>
         /// <param name="consCase">The cons case.</param>
         /// <returns></returns>
-        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> consCase)
+        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> consCase)
         {
-            if (e is ZenListEmptyExpr<T> l1)
+            if (e is ZenListEmptyExpr<T>)
             {
                 return emptyCase;
             }
@@ -59,7 +59,7 @@ namespace ZenLib
         public static Zen<TResult> Create(
             Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
+            Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
             Contract.AssertNotNull(listExpr);
             Contract.AssertNotNull(empty);
@@ -77,7 +77,7 @@ namespace ZenLib
         private ZenListCaseExpr(
             Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
+            Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
             this.ListExpr = listExpr;
             this.EmptyExpr = empty;

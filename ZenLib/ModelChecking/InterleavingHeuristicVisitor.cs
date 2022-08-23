@@ -144,7 +144,7 @@ namespace ZenLib.ModelChecking
         /// <returns>The interleaving result.</returns>
         public override InterleavingResult VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
-            return emptySetVisitor.Visit(typeof(T), Unit.Instance);
+            return emptySetVisitor.Visit(typeof(Option<T>), Unit.Instance);
         }
 
         /// <summary>

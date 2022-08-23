@@ -168,6 +168,9 @@ namespace ZenLib.ModelChecking
             var result = this.solver.True();
             object deflt = null;
 
+            Console.WriteLine(v1.Value.Count);
+            Console.WriteLine(v2.Value.Count);
+
             for (int i = 0; i < Math.Max(v1.Value.Count, v2.Value.Count); i++)
             {
                 (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt1;
@@ -183,7 +186,7 @@ namespace ZenLib.ModelChecking
                     elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                if (i >= v2.Value.Count)
+                if (i < v2.Value.Count)
                 {
                     elt2 = v2.Value[i];
                 }

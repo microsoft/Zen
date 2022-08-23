@@ -35,7 +35,6 @@ namespace ZenLib.Tests
             Assert.IsTrue(new ZenFunction<Option<Real>>(() => Option.Null<Real>()).Assert(v => v.Value() == new Real(0)));
             Assert.IsTrue(new ZenFunction<Option<Seq<bool>>>(() => Option.Null<Seq<bool>>()).Assert(v => v.Value() == new Seq<bool>()));
             Assert.IsTrue(new ZenFunction<Option<FSeq<bool>>>(() => Option.Null<FSeq<bool>>()).Assert(v => v.Value().IsEmpty()));
-            Assert.IsTrue(new ZenFunction<Option<FMap<bool, bool>>>(() => Option.Null<FMap<bool, bool>>()).Assert(v => v.Value().Get(true).IsSome() == false));
             Assert.IsTrue(new ZenFunction<Option<CMap<bool, bool>>>(() => Option.Null<CMap<bool, bool>>()).Assert(v => v.Value().Get(true) == false));
         }
 
@@ -75,8 +74,6 @@ namespace ZenLib.Tests
             var m = ReflectionUtilities.GetDefaultValue<Map<byte, byte>>();
             Assert.AreEqual(0, m.Count());
             var v = Option.Null<Map<byte, byte>>();
-
-            var d = ReflectionUtilities.GetDefaultValue<FMap<int, int>>();
         }
 
         private void CheckDefault<T>(object o)

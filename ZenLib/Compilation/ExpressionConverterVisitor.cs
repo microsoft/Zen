@@ -385,7 +385,7 @@ namespace ZenLib.Compilation
             var list = Convert(expression.Expr, parameter);
             var element = Convert(expression.ElementExpr, parameter);
             var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
-            var method = typeof(FSeq<T>).GetMethodCached("AddFront");
+            var method = typeof(FSeq<T>).GetMethodCached("AddFrontOption");
             return Expression.Call(fseqExpr, method, element);
         }
 
@@ -426,7 +426,7 @@ namespace ZenLib.Compilation
             // call SplitHead to get the tuple result.
             var splitMethod = typeof(CommonUtilities).GetMethodCached("SplitHead").MakeGenericMethod(typeof(TList));
             var splitExpr = Expression.Call(splitMethod, fseqVariable);
-            var splitVariable = FreshVariable(typeof(ValueTuple<TList, FSeq<TList>>));
+            var splitVariable = FreshVariable(typeof(ValueTuple<Option<TList>, FSeq<TList>>));
 
             // extract the head and tail
             var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
@@ -438,7 +438,7 @@ namespace ZenLib.Compilation
             // run the cons lambda
             var runMethod = typeof(Interpreter)
                 .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(TList), typeof(FSeq<TList>), typeof(TResult));
+                .MakeGenericMethod(typeof(Option<TList>), typeof(FSeq<TList>), typeof(TResult));
 
             // create the bound arguments by constructing the immutable list
             var dictType = typeof(ImmutableDictionary<long, object>);
@@ -466,7 +466,7 @@ namespace ZenLib.Compilation
             {
                 var newAssignment = parameter.ArgumentAssignment;
 
-                var argHd = new ZenArgumentExpr<TList>();
+                var argHd = new ZenArgumentExpr<Option<TList>>();
                 newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
                 var argTl = new ZenArgumentExpr<FSeq<TList>>();
                 newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);

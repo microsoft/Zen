@@ -109,9 +109,9 @@ namespace ZenLib.Tests
             Assert.AreEqual(2, asol.Count());
             Assert.AreEqual(1, bsol.Count());
 
-            Assert.AreEqual(1, asol.Values[0]);
-            Assert.AreEqual(2, asol.Values[1]);
-            Assert.AreEqual(3, bsol.Values[0]);
+            Assert.AreEqual(1, asol.ToList()[0]);
+            Assert.AreEqual(2, asol.ToList()[1]);
+            Assert.AreEqual(3, bsol.ToList()[0]);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace ZenLib.Tests
 
             var assignment = new Dictionary<object, object>
             {
-                { a, new FSeq<int> { Values = ImmutableList.CreateRange(new List<int> { 3, 2, 1 }) } },
+                { a, new FSeq<int>(3, 2, 1) },
             };
 
             var l = expr.Evaluate(assignment);

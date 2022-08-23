@@ -1366,11 +1366,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="elements">Zen elements.</param>
         /// <returns>Zen value.</returns>
-        internal static Zen<FSeq<T>> List<T>(params Zen<T>[] elements)
+        internal static Zen<FSeq<T>> List<T>(params Zen<Option<T>>[] elements)
         {
             Contract.AssertNotNull(elements);
 
-            Zen<T>[] copy = new Zen<T>[elements.Length];
+            Zen<Option<T>>[] copy = new Zen<Option<T>>[elements.Length];
             Array.Copy(elements, copy, elements.Length);
             Array.Reverse(copy);
             var list = EmptyList<T>();

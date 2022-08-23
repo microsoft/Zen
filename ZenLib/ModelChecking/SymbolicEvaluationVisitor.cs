@@ -567,8 +567,9 @@ namespace ZenLib.ModelChecking
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitListAdd<T1>(ZenListAddFrontExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
             var v = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.Expr, parameter);
-            var elt = this.Visit(expression.ElementExpr, parameter);
-            var newList = v.Value.Add((this.Solver.True(), elt));
+            var elt = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ElementExpr, parameter);
+            var hasValue = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)elt.Fields["HasValue"];
+            var newList = v.Value.Add((hasValue.Value, elt.Fields["Value"]));
             return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, newList);
         }
 
@@ -594,8 +595,6 @@ namespace ZenLib.ModelChecking
         {
             var list = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.ListExpr, parameter);
 
-            SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> result = null;
-
             // if the list is empty, evaluate the empty case.
             if (list.Value.Count == 0)
             {
@@ -608,19 +607,19 @@ namespace ZenLib.ModelChecking
             // get the symbolic value for the tail.
             var rest = new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, tl);
 
-            // there are two cases: either the hd has an element or it doesn't.
-
             // execute the cons case with placeholder values to get a new Zen value.
-            var arg1 = new ZenArgumentExpr<TList>();
+            var arg1 = new ZenArgumentExpr<Option<TList>>();
             var arg2 = new ZenArgumentExpr<FSeq<TList>>();
-            var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hd.Item2).Add(arg2.ArgumentId, rest);
+            var mapping = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty
+                .Add("HasValue", new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, hd.Item1))
+                .Add("Value", hd.Item2);
+            var hdArg = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<TList>), this.Solver, mapping);
+            var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hdArg).Add(arg2.ArgumentId, rest);
             var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
             var newExpression = expression.ConsCase(arg1, arg2);
 
             // model check the resulting value using the computed values for the placeholders.
-            var r = this.Visit(newExpression, newEnv);
-
-            return result;
+            return this.Visit(newExpression, newEnv);
         }
 
         /// <summary>

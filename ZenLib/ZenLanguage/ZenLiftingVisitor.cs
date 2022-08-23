@@ -305,10 +305,10 @@ namespace ZenLib.ZenLanguage
         internal Zen<FSeq<T>> CreateZenListConstant<T>(FSeq<T> value)
         {
             Zen<FSeq<T>> list = ZenListEmptyExpr<T>.Instance;
-            foreach (var elt in value.Values.Reverse())
+            foreach (var elt in value.ToList().Reverse())
             {
                 Contract.AssertNullConversion(elt, "element", typeof(FSeq<T>));
-                list = ZenListAddFrontExpr<T>.Create(list, elt);
+                list = ZenListAddFrontExpr<T>.Create(list, Option.Create<T>(elt));
             }
 
             return list;

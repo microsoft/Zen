@@ -458,8 +458,8 @@ namespace ZenLib.Tests
             var solution = (x == new CMap<int, FSeq<int>>().Set(1, l)).Solve();
             var result = solution.Get(x);
             Assert.AreEqual(2, result.Get(1).Count());
-            Assert.AreEqual(2, result.Get(1).Values[0]);
-            Assert.AreEqual(1, result.Get(1).Values[1]);
+            Assert.AreEqual(2, result.Get(1).ToList()[0]);
+            Assert.AreEqual(1, result.Get(1).ToList()[1]);
         }
 
         /// <summary>
@@ -521,9 +521,9 @@ namespace ZenLib.Tests
             var y = Zen.Symbolic<CMap<int, FSeq<int>>>();
             var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == 2).Solve();
 
-            Assert.IsTrue(solution.Get(x).Get(1).Values.Contains(3));
-            Assert.IsTrue(solution.Get(y).Get(1).Values.Contains(3));
-            Assert.IsTrue(solution.Get(y).Get(2).Values.Count == 2);
+            Assert.IsTrue(solution.Get(x).Get(1).ToList().Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(1).ToList().Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(2).ToList().Count == 2);
         }
 
         /// <summary>

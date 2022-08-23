@@ -986,8 +986,8 @@ namespace ZenLib.Tests
             Assert.IsTrue(input.HasValue);
 
             var o = encap.Evaluate(input.Value);
-            Assert.IsTrue(o.Values.Count >= 1);
-            Assert.AreEqual(5U, o.Values.First().DstIp.Value);
+            Assert.IsTrue(o.ToList().Count >= 1);
+            Assert.AreEqual(5U, o.ToList().First().DstIp.Value);
         }
 
         /// <summary>

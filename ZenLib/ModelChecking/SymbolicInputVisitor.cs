@@ -138,27 +138,25 @@ namespace ZenLib.ModelChecking
         /// <returns>The input.</returns>
         public override object VisitList(Type listType, Type elementType, ZenGenerationConfiguration parameter)
         {
-            if (!parameter.ExhaustiveDepth)
+            var method = listMethod.MakeGenericMethod(elementType);
+
+            var args = new object[parameter.Depth];
+            for (int i = 0; i < parameter.Depth; i++)
             {
-                return ApplyToList(elementType, parameter, parameter.Depth);
+                var optionType = typeof(Option<>).MakeGenericType(elementType);
+                var arg = this.Visit(optionType, new ZenGenerationConfiguration
+                {
+                    Depth = parameter.Depth,
+                    ExhaustiveDepth = parameter.ExhaustiveDepth,
+                    Name = parameter.Name + $"_elt_{i + 1}",
+                });
+                args[i] = arg;
             }
 
-            var length = Arbitrary<byte>(parameter.Name + "_length");
-
-            // start with empty list
-            var emptyMethod = emptyListMethod.MakeGenericMethod(elementType);
-            var ifMethod = ifConditionMethod.MakeGenericMethod(listType);
-
-            var list = emptyMethod.Invoke(null, CommonUtilities.EmptyArray);
-
-            for (int i = parameter.Depth; i > 0; i--)
-            {
-                var guard = length == Constant((byte)i);
-                var trueBranch = ApplyToList(elementType, parameter, i);
-                list = ifMethod.Invoke(null, new object[] { guard, trueBranch, list });
-            }
-
-            return list;
+            var zenType = typeof(Zen<>).MakeGenericType(typeof(Option<>).MakeGenericType(elementType));
+            var finalArgs = Array.CreateInstance(zenType, args.Length);
+            Array.Copy(args, finalArgs, args.Length);
+            return method.Invoke(null, new object[] { finalArgs });
         }
 
         /// <summary>
@@ -356,35 +354,6 @@ namespace ZenLib.ModelChecking
 
             var propertyInfo = type.GetPropertyCached(fieldName);
             return (ZenSizeAttribute)propertyInfo.GetCustomAttribute(typeof(ZenSizeAttribute));
-        }
-
-        /// <summary>
-        /// Create a list from a given type.
-        /// </summary>
-        /// <param name="innerType">The list element type.</param>
-        /// <param name="parameter">The configuration parameter.</param>
-        /// <param name="size">The size.</param>
-        /// <returns>A zen object.</returns>
-        public object ApplyToList(Type innerType, ZenGenerationConfiguration parameter, int size)
-        {
-            var method = listMethod.MakeGenericMethod(innerType);
-
-            var args = new object[size];
-            for (int i = 0; i < size; i++)
-            {
-                var arg = this.Visit(innerType, new ZenGenerationConfiguration
-                {
-                    Depth = parameter.Depth,
-                    ExhaustiveDepth = parameter.ExhaustiveDepth,
-                    Name = parameter.Name + $"_elt_{size}_{i}",
-                });
-                args[i] = arg;
-            }
-
-            var zenType = typeof(Zen<>).MakeGenericType(innerType);
-            var finalArgs = Array.CreateInstance(zenType, args.Length);
-            Array.Copy(args, finalArgs, args.Length);
-            return method.Invoke(null, new object[] { finalArgs });
         }
     }
 }

@@ -39,14 +39,6 @@ namespace ZenLib.Tests
             CheckAgreement<FSeq<FSeq<int>>>(x => x == FSeq.FromRange(new List<FSeq<int>>() { FSeq.FromRange(new List<int>() { 1 }) }));
             CheckAgreement<FString>(x => x == new FString("hello"));
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
-
-            CheckAgreement<FMap<int, int>>(x =>
-            {
-                var d = new FMap<int, int>();
-                d.Set(1, 2);
-                Zen<FMap<int, int>> y = d;
-                return y.ContainsKey(4);
-            });
         }
 
         /// <summary>
@@ -145,18 +137,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that converting a value with a null dictionary value does not work.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestConvertNullDictionaryValue()
-        {
-            FMap<int, Object1> o = new FMap<int, Object1>();
-            o = o.Set(1, null);
-            var _ = Constant(o);
-        }
-
-        /// <summary>
         /// Check we convert a value correctly.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -179,7 +159,7 @@ namespace ZenLib.Tests
 
             for (int i = 0; i < value.Count(); i++)
             {
-                Assert.AreEqual(value.Values[i], result.Values[i]);
+                Assert.AreEqual(value.ToList()[i], result.ToList()[i]);
             }
         }
 

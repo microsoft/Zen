@@ -460,8 +460,8 @@ namespace ZenLib.Interpretation
         public override object VisitListAdd<T>(ZenListAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (FSeq<T>)this.Visit(expression.Expr, parameter);
-            var e2 = (T)this.Visit(expression.ElementExpr, parameter);
-            return e1.AddFront(e2);
+            var e2 = (Option<T>)this.Visit(expression.ElementExpr, parameter);
+            return e1.AddFrontOption(e2);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace ZenLib.Interpretation
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-                var argHd = new ZenArgumentExpr<T>();
+                var argHd = new ZenArgumentExpr<Option<T>>();
                 var argTl = new ZenArgumentExpr<FSeq<T>>();
                 parameter.ArgumentAssignment[argHd.ArgumentId] = hd;
                 parameter.ArgumentAssignment[argTl.ArgumentId] = tl;

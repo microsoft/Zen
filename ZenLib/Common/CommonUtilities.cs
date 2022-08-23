@@ -96,7 +96,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="list">The list.</param>
         /// <returns>The head and the rest of the list.</returns>
-        public static (T, FSeq<T>) SplitHead<T>(FSeq<T> list)
+        public static (Option<T>, FSeq<T>) SplitHead<T>(FSeq<T> list)
         {
             var (hd, tl) = SplitHeadHelper(list.Values);
             return (hd, new FSeq<T>(tl));

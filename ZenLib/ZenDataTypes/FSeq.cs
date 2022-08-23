@@ -19,14 +19,14 @@ namespace ZenLib
         /// <summary>
         /// Gets the underlying values with more recent values at the front.
         /// </summary>
-        public ImmutableList<T> Values { get; set; } = ImmutableList<T>.Empty;
+        public ImmutableList<Option<T>> Values { get; set; } = ImmutableList<Option<T>>.Empty;
 
         /// <summary>
         /// Creates a new instance of the <see cref="FSeq{T}"/> class.
         /// </summary>
         public FSeq()
         {
-            this.Values = ImmutableList<T>.Empty;
+            this.Values = ImmutableList<Option<T>>.Empty;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ZenLib
         /// <param name="values">The values.</param>
         public FSeq(params T[] values)
         {
-            this.Values = ImmutableList<T>.Empty.AddRange(values);
+            this.Values = ImmutableList<Option<T>>.Empty.AddRange(values.Select(Option.Some));
         }
 
         /// <summary>
@@ -44,16 +44,25 @@ namespace ZenLib
         /// <param name="values">The values.</param>
         public FSeq(IEnumerable<T> values)
         {
-            this.Values = ImmutableList<T>.Empty.AddRange(values);
+            this.Values = ImmutableList<Option<T>>.Empty.AddRange(values.Select(Option.Some));
         }
 
         /// <summary>
         /// Creates a new instance of the <see cref="FSeq{T}"/> class.
         /// </summary>
         /// <param name="list">The existing list.</param>
-        internal FSeq(ImmutableList<T> list)
+        internal FSeq(ImmutableList<Option<T>> list)
         {
             this.Values = list;
+        }
+
+        /// <summary>
+        /// Convert the sequence to a list.
+        /// </summary>
+        /// <returns>The sequence as a list.</returns>
+        public IList<T> ToList()
+        {
+            return this.Values.Where(x => x.HasValue).Select(x => x.Value).ToList();
         }
 
         /// <summary>
@@ -62,7 +71,7 @@ namespace ZenLib
         /// <returns>True if the sequence contains no elements..</returns>
         public bool IsEmpty()
         {
-            return this.Values.Count == 0;
+            return this.ToList().Count == 0;
         }
 
         /// <summary>
@@ -71,7 +80,7 @@ namespace ZenLib
         /// <returns>An integer count.</returns>
         public int Count()
         {
-            return this.Values.Count;
+            return this.ToList().Count;
         }
 
         /// <summary>
@@ -80,8 +89,21 @@ namespace ZenLib
         /// <param name="value">The value to add.</param>
         public FSeq<T> AddFront(T value)
         {
-            var l = (ImmutableList<T>)this.Values;
-            return new FSeq<T>(l.Insert(0, value));
+            return new FSeq<T>(this.Values.Insert(0, Option.Some(value)));
+        }
+
+        /// <summary>
+        /// Add an element to the front of the list.
+        /// </summary>
+        /// <param name="value">The value to add.</param>
+        public FSeq<T> AddFrontOption(Option<T> value)
+        {
+            if (value.HasValue)
+            {
+                return new FSeq<T>(this.Values.Insert(0, value));
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -91,7 +113,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"[{string.Join(",", this.Values)}]";
+            return $"[{string.Join(",", this.ToList())}]";
         }
 
         /// <summary>
@@ -111,14 +133,17 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool Equals(FSeq<T> other)
         {
-            if (this.Values.Count != other.Values.Count)
+            var v1 = this.ToList();
+            var v2 = other.ToList();
+
+            if (v1.Count != v2.Count)
             {
                 return false;
             }
 
-            for (int i = 0; i < this.Values.Count; i++)
+            for (int i = 0; i < v1.Count; i++)
             {
-                if (!this.Values[i].Equals(other.Values[i]))
+                if (!v1[i].Equals(v2[i]))
                 {
                     return false;
                 }
@@ -134,7 +159,7 @@ namespace ZenLib
         public override int GetHashCode()
         {
             var hash = 1291433875;
-            foreach (var element in this.Values)
+            foreach (var element in this.ToList())
             {
                 hash += element.GetHashCode();
             }
@@ -176,7 +201,7 @@ namespace ZenLib
         /// <param name="values">The items to add to the sequence.</param>
         public static FSeq<T> FromRange<T>(IEnumerable<T> values)
         {
-            return new FSeq<T> { Values = ImmutableList.CreateRange(values) };
+            return new FSeq<T> { Values = ImmutableList.CreateRange(values.Select(Option.Some)) };
         }
 
         /// <summary>
@@ -197,7 +222,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(element);
 
-            return FSeq.Empty<T>().AddFront(element);
+            return FSeq.Empty<T>().AddFrontOption(Option.Create(element));
         }
 
         /// <summary>
@@ -209,7 +234,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(elements);
 
-            return Zen.List(elements.ToArray());
+            return Zen.List(elements.Select(Option.Create).ToArray());
         }
 
         /// <summary>
@@ -218,12 +243,26 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> AddBack<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
+        public static Zen<FSeq<T>> AddBackOption<T>(this Zen<FSeq<T>> seqExpr, Zen<Option<T>> valueExpr)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(valueExpr);
 
-            return seqExpr.Append(FSeq.Empty<T>().AddFront(valueExpr));
+            return seqExpr.Append(FSeq.Empty<T>().AddFrontOption(valueExpr));
+        }
+
+        /// <summary>
+        /// Add a value to the front of a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="valueExpr">Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> AddFrontOption<T>(this Zen<FSeq<T>> seqExpr, Zen<Option<T>> valueExpr)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
+
+            return ZenListAddFrontExpr<T>.Create(seqExpr, valueExpr);
         }
 
         /// <summary>
@@ -237,7 +276,21 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(valueExpr);
 
-            return ZenListAddFrontExpr<T>.Create(seqExpr, valueExpr);
+            return seqExpr.AddFrontOption(Option.Create(valueExpr));
+        }
+
+        /// <summary>
+        /// Add a value to the back of a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="valueExpr">Zen expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> AddBack<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(valueExpr);
+
+            return seqExpr.AddBackOption(Option.Create(valueExpr));
         }
 
         /// <summary>
@@ -250,7 +303,7 @@ namespace ZenLib
         public static Zen<TResult> Case<T, TResult>(
             this Zen<FSeq<T>> seqExpr,
             Zen<TResult> empty,
-            Func<Zen<T>, Zen<FSeq<T>>, Zen<TResult>> cons)
+            Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(empty);
@@ -282,7 +335,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            return seqExpr.Case(empty: Zen.Default<T>(), cons: (hd, tl) => hd);
+            return seqExpr.Case(empty: Zen.Default<T>(), cons: (hd, tl) => If(hd.IsNone(), tl.Head(), hd.Value()));
         }
 
         /// <summary>
@@ -294,7 +347,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            return seqExpr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => tl);
+            return seqExpr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => If(hd.IsNone(), tl.Tail(), tl));
         }
 
         /// <summary>
@@ -320,7 +373,9 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(function);
 
-            return seqExpr.Fold(FSeq.Empty<T2>(), (x, acc) => acc.AddFront(function(x)));
+            return seqExpr.Case(
+                empty: FSeq.Empty<T2>(),
+                cons: (hd, tl) => tl.Select(function).AddFrontOption(hd.Select(function)));
         }
 
         /// <summary>
@@ -334,7 +389,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(predicate);
 
-            return seqExpr.Fold(FSeq.Empty<T>(), (x, acc) => If(predicate(x), acc.AddFront(x), acc));
+            return seqExpr.Case(empty: FSeq.Empty<T>(), cons: (hd, tl) => tl.Where(predicate).AddFrontOption(hd.Where(predicate)));
         }
 
         /// <summary>
@@ -374,7 +429,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr1);
             Contract.AssertNotNull(seqExpr2);
 
-            return seqExpr1.Fold(seqExpr2, (x, acc) => acc.AddFront(x));
+            return seqExpr1.Case(empty: seqExpr2, cons: (hd, tl) => tl.Append(seqExpr2).AddFrontOption(hd));
         }
 
         /// <summary>
@@ -399,7 +454,7 @@ namespace ZenLib
         {
             return expr.Case(
                 empty: acc,
-                cons: (hd, tl) => tl.Reverse(acc.AddFront(hd)));
+                cons: (hd, tl) => tl.Reverse(acc.AddFrontOption(hd)));
         }
 
         /// <summary>
@@ -445,7 +500,11 @@ namespace ZenLib
 
             return seqExpr.Case(
                 empty: acc,
-                cons: (hd, tl) => function(hd, tl.Fold(acc, function)));
+                cons: (hd, tl) =>
+                {
+                    var rest = tl.Fold(acc, function);
+                    return If(hd.IsNone(), rest, function(hd.Value(), rest));
+                });
         }
 
         /// <summary>
@@ -463,7 +522,11 @@ namespace ZenLib
 
             return seqExpr.Case(
                 empty: acc,
-                cons: (hd, tl) => tl.FoldLeft(function(acc, hd), function));
+                cons: (hd, tl) =>
+                {
+                    var elt = If(hd.IsNone(), acc, function(acc, hd.Value()));
+                    return tl.FoldLeft(elt, function);
+                });
         }
 
         /// <summary>
@@ -477,7 +540,8 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(predicate);
 
-            return seqExpr.Fold(False(), (x, y) => Or(predicate(x), y));
+            return seqExpr.Case(empty: False(), (hd, tl) => Or(And(hd.IsSome(), predicate(hd.Value())), tl.Any(predicate)));
+            // return seqExpr.Fold(False(), (x, y) => Or(predicate(x), y));
         }
 
         /// <summary>
@@ -491,7 +555,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(predicate);
 
-            return seqExpr.Fold(True(), (x, y) => And(predicate(x), y));
+            return seqExpr.Case(empty: True(), cons: (hd, tl) => And(Or(hd.IsNone(), predicate(hd.Value())), tl.All(predicate)));
         }
 
         /// <summary>
@@ -505,9 +569,28 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(numElements);
 
-            var init = Pair.Create(Constant<ushort>(0), FSeq.Empty<T>());
-            return seqExpr.FoldLeft(init, (acc, x) =>
-                Pair.Create(acc.Item1() + 1, If(acc.Item1() >= numElements, acc.Item2(), acc.Item2().AddFront(x)))).Item2().Reverse();
+            return Take(seqExpr, numElements, 0);
+        }
+
+        /// <summary>
+        /// Take n elements from a sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="numElements">The number of elements to take.</param>
+        /// <param name="i">The current index.</param>
+        /// <returns>Zen value.</returns>
+        private static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements, Zen<ushort> i)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(numElements);
+            Contract.AssertNotNull(i);
+
+            return seqExpr.Case(
+                empty: FSeq.Empty<T>(),
+                cons: (hd, tl) =>
+                {
+                    return If(i == numElements, FSeq.Empty<T>(), tl.Take(numElements, If(hd.IsNone(), i, i + 1)).AddFrontOption(hd));
+                });
         }
 
         /// <summary>
@@ -523,7 +606,7 @@ namespace ZenLib
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
-                cons: (hd, tl) => If(predicate(hd), tl.TakeWhile(predicate).AddFront(hd), FSeq.Empty<T>()));
+                cons: (hd, tl) => If(Or(hd.IsNone(), predicate(hd.Value())), tl.TakeWhile(predicate).AddFrontOption(hd), FSeq.Empty<T>()));
         }
 
         /// <summary>
@@ -547,11 +630,11 @@ namespace ZenLib
         /// <param name="numElements">The number of elements to take.</param>
         /// <param name="i">The current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements, int i)
+        private static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements, Zen<ushort> i)
         {
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
-                cons: (hd, tl) => If(Constant((ushort)i) == numElements, seqExpr, tl.Drop(numElements, i + 1)));
+                cons: (hd, tl) => If(i == numElements, seqExpr, tl.Drop(numElements, If<ushort>(hd.IsNone(), i, i + 1))));
         }
 
         /// <summary>
@@ -567,7 +650,7 @@ namespace ZenLib
 
             return seqExpr.Case(
                 empty: FSeq.Empty<T>(),
-                cons: (hd, tl) => If(predicate(hd), FSeq.Empty<T>(), tl.DropWhile(predicate).AddFront(hd)));
+                cons: (hd, tl) => If(Or(hd.IsNone(), predicate(hd.Value())), tl.DropWhile(predicate), tl));
         }
 
         /// <summary>
@@ -581,9 +664,21 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(index);
 
-            var init = Pair.Create(Constant<ushort>(0), Option.Null<T>());
-            return seqExpr.FoldLeft(init, (acc, x) =>
-                Pair.Create(acc.Item1() + 1, If(acc.Item1() == index, Option.Create(x), acc.Item2()))).Item2();
+            return At(seqExpr, index, 0);
+        }
+
+        /// <summary>
+        /// Get the value of a sequence at an index.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <param name="i">Current index.</param>
+        /// <returns>Zen value.</returns>
+        private static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index, Zen<ushort> i)
+        {
+            return seqExpr.Case(
+                empty: Option.Null<T>(),
+                cons: (hd, tl) => If(And(i == index, hd.IsSome()), hd, tl.At(index, If(hd.IsNone(), i, i + 1))));
         }
 
         /// <summary>
@@ -599,9 +694,22 @@ namespace ZenLib
             Contract.AssertNotNull(index);
             Contract.AssertNotNull(value);
 
-            var init = Pair.Create(Constant<ushort>(0), FSeq.Empty<T>());
-            return seqExpr.FoldLeft(init, (acc, x) =>
-                Pair.Create(acc.Item1() + 1, acc.Item2().AddFront(If(acc.Item1() == index, value, x)))).Item2().Reverse();
+            return Set(seqExpr, index, value, 0);
+        }
+
+        /// <summary>
+        /// Sets the value of the sequence at a given index and returns a new sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <param name="value">Zen value expression.</param>
+        /// <param name="i">Current index.</param>
+        /// <returns>Zen value.</returns>
+        private static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index, Zen<T> value, Zen<ushort> i)
+        {
+            return seqExpr.Case(
+                empty: seqExpr,
+                cons: (hd, tl) => If(And(i == index, hd.IsSome()), tl.AddFrontOption(Option.Create(value)), tl.Set(index, value, If(hd.IsNone(), i, i + 1)).AddFrontOption(hd)));
         }
 
         /// <summary>

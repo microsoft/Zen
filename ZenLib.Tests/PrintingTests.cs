@@ -58,7 +58,6 @@ namespace ZenLib.Tests
             Assert.AreEqual("x", Zen.Arbitrary<Map<int, int>>("x").ToString());
             Assert.AreEqual("new Set`1(Values=x_Values)", Zen.Arbitrary<Set<int>>("x").ToString());
             Assert.AreEqual("new Option`1(HasValue=x_HasValue, Value=x_Value)", Zen.Arbitrary<Option<int>>("x").ToString());
-            Assert.AreEqual("new FBag`1(Values=Cons(new Option`1(HasValue=x_Values_elt_2_0_HasValue, Value=x_Values_elt_2_0_Value), Cons(new Option`1(HasValue=x_Values_elt_2_1_HasValue, Value=x_Values_elt_2_1_Value), [])))", Zen.Arbitrary<FBag<int>>("x", depth: 2, exhaustiveDepth: false).ToString());
         }
 
         /// <summary>
@@ -199,17 +198,6 @@ namespace ZenLib.Tests
         {
             var a = Zen.Symbolic<CMap<string, int>>("map");
             Console.WriteLine(a.Set("a", 1).Get("b").Format());
-        }
-
-        /// <summary>
-        /// Test that formatting works for deep nesting.
-        /// </summary>
-        [TestMethod]
-        public void TestFormattingWorksForObjectExpressions()
-        {
-            var e = Zen.Symbolic<Event>("event");
-            var s = Zen.Symbolic<SwitchState>("state");
-            Console.WriteLine(PfcModel.ProcessEvent(e, s).Format());
         }
     }
 }

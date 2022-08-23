@@ -37,7 +37,7 @@ namespace ZenLib
                 chars = chars.Add(c);
             }
 
-            this.Characters = new FSeq<ushort> { Values = chars };
+            this.Characters = new FSeq<ushort>(chars);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ZenLib
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var c in this.Characters.Values)
+            foreach (var c in this.Characters.ToList())
             {
                 sb.Append((char)c);
             }
@@ -78,12 +78,7 @@ namespace ZenLib
         /// <returns>Whether they are equal.</returns>
         public bool Equals(FString other)
         {
-            if (this.Characters.Values.Count != other.Characters.Values.Count)
-            {
-                return false;
-            }
-
-            return Enumerable.SequenceEqual(this.Characters.Values, other.Characters.Values);
+            return this.Characters.Equals(other.Characters);
         }
 
         /// <summary>
@@ -115,7 +110,7 @@ namespace ZenLib
         public override int GetHashCode()
         {
             int hash = 7;
-            foreach (var c in this.Characters.Values)
+            foreach (var c in this.Characters.ToList())
             {
                 hash = 31 * hash + c;
             }
@@ -214,6 +209,12 @@ namespace ZenLib
             return StartsWith(s.GetCharacters(), pre.GetCharacters());
         }
 
+        /// <summary>
+        /// Wheterh a string is a prefix of another.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="pre">The prefix.</param>
+        /// <returns></returns>
         private static Zen<bool> StartsWith(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> pre)
         {
             return pre.Case(
@@ -246,12 +247,20 @@ namespace ZenLib
             return At(s.GetCharacters(), i, 0);
         }
 
-        private static Zen<FString> At(Zen<FSeq<ushort>> s, Zen<ushort> i, int current)
+        /// <summary>
+        /// Substring of length 1 at the offset.
+        /// Empty if the offset is invalid.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="i">The index.</param>
+        /// <param name="current">The current index.</param>
+        /// <returns>The substring.</returns>
+        private static Zen<FString> At(Zen<FSeq<ushort>> s, Zen<ushort> i, Zen<ushort> current)
         {
             return s.Case(
                 empty: FString.Create(""),
                 cons: (hd, tl) =>
-                    If(i == (ushort)current, FString.Create(hd), At(tl, i, current + 1)));
+                    If(And(hd.IsSome(), i == current), FString.Create(hd.Value()), At(tl, i, Zen.If(hd.IsNone(), current, current + 1))));
         }
 
         /// <summary>

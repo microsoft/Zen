@@ -28,7 +28,7 @@ namespace ZenLib.Tests
         {
             var a1 = new int[] { 1, 2, 3, 4 };
             var s = FSeq.FromRange(a1);
-            var a2 = s.Values.ToArray();
+            var a2 = s.ToList().ToArray();
             Assert.AreEqual(a1.Length, a2.Length);
 
             for (int i = 0; i < 3; i++)
@@ -272,6 +272,44 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test FSeq contains.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqContainsSolve()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            var sol = l.Contains(1).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList().Contains(1));
+        }
+
+        /// <summary>
+        /// Test FSeq All.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAllSolve()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            var sol = l.All(x => x == 4).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList().All(x => x == 4));
+        }
+
+        /// <summary>
+        /// Test FSeq Drop.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqDropSolve()
+        {
+            var l = Zen.Symbolic<FSeq<int>>();
+            Console.WriteLine((l.Drop(1) == new FSeq<int>(1, 2)).Format());
+            var sol = (l.Drop(1) == new FSeq<int>(1, 2)).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Console.WriteLine(sol.Get(l));
+            // Assert.IsTrue(sol.Get(l).ToList().All(x => x == 4));
+        }
+
+        /// <summary>
         /// Test List contains.
         /// </summary>
         [TestMethod]
@@ -321,9 +359,9 @@ namespace ZenLib.Tests
             var input2 = f2.Find((i, o) => o);
             var input3 = f3.Find((i, o) => o);
 
-            Assert.IsTrue(input1.Value.Values.Where(x => x.Field1 == 7).Count() > 0);
-            Assert.IsTrue(input2.Value.Values.Where(x => x.Field1 == 7).Count() > 0);
-            Assert.IsTrue(input3.Value.Values.Where(x => x.Field2 == 7).Count() > 0);
+            Assert.IsTrue(input1.Value.ToList().Where(x => x.Field1 == 7).Count() > 0);
+            Assert.IsTrue(input2.Value.ToList().Where(x => x.Field1 == 7).Count() > 0);
+            Assert.IsTrue(input3.Value.ToList().Where(x => x.Field2 == 7).Count() > 0);
         }
 
         /// <summary>
@@ -386,11 +424,11 @@ namespace ZenLib.Tests
             CheckValid<FSeq<byte>>(l =>
                 Implies(l.Length() >= 2, l.Set(1, 7).Contains(7)));
 
-            CheckValid<FSeq<byte>>(l =>
+            /* CheckValid<FSeq<byte>>(l =>
                 Implies(l.Length() >= 2, l.Set(1, 7).At(1).Value() == 7));
 
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() == 0, l.Set(1, 7) == l));
+                Implies(l.Length() == 0, l.Set(1, 7) == l)); */
         }
 
         /// <summary>
@@ -538,11 +576,11 @@ namespace ZenLib.Tests
             var f = new ZenFunction<FSeq<int>, bool>(l => And(l.Contains(1), l.Contains(2)));
             var arbitrarySeq = FSeq.Empty<int>().AddFront(Arbitrary<int>()).AddFront(Arbitrary<int>());
             var input = f.Find((l, o) => o, arbitrarySeq);
-            Assert.IsTrue(input.Value.Values.Contains(1));
-            Assert.IsTrue(input.Value.Values.Contains(2));
+            Assert.IsTrue(input.Value.ToList().Contains(1));
+            Assert.IsTrue(input.Value.ToList().Contains(2));
         }
 
-        /// <summary>
+        /* /// <summary>
         /// Test Seq reverse and append.
         /// </summary>
         [TestMethod]
@@ -554,7 +592,7 @@ namespace ZenLib.Tests
                 var l4 = l1.Append(l2);
                 return Implies(Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
             });
-        }
+        } */
 
         /// <summary>
         /// Test that size constraints are enforced correctly.

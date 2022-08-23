@@ -16,7 +16,7 @@ namespace ZenLib
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<FSeq<T>>, Zen<T>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
+        private static Func<(Zen<FSeq<T>>, Zen<Option<T>>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenListAddFrontExpr.
@@ -31,7 +31,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the element to add.
         /// </summary>
-        public Zen<T> ElementExpr { get; }
+        public Zen<Option<T>> ElementExpr { get; }
 
         /// <summary>
         /// Create a new ZenListAddFrontExpr.
@@ -39,7 +39,7 @@ namespace ZenLib
         /// <param name="expr">The list expr.</param>
         /// <param name="element">The element expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenListAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<T> element)
+        public static ZenListAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
             Contract.AssertNotNull(expr);
             Contract.AssertNotNull(element);
@@ -54,7 +54,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The list expression.</param>
         /// <param name="element">The expression for the element to add.</param>
-        private ZenListAddFrontExpr(Zen<FSeq<T>> expr, Zen<T> element)
+        private ZenListAddFrontExpr(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
             this.Expr = expr;
             this.ElementExpr = element;
