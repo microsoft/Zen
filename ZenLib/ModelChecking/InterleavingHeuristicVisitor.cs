@@ -167,9 +167,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
-        public override InterleavingResult VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
+        public override InterleavingResult VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
-            return this.Visit(expression.SourceExpr, parameter);
+            var _ = this.Visit(expression.ListExpr, parameter);
+            var e = this.Visit(expression.EmptyExpr, parameter);
+            return e; // no easy way to evaluate cons case.
         }
 
         /// <summary>
@@ -178,11 +180,9 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
-        public override InterleavingResult VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
+        public override InterleavingResult VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
-            var _ = this.Visit(expression.ListExpr, parameter);
-            var e = this.Visit(expression.EmptyExpr, parameter);
-            return e; // no easy way to evaluate cons case.
+            return this.Visit(expression.SourceExpr, parameter);
         }
 
         /// <summary>

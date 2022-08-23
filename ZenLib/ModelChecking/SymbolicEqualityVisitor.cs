@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using ZenLib.Solver;
 
     /// <summary>
@@ -203,6 +204,53 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
+        /// Equality for finite sets.
+        /// </summary>
+        /// <param name="listType">The list type.</param>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The result.</returns>
+        private TBool EqualFiniteSets(Type listType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        {
+            var v1 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
+            var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
+
+            return this.solver.And(
+                EqualFiniteSetsHelper(innerType, v1.Value, v2.Value),
+                EqualFiniteSetsHelper(innerType, v2.Value, v1.Value));
+        }
+
+        /// <summary>
+        /// Helper function for finite set equality.
+        /// </summary>
+        /// <param name="innerType">The inner type.</param>
+        /// <param name="values1">The symbolic values for the first set.</param>
+        /// <param name="values2">The symbolic values for the second set.</param>
+        /// <returns></returns>
+        private TBool EqualFiniteSetsHelper(
+            Type innerType,
+            ImmutableList<(TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)> values1,
+            ImmutableList<(TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)> values2)
+        {
+            var result = this.solver.True();
+
+            foreach (var elt1 in values1)
+            {
+                var isContained = this.solver.False();
+                foreach (var elt2 in values2)
+                {
+                    var eqValues = this.Visit(innerType, (elt1.Item2, elt2.Item2));
+                    isContained = this.solver.Or(isContained, this.solver.And(elt2.Item1, eqValues));
+                }
+
+                var elementActiveImpliesContained = this.solver.Or(this.solver.Not(elt1.Item1), isContained);
+                result = this.solver.And(result, elementActiveImpliesContained);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Visit a type.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
@@ -238,6 +286,14 @@ namespace ZenLib.ModelChecking
         {
             var v1 = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
+
+            // special case for equality with the FSet type.
+            if (ReflectionUtilities.IsFSetType(objectType))
+            {
+                var l1 = v1.Fields["Values"];
+                var l2 = v2.Fields["Values"];
+                return EqualFiniteSets(fields["Values"], fields["Values"].GetGenericArgumentsCached()[0], (l1, l2));
+            }
 
             var result = this.solver.True();
             foreach (var kv in fields)

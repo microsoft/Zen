@@ -84,7 +84,7 @@ namespace ZenLib.ModelChecking
         /// <returns>An empty interleaving result set.</returns>
         public override InterleavingResult VisitList(Type listType, Type innerType, Unit parameter)
         {
-            return this.Visit(innerType, parameter);
+            return this.Visit(typeof(Option<>).MakeGenericType(innerType), parameter);
         }
 
         /// <summary>
