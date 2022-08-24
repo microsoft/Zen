@@ -655,7 +655,9 @@ namespace ZenLib
                 {
                     bytes = BitConverter.GetBytes((long)(dynamic)x);
                     if (BitConverter.IsLittleEndian)
-                        Array.Reverse(bytes);
+                    {
+                        System.Array.Reverse(bytes);
+                    }
                 }
 
                 var c = typeof(TTarget).GetConstructor(new Type[] { typeof(byte[]) });

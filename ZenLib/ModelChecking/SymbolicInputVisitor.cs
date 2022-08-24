@@ -147,8 +147,8 @@ namespace ZenLib.ModelChecking
             }
 
             var zenType = typeof(Zen<>).MakeGenericType(typeof(Option<>).MakeGenericType(elementType));
-            var finalArgs = Array.CreateInstance(zenType, args.Length);
-            Array.Copy(args, finalArgs, args.Length);
+            var finalArgs = System.Array.CreateInstance(zenType, args.Length);
+            System.Array.Copy(args, finalArgs, args.Length);
             return method.Invoke(null, new object[] { finalArgs });
         }
 
