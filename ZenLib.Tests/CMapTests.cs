@@ -548,9 +548,18 @@ namespace ZenLib.Tests
             var x = Zen.Symbolic<CMap<int, int>>();
             var i = Zen.If(l.IsEmpty(), 0, x.Get(1));
             var sol = (i == 2).Solve();
-            Console.WriteLine(sol.Get(l));
-            Console.WriteLine(sol.Get(x));
             Assert.IsTrue(sol.Get(l).Count() > 0);
+        }
+
+        /// <summary>
+        /// Test maps fail with lists.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCMapInFSeqFail()
+        {
+            var zf = Zen.Constraint<CMap<string, int>, FSeq<int>>((m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4);
+            var res = zf.Find();
         }
 
         /// <summary>
