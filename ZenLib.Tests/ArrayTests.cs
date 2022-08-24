@@ -135,7 +135,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(a1 != a3);
             Assert.IsTrue(!a1.Equals(a4));
             Assert.IsTrue(!a1.Equals(new object()));
-            Assert.IsTrue(a1.Equals(a2));
+            Assert.IsTrue(a1.Equals((object)a2));
             Assert.AreEqual(a1.GetHashCode(), a2.GetHashCode());
             Assert.AreNotEqual(a1.GetHashCode(), a3.GetHashCode());
         }
