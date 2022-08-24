@@ -420,7 +420,7 @@ namespace ZenLib.Generation
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.Expr, indent);
-            return FormatFunction(parameter, "GetField", e1, (new LazyString(expression.FieldName), true));
+            return FormatFunction(parameter, "GetField", e1, (new LazyString("\"" + expression.FieldName + "\""), true));
         }
 
         public override (LazyString, bool) VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Parameter parameter)
@@ -428,7 +428,7 @@ namespace ZenLib.Generation
             var indent = parameter.Indent();
             var e1 = Format(expression.Expr, indent);
             var e3 = Format(expression.FieldExpr, indent);
-            return FormatFunction(parameter, "WithField", e1, (new LazyString(expression.FieldName), true), e3);
+            return FormatFunction(parameter, "WithField", e1, (new LazyString("\"" + expression.FieldName + "\""), true), e3);
         }
 
         [ExcludeFromCodeCoverage] // weird issue with call to FormatFunction

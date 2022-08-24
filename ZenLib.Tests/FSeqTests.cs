@@ -164,10 +164,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqHeadEval()
         {
-            var zf = Zen.Function<FSeq<int>, int>(l => l.Head());
-            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2)));
-            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>()));
-            Assert.AreEqual(3, zf.Evaluate(new FSeq<int>(3, 4, 5)));
+            var zf = Zen.Function<FSeq<int>, Option<int>>(l => l.Head());
+            Assert.AreEqual(Option.Some(1), zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual(Option.None<int>(), zf.Evaluate(new FSeq<int>()));
+            Assert.AreEqual(Option.Some(3), zf.Evaluate(new FSeq<int>(3, 4, 5)));
         }
 
         /// <summary>
@@ -282,6 +282,42 @@ namespace ZenLib.Tests
             Assert.AreEqual(new FSeq<int>(3, 2), zf.Evaluate(new FSeq<int>(1, 2), 0, 3));
             Assert.AreEqual(new FSeq<int>(1, 3), zf.Evaluate(new FSeq<int>(1, 2), 1, 3));
             Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), 2, 3));
+        }
+
+        /// <summary>
+        /// Test FSeq set.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqFoldEval()
+        {
+            var zf1 = Zen.Function<FSeq<int>, int>(l => l.Fold(Constant(0), (x, acc) => acc + x));
+            var zf2 = Zen.Function<FSeq<int>, int>(l => l.FoldLeft(Constant(0), (acc, x) => acc + x));
+
+            Assert.AreEqual(6, zf1.Evaluate(new FSeq<int>(1, 2, 3)));
+            Assert.AreEqual(6, zf2.Evaluate(new FSeq<int>(1, 2, 3)));
+
+            zf1.Compile();
+            zf2.Compile();
+
+            Assert.AreEqual(6, zf1.Evaluate(new FSeq<int>(1, 2, 3)));
+            Assert.AreEqual(6, zf2.Evaluate(new FSeq<int>(1, 2, 3)));
+        }
+
+        /// <summary>
+        /// Test FSeq evaluate long sequence.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqLongEval()
+        {
+            var zf = Zen.Function<FSeq<int>, FSeq<int>>(l => l.Select(x => x + 1));
+
+            var res = zf.Evaluate(new FSeq<int>(1, 2, 3, 4, 5, 6, 7, 8, 9));
+            Assert.AreEqual(new FSeq<int>(2, 3, 4, 5, 6, 7, 8, 9, 10), res);
+
+            zf.Compile();
+
+            res = zf.Evaluate(new FSeq<int>(1, 2, 3, 4, 5, 6, 7, 8, 9));
+            Assert.AreEqual(new FSeq<int>(2, 3, 4, 5, 6, 7, 8, 9, 10), res);
         }
 
         /// <summary>

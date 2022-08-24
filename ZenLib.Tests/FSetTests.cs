@@ -20,7 +20,7 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class FSetTests
     {
-        private static FSet<int> b1 = new FSet<int>(1, 2, 3);
+        private static FSet<int> b1 = new FSet<int>(new List<int> { 1, 2, 3 });
 
         private static FSet<int> b2 = new FSet<int>(0, 0, 1);
 
@@ -154,6 +154,36 @@ namespace ZenLib.Tests
             zf.Compile();
             Assert.AreEqual(b1.Size(), (int)zf.Evaluate(b1));
             Assert.AreEqual(b3.Size(), (int)zf.Evaluate(b3));
+        }
+
+        /// <summary>
+        /// Test set evaluation with union.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetUnionEvaluation()
+        {
+            var zf = new ZenFunction<FSet<int>, FSet<int>, FSet<int>>((s1, s2) => s1.Union(s2));
+
+            Assert.AreEqual(new FSet<int>(0, 1, 2, 3), zf.Evaluate(b1, b2));
+            zf.Compile();
+            Assert.AreEqual(new FSet<int>(0, 1, 2, 3), zf.Evaluate(b1, b2));
+        }
+
+        /// <summary>
+        /// Test set evaluation with subsetof.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetIsSubsetOfEvaluation()
+        {
+            var zf = new ZenFunction<FSet<int>, FSet<int>, bool>((s1, s2) => s1.IsSubsetOf(s2));
+
+            Assert.AreEqual(false, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1)));
+            Assert.AreEqual(true, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1, 2)));
+            Assert.AreEqual(true, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1, 2, 3)));
+            zf.Compile();
+            Assert.AreEqual(false, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1)));
+            Assert.AreEqual(true, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1, 2)));
+            Assert.AreEqual(true, zf.Evaluate(new FSet<int>(1, 2), new FSet<int>(1, 2, 3)));
         }
 
         /// <summary>
@@ -371,6 +401,71 @@ namespace ZenLib.Tests
         public void TestFSetRemoveContains()
         {
             RandomBytes(x => CheckValid<FSet<byte>>(l => Not(l.Remove(x).Contains(x))));
+        }
+
+        /// <summary>
+        /// Test that set equality works.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetEquality()
+        {
+            var s1 = Zen.Symbolic<FSet<int>>();
+            var s2 = Zen.Symbolic<FSet<int>>();
+            var sol = And(s1.Contains(3), s1 == s2).Solve();
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(s1) == sol.Get(s2));
+            Assert.IsTrue(sol.Get(s1).ToSet().Contains(3));
+        }
+
+        /// <summary>
+        /// Test that set inequality works.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetInEquality()
+        {
+            var s1 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var s2 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var sol = And(s1.Size() == s2.Size(), s1 != s2, s1.All(e => s2.Contains(e))).Solve();
+            Assert.IsFalse(sol.IsSatisfiable());
+        }
+
+        /// <summary>
+        /// Test that union works as expected.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetUnion()
+        {
+            var s1 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var s2 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var sol = (s1 == s2.Union(new FSet<int>(1, 2))).Solve();
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            var x = sol.Get(s2);
+            x = x.Add(1).Add(2);
+            Assert.AreEqual(x, sol.Get(s1));
+        }
+
+        /// <summary>
+        /// Test that issubsetof works as expected.
+        /// </summary>
+        [TestMethod]
+        public void TestFSetIsSubsetOf()
+        {
+            var s1 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var s2 = Zen.Symbolic<FSet<int>>(depth: 4);
+            var sol = And(s1.Size() < s2.Size(), s1.IsSubsetOf(s2)).Solve();
+
+            var x = sol.Get(s1);
+            var y = sol.Get(s2);
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(x.Size() < y.Size());
+
+            foreach (var elt in x.ToSet())
+            {
+                Assert.IsTrue(y.ToSet().Contains(elt));
+            }
         }
     }
 }

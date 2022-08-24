@@ -143,6 +143,23 @@ namespace ZenLib.Tests
         /// Test that formatting an expression works.
         /// </summary>
         [TestMethod]
+        public void TestFormatFiniteSequences()
+        {
+            var s1 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
+            var s2 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
+            var s3 = Zen.Symbolic<FSeq<string>>();
+            var s4 = new ZenArgumentExpr<FSeq<string>>();
+
+            Console.WriteLine(s1.Length().Format());
+            Console.WriteLine(s2.Append(s3).Format());
+            Console.WriteLine(s3.Contains("c").Format());
+            Console.WriteLine(s4.Contains("c").Format());
+        }
+
+        /// <summary>
+        /// Test that formatting an expression works.
+        /// </summary>
+        [TestMethod]
         public void TestFormatMaps()
         {
             var a = Zen.Symbolic<Map<int, int>>("a");
@@ -185,7 +202,9 @@ namespace ZenLib.Tests
             Console.WriteLine(Zen.Symbolic<Map<int, int>>("x").Set(1, 2).Set(3, 4).Format());
             Console.WriteLine(Zen.Arbitrary<Option<int>>("x").Format());
             Console.WriteLine(Zen.Symbolic<FSeq<int>>("x").Format());
-
+            Console.WriteLine(Zen.If(Zen.Arbitrary<bool>(), Zen.Arbitrary<Option<int>>("x"), Zen.Arbitrary<Option<int>>("y")).IsSome().Format());
+            Console.WriteLine(Zen.If(Zen.Arbitrary<bool>(), Zen.Arbitrary<Option<int>>("x"), Zen.Arbitrary<Option<int>>("y")).WithField<Option<int>, int>("Value", 3).Format());
+            Console.WriteLine((Zen.Arbitrary<int>() == 3).Format());
             var l = Zen.Symbolic<FSeq<byte>>(depth: 3);
             Console.WriteLine(l.Select(x => x + 1).Format());
         }

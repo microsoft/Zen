@@ -76,7 +76,7 @@ namespace ZenLib.Tests
         /// Test symbolic execution for lists.
         /// </summary>
         [TestMethod]
-        public void TestSymbolicExecutionListContains()
+        public void TestSymbolicExecutionFSeqContains()
         {
             ZenSettings.PreserveBranches = true;
             Assert.AreEqual(1, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
@@ -87,10 +87,30 @@ namespace ZenLib.Tests
         /// Test symbolic execution for lists.
         /// </summary>
         [TestMethod]
-        public void TestSymbolicExecutionListFilter()
+        public void TestSymbolicExecutionFSeqFilter()
         {
             var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
             Assert.AreEqual(8, f.GenerateInputs(depth: 3).Count());
+        }
+
+        /// <summary>
+        /// Test symbolic execution for fseq.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionFSeqIndexOf()
+        {
+            var f = new ZenFunction<FSeq<int>, short>(x => x.IndexOf(3));
+            Assert.AreEqual(6, f.GenerateInputs(depth: 5).Count());
+        }
+
+        /// <summary>
+        /// Test symbolic execution for fseq.
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolicExecutionFSeqCase()
+        {
+            var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
+            Assert.AreEqual(2, f.GenerateInputs(depth: 5).Count());
         }
 
         /// <summary>

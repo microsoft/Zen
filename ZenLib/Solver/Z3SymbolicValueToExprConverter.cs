@@ -64,12 +64,6 @@ namespace ZenLib.Solver
         }
 
         [ExcludeFromCodeCoverage]
-        public Expr Visit(SymbolicList<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)
-        {
-            throw new ZenException("Invalid use of list in map or set type.");
-        }
-
-        [ExcludeFromCodeCoverage]
         public Expr Visit(SymbolicFSeq<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr> v, Type parameter)
         {
             throw new ZenException("Invalid use of FSeq in map or set type.");

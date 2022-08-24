@@ -212,18 +212,6 @@ namespace ZenLib.ModelChecking
         }
 
         /// <summary>
-        /// Map the guard over a list.
-        /// </summary>
-        /// <param name="guard">The guard.</param>
-        /// <param name="list">The list.</param>
-        /// <returns></returns>
-        private GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> MapGuard(TBool guard, GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> list)
-        {
-            var newGuard = this.solver.And(guard, list.Guard);
-            return new GuardedList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(newGuard, list.Values);
-        }
-
-        /// <summary>
         /// Visit a type.
         /// </summary>
         /// <param name="parameter">The parameter.</param>

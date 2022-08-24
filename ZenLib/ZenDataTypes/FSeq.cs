@@ -355,11 +355,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <returns>The head, or the default value if the sequence is empty.</returns>
-        public static Zen<T> Head<T>(this Zen<FSeq<T>> seqExpr)
+        internal static Zen<Option<T>> Head<T>(this Zen<FSeq<T>> seqExpr)
         {
             Contract.AssertNotNull(seqExpr);
 
-            return seqExpr.Case(empty: Zen.Default<T>(), cons: (hd, tl) => If(hd.IsNone(), tl.Head(), hd.Value()));
+            return seqExpr.Case(empty: Option.Null<T>(), cons: (hd, tl) => hd);
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <returns>The tail, empty if the sequence is empty.</returns>
-        public static Zen<FSeq<T>> Tail<T>(this Zen<FSeq<T>> seqExpr)
+        internal static Zen<FSeq<T>> Tail<T>(this Zen<FSeq<T>> seqExpr)
         {
             Contract.AssertNotNull(seqExpr);
 

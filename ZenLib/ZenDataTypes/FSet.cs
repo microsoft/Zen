@@ -337,6 +337,34 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Union two sets together.
+        /// </summary>
+        /// <param name="setExpr1">Zen first set expression.</param>
+        /// <param name="setExpr2">Zen second set expression.</param>
+        /// <returns>The new set from the union.</returns>
+        public static Zen<FSet<T>> Union<T>(this Zen<FSet<T>> setExpr1, Zen<FSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return FSet.Create(setExpr1.Values().Append(setExpr2.Values()));
+        }
+
+        /// <summary>
+        /// Determines if a set is a subset of another set.
+        /// </summary>
+        /// <param name="setExpr1">Zen first set expression.</param>
+        /// <param name="setExpr2">Zen second set expression.</param>
+        /// <returns>True if all elements of the furst set are contained in the second.</returns>
+        public static Zen<bool> IsSubsetOf<T>(this Zen<FSet<T>> setExpr1, Zen<FSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return setExpr1.Values().All(x => setExpr2.Contains(x));
+        }
+
+        /// <summary>
         /// Remove all occurences of a value from a set.
         /// </summary>
         /// <param name="setExpr">Zen set expression.</param>

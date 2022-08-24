@@ -114,7 +114,7 @@ namespace ZenLib
         /// <summary>
         /// The type of fset values.
         /// </summary>
-        public readonly static Type FSetType = typeof(FSeq<>);
+        public readonly static Type FSetType = typeof(FSet<>);
 
         /// <summary>
         /// Type of a fixed size integer.

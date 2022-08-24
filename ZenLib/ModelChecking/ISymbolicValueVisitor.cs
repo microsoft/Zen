@@ -57,11 +57,6 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Visit the symbolic list type.
         /// </summary>
-        TReturn Visit(SymbolicList<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
-
-        /// <summary>
-        /// Visit the symbolic list type.
-        /// </summary>
         TReturn Visit(SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> v, TParam parameter);
 
         /// <summary>

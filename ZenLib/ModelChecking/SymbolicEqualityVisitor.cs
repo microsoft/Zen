@@ -206,11 +206,10 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Equality for finite sets.
         /// </summary>
-        /// <param name="listType">The list type.</param>
         /// <param name="innerType">The inner type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The result.</returns>
-        private TBool EqualFiniteSets(Type listType, Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
+        private TBool EqualFiniteSets(Type innerType, (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) parameter)
         {
             var v1 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item1;
             var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
@@ -247,6 +246,7 @@ namespace ZenLib.ModelChecking
                 result = this.solver.And(result, elementActiveImpliesContained);
             }
 
+            Console.WriteLine(result);
             return result;
         }
 
@@ -292,7 +292,7 @@ namespace ZenLib.ModelChecking
             {
                 var l1 = v1.Fields["Values"];
                 var l2 = v2.Fields["Values"];
-                return EqualFiniteSets(fields["Values"], fields["Values"].GetGenericArgumentsCached()[0], (l1, l2));
+                return EqualFiniteSets(fields["Values"].GetGenericArgumentsCached()[0], (l1, l2));
             }
 
             var result = this.solver.True();
