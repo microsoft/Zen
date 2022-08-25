@@ -26,11 +26,6 @@ namespace ZenLib.ModelChecking
         private SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluationVisitor;
 
         /// <summary>
-        /// The evaluation environment.
-        /// </summary>
-        private SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluationEnv;
-
-        /// <summary>
         /// The solver instance.
         /// </summary>
         private ISolver<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> solver;
@@ -39,13 +34,9 @@ namespace ZenLib.ModelChecking
         /// Creates a new instance of the <see cref="SymbolicMergeVisitor{TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal}"/> class.
         /// </summary>
         /// <param name="evaluationVisitor">The evaluation visitor.</param>
-        /// <param name="evaluationEnv">The evaluation environment.</param>
-        public SymbolicMergeVisitor(
-            SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluationVisitor,
-            SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluationEnv)
+        public SymbolicMergeVisitor(SymbolicEvaluationVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> evaluationVisitor)
         {
             this.evaluationVisitor = evaluationVisitor;
-            this.evaluationEnv = evaluationEnv;
             this.solver = evaluationVisitor.Solver;
         }
 
@@ -126,13 +117,13 @@ namespace ZenLib.ModelChecking
                 if (!v1.Value.TryGetValue(key, out var val1))
                 {
                     deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
-                    val1 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
+                    val1 = this.evaluationVisitor.Visit((dynamic)deflt, null);
                 }
 
                 if (!v2.Value.TryGetValue(key, out var val2))
                 {
                     deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(valueType));
-                    val2 = this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv);
+                    val2 = this.evaluationVisitor.Visit((dynamic)deflt, null);
                 }
 
                 result = result.Add(key, this.Visit(valueType, (guard, val1, val2)));
@@ -190,7 +181,7 @@ namespace ZenLib.ModelChecking
                 else
                 {
                     deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
-                    elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
+                    elt1 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, null));
                 }
 
                 if (i < v2.Value.Count)
@@ -200,7 +191,7 @@ namespace ZenLib.ModelChecking
                 else
                 {
                     deflt = deflt ?? ReflectionUtilities.CreateZenConstant(ReflectionUtilities.GetDefaultValue(innerType));
-                    elt2 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
+                    elt2 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, null));
                 }
 
                 var enabled = this.solver.Ite(guard, elt1.Item1, elt2.Item1);

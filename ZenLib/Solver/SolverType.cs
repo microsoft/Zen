@@ -1,13 +1,13 @@
-﻿// <copyright file="Backend.cs" company="Microsoft">
+﻿// <copyright file="SolverType.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.ModelChecking
+namespace ZenLib.Solver
 {
     /// <summary>
-    /// Model checking backend.
+    /// Solver type.
     /// </summary>
-    public enum Backend
+    public enum SolverType
     {
         /// <summary>
         /// DecisionDiagram backend.

@@ -94,7 +94,7 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="backend">The backend.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
-        public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Backend backend = Backend.Z3)
+        public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Solver.SolverType backend = Solver.SolverType.Z3)
         {
             var result = invariant(this.Function());
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend) != null);
@@ -225,7 +225,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             var args = new Dictionary<long, object>
@@ -249,7 +249,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             var args = new Dictionary<long, object>
@@ -287,7 +287,7 @@ namespace ZenLib
             Zen<T1> input = null,
             Func<Zen<T1>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             precondition = precondition == null ? (x) => true : precondition;
@@ -437,7 +437,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -465,7 +465,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -508,7 +508,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -672,7 +672,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -704,7 +704,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -751,7 +751,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -929,7 +929,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -965,7 +965,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
@@ -1016,7 +1016,7 @@ namespace ZenLib
             Zen<T4> input4 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);

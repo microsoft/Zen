@@ -9,6 +9,7 @@ namespace ZenLibBench
     using System.Linq;
     using System.Numerics;
     using ZenLib;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Run a collection of benchmarks for Zen.
@@ -139,7 +140,7 @@ namespace ZenLibBench
             Benchmark(nameof(BenchmarkAllocation), 30, () =>
             {
                 var b = new AclBench();
-                b.Backend = ZenLib.ModelChecking.Backend.DecisionDiagrams;
+                b.Backend = SolverType.DecisionDiagrams;
                 b.NumLines = 10000;
                 b.CreateAcl();
                 b.Acl.ProcessProvenance(Zen.Arbitrary<ZenLib.Tests.Network.IpHeader>());

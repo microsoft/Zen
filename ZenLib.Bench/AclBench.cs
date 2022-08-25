@@ -9,7 +9,7 @@ namespace ZenLibBench
     using System.IO;
     using BenchmarkDotNet.Attributes;
     using ZenLib;
-    using ZenLib.ModelChecking;
+    using ZenLib.Solver;
     using ZenLib.Tests.Network;
 
     using static ZenLib.Zen;
@@ -24,8 +24,8 @@ namespace ZenLibBench
         /// <summary>
         /// The backend to use.
         /// </summary>
-        [Params(Backend.DecisionDiagrams, Backend.Z3)]
-        public Backend Backend { get; set; }
+        [Params(SolverType.DecisionDiagrams, SolverType.Z3)]
+        public SolverType Backend { get; set; }
 
         /// <summary>
         /// The number of ACL lines to benchmark.

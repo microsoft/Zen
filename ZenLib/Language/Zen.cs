@@ -1363,7 +1363,7 @@ namespace ZenLib
         /// <param name="expr">The boolean expression.</param>
         /// <param name="backend">The solver backend to use.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Solve(this Zen<bool> expr, Backend backend = Backend.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType backend = Solver.SolverType.Z3)
         {
             var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
             return new ZenSolution(model);
@@ -1378,7 +1378,7 @@ namespace ZenLib
         public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
             return new ZenSolution(model);
         }
 
@@ -1391,7 +1391,7 @@ namespace ZenLib
         public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Backend.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
             return new ZenSolution(model);
         }
 
@@ -1617,7 +1617,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1>(invariant).Find(input, depth, backend);
         }
@@ -1636,7 +1636,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, backend);
         }
@@ -1657,7 +1657,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, backend);
         }
@@ -1680,7 +1680,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, backend);
         }
@@ -1697,7 +1697,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>> f,
             Func<Zen<T1>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, backend);
         }
@@ -1714,7 +1714,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<T3>> f,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, backend);
         }
@@ -1731,7 +1731,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, backend);
         }
@@ -1748,7 +1748,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, backend);
         }

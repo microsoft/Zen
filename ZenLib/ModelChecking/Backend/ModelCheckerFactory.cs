@@ -22,9 +22,9 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression to evaluate.</param>
         /// <param name="arguments">The arguements.</param>
         /// <returns>A new model checker.</returns>
-        internal static IModelChecker CreateModelChecker(Backend backend, ModelCheckerContext context, Zen<bool> expression, Dictionary<long, object> arguments)
+        internal static IModelChecker CreateModelChecker(SolverType backend, ModelCheckerContext context, Zen<bool> expression, Dictionary<long, object> arguments)
         {
-            if (backend == Backend.DecisionDiagrams)
+            if (backend == SolverType.DecisionDiagrams)
             {
                 return CreateModelCheckerDD(expression, arguments);
             }

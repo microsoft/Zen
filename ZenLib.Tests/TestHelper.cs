@@ -9,7 +9,7 @@ namespace ZenLib.Tests
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
-    using ZenLib.ModelChecking;
+    using ZenLib.Solver;
     using static ZenLib.Zen;
 
     /// <summary>
@@ -95,18 +95,18 @@ namespace ZenLib.Tests
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
-                    new TestParameter { Backend = Backend.DecisionDiagrams, Simplify = false, ListSize = 1 },
-                    new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                    new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
+                    new TestParameter { SolverType = SolverType.DecisionDiagrams, Simplify = false, ListSize = 1 },
+                    new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
                 };
             }
             else
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                    new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
                 };
             }
         }
@@ -115,8 +115,8 @@ namespace ZenLib.Tests
         {
             return new TestParameter[]
             {
-                new TestParameter { Backend = Backend.Z3, Simplify = true, ListSize = 5 },
-                new TestParameter { Backend = Backend.Z3, Simplify = false, ListSize = 5 },
+                new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
+                new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
             };
         }
 
@@ -148,11 +148,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, o) => o, depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, o) => o, depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value));
@@ -177,11 +177,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -206,11 +206,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -236,11 +236,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
+                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -263,7 +263,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is not valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -287,7 +287,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -307,7 +307,7 @@ namespace ZenLib.Tests
             foreach (var p in GetBoundedParameters(defaultBddListSize, runBdds))
             {
                 var f = Zen.Function<bool>(function);
-                var result = f.Assert(o => Flatten(o, p), backend: p.Backend);
+                var result = f.Assert(o => Flatten(o, p), backend: p.SolverType);
 
                 Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
@@ -328,7 +328,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
                 if (result.HasValue)
                 {
                     Assert.IsTrue(f.Evaluate(result.Value));
@@ -353,7 +353,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.Backend);
+                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
 
                 if (result.HasValue)
                 {
@@ -629,7 +629,7 @@ namespace ZenLib.Tests
 
         private class TestParameter
         {
-            public Backend Backend { get; set; }
+            public SolverType SolverType { get; set; }
 
             public bool Simplify { get; set; }
 

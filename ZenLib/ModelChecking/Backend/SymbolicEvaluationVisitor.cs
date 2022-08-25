@@ -45,14 +45,14 @@ namespace ZenLib.ModelChecking
         public Dictionary<object, Dictionary<object, object>> ConstMapAssignment { get; private set; }
 
         /// <summary>
+        /// The map constants for the ConstMap type.
+        /// </summary>
+        internal Dictionary<Type, ISet<object>> MapConstants;
+
+        /// <summary>
         /// A visitor to perform merges.
         /// </summary>
         private SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> mergeVisitor;
-
-        /// <summary>
-        /// The map constants for the ConstMap type.
-        /// </summary>
-        private Dictionary<Type, ISet<object>> mapConstants;
 
         /// <summary>
         /// Creates a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal}"/> class.
@@ -64,6 +64,7 @@ namespace ZenLib.ModelChecking
             this.Variables = new List<TVar>();
             this.ArbitraryVariables = new Dictionary<object, TVar>();
             this.ConstMapAssignment = new Dictionary<object, Dictionary<object, object>>();
+            this.mergeVisitor = new SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this);
         }
 
         /// <summary>
@@ -74,9 +75,8 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Compute<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            this.mergeVisitor = new SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
             var constantMapKeyVisitor = new CMapKeyVisitor(parameter.ArgumentsToExpr);
-            this.mapConstants = constantMapKeyVisitor.Compute(expression);
+            this.MapConstants = constantMapKeyVisitor.Compute(expression);
             return this.Visit(expression, parameter);
         }
 
@@ -127,111 +127,8 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitArbitrary<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            var type = typeof(T1);
-
-            if (type == ReflectionUtilities.BoolType)
-            {
-                var (variable, expr) = this.Solver.CreateBoolVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.ByteType)
-            {
-                var (variable, expr) = this.Solver.CreateByteVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.CharType)
-            {
-                var (variable, expr) = this.Solver.CreateCharVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicChar<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.ShortType || type == ReflectionUtilities.UshortType)
-            {
-                var (variable, expr) = this.Solver.CreateShortVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.IntType || type == ReflectionUtilities.UintType)
-            {
-                var (variable, expr) = this.Solver.CreateIntVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
-            {
-                var (variable, expr) = this.Solver.CreateLongVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.BigIntType)
-            {
-                var (variable, expr) = this.Solver.CreateBigIntegerVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicInteger<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (type == ReflectionUtilities.RealType)
-            {
-                var (variable, expr) = this.Solver.CreateRealVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicReal<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (ReflectionUtilities.IsMapType(type))
-            {
-                var (variable, expr) = this.Solver.CreateDictVar(expression);
-                this.Variables.Add(variable);
-                this.ArbitraryVariables[expression] = variable;
-                return new SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, expr);
-            }
-            else if (ReflectionUtilities.IsConstMapType(type))
-            {
-                if (!this.mapConstants.TryGetValue(type, out var constants))
-                {
-                    throw new ZenException("Unsupported const map operation detected");
-                }
-
-                var valueType = type.GetGenericArgumentsCached()[1];
-                var arbitraryMethod = typeof(Zen).GetMethod("Symbolic").MakeGenericMethod(valueType);
-
-                var assignment = new Dictionary<object, object>();
-                var result = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
-                foreach (var constant in constants)
-                {
-                    var newArbitrary = arbitraryMethod.Invoke(null, new object[] { "k!", 5 });
-                    var symbolicValue = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit((dynamic)newArbitrary, parameter);
-                    result = result.Add(constant, symbolicValue);
-                    assignment[constant] = newArbitrary;
-                }
-
-                this.ConstMapAssignment[expression] = assignment;
-                return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
-            }
-            else if (ReflectionUtilities.IsFixedIntegerType(type))
-            {
-                var size = CommonUtilities.IntegerSize(type);
-                var (v, e) = this.Solver.CreateBitvecVar(expression, (uint)size);
-                this.Variables.Add(v);
-                this.ArbitraryVariables[expression] = v;
-                return new SymbolicBitvec<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, e);
-            }
-            else
-            {
-                Contract.Assert(ReflectionUtilities.IsSeqType(type));
-
-                var (v, e) = this.Solver.CreateSeqVar(expression);
-                this.Variables.Add(v);
-                this.ArbitraryVariables[expression] = v;
-                return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, e);
-            }
+            var arbitraryVisitor = new SymbolicArbitraryVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
+            return arbitraryVisitor.Visit(typeof(T1), expression);
         }
 
         /// <summary>

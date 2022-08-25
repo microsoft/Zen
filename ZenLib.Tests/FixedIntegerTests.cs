@@ -10,7 +10,7 @@ namespace ZenLib.Tests
     using System.Linq;
     using System.Net;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using ZenLib.ModelChecking;
+    using ZenLib.Solver;
     using static ZenLib.Zen;
 
     /// <summary>
@@ -480,7 +480,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingEquality()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, bool>((x, y) => x == y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
@@ -498,7 +498,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingAddition()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x + y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
@@ -516,7 +516,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingSubtraction()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x - y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
@@ -534,7 +534,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingBitwiseAnd()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x & y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
@@ -552,7 +552,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingBitwiseOr()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x | y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
@@ -570,7 +570,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingBitwiseXor()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, Int5>((x, y) => x ^ y);
                 var inputs = f.FindAll((x, y, z) => z == new Int5(4)).Take(5);
@@ -588,7 +588,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingLeq()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, bool>((x, y) => x <= y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
@@ -606,7 +606,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolvingGeq()
         {
-            foreach (var backend in new List<Backend>() { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new List<SolverType>() { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var f = new ZenFunction<Int5, Int5, bool>((x, y) => x >= y);
                 var inputs = f.FindAll((x, y, z) => z).Take(5);
@@ -655,7 +655,7 @@ namespace ZenLib.Tests
             var b = new UInt128(IPAddress.Parse("2000::").GetAddressBytes());
 
             var f = new ZenFunction<UInt128, bool>(x => And(x >= a, x <= b));
-            var input = f.Find((x, y) => y, backend: Backend.DecisionDiagrams);
+            var input = f.Find((x, y) => y, backend: SolverType.DecisionDiagrams);
 
             Assert.AreEqual(a, input.Value);
         }

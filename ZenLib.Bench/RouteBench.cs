@@ -8,7 +8,7 @@ namespace ZenLibBench
     using System.Collections.Generic;
     using BenchmarkDotNet.Attributes;
     using ZenLib;
-    using ZenLib.ModelChecking;
+    using ZenLib.Solver;
     using ZenLib.Tests.Network;
 
     using static ZenLib.Zen;
@@ -23,8 +23,8 @@ namespace ZenLibBench
         /// <summary>
         /// Gets or sets the backend to use.
         /// </summary>
-        [Params(Backend.DecisionDiagrams, Backend.Z3)]
-        public Backend Backend { get; set; }
+        [Params(SolverType.DecisionDiagrams, SolverType.Z3)]
+        public SolverType Backend { get; set; }
 
         /// <summary>
         /// The maximum bounded list input size.

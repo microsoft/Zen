@@ -7,6 +7,7 @@ namespace ZenLib.ModelChecking
     using System;
     using System.Collections.Generic;
     using ZenLib.Interpretation;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Helper class to perform symbolic reasoning.
@@ -20,7 +21,7 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Find(Zen<bool> expression, Dictionary<long, object> arguments, Backend backend)
+        public static Dictionary<object, object> Find(Zen<bool> expression, Dictionary<long, object> arguments, SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
             return modelChecker.ModelCheck(expression, arguments);
@@ -34,7 +35,7 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, Backend backend)
+        public static Dictionary<object, object> Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments);
             return modelChecker.Maximize(objective, subjectTo, arguments);
@@ -48,7 +49,7 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, Backend backend)
+        public static Dictionary<object, object> Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments);
             return modelChecker.Minimize(objective, subjectTo, arguments);
@@ -66,7 +67,7 @@ namespace ZenLib.ModelChecking
             Zen<bool> expression,
             Dictionary<long, object> arguments,
             Zen<T> input,
-            Backend backend)
+            SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
             var assignment = modelChecker.ModelCheck(expression, arguments);
@@ -95,7 +96,7 @@ namespace ZenLib.ModelChecking
             Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
-            Backend backend)
+            SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
 
@@ -129,7 +130,7 @@ namespace ZenLib.ModelChecking
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
-            Backend backend)
+            SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
             var assignment = modelChecker.ModelCheck(expression, arguments);
@@ -165,7 +166,7 @@ namespace ZenLib.ModelChecking
             Zen<T2> input2,
             Zen<T3> input3,
             Zen<T4> input4,
-            Backend backend)
+            SolverType backend)
         {
             var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
             var assignment = modelChecker.ModelCheck(expression, arguments);

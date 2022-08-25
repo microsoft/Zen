@@ -394,7 +394,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test List contains.
+        /// Test FSeq contains.
         /// </summary>
         [TestMethod]
         public void TestFSeqContains()
@@ -403,7 +403,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq contains.
+        /// Test FSeq contains.
         /// </summary>
         [TestMethod]
         public void TestFSeqContainsVariable()
@@ -412,7 +412,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq all.
+        /// Test FSeq all.
         /// </summary>
         [TestMethod]
         public void TestFSeqAll()
@@ -421,7 +421,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq any.
+        /// Test FSeq any.
         /// </summary>
         [TestMethod]
         public void TestFSeqAny()
@@ -430,7 +430,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq any.
+        /// Test FSeq any.
         /// </summary>
         [TestMethod]
         public void TestFSeqAnyObjects()
@@ -449,7 +449,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq map.
+        /// Test FSeq map.
         /// </summary>
         [TestMethod]
         public void TestFSeqMap()
@@ -458,7 +458,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq filter.
+        /// Test FSeq filter.
         /// </summary>
         [TestMethod]
         public void TestFSeqFilter()
@@ -467,7 +467,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq find implies contains.
+        /// Test FSeq find implies contains.
         /// </summary>
         [TestMethod]
         public void TestFSeqContainsFind()
@@ -477,7 +477,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq index of.
+        /// Test FSeq index of.
         /// </summary>
         [TestMethod]
         public void TestFSeqIndexOf()
@@ -487,7 +487,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq at.
+        /// Test FSeq at.
         /// </summary>
         [TestMethod]
         public void TestFSeqAt()
@@ -500,7 +500,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq set.
+        /// Test FSeq set.
         /// </summary>
         [TestMethod]
         public void TestFSeqSet()
@@ -516,7 +516,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq length.
+        /// Test FSeq length.
         /// </summary>
         [TestMethod]
         public void TestFSeqLength()
@@ -525,7 +525,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq length.
+        /// Test FSeq length.
         /// </summary>
         [TestMethod]
         public void TestFSeqLength2()
@@ -534,7 +534,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq reverse.
+        /// Test FSeq reverse.
         /// </summary>
         [TestMethod]
         public void TestFSeqReverse()
@@ -543,7 +543,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that Seq remove all does not contain that element.
+        /// Test that FSeq remove all does not contain that element.
         /// </summary>
         [TestMethod]
         public void TestFSeqRemoveAllNotContains()
@@ -552,7 +552,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq remove all results in a smaller Seq.
+        /// Test FSeq remove all results in a smaller Seq.
         /// </summary>
         [TestMethod]
         public void TestFSeqRemoveAllSmaller()
@@ -561,7 +561,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq remove first.
+        /// Test FSeq remove first.
         /// </summary>
         [TestMethod]
         public void TestFSeqRemoveFirstCount()
@@ -571,7 +571,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that Seq take results in a smaller Seq.
+        /// Test that FSeq take results in a smaller Seq.
         /// </summary>
         [TestMethod]
         public void TestFSeqTakeSmaller()
@@ -580,7 +580,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq take.
+        /// Test FSeq take.
         /// </summary>
         [TestMethod]
         public void TestFSeqTakeExact()
@@ -594,7 +594,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that Seq drop results in a smaller Seq.
+        /// Test that FSeq drop results in a smaller Seq.
         /// </summary>
         [TestMethod]
         public void TestFSeqDropSmaller()
@@ -604,7 +604,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq drop.
+        /// Test FSeq drop.
         /// </summary>
         [TestMethod]
         public void TestFSeqDropExact()
@@ -614,7 +614,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq drop while.
+        /// Test FSeq drop while.
         /// </summary>
         [TestMethod]
         public void TestFSeqDropWhile()
@@ -628,7 +628,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq take while.
+        /// Test FSeq take while.
         /// </summary>
         [TestMethod]
         public void TestFSeqTakeWhile()
@@ -642,7 +642,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq append.
+        /// Test FSeq append.
         /// </summary>
         [TestMethod]
         public void TestFSeqAppend()
@@ -652,7 +652,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq arbitrary.
+        /// Test FSeq arbitrary.
         /// </summary>
         [TestMethod]
         public void TestFSeqArbitrary()
@@ -665,7 +665,7 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test Seq reverse and append.
+        /// Test FSeq reverse and append.
         /// </summary>
         [TestMethod]
         public void TestFSeqReverseAppend()

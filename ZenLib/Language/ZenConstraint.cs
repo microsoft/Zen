@@ -31,7 +31,7 @@ namespace ZenLib
         public Option<T> Find(
             Zen<T> input = null,
             int listSize = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.Find((i, o) => o, input, listSize, backend);
         }
@@ -46,7 +46,7 @@ namespace ZenLib
         public IEnumerable<T> FindAll(
             Zen<T> input = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.FindAll((i, o) => o, input, depth, backend);
         }
@@ -86,7 +86,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int listSize = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.Find((i1, i2, o) => o, input1, input2, listSize, backend);
         }
@@ -103,7 +103,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.FindAll((i1, i2, o) => o, input1, input2, depth, backend);
         }
@@ -145,7 +145,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int listSize = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.Find((i1, i2, i3, o) => o, input1, input2, input3, listSize, backend);
         }
@@ -164,7 +164,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, backend);
         }
@@ -208,7 +208,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, backend);
         }
@@ -229,7 +229,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int listSize = 5,
-            Backend backend = Backend.Z3)
+            Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return this.FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, listSize, backend);
         }

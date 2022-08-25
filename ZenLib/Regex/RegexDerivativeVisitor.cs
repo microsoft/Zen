@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace ZenLib
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// A class to compute a regex derivative.
     /// </summary>
