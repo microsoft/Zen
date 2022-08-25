@@ -27,6 +27,12 @@ namespace ZenLib.Generation
             return this.reusedSubexpressions;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit Visit<T>(Zen<T> expression, Unit parameter)
         {
             if (this.cache.ContainsKey((expression.Id, Unit.Instance)))
@@ -42,6 +48,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitLogicalBinop(ZenLogicalBinopExpr expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -49,12 +61,24 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitNot(ZenNotExpr expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitIf<T>(ZenIfExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.GuardExpr, parameter);
@@ -63,11 +87,23 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitConstant<T>(ZenConstantExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitArithBinop<T>(ZenArithBinopExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -75,12 +111,24 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitBitwiseNot<T>(ZenBitwiseNotExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -88,16 +136,34 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
@@ -105,6 +171,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr, parameter);
@@ -113,6 +185,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitMapDelete<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr, parameter);
@@ -120,6 +198,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitMapGet<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr, parameter);
@@ -127,6 +211,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitMapCombine<TKey>(ZenMapCombineExpr<TKey> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr1, parameter);
@@ -134,6 +224,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitConstMapSet<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr, parameter);
@@ -141,12 +237,24 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.MapExpr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Unit parameter)
         {
             this.Visit(expression.ListExpr, parameter);
@@ -154,17 +262,35 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.ValueExpr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr1, parameter);
@@ -172,12 +298,24 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqLength<T>(ZenSeqLengthExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqAt<T>(ZenSeqAtExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
@@ -185,6 +323,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
@@ -192,6 +336,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqIndexOf<T>(ZenSeqIndexOfExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
@@ -200,6 +350,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqSlice<T>(ZenSeqSliceExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
@@ -208,6 +364,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqReplaceFirst<T>(ZenSeqReplaceFirstExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
@@ -216,18 +378,36 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqRegex<T>(ZenSeqRegexExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitGetField<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
@@ -235,6 +415,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitCreateObject<TObject>(ZenCreateObjectExpr<TObject> expression, Unit parameter)
         {
             foreach (var fieldValuePair in expression.Fields)
@@ -246,6 +432,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitEquality<T>(ZenEqualityExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -253,6 +445,12 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitArithComparison<T>(ZenArithComparisonExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -260,16 +458,34 @@ namespace ZenLib.Generation
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitArgument<T>(ZenArgumentExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitArbitrary<T>(ZenArbitraryExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Unit parameter)
         {
             this.Visit(expression.SourceExpr, parameter);
