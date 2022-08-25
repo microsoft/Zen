@@ -88,7 +88,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public override Unit VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Unit parameter)
+        public override Unit VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Unit parameter)
         {
             return parameter;
         }
@@ -98,7 +98,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public override Unit VisitListAdd<T>(ZenListAddFrontExpr<T> expression, Unit parameter)
+        public override Unit VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
             this.Visit(expression.ElementExpr, parameter);
@@ -147,7 +147,7 @@ namespace ZenLib.Generation
             return parameter;
         }
 
-        public override Unit VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Unit parameter)
+        public override Unit VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Unit parameter)
         {
             this.Visit(expression.ListExpr, parameter);
             this.Visit(expression.EmptyExpr, parameter);

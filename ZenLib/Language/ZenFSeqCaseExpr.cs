@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenListCaseExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenFSeqCaseExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace ZenLib
     /// <summary>
     /// Class representing a list case expression.
     /// </summary>
-    internal sealed class ZenListCaseExpr<T, TResult> : Zen<TResult>
+    internal sealed class ZenFSeqCaseExpr<T, TResult> : Zen<TResult>
     {
         /// <summary>
         /// Gets the list expr.
@@ -36,17 +36,17 @@ namespace ZenLib
         /// <returns></returns>
         private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> consCase)
         {
-            if (e is ZenListEmptyExpr<T>)
+            if (e is ZenFSeqEmptyExpr<T>)
             {
                 return emptyCase;
             }
 
-            if (e is ZenListAddFrontExpr<T> l2)
+            if (e is ZenFSeqAddFrontExpr<T> l2)
             {
                 return consCase(l2.ElementExpr, l2.Expr);
             }
 
-            return new ZenListCaseExpr<T, TResult>(e, emptyCase, consCase);
+            return new ZenFSeqCaseExpr<T, TResult>(e, emptyCase, consCase);
         }
 
         /// <summary>
@@ -69,12 +69,12 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenListCaseExpr{TList, TResult}"/> class.
+        /// Initializes a new instance of the <see cref="ZenFSeqCaseExpr{TList, TResult}"/> class.
         /// </summary>
         /// <param name="listExpr">The list.</param>
         /// <param name="empty">The empty case.</param>
         /// <param name="cons">The cons case.</param>
-        private ZenListCaseExpr(
+        private ZenFSeqCaseExpr(
             Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
             Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)

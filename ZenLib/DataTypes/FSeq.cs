@@ -210,7 +210,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Empty<T>()
         {
-            return ZenListEmptyExpr<T>.Instance;
+            return ZenFSeqEmptyExpr<T>.Instance;
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(valueExpr);
 
-            return ZenListAddFrontExpr<T>.Create(seqExpr, valueExpr);
+            return ZenFSeqAddFrontExpr<T>.Create(seqExpr, valueExpr);
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace ZenLib
             Contract.AssertNotNull(empty);
             Contract.AssertNotNull(cons);
 
-            return ZenListCaseExpr<T, TResult>.Create(seqExpr, empty, (hd, tl) => cons(hd, tl));
+            return ZenFSeqCaseExpr<T, TResult>.Create(seqExpr, empty, (hd, tl) => cons(hd, tl));
         }
 
         /// <summary>

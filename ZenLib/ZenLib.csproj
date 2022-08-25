@@ -36,7 +36,7 @@
   <ItemGroup>
     <PackageReference Include="DecisionDiagrams" Version="1.2.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Z3" Version="4.10.1" />
+    <PackageReference Include="Microsoft.Z3" Version="4.11.0" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
   </ItemGroup>

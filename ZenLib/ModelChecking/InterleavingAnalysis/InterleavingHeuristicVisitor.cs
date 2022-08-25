@@ -142,7 +142,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
-        public override InterleavingResult VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Dictionary<long, object> parameter)
+        public override InterleavingResult VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
         {
             return emptySetVisitor.Visit(typeof(Option<T>), Unit.Instance);
         }
@@ -154,7 +154,7 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public override InterleavingResult VisitListAdd<T>(ZenListAddFrontExpr<T> expression, Dictionary<long, object> parameter)
+        public override InterleavingResult VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Dictionary<long, object> parameter)
         {
             var x = this.Visit(expression.ElementExpr, parameter);
             var y = this.Visit(expression.Expr, parameter);
@@ -167,7 +167,7 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
-        public override InterleavingResult VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
+        public override InterleavingResult VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Dictionary<long, object> parameter)
         {
             var _ = this.Visit(expression.ListExpr, parameter);
             var e = this.Visit(expression.EmptyExpr, parameter);

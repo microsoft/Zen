@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenListAddFrontExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenFSeqAddFrontExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -10,17 +10,17 @@ namespace ZenLib
     /// <summary>
     /// Class representing a list add expression.
     /// </summary>
-    internal sealed class ZenListAddFrontExpr<T> : Zen<FSeq<T>>
+    internal sealed class ZenFSeqAddFrontExpr<T> : Zen<FSeq<T>>
     {
         /// <summary>
         /// Static creation function for hash consing.
         /// </summary>
-        private static Func<(Zen<FSeq<T>>, Zen<Option<T>>), ZenListAddFrontExpr<T>> createFunc = (v) => new ZenListAddFrontExpr<T>(v.Item1, v.Item2);
+        private static Func<(Zen<FSeq<T>>, Zen<Option<T>>), ZenFSeqAddFrontExpr<T>> createFunc = (v) => new ZenFSeqAddFrontExpr<T>(v.Item1, v.Item2);
 
         /// <summary>
         /// Hash cons table for ZenListAddFrontExpr.
         /// </summary>
-        private static HashConsTable<(long, long), ZenListAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenListAddFrontExpr<T>>();
+        private static HashConsTable<(long, long), ZenFSeqAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenFSeqAddFrontExpr<T>>();
 
         /// <summary>
         /// Gets the list expr.
@@ -38,7 +38,7 @@ namespace ZenLib
         /// <param name="expr">The list expr.</param>
         /// <param name="element">The element expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenListAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<Option<T>> element)
+        public static ZenFSeqAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
             Contract.AssertNotNull(expr);
             Contract.AssertNotNull(element);
@@ -49,11 +49,11 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenListAddFrontExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenFSeqAddFrontExpr{T}"/> class.
         /// </summary>
         /// <param name="expr">The list expression.</param>
         /// <param name="element">The expression for the element to add.</param>
-        private ZenListAddFrontExpr(Zen<FSeq<T>> expr, Zen<Option<T>> element)
+        private ZenFSeqAddFrontExpr(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
             this.Expr = expr;
             this.ElementExpr = element;

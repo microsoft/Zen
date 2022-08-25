@@ -44,17 +44,19 @@ namespace ZenLib.Tests
         /// Test that find all orders values in a deterministic way.
         /// </summary>
         [TestMethod]
-        public void TestFindAllOrdering()
+        public void TestFindAllCorrect()
         {
             var values1 = new ZenFunction<ushort, bool>(x => x <= 10).FindAll((i, o) => o).ToList();
             var values2 = new ZenFunction<ushort, bool>(x => x <= 10).FindAll((i, o) => o).ToList();
 
-            Assert.AreEqual(values1.Count, values2.Count);
+            Assert.IsTrue(values1.TrueForAll(x => x <= 10));
+            Assert.IsTrue(values2.TrueForAll(x => x <= 10));
 
-            for (int i = 0; i < values1.Count; i++)
-            {
-                Assert.AreEqual(values1[i], values2[i]);
-            }
+            var unique1 = new HashSet<ushort>(values1);
+            var unique2 = new HashSet<ushort>(values2);
+
+            Assert.AreEqual(11, unique1.Count);
+            Assert.AreEqual(11, unique2.Count);
         }
     }
 }

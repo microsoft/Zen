@@ -1204,7 +1204,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<FSeq<T>> EmptyList<T>()
         {
-            return ZenListEmptyExpr<T>.Instance;
+            return ZenFSeqEmptyExpr<T>.Instance;
         }
 
         /// <summary>
@@ -1351,7 +1351,7 @@ namespace ZenLib
             var list = EmptyList<T>();
             foreach (var element in copy)
             {
-                list = ZenListAddFrontExpr<T>.Create(list, element);
+                list = ZenFSeqAddFrontExpr<T>.Create(list, element);
             }
 
             return list;

@@ -120,8 +120,8 @@ namespace ZenLib.Generation
             return expression is ZenArbitraryExpr<T> ||
                    expression is ZenConstantExpr<T> ||
                    typeName.StartsWith("ZenSeqEmptyExpr") ||
-                   typeName.StartsWith("ZenDictEmptyExpr") ||
-                   typeName.StartsWith("ZenListEmptyExpr");
+                   typeName.StartsWith("ZenMapEmptyExpr") ||
+                   typeName.StartsWith("ZenFSeqEmptyExpr");
         }
 
         private (LazyString, bool) FormatFunction(Parameter parameter, string name, params (LazyString, bool)[] results)
@@ -264,7 +264,7 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, expression.Operation.ToString(), arguments);
         }
 
-        public override (LazyString, bool) VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Parameter parameter)
+        public override (LazyString, bool) VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Parameter parameter)
         {
             return (new LazyString("[]"), true);
         }
@@ -274,7 +274,7 @@ namespace ZenLib.Generation
             return (new LazyString("{}"), true);
         }
 
-        public override (LazyString, bool) VisitListAdd<T>(ZenListAddFrontExpr<T> expression, Parameter parameter)
+        public override (LazyString, bool) VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ElementExpr, indent);
@@ -331,7 +331,7 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Get", e1, (new LazyString(expression.Key.ToString()), true));
         }
 
-        public override (LazyString, bool) VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Parameter parameter)
+        public override (LazyString, bool) VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ListExpr, indent);

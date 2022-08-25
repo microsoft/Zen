@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenListEmptyExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenFSeqEmptyExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -9,17 +9,17 @@ namespace ZenLib
     /// <summary>
     /// Class representing an empty list expression.
     /// </summary>
-    internal sealed class ZenListEmptyExpr<T> : Zen<FSeq<T>>
+    internal sealed class ZenFSeqEmptyExpr<T> : Zen<FSeq<T>>
     {
         /// <summary>
         /// The empty list instance.
         /// </summary>
-        public static ZenListEmptyExpr<T> Instance = new ZenListEmptyExpr<T>();
+        public static ZenFSeqEmptyExpr<T> Instance = new ZenFSeqEmptyExpr<T>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenListEmptyExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenFSeqEmptyExpr{T}"/> class.
         /// </summary>
-        private ZenListEmptyExpr()
+        private ZenFSeqEmptyExpr()
         {
         }
 

@@ -128,7 +128,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenListEmptyExpr<T> expression)
+        public virtual void Visit<T>(ZenFSeqEmptyExpr<T> expression)
         {
             return;
         }
@@ -138,7 +138,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenListAddFrontExpr<T> expression)
+        public virtual void Visit<T>(ZenFSeqAddFrontExpr<T> expression)
         {
             VisitCached(expression.Expr);
             VisitCached(expression.ElementExpr);
@@ -225,7 +225,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        public virtual void Visit<TList, TResult>(ZenListCaseExpr<TList, TResult> expression)
+        public virtual void Visit<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression)
         {
             // TODO: how to handle cons case.
             VisitCached(expression.ListExpr);

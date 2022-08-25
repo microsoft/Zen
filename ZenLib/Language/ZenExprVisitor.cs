@@ -81,7 +81,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        public abstract TReturn VisitListEmpty<T>(ZenListEmptyExpr<T> expression, TParam parameter);
+        public abstract TReturn VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a ListAddFrontExpr.
@@ -89,7 +89,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        public abstract TReturn VisitListAdd<T>(ZenListAddFrontExpr<T> expression, TParam parameter);
+        public abstract TReturn VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit a MapEmptyExpr.
@@ -153,7 +153,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        public abstract TReturn VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, TParam parameter);
+        public abstract TReturn VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, TParam parameter);
 
         /// <summary>
         /// Visit a SeqEmptyExpr.
