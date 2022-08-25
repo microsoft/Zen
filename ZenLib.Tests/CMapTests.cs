@@ -642,15 +642,13 @@ namespace ZenLib.Tests
             var solution = e.GetField<TestMapObject, bool>("Field").Solve();
 
             Assert.IsTrue(solution.IsSatisfiable());
-            Console.WriteLine(solution.Get(b));
-            Console.WriteLine(solution.Get(x));
-            Console.WriteLine(solution.Get(y));
         }
     }
 
     /// <summary>
     /// A test object.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestMapObject
     {
         /// <summary>

@@ -246,7 +246,6 @@ namespace ZenLib.ModelChecking
                 result = this.solver.And(result, elementActiveImpliesContained);
             }
 
-            Console.WriteLine(result);
             return result;
         }
 

@@ -290,5 +290,46 @@ namespace ZenLib.Tests
             Assert.IsTrue(sol.IsSatisfiable());
             Assert.AreEqual(10, sol.Get(a).ToArray().Sum());
         }
+
+        /// <summary>
+        /// Test array in an object.
+        /// </summary>
+        [TestMethod]
+        public void TestArrayInObject()
+        {
+            var a = Zen.Symbolic<TestArray>();
+            var f = a.GetField<TestArray, Array<string, _3>>("Array");
+            var sol = (f.All(x => x == "a")).Solve();
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(a).Array.Length() == 3);
+            Assert.IsTrue(sol.Get(a).Array.ToArray().All(x => x == "a"));
+        }
+
+        /// <summary>
+        /// Test array in an array.
+        /// </summary>
+        [TestMethod]
+        public void TestArrayInArray()
+        {
+            var a = Zen.Symbolic<Array<Array<int, _2>, _2>>();
+            var sol = a.All(a2 => a2.All(x => x == 9)).Solve();
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            var elts = sol.Get(a).ToArray().Select(x => x.ToArray()).ToArray();
+            Assert.IsTrue(elts.All(a2 => a2.All(x => x == 9)));
+        }
+    }
+
+    /// <summary>
+    /// Class that holds an array.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public class TestArray
+    {
+        /// <summary>
+        /// An array field.
+        /// </summary>
+        public Array<string, _3> Array { get; set; }
     }
 }
