@@ -226,15 +226,15 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<Option<int>, FSeq<int>>(o => o.ToSequence());
 
-            Assert.AreEqual(1, zf.Evaluate(Option.Some(1)).Values.Count);
-            Assert.AreEqual(0, zf.Evaluate(Option.None<int>()).Values.Count);
+            Assert.AreEqual(1, zf.Evaluate(Option.Some(1)).ToList().Count);
+            Assert.AreEqual(0, zf.Evaluate(Option.None<int>()).ToList().Count);
 
             zf.Compile();
-            Assert.AreEqual(1, zf.Evaluate(Option.Some(1)).Values.Count);
-            Assert.AreEqual(0, zf.Evaluate(Option.None<int>()).Values.Count);
+            Assert.AreEqual(1, zf.Evaluate(Option.Some(1)).ToList().Count);
+            Assert.AreEqual(0, zf.Evaluate(Option.None<int>()).ToList().Count);
 
-            Assert.AreEqual(1, Option.Some(1).ToSequence().Values.Count);
-            Assert.AreEqual(0, Option.None<int>().ToSequence().Values.Count);
+            Assert.AreEqual(1, Option.Some(1).ToSequence().ToList().Count);
+            Assert.AreEqual(0, Option.None<int>().ToSequence().ToList().Count);
         }
 
         /// <summary>

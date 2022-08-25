@@ -18,10 +18,5 @@ namespace ZenLib
         /// An optional name to use for variables.
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Whether to exhaustively enumerate objects up to a given depth.
-        /// </summary>
-        public bool ExhaustiveDepth { get; set; }
     }
 }

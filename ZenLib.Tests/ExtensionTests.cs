@@ -109,9 +109,9 @@ namespace ZenLib.Tests
             Assert.AreEqual(2, asol.Count());
             Assert.AreEqual(1, bsol.Count());
 
-            Assert.AreEqual(1, asol.Values[0]);
-            Assert.AreEqual(2, asol.Values[1]);
-            Assert.AreEqual(3, bsol.Values[0]);
+            Assert.AreEqual(1, asol.ToList()[0]);
+            Assert.AreEqual(2, asol.ToList()[1]);
+            Assert.AreEqual(3, bsol.ToList()[0]);
         }
 
         /// <summary>
@@ -205,25 +205,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that evaluate works as expected for booleans.
+        /// Test that evaluate works as expected for lists.
         /// </summary>
         [TestMethod]
-        public void TestEvaluateList()
+        public void TestEvaluateFSeq()
         {
             var a = Arbitrary<FSeq<int>>();
-            var expr = a.Sort();
+            var expr = a.Contains(3);
 
             var assignment = new Dictionary<object, object>
             {
-                { a, new FSeq<int> { Values = ImmutableList.CreateRange(new List<int> { 3, 2, 1 }) } },
+                { a, new FSeq<int>(3, 2, 1) },
             };
 
             var l = expr.Evaluate(assignment);
 
-            Assert.AreEqual(3, l.Values.Count);
-            Assert.AreEqual(1, l.Values[0]);
-            Assert.AreEqual(2, l.Values[1]);
-            Assert.AreEqual(3, l.Values[2]);
+            Assert.IsTrue(l);
         }
 
         /// <summary>
@@ -301,7 +298,7 @@ namespace ZenLib.Tests
         public void TestEvaluateWrongTypes3()
         {
             var a = Arbitrary<FSeq<int>>();
-            var expr = a.Sort();
+            var expr = a.Select(x => x + 1);
 
             var assignment = new Dictionary<object, object>
             {

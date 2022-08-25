@@ -6,7 +6,7 @@ namespace ZenLib.Tests
 {
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using ZenLib.ModelChecking;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Tests conversion from values to Zen values.
@@ -286,7 +286,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<short, byte>(x => Zen.Cast<short, byte>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -303,7 +303,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<int, byte>(x => Zen.Cast<int, byte>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -320,7 +320,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<long, byte>(x => Zen.Cast<long, byte>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -337,7 +337,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<byte, short>(x => Zen.Cast<byte, short>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((b, s) => Zen.And(b == 4, s == 4), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -354,7 +354,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<ushort, short>(x => Zen.Cast<ushort, short>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((u, s) => Zen.And(u == ushort.MaxValue, s == -1), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -371,7 +371,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenFunction<UInt16, ulong>(x => Zen.Cast<UInt16, ulong>(x));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find((u, s) => u == new UInt16(ushort.MaxValue), backend: backend);
                 Assert.IsTrue(example.HasValue);
@@ -388,7 +388,7 @@ namespace ZenLib.Tests
         {
             var zf = new ZenConstraint<UInt3>(x => Zen.Cast<UInt3, Int3>(x) < new Int3(0));
 
-            foreach (var backend in new Backend[] { Backend.Z3, Backend.DecisionDiagrams })
+            foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
                 var example = zf.Find(backend: backend);
                 Assert.IsTrue(example.HasValue);

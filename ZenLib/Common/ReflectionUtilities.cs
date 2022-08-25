@@ -112,6 +112,11 @@ namespace ZenLib
         public readonly static Type FSeqType = typeof(FSeq<>);
 
         /// <summary>
+        /// The type of fset values.
+        /// </summary>
+        public readonly static Type FSetType = typeof(FSet<>);
+
+        /// <summary>
         /// Type of a fixed size integer.
         /// </summary>
         public readonly static Type IntNType = typeof(IntN<,>);
@@ -405,6 +410,16 @@ namespace ZenLib
         public static bool IsFSeqType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinitionCached() == FSeqType;
+        }
+
+        /// <summary>
+        /// Check if a type is a FSet type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsFSetType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinitionCached() == FSetType;
         }
 
         /// <summary>

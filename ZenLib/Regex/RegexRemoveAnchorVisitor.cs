@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace ZenLib
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// A class to remove anchors from a regular expression.
     /// </summary>

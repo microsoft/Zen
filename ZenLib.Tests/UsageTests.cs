@@ -24,36 +24,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestAddException1()
-        {
-            FMap.Set(null, Constant(1), Constant(1));
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestAddException2()
-        {
-            FMap.Set(FMap.Empty<int, int>(), null, 1);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestAddException3()
-        {
-            FMap.Set(FMap.Empty<int, int>(), 1, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestAddBackException1()
         {
             FSeq.AddBack(null, Constant(1));
@@ -66,7 +36,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddBackException2()
         {
-            FSeq.AddBack(FSeq.Empty<int>(), null);
+            FSeq.AddBackOption(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -86,7 +56,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestAddFrontException2()
         {
-            FSeq.AddFront(FSeq.Empty<int>(), null);
+            FSeq.AddFrontOption(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -294,26 +264,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestContainsKeyException1()
-        {
-            FMap.ContainsKey<int, int>(null, 0);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestContainsKeyException2()
-        {
-            FMap.ContainsKey(FMap.Empty<int, int>(), null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestDropException1()
         {
             FSeq.Drop<int>(null, 0);
@@ -474,26 +424,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestGetException1()
-        {
-            FMap.Get<int, int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestGetException2()
-        {
-            FMap.Get(FMap.Empty<int, int>(), null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestGetFieldException1()
         {
             Zen.GetField<Object1, int>(null, null);
@@ -614,59 +544,9 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestInsertException1()
-        {
-            FSeq.Insert<int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestInsertException2()
-        {
-            FSeq.Insert<int>(0, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestIntersperseException1()
-        {
-            FSeq.Intersperse<int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestIntersperseException2()
-        {
-            FSeq.Intersperse(FSeq.Empty<int>(), null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestIsEmptyException1()
         {
             FSeq.IsEmpty<int>(null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestIsSortedException1()
-        {
-            FSeq.IsSorted<int>(null);
         }
 
         /// <summary>
@@ -1120,26 +1000,6 @@ namespace ZenLib.Tests
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ZenException))]
-        public void TestRemoveFirstException1()
-        {
-            FSeq.RemoveFirst<int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestRemoveFirstException2()
-        {
-            FSeq.RemoveFirst(FSeq.Empty<int>(), null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
         public void TestReverseException()
         {
             FSeq.Reverse<int>(null);
@@ -1208,36 +1068,6 @@ namespace ZenLib.Tests
         public void TestSomeException()
         {
             Option.Create<int>(null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSortException()
-        {
-            FSeq.Sort<int>(null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSplitAtException1()
-        {
-            FSeq.SplitAt<int>(null, null);
-        }
-
-        /// <summary>
-        /// Exception thrown for null parameter.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestSplitAtException2()
-        {
-            FSeq.SplitAt(FSeq.Empty<int>(), null);
         }
 
         /// <summary>
@@ -1459,7 +1289,7 @@ namespace ZenLib.Tests
         public void TestExactSeqs()
         {
             var f = new ZenFunction<FSeq<int>, ushort>(l => l.Length());
-            f.Find((i, o) => true, exhaustiveDepth: false);
+            f.Find((i, o) => true);
         }
 
         /// <summary>

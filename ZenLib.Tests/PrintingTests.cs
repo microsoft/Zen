@@ -26,7 +26,7 @@ namespace ZenLib.Tests
             // expressions
             Assert.AreEqual("1", Zen.Constant(1).ToString());
             Assert.AreEqual("[]", FSeq.Empty<int>().ToString());
-            Assert.AreEqual("Cons(1, [])", FSeq.Empty<int>().AddBack(1).ToString());
+            Assert.AreEqual("Cons(new Option`1(HasValue=True, Value=1), [])", FSeq.Empty<int>().AddBack(1).ToString());
             Assert.AreEqual("new Set`1(Values=Set({}, 1, new SetUnit()))", Set.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Unit(1)", Seq.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Concat(Unit(1), Unit(2))", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
@@ -58,7 +58,6 @@ namespace ZenLib.Tests
             Assert.AreEqual("x", Zen.Arbitrary<Map<int, int>>("x").ToString());
             Assert.AreEqual("new Set`1(Values=x_Values)", Zen.Arbitrary<Set<int>>("x").ToString());
             Assert.AreEqual("new Option`1(HasValue=x_HasValue, Value=x_Value)", Zen.Arbitrary<Option<int>>("x").ToString());
-            Assert.AreEqual("new FBag`1(Values=Cons(new Option`1(HasValue=x_Values_elt_2_0_HasValue, Value=x_Values_elt_2_0_Value), Cons(new Option`1(HasValue=x_Values_elt_2_1_HasValue, Value=x_Values_elt_2_1_Value), [])))", Zen.Arbitrary<FBag<int>>("x", depth: 2, exhaustiveDepth: false).ToString());
         }
 
         /// <summary>
@@ -144,6 +143,23 @@ namespace ZenLib.Tests
         /// Test that formatting an expression works.
         /// </summary>
         [TestMethod]
+        public void TestFormatFiniteSequences()
+        {
+            var s1 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
+            var s2 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
+            var s3 = Zen.Symbolic<FSeq<string>>();
+            var s4 = new ZenArgumentExpr<FSeq<string>>();
+
+            Console.WriteLine(s1.Length().Format());
+            Console.WriteLine(s2.Append(s3).Format());
+            Console.WriteLine(s3.Contains("c").Format());
+            Console.WriteLine(s4.Contains("c").Format());
+        }
+
+        /// <summary>
+        /// Test that formatting an expression works.
+        /// </summary>
+        [TestMethod]
         public void TestFormatMaps()
         {
             var a = Zen.Symbolic<Map<int, int>>("a");
@@ -186,9 +202,11 @@ namespace ZenLib.Tests
             Console.WriteLine(Zen.Symbolic<Map<int, int>>("x").Set(1, 2).Set(3, 4).Format());
             Console.WriteLine(Zen.Arbitrary<Option<int>>("x").Format());
             Console.WriteLine(Zen.Symbolic<FSeq<int>>("x").Format());
-
-            var l = Zen.Symbolic<FSeq<byte>>(depth: 3, exhaustiveDepth: false);
-            Console.WriteLine(l.Sort().Format());
+            Console.WriteLine(Zen.If(Zen.Arbitrary<bool>(), Zen.Arbitrary<Option<int>>("x"), Zen.Arbitrary<Option<int>>("y")).IsSome().Format());
+            Console.WriteLine(Zen.If(Zen.Arbitrary<bool>(), Zen.Arbitrary<Option<int>>("x"), Zen.Arbitrary<Option<int>>("y")).WithField<Option<int>, int>("Value", 3).Format());
+            Console.WriteLine((Zen.Arbitrary<int>() == 3).Format());
+            var l = Zen.Symbolic<FSeq<byte>>(depth: 3);
+            Console.WriteLine(l.Select(x => x + 1).Format());
         }
 
         /// <summary>
@@ -199,17 +217,6 @@ namespace ZenLib.Tests
         {
             var a = Zen.Symbolic<CMap<string, int>>("map");
             Console.WriteLine(a.Set("a", 1).Get("b").Format());
-        }
-
-        /// <summary>
-        /// Test that formatting works for deep nesting.
-        /// </summary>
-        [TestMethod]
-        public void TestFormattingWorksForObjectExpressions()
-        {
-            var e = Zen.Symbolic<Event>("event");
-            var s = Zen.Symbolic<SwitchState>("state");
-            Console.WriteLine(PfcModel.ProcessEvent(e, s).Format());
         }
     }
 }

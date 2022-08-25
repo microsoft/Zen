@@ -4,12 +4,8 @@
 
 namespace ZenLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.Z3;
     using ZenLib;
     using static ZenLib.Zen;
 
@@ -32,25 +28,24 @@ namespace ZenLib.Tests
             o1.Field2 = new FSeq<int>();
             o1.Field3 = new FSeq<int>();
 
-            var o = Symbolic<ObjectAttribute>(depth: 3, exhaustiveDepth: true);
-
+            var o = Symbolic<ObjectAttribute>(depth: 3);
             var s1 = o.GetField<ObjectAttribute, FSeq<int>>("Field1").ToString();
             var s2 = o.GetField<ObjectAttribute, FSeq<int>>("Field2").ToString();
             var s3 = o.GetField<ObjectAttribute, FSeq<int>>("Field3").ToString();
             Assert.AreEqual(11, s1.Split("Cons").Length);
-            Assert.AreEqual(6, s2.Split("==").Length);
-            Assert.AreEqual(4, s3.Split("==").Length);
+            Assert.AreEqual(6, s2.Split("Cons").Length);
+            Assert.AreEqual(4, s3.Split("Cons").Length);
         }
 
         private struct ObjectAttribute
         {
-            [ZenSize(depth: 10, EnumerationType.FixedSize)]
+            [ZenSize(depth: 10)]
             public FSeq<int> Field1;
 
-            [ZenSize(depth: 5, EnumerationType.Exhaustive)]
+            [ZenSize(depth: 5)]
             public FSeq<int> Field2;
 
-            [ZenSize(depth: -1, EnumerationType.User)]
+            [ZenSize(depth: -1)]
             public FSeq<int> Field3;
         }
     }

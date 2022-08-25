@@ -76,6 +76,12 @@ namespace ZenLib.Generation
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Format an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         private (LazyString, bool) Format<T>(Zen<T> expression, Parameter parameter)
         {
             if (this.reusedSubExpressions.Contains(expression))
@@ -101,6 +107,11 @@ namespace ZenLib.Generation
             return expression.Accept(this, parameter);
         }
 
+        /// <summary>
+        /// Create a let binding for an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A formatted string.</returns>
         private LazyString CreateLetBinding<T>(Zen<T> expression)
         {
             var (s, _) = expression.Accept(this, new Parameter { Level = 0 });
@@ -109,21 +120,37 @@ namespace ZenLib.Generation
             return new LazyString(variable);
         }
 
+        /// <summary>
+        /// Gets a fresh let variable name.
+        /// </summary>
+        /// <returns></returns>
         private string FreshLetVariable()
         {
             return $"e!{this.nextId++}";
         }
 
+        /// <summary>
+        /// Determines if an expression is a basic expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>True if the expression can be formatted on one line.</returns>
         private bool IsBasicExpression<T>(Zen<T> expression)
         {
             var typeName = expression.GetType().Name;
             return expression is ZenArbitraryExpr<T> ||
                    expression is ZenConstantExpr<T> ||
                    typeName.StartsWith("ZenSeqEmptyExpr") ||
-                   typeName.StartsWith("ZenDictEmptyExpr") ||
-                   typeName.StartsWith("ZenListEmptyExpr");
+                   typeName.StartsWith("ZenMapEmptyExpr") ||
+                   typeName.StartsWith("ZenFSeqEmptyExpr");
         }
 
+        /// <summary>
+        /// A formatting function that for a function.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="results">The formatted arguments.</param>
+        /// <returns>A formatted string.</returns>
         private (LazyString, bool) FormatFunction(Parameter parameter, string name, params (LazyString, bool)[] results)
         {
             var indent = parameter.Indent().ToString();
@@ -161,6 +188,12 @@ namespace ZenLib.Generation
             return (str, inline);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitLogicalBinop(ZenLogicalBinopExpr expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -183,9 +216,15 @@ namespace ZenLib.Generation
 
             exprs.AddRange(stack);
             var arguments = exprs.Select(e => Format(e, indent)).ToArray();
-            return FormatFunction(parameter, "And", arguments);
+            return FormatFunction(parameter, expression.Operation.ToString(), arguments);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitNot(ZenNotExpr expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -193,6 +232,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Not", e1);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitIf<T>(ZenIfExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -202,11 +247,23 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "If", e1, e2, e3);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitConstant<T>(ZenConstantExpr<T> expression, Parameter parameter)
         {
             return (new LazyString(expression.ToString()), true);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitArithBinop<T>(ZenArithBinopExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -232,6 +289,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, expression.Operation.ToString(), arguments);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitBitwiseNot<T>(ZenBitwiseNotExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -239,6 +302,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "BitwiseNot", e1);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -264,17 +333,35 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, expression.Operation.ToString(), arguments);
         }
 
-        public override (LazyString, bool) VisitListEmpty<T>(ZenListEmptyExpr<T> expression, Parameter parameter)
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Parameter parameter)
         {
             return (new LazyString("[]"), true);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Parameter parameter)
         {
             return (new LazyString("{}"), true);
         }
 
-        public override (LazyString, bool) VisitListAdd<T>(ZenListAddFrontExpr<T> expression, Parameter parameter)
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ElementExpr, indent);
@@ -282,6 +369,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Cons", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -291,6 +384,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Set", e1, e2, e3);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitMapDelete<TKey, TValue>(ZenMapDeleteExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -299,6 +398,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Delete", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitMapGet<TKey, TValue>(ZenMapGetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -307,6 +412,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Get", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitMapCombine<TKey>(ZenMapCombineExpr<TKey> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -316,6 +427,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, op, e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitConstMapSet<TKey, TValue>(ZenConstMapSetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -324,6 +441,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Set", e1, (new LazyString(expression.Key.ToString()), true), e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -331,7 +454,13 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Get", e1, (new LazyString(expression.Key.ToString()), true));
         }
 
-        public override (LazyString, bool) VisitListCase<TList, TResult>(ZenListCaseExpr<TList, TResult> expression, Parameter parameter)
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ListExpr, indent);
@@ -339,11 +468,23 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Case", e1, e2, (new LazyString("<lambda>"), true));
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Parameter parameter)
         {
             return (new LazyString("[]"), true);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -351,6 +492,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Unit", e1);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -359,6 +506,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Concat", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqLength<T>(ZenSeqLengthExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -366,6 +519,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Length", e1);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqAt<T>(ZenSeqAtExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -374,6 +533,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "At", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -383,6 +548,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, op, e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqIndexOf<T>(ZenSeqIndexOfExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -391,6 +562,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "IndexOf", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqSlice<T>(ZenSeqSliceExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -400,6 +577,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Slice", e1, e2, e3);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqReplaceFirst<T>(ZenSeqReplaceFirstExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -409,6 +592,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "ReplaceFirst", e1, e2, e3);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqRegex<T>(ZenSeqRegexExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -416,21 +605,39 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "MatchesRegex", e1, (new LazyString(expression.Regex.ToString()), true));
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitGetField<T1, T2>(ZenGetFieldExpr<T1, T2> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.Expr, indent);
-            return FormatFunction(parameter, "GetField", e1, (new LazyString(expression.FieldName), true));
+            return FormatFunction(parameter, "GetField", e1, (new LazyString("\"" + expression.FieldName + "\""), true));
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitWithField<T1, T2>(ZenWithFieldExpr<T1, T2> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.Expr, indent);
             var e3 = Format(expression.FieldExpr, indent);
-            return FormatFunction(parameter, "WithField", e1, (new LazyString(expression.FieldName), true), e3);
+            return FormatFunction(parameter, "WithField", e1, (new LazyString("\"" + expression.FieldName + "\""), true), e3);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         [ExcludeFromCodeCoverage] // weird issue with call to FormatFunction
         public override (LazyString, bool) VisitCreateObject<TObject>(ZenCreateObjectExpr<TObject> expression, Parameter parameter)
         {
@@ -448,6 +655,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "new " + typeof(TObject), results);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitEquality<T>(ZenEqualityExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -456,6 +669,12 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, "Equals", e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitArithComparison<T>(ZenArithComparisonExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
@@ -465,11 +684,23 @@ namespace ZenLib.Generation
             return FormatFunction(parameter, op, e1, e2);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitArgument<T>(ZenArgumentExpr<T> expression, Parameter parameter)
         {
             return (new LazyString($"Argument({expression.ArgumentId})"), true);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitArbitrary<T>(ZenArbitraryExpr<T> expression, Parameter parameter)
         {
             var str = expression.ToString();
@@ -477,6 +708,12 @@ namespace ZenLib.Generation
             return (new LazyString(str), true);
         }
 
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitCast<TKey, TValue>(ZenCastExpr<TKey, TValue> expression, Parameter parameter)
         {
             var indent = parameter.Indent();

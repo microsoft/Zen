@@ -531,6 +531,21 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that merging works with strings.
+        /// </summary>
+        [TestMethod]
+        public void TestStringMerge()
+        {
+            var b = Zen.Symbolic<bool>();
+            var s = Zen.Symbolic<string>();
+            var e = Zen.If(b, "hello", s);
+            var sol = e.StartsWith("hi").Solve();
+
+            Assert.IsFalse(sol.Get(b));
+            Assert.IsTrue(sol.Get(s).StartsWith("hi"));
+        }
+
+        /// <summary>
         /// Test that string characters in the d800-dfff range work.
         /// </summary>
         [TestMethod]
@@ -627,7 +642,7 @@ namespace ZenLib.Tests
         public void TestDiagramBackendException1()
         {
             var f = new ZenFunction<string, bool>(s => s == "a");
-            f.Find((x, y) => y, backend: ModelChecking.Backend.DecisionDiagrams);
+            f.Find((x, y) => y, backend: ZenLib.Solver.SolverType.DecisionDiagrams);
         }
 
         /// <summary>
@@ -638,7 +653,7 @@ namespace ZenLib.Tests
         public void TestDiagramBackendException2()
         {
             var f = new ZenFunction<string, string>(s => s + "a");
-            f.Find((x, y) => x == y, backend: ModelChecking.Backend.DecisionDiagrams);
+            f.Find((x, y) => x == y, backend: ZenLib.Solver.SolverType.DecisionDiagrams);
         }
 
         /// <summary>

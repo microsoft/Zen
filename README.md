@@ -24,6 +24,7 @@ Zen is a research library that provides high-level abstractions in .NET to make 
   - [Finite Sequences, Bags, Maps](#finite-sequences-bags-maps)
   - [Unbounded Sets and Maps](#unbounded-sets-and-maps)
   - [Constant Sets and Maps](#constant-sets-and-maps)
+  - [Fixed Length Arrays](#fixed-length-arrays)
   - [Sequences, Strings, and Regular Expressions](#sequences-strings-and-regular-expressions)
   - [Custom classes and structs](#custom-classes-and-structs)
   - [Enumerated values](#enumerated-values)
@@ -60,13 +61,13 @@ var b = Zen.Symbolic<bool>();
 var i = Zen.Symbolic<int>();
 var s = Zen.Symbolic<string>();
 var o = Zen.Symbolic<Option<ulong>>();
-var l = Zen.Symbolic<FSeq<int>>(depth: 10, exhaustiveDepth: false);
+var l = Zen.Symbolic<FSeq<int>>(depth: 10);
 
 // build constraints on these variables
 var c1 = Zen.Or(b, i <= 10);
 var c2 = Zen.Or(Zen.Not(b), o == Option.Some(1UL));
 var c3 = Zen.Or(s.Contains("hello"), o.IsNone());
-var c4 = l.Where(x => x <= i).Length() == 5;
+var c4 = Zen.And(l.Where(x => x == i).Length() == 5, Zen.Not(l.All(x => x == i)));
 var c5 = l.All(x => Zen.And(x >= 0, x <= 100));
 var expr = Zen.And(c1, c2, c3, c4, c5);
 
@@ -80,14 +81,14 @@ System.Console.WriteLine("o: " + solution.Get(o));
 System.Console.WriteLine("l: " + string.Join(",", solution.Get(l)));
 ```
 
-The output of this example produces the following values:
+An example output is the following values:
 
 ```csharp
 b: True
-i: 68
+i: 38
 s: hello
 o: Some(1)
-l: [69,69,69,5,69,69,5,5,5,5]
+l: [10,38,38,38,38,38]
 ```
 
 <a name="computing-with-zen-expressions"></a>
@@ -278,8 +279,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Pair<T1, ...>`  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
 | `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
-| `FBag<T>`       | finite size unordered multiset of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
-| `FMap<T1, T2>` | finite size maps of keys and values of type `T1` and `T2` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
+| `FSet<T>`       | finite size set of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
 | `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :heavy_minus_sign:  |
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
 | `Real` | arbitrary precision rational number | :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
@@ -287,6 +287,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `CMap<T1, T2>` | maps of constant keys of type `T1` to values of type `T2`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `CSet<T>` | sets of constants of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `Array<T, TSize>` | Fixed size arrays of values of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 
@@ -343,7 +344,7 @@ var solution = And(b.IsNone(), p.Item1() == 3).Solve(); // b = None, p = (3, 0)
 <a name="real-values"></a>
 ## Real Values
 
-Zen supports arbitrary precision real numbers through the `Real` type.
+Zen supports arbitrary precision rational numbers through the `Real` type.
 
 ```csharp
 var c = new Real(3, 2); // the fraction 3/2 or equivalently 1.5 
@@ -357,42 +358,23 @@ var solution = (2 * x + 3 * y == c).Solve(); // x = 1/2, y = 1/6
 
 Zen supports several high-level data types that are finite (bounded) in size (the default size is 5 but can be changed). These include:
 
-- `FSeq<T>` for reasoning about variable length sequences of values where the order is important. For instance, the sorting example earlier.
-- `FBag<T>` represents finite unordered multi-sets. When the order of elements is not important, it is often preferred to use `FBag<T>` if compared to `FSeq<T>` as it may scale better.
-- `FMap<T1, T2>` type to emulate finite maps from keys to values.
+- `FSeq<T>` for reasoning about variable length sequences of values where the order is important.
+- `FSet<T>` represents finite sets.
 
-One can implement complex functionality over `FSeq<T>` types by recursively processing the list in the style of functional programming. This is done via the `Zen.Case` expression, which says what to return for an empty and non-empty list. As an example, below is the implementation for the insertion sort algorithm in Zen:
-
-```csharp
-// sort a finite sequence of elements of type T.
-public Zen<FSeq<T>> Sort<T>(Zen<FSeq<T>> expr)
-{
-    return expr.Case(
-        empty: FSeq.Empty<T>(),
-        cons: (hd, tl) => Insert(hd, Sort(tl)));
-}
-
-// insert the element in sorted order into the sorted list.
-public Zen<FSeq<T>> Insert<T>(Zen<T> elt, Zen<FSeq<T>> list)
-{
-    return list.Case(
-        empty: FSeq.Create(elt),
-        cons: (hd, tl) => Zen.If(elt <= hd, list.AddFront(elt), Insert(elt, tl).AddFront(hd)));
-}
-```
-
-We can verify properties about this sorting algorithm by proving that there is no input that can lead to some undesirable outcome. For instance, we can use Zen to show that a sorted list has the same length as the input list:
+One can implement complex functionality over `FSeq<T>` types by combining the elements of the sequence. For instance, we can sum the elements of a sequence:
 
 ```csharp
-var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
-var input = f.Find((inseq, outseq) => inseq.Length() != outseq.Length()); // input = None
+public Zen<int> Sum<T>(Zen<FSeq<int>> seq)
+{
+    return seq.Fold(Zen.Constant(0), (x, y) => x + y);
+}
 ```
 
 
 <a name="unbounded-sets-maps"></a>
 ## Unbounded Sets and Maps
 
-Zen supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map. This type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain any finitized types (`FSeq`, `FString`, or `FBag`). Primitive types (bool, integers, string, BigInteger), classes/structs are allowed.
+Zen supports `Set<T>` and `Map<T1, T2>` data types that do not restrict the size of the set/map. This type only works with the Z3 backend and requires that `T`, `T1` and `T2` not contain any finitized types (`FSeq`, `FString`, or `FSet`). Primitive types (bool, integers, string, BigInteger), classes/structs are allowed.
 
 ```csharp
 var s  = Symbolic<string>();
@@ -429,10 +411,29 @@ var solution = And(c1, c2).Solve(); // x = 0, m1 = m2 = {"a" => 1, _ => 0}
 ```
 
 Constant maps and sets have several limitations:
-* `T1` and `T2` *are* allowed to be any supported Zen types, including finitized types like `FSeq` or `FBag`.
 * Inequality may not always give the expected result, as the constant maps do not have a canonical representation.
 * They can not be used as values in the `Map`, `Set`, or `Seq` types. This restriction may be relaxed int the future.
-* You can not use them in recursive `FSeq.Case` definitions (e.g., see the sorting example from earlier).
+* You can not use them in recursive `FSeq.Case` definitions.
+
+<a name="arrays"></a>
+## Fixed Length Arrays
+
+Zen can model fixed-length arrays of symbolic values using the `Array<T, TSize>` class. As an example:
+
+```csharp
+Zen<Array<int, _10>> a = Zen.Symbolic<Array<int, _10>>();
+Zen<int>[] elements    = a.ToArray();
+var solution = Zen.And(
+    elements.Aggregate(Zen.Plus) == 100,
+    a.All(x => Zen.And(x >= 1, x <= 20))).Solve();
+// a = [8,6,13,16,14,15,5,13,5,5]
+```
+
+The type parameter `TSize` specifies the size of the array. The types `_1` through `_100` are predefined in the library. To add a custom size, you can create a new struct following this naming convention:
+
+```csharp
+struct _150 { }
+```
 
 
 <a name="strings-and-sequences"></a>
@@ -569,7 +570,7 @@ public class Person
 <a name="solver-backends"></a>
 # Solver backends
 
-Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` and `Zen.Solve` APIs provide an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` API uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded-size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FBag<T>`, `FMap<T1, T2>`, and `Map<T1, T2>` can not be used with transformers.
+Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` and `Zen.Solve` APIs provide an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` API uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded-size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FSet<T>`, and `Map<T1, T2>` can not be used with transformers.
 
 <a name="example-network-acls"></a>
 # Example: Network ACLs

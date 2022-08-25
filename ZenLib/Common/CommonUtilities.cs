@@ -96,7 +96,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="list">The list.</param>
         /// <returns>The head and the rest of the list.</returns>
-        public static (T, FSeq<T>) SplitHead<T>(FSeq<T> list)
+        public static (Option<T>, FSeq<T>) SplitHead<T>(FSeq<T> list)
         {
             var (hd, tl) = SplitHeadHelper(list.Values);
             return (hd, new FSeq<T>(tl));
@@ -278,11 +278,10 @@ namespace ZenLib
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="depth">The input depth.</param>
-        /// <param name="exhaustiveDepth">Whether to check smaller sizes.</param>
         /// <returns>An arbitrary Zen value.</returns>
-        public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int depth, bool exhaustiveDepth)
+        public static Zen<T> GetArbitraryIfNull<T>(Zen<T> input, int depth)
         {
-            return (input is null) ? Zen.Arbitrary<T>(depth: depth, exhaustiveDepth: exhaustiveDepth) : input;
+            return (input is null) ? Zen.Arbitrary<T>(depth: depth) : input;
         }
 
         /// <summary>

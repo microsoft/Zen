@@ -458,8 +458,8 @@ namespace ZenLib.Tests
             var solution = (x == new CMap<int, FSeq<int>>().Set(1, l)).Solve();
             var result = solution.Get(x);
             Assert.AreEqual(2, result.Get(1).Count());
-            Assert.AreEqual(2, result.Get(1).Values[0]);
-            Assert.AreEqual(1, result.Get(1).Values[1]);
+            Assert.AreEqual(2, result.Get(1).ToList()[0]);
+            Assert.AreEqual(1, result.Get(1).ToList()[1]);
         }
 
         /// <summary>
@@ -521,9 +521,9 @@ namespace ZenLib.Tests
             var y = Zen.Symbolic<CMap<int, FSeq<int>>>();
             var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == 2).Solve();
 
-            Assert.IsTrue(solution.Get(x).Get(1).Values.Contains(3));
-            Assert.IsTrue(solution.Get(y).Get(1).Values.Contains(3));
-            Assert.IsTrue(solution.Get(y).Get(2).Values.Count == 2);
+            Assert.IsTrue(solution.Get(x).Get(1).ToList().Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(1).ToList().Contains(3));
+            Assert.IsTrue(solution.Get(y).Get(2).ToList().Count == 2);
         }
 
         /// <summary>
@@ -539,16 +539,27 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test maps work do not work with lists.
+        /// Test maps work with lists.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestCMapInList()
+        public void TestCMapInFSeq()
         {
             var l = Zen.Symbolic<FSeq<int>>();
             var x = Zen.Symbolic<CMap<int, int>>();
-            var i = l.Case(0, (hd, tl) => x.Get(1));
-            (i == 2).Solve();
+            var i = Zen.If(l.IsEmpty(), 0, x.Get(1));
+            var sol = (i == 2).Solve();
+            Assert.IsTrue(sol.Get(l).Count() > 0);
+        }
+
+        /// <summary>
+        /// Test maps fail with lists.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCMapInFSeqFail()
+        {
+            var zf = Zen.Constraint<CMap<string, int>, FSeq<int>>((m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4);
+            var res = zf.Find();
         }
 
         /// <summary>
@@ -631,15 +642,13 @@ namespace ZenLib.Tests
             var solution = e.GetField<TestMapObject, bool>("Field").Solve();
 
             Assert.IsTrue(solution.IsSatisfiable());
-            Console.WriteLine(solution.Get(b));
-            Console.WriteLine(solution.Get(x));
-            Console.WriteLine(solution.Get(y));
         }
     }
 
     /// <summary>
     /// A test object.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestMapObject
     {
         /// <summary>
