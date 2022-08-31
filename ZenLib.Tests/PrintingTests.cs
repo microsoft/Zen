@@ -29,7 +29,7 @@ namespace ZenLib.Tests
             Assert.AreEqual("Cons(new Option`1(HasValue=True, Value=1), [])", FSeq.Empty<int>().AddBack(1).ToString());
             Assert.AreEqual("new Set`1(Values=Set({}, 1, new SetUnit()))", Set.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Unit(1)", Seq.Empty<int>().Add(1).ToString());
-            Assert.AreEqual("Concat(Unit(1), Unit(2))", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
+            Assert.AreEqual("Concat(Unit(1), [2])", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
             Assert.AreEqual("(x == y)", (Zen.Symbolic<int>("x") == Zen.Symbolic<int>("y")).ToString());
             Assert.AreEqual("(x <= y)", (Zen.Symbolic<int>("x") <= Zen.Symbolic<int>("y")).ToString());
             Assert.AreEqual("(x >= y)", (Zen.Symbolic<int>("x") >= Zen.Symbolic<int>("y")).ToString());

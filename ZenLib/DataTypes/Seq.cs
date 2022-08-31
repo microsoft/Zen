@@ -432,7 +432,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Empty<T>()
         {
-            return ZenSeqEmptyExpr<T>.Instance;
+            return Zen.Constant(new Seq<T>());
         }
 
         /// <summary>

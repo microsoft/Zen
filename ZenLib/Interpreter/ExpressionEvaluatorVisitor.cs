@@ -633,17 +633,6 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public override object VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return new Seq<T>();
-        }
-
-        /// <summary>
-        /// Visit a Zen expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>The C# object.</returns>
         public override object VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)this.Visit(expression.SeqExpr1, parameter);

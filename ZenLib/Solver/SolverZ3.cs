@@ -163,7 +163,7 @@ namespace ZenLib.Solver
             this.TypeToSortConverter = new Z3TypeToSortConverter(this);
             this.ExprToSymbolicValueConverter = new Z3ExprToSymbolicValueConverter(this);
             this.SymbolicValueToExprConverter = new Z3SymbolicValueToExprConverter(this);
-            this.ExprToObjectConverter = new Z3ExprToObjectConverter();
+            this.ExprToObjectConverter = new Z3ExprToObjectConverter(this);
             this.OptionSorts = new Dictionary<Sort, DatatypeSort>();
         }
 

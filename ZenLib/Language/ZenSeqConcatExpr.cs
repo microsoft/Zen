@@ -42,12 +42,12 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         private static Zen<Seq<T>> Simplify(Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2)
         {
-            if (seqExpr1 is ZenSeqEmptyExpr<T> e1)
+            if (seqExpr1 is ZenConstantExpr<Seq<T>> e1 && e1.Value.Length() == 0)
             {
                 return seqExpr2;
             }
 
-            if (seqExpr2 is ZenSeqEmptyExpr<T> e2)
+            if (seqExpr2 is ZenConstantExpr<Seq<T>> e2 && e2.Value.Length() == 0)
             {
                 return seqExpr1;
             }

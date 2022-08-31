@@ -283,18 +283,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The Zen value representing the seq.</returns>
         internal Zen<Seq<T>> CreateZenSeqConstant<T>(Seq<T> value)
         {
-            if (typeof(T) == typeof(char))
-            {
-                return ZenConstantExpr<Seq<T>>.Create(value);
-            }
-
-            Zen<Seq<T>> seq = ZenSeqEmptyExpr<T>.Instance;
-            foreach (var elt in value.Values)
-            {
-                seq = ZenSeqConcatExpr<T>.Create(seq, ZenSeqUnitExpr<T>.Create(elt));
-            }
-
-            return seq;
+            return ZenConstantExpr<Seq<T>>.Create(value);
         }
 
         /// <summary>

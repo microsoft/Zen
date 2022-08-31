@@ -17,6 +17,26 @@ namespace ZenLib.Solver
     [ExcludeFromCodeCoverage] // Z3 changes its internal representation frequently.
     internal class Z3ExprToObjectConverter : TypeVisitor<object, Expr>
     {
+        /// <summary>
+        /// The solver.
+        /// </summary>
+        private SolverZ3 solver;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Z3ExprToObjectConverter"/> class.
+        /// </summary>
+        /// <param name="solver">The Z3 solver.</param>
+        public Z3ExprToObjectConverter(SolverZ3 solver)
+        {
+            this.solver = solver;
+        }
+
+        /// <summary>
+        /// Convert an expression to a C# object of the given type.
+        /// </summary>
+        /// <param name="e">The Z3 expression.</param>
+        /// <param name="type">The C# type.</param>
+        /// <returns>A C# object.</returns>
         public object Convert(Expr e, Type type)
         {
             if (e.IsApp && e.FuncDecl.Name.ToString() == "Some")
@@ -129,13 +149,10 @@ namespace ZenLib.Solver
                 var dict = Convert(arrayExpr, mapType);
                 var key = Convert(keyExpr, keyType);
                 var value = Convert(valueExpr, valueType);
-                return AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
+                return AddKeyValuePair(dict, key, value, keyType, valueType);
             }
-            else
+            else if (parameter.IsApp && parameter.FuncDecl.Name.ToString() == "map")
             {
-                Contract.Assert(parameter.IsApp);
-                Contract.Assert(parameter.FuncDecl.Name.ToString() == "map");
-
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
                 var e1 = Convert(parameter.Args[0], mapType);
                 var e2 = Convert(parameter.Args[1], mapType);
@@ -143,7 +160,7 @@ namespace ZenLib.Solver
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
-            /* else
+            else
             {
                 Contract.Assert(parameter.IsApp);
                 Contract.Assert(parameter.FuncDecl.Name.ToString() == "as-array");
@@ -151,20 +168,29 @@ namespace ZenLib.Solver
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl;
                 var interpretation = this.solver.Solver.Model.FuncInterp(lambda);
                 var elseCase = interpretation.Else.ToString();
-                CommonUtilities.ValidateIsTrue(elseCase == "false" || elseCase == "None", "Internal error.");
+                Contract.Assert(elseCase == "false" || elseCase == "None", "Internal error.");
 
-                var dict = CreateEmptyDictionary(keyType, valueType);
+                var dictConstructor = typeof(Map<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
+                var dict = dictConstructor.Invoke(new object[] { });
+
+                // var dict = CreateEmptyDictionary(keyType, valueType);
                 for (int i = 0; i < interpretation.NumEntries; i++)
                 {
                     var keyExpr = interpretation.Entries[i].Args[0];
                     var valueExpr = interpretation.Entries[i].Value;
+
+                    if (valueExpr.IsApp && valueExpr.FuncDecl.Name.ToString() == "None")
+                    {
+                        continue;
+                    }
+
                     var key = Convert(keyExpr, keyType);
                     var value = Convert(valueExpr, valueType);
-                    dict = AddKeyValuePair(dict, key, value, keyType, valueType, valueExpr);
+                    dict = AddKeyValuePair(dict, key, value, keyType, valueType);
                 }
 
                 return dict;
-            } */
+            }
         }
 
         /// <summary>
@@ -351,9 +377,8 @@ namespace ZenLib.Solver
         /// <param name="value">The value.</param>
         /// <param name="keyType">The key type.</param>
         /// <param name="valueType">The value type.</param>
-        /// <param name="valueExpr">The value expression.</param>
         /// <returns></returns>
-        private object AddKeyValuePair(object map, object key, object value, Type keyType, Type valueType, Expr valueExpr)
+        private object AddKeyValuePair(object map, object key, object value, Type keyType, Type valueType)
         {
             // Contract.Assert(!valueExpr.IsFalse);
             // for sets, don't add the key when the value is false.

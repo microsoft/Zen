@@ -268,17 +268,6 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
-        public override Unit VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Unit parameter)
-        {
-            return parameter;
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns></returns>
         public override Unit VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.ValueExpr, parameter);

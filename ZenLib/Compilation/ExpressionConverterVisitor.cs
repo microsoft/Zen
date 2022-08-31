@@ -638,18 +638,6 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public override Expression VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Seq<T>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The Zen expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>An expression tree.</returns>
         public override Expression VisitSeqUnit<T>(ZenSeqUnitExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var c = typeof(Seq<T>).GetConstructor(new Type[] { typeof(T) });

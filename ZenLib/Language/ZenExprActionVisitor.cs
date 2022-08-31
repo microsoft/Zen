@@ -233,16 +233,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Visit a SeqEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenSeqEmptyExpr<T> expression)
-        {
-            return;
-        }
-
-        /// <summary>
         /// Visit a ZenSeqUnitExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

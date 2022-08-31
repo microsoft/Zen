@@ -557,6 +557,22 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq find with maps.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindWithMaps()
+        {
+            var result = new ZenConstraint<Seq<Map<int, int>>>(s =>
+            {
+                var elt2 = s.At(new BigInteger(2));
+                return elt2 == new Seq<Map<int, int>>(new Map<int, int>().Set(1, 2));
+            }).Find();
+
+            Assert.IsTrue(result.Value.At(2).Values.Count > 0);
+            Assert.AreEqual(2, result.Value.At(2).Values[0].Get(1).Value);
+        }
+
+        /// <summary>
         /// Test seq find with strings in sets.
         /// </summary>
         [TestMethod]

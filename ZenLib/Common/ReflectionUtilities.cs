@@ -463,15 +463,26 @@ namespace ZenLib
         /// <returns>The field value.</returns>
         public static TField GetFieldOrProperty<TObject, TField>(TObject obj, string fieldName)
         {
-            var type = typeof(TObject);
+            return (TField)GetFieldOrProperty(obj, fieldName);
+        }
+
+        /// <summary>
+        /// Get the value of a field or property using reflection.
+        /// </summary>
+        /// <param name="obj">The runtime object.</param>
+        /// <param name="fieldName">The field name.</param>
+        /// <returns>The field value.</returns>
+        public static object GetFieldOrProperty(object obj, string fieldName)
+        {
+            var type = obj.GetType();
             var fieldInfo = type.GetField(fieldName);
             if (fieldInfo != null)
             {
-                return (TField)fieldInfo.GetValue(obj);
+                return fieldInfo.GetValue(obj);
             }
 
             var propertyInfo = type.GetPropertyCached(fieldName);
-            return (TField)propertyInfo.GetValue(obj);
+            return propertyInfo.GetValue(obj);
         }
 
         /// <summary>
