@@ -519,18 +519,6 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public override Expression VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The Zen expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>An expression tree.</returns>
         public override Expression VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);

@@ -100,7 +100,7 @@ namespace ZenLib.Tests
             var s3 = s1.Intersect(s2);
 
             Assert.IsFalse(s3.IsEmpty());
-            Assert.AreEqual(new Pair<ushort, ushort> { Item1 = 1, Item2 = 1 }, s3.Element());
+            Assert.AreEqual(new Pair<ushort, ushort>(1, 1), s3.Element());
         }
 
         /// <summary>

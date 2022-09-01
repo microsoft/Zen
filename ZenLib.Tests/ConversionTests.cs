@@ -33,7 +33,7 @@ namespace ZenLib.Tests
             CheckAgreement<long>(x => x == 8);
             CheckAgreement<ulong>(x => x == 9);
             CheckAgreement<Option<int>>(x => x == Option.Some(3));
-            CheckAgreement<Pair<int, int>>(x => x == new Pair<int, int> { Item1 = 1, Item2 = 2 });
+            CheckAgreement<Pair<int, int>>(x => x == new Pair<int, int>(1, 2));
             CheckAgreement<(int, int)>(x => x == (1, 2));
             CheckAgreement<FSeq<int>>(x => x == FSeq.FromRange(new List<int>() { 1, 2, 3 }));
             CheckAgreement<FSeq<FSeq<int>>>(x => x == new FSeq<FSeq<int>>(new FSeq<int>(1)));
@@ -57,7 +57,7 @@ namespace ZenLib.Tests
             CheckEqual(7UL);
             CheckEqual(Option.None<int>());
             CheckEqual(Option.Some(8));
-            CheckEqual(new Pair<int, int> { Item1 = 9, Item2 = 10 });
+            CheckEqual(new Pair<int, int>(9, 10));
             CheckEqual(new FString("hello"));
             CheckEqualLists(FSeq.FromRange(new List<int>() { 1, 2, 3 }));
         }
@@ -90,7 +90,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestConvertNullTupleValue()
         {
-            var o = new Pair<Object1, Object1> { Item1 = null, Item2 = null };
+            var o = new Pair<Object1, Object1>(null, null);
             var _ = Constant(o);
         }
 

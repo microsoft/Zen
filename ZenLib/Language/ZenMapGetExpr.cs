@@ -42,7 +42,7 @@ namespace ZenLib
         /// <returns>The new Zen expr.</returns>
         private static Zen<Option<TValue>> Simplify(Zen<Map<TKey, TValue>> map, Zen<TKey> key)
         {
-            if (map is ZenMapEmptyExpr<TKey, TValue>)
+            if (map is ZenConstantExpr<Map<TKey, TValue>> ce && ce.Value.Values.Count == 0)
             {
                 return Option.Null<TValue>();
             }

@@ -310,14 +310,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The Zen value representing the list.</returns>
         internal Zen<Map<TKey, TValue>> CreateZenMapConstant<TKey, TValue>(Map<TKey, TValue> value)
         {
-            Zen<Map<TKey, TValue>> map = ZenMapEmptyExpr<TKey, TValue>.Instance;
-            foreach (var elt in value.Values)
-            {
-                Contract.AssertNullConversion(elt.Key, "element", typeof(Map<TKey, TValue>));
-                map = ZenMapSetExpr<TKey, TValue>.Create(map, elt.Key, elt.Value);
-            }
-
-            return map;
+            return ZenConstantExpr<Map<TKey, TValue>>.Create(value);
         }
 
         /// <summary>

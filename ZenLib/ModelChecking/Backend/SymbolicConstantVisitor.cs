@@ -259,7 +259,10 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitString(object parameter)
         {
-            throw new ZenUnreachableException();
+            var seq = Seq.FromString((string)parameter);
+            var escapedString = CommonUtilities.ConvertCShaprStringToZ3(seq);
+            var s = this.solver.CreateStringConst(escapedString);
+            return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, s);
         }
 
         /// <summary>

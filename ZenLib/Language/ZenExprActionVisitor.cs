@@ -145,16 +145,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Visit a MapEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        public virtual void Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression)
-        {
-            return;
-        }
-
-        /// <summary>
         /// Visit a MapSetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

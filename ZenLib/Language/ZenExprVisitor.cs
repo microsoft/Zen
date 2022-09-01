@@ -92,14 +92,6 @@ namespace ZenLib
         public abstract TReturn VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a MapEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        public abstract TReturn VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a MapSetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

@@ -1213,7 +1213,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<Map<TKey, TValue>> EmptyMap<TKey, TValue>()
         {
-            return ZenMapEmptyExpr<TKey, TValue>.Instance;
+            return ZenConstantExpr<Map<TKey, TValue>>.Create(new Map<TKey, TValue>());
         }
 
         /// <summary>

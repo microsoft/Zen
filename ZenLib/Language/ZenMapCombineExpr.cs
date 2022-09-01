@@ -62,7 +62,7 @@ namespace ZenLib
             // {} union a == a
             // {} inter a == {}
             // {} minus a == {}
-            if (map1 is ZenMapEmptyExpr<TKey, SetUnit>)
+            if (map1 is ZenConstantExpr<Map<TKey, SetUnit>> ce1 && ce1.Value.Values.Count == 0)
             {
                 return combinationType == CombineType.Union ? map2 : map1;
             }
@@ -70,7 +70,7 @@ namespace ZenLib
             // a union {} == a
             // a inter {} == {}
             // a minus {} == a
-            if (map2 is ZenMapEmptyExpr<TKey, SetUnit>)
+            if (map2 is ZenConstantExpr<Map<TKey, SetUnit>> ce2 && ce2.Value.Values.Count == 0)
             {
                 return combinationType == CombineType.Intersect ? map2 : map1;
             }

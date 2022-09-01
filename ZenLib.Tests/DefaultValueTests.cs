@@ -60,7 +60,7 @@ namespace ZenLib.Tests
             CheckDefault<string>(string.Empty);
             CheckDefault<BigInteger>(new BigInteger(0));
             CheckDefault<Real>(new Real(0));
-            CheckDefault<Pair<int, int>>(new Pair<int, int> { Item1 = 0, Item2 = 0 });
+            CheckDefault<Pair<int, int>>(new Pair<int, int>(0, 0));
             CheckDefault<Option<int>>(Option.None<int>());
             CheckDefault<CMap<int, int>>(new CMap<int, int>());
 

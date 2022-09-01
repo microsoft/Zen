@@ -29,6 +29,106 @@ namespace ZenLib.Tests
         private static Seq<int> three = new Seq<int>(3);
 
         /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqAddNull()
+        {
+            new Seq<string>().Add(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqConcatNull()
+        {
+            new Seq<string>().Concat(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqIndexOfNull1()
+        {
+            new Seq<string>().IndexOf(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqIndexOfNull2()
+        {
+            new Seq<string>().IndexOf(null, 0);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqIndexOfBigIntegerNull()
+        {
+            new Seq<string>().IndexOfBigInteger(null, BigInteger.Zero);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqHasPrefixNull()
+        {
+            new Seq<string>().HasPrefix(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqHasSuffixNull()
+        {
+            new Seq<string>().HasSuffix(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqMatchesRegexNull()
+        {
+            new Seq<string>().MatchesRegex(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqReplaceFirstNull1()
+        {
+            new Seq<string>().ReplaceFirst(null, new Seq<string>());
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSeqReplaceFirstNull2()
+        {
+            new Seq<string>().ReplaceFirst(new Seq<string>(), null);
+        }
+
+        /// <summary>
         /// Test that some basic set equations hold.
         /// </summary>
         [TestMethod]
@@ -355,19 +455,19 @@ namespace ZenLib.Tests
 
             Assert.AreEqual(false, zf.Evaluate(new Seq<byte>()));
             Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1)));
-            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2))));
-            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1, 2)));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1, 2, 3)));
 
             zf.Compile();
             Assert.AreEqual(false, zf.Evaluate(new Seq<byte>()));
             Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1)));
-            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2))));
-            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3))));
+            Assert.AreEqual(true, zf.Evaluate(new Seq<byte>(1, 2)));
+            Assert.AreEqual(false, zf.Evaluate(new Seq<byte>(1, 2, 3)));
 
             Assert.AreEqual(false, new Seq<byte>().MatchesRegex(r));
             Assert.AreEqual(false, new Seq<byte>(1).MatchesRegex(r));
-            Assert.AreEqual(true, new Seq<byte>(1).Concat(new Seq<byte>(2)).MatchesRegex(r));
-            Assert.AreEqual(false, new Seq<byte>(1).Concat(new Seq<byte>(2)).Concat(new Seq<byte>(3)).MatchesRegex(r));
+            Assert.AreEqual(true, new Seq<byte>(1, 2).MatchesRegex(r));
+            Assert.AreEqual(false, new Seq<byte>(1, 2, 3).MatchesRegex(r));
         }
 
         /// <summary>
@@ -549,7 +649,7 @@ namespace ZenLib.Tests
             var result = new ZenConstraint<Seq<Pair<int, int>>>(s =>
             {
                 var elt2 = s.At(new BigInteger(2));
-                return elt2 == new Seq<Pair<int, int>>(new Pair<int, int> { Item1 = 4, Item2 = 2 });
+                return elt2 == new Seq<Pair<int, int>>(new Pair<int, int>(4, 2));
             }).Find();
 
             Assert.IsTrue(result.Value.At(2).Values.Count > 0);

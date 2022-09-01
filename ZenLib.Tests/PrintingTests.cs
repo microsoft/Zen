@@ -137,6 +137,7 @@ namespace ZenLib.Tests
             Console.WriteLine(s1.Concat(s2).Concat(Zen.Symbolic<Seq<string>>("seq")).Format());
             Console.WriteLine(Seq.Concat(s1, Seq.Concat(s2, Zen.Symbolic<Seq<string>>("seq"))).Format());
             Console.WriteLine(Zen.Symbolic<Seq<byte>>().MatchesRegex(Regex.ParseAscii("abc")).Format());
+            Console.WriteLine(Seq.Empty<int>().Add(1).Format());
         }
 
         /// <summary>

@@ -361,8 +361,8 @@ namespace ZenLib.Tests
                 return d.Set(Pair.Create<int, int>(1, 2).WithField<Pair<int, int>, int>("Item1", 3), 1);
             });
 
-            var key1 = new Pair<int, int> { Item1 = 1, Item2 = 2 };
-            var key2 = new Pair<int, int> { Item1 = 3, Item2 = 2 };
+            var key1 = new Pair<int, int>(1, 2);
+            var key2 = new Pair<int, int>(3, 2);
             var sat = f.Find((d1, d2) => And(d1.Get(key1) == Option.None<int>(), d2.Get(key2) == Option.Some(1)));
 
             Assert.IsTrue(sat.HasValue);
@@ -494,6 +494,56 @@ namespace ZenLib.Tests
         {
             var sat = new ZenConstraint<Map<Map<int, int>, int>>(m => m.Get(Map.Empty<int, int>()).IsSome()).Find();
             Assert.IsTrue(sat.Value.ContainsKey(new Map<int, int>()));
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestMapSetKeyNull()
+        {
+            new Map<string, string>().Set(null, "a");
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestMapSetValueNull()
+        {
+            new Map<string, string>().Set("a", null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestMapGetKeyNull()
+        {
+            new Map<string, string>().Get(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestMapDeleteKeyNull()
+        {
+            new Map<string, string>().Delete(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestMapContainsKeyNull()
+        {
+            new Map<string, string>().ContainsKey(null);
         }
     }
 }

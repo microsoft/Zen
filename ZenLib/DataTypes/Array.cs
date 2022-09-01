@@ -56,6 +56,8 @@ namespace ZenLib
         /// <param name="values">The values.</param>
         public Array(params T[] values)
         {
+            Contract.AssertNotNull(values);
+
             if (values.Length != Size)
             {
                 throw new ZenException($"Array size mismatch, expected array of length: {Size}");
@@ -82,6 +84,7 @@ namespace ZenLib
         /// <param name="values">The values.</param>
         private Array(CMap<int, T> values)
         {
+            Contract.AssertNotNull(values);
             this.Values = values;
         }
 
@@ -120,6 +123,8 @@ namespace ZenLib
         public Array<T, TSize> Set(int index, T element)
         {
             Contract.Assert(IsValidIndex(index));
+            Contract.AssertNotNull(element);
+
             return new Array<T, TSize>(this.Values.Set(index, element));
         }
 

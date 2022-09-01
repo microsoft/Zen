@@ -40,6 +40,8 @@ namespace ZenLib
         /// </summary>
         public Set(IEnumerable<T> values)
         {
+            Contract.Assert(values != null);
+
             this.Values = new Map<T, SetUnit>();
             foreach (var value in values)
             {
@@ -47,8 +49,13 @@ namespace ZenLib
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Set{T}"/> class.
+        /// </summary>
+        /// <param name="map">The backing map.</param>
         private Set(Map<T, SetUnit> map)
         {
+            Contract.AssertNotNull(map);
             this.Values = map;
         }
 
@@ -63,6 +70,7 @@ namespace ZenLib
         /// <param name="elt">The element to add.</param>
         public Set<T> Add(T elt)
         {
+            Contract.AssertNotNull(elt);
             return new Set<T>(this.Values.Set(elt, new SetUnit()));
         }
 
@@ -72,6 +80,7 @@ namespace ZenLib
         /// <param name="elt">The element to remove.</param>
         public Set<T> Delete(T elt)
         {
+            Contract.AssertNotNull(elt);
             return new Set<T>(this.Values.Delete(elt));
         }
 
@@ -82,6 +91,7 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool Contains(T elt)
         {
+            Contract.AssertNotNull(elt);
             return this.Values.ContainsKey(elt);
         }
 
@@ -92,6 +102,7 @@ namespace ZenLib
         /// <returns>The union of the two sets.</returns>
         public Set<T> Union(Set<T> other)
         {
+            Contract.AssertNotNull(other);
             return new Set<T>(CommonUtilities.DictionaryUnion(this.Values, other.Values));
         }
 
@@ -102,6 +113,7 @@ namespace ZenLib
         /// <returns>The intersection of the two sets.</returns>
         public Set<T> Intersect(Set<T> other)
         {
+            Contract.AssertNotNull(other);
             return new Set<T>(CommonUtilities.DictionaryIntersect(this.Values, other.Values));
         }
 
@@ -112,6 +124,7 @@ namespace ZenLib
         /// <returns>The difference of the two sets.</returns>
         public Set<T> Difference(Set<T> other)
         {
+            Contract.AssertNotNull(other);
             return new Set<T>(CommonUtilities.DictionaryDifference(this.Values, other.Values));
         }
 
@@ -122,6 +135,7 @@ namespace ZenLib
         /// <returns>True if this set is a subset of the other..</returns>
         public bool IsSubsetOf(Set<T> other)
         {
+            Contract.AssertNotNull(other);
             return this.Equals(this.Intersect(other));
         }
 

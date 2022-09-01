@@ -19,6 +19,16 @@ namespace ZenLib.Tests
     public class FStringTests
     {
         /// <summary>
+        /// Test that creating from a null string fails.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestCreateNull()
+        {
+            new FString(null);
+        }
+
+        /// <summary>
         /// Test FiniteString equality and hashing.
         /// </summary>
         [TestMethod]
