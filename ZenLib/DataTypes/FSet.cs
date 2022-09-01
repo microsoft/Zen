@@ -192,16 +192,7 @@ namespace ZenLib
         /// <returns>The number of elements in the multiset.</returns>
         public int Size()
         {
-            int count = 0;
-            foreach (var value in this.Values.Values)
-            {
-                if (value.HasValue)
-                {
-                    count++;
-                }
-            }
-
-            return count;
+            return this.ToSet().Count;
         }
 
         /// <summary>
