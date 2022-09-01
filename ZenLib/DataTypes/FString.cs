@@ -31,6 +31,8 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         public FString(string s)
         {
+            Contract.AssertNotNull(s);
+
             var chars = ImmutableList.Create<ushort>();
             foreach (var c in s)
             {
@@ -133,6 +135,8 @@ namespace ZenLib
         /// <returns>The string value.</returns>
         public static Zen<FString> Create(string s)
         {
+            Contract.AssertNotNull(s);
+
             var l = FSeq.Empty<ushort>();
             foreach (var c in s.Reverse())
             {
@@ -148,6 +152,7 @@ namespace ZenLib
         /// <returns>The finite string.</returns>
         public static Zen<FString> Create(Zen<ushort> b)
         {
+            Contract.AssertNotNull(b);
             return Create(FSeq.Create(b));
         }
     }

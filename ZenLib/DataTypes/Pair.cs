@@ -24,16 +24,33 @@ namespace ZenLib
         public T2 Item2 { get; set; }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2}"/> class.
+        /// </summary>
+        public Pair()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2}"/> class.
+        /// </summary>
+        /// <param name="item1">The first item.</param>
+        /// <param name="item2">The second item.</param>
+        public Pair(T1 item1, T2 item2)
+        {
+            Contract.AssertNotNull(item1);
+            Contract.AssertNotNull(item2);
+
+            this.Item1 = item1;
+            this.Item2 = item2;
+        }
+
+        /// <summary>
         /// Convert a value tuple to a pair.
         /// </summary>
         /// <param name="value">The value.</param>
         public static implicit operator Pair<T1, T2>((T1, T2) value)
         {
-            return new Pair<T1, T2>
-            {
-                Item1 = value.Item1,
-                Item2 = value.Item2,
-            };
+            return new Pair<T1, T2>(value.Item1, value.Item2);
         }
 
         /// <summary>
@@ -104,17 +121,36 @@ namespace ZenLib
         public T3 Item3 { get; set; }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3}"/> class.
+        /// </summary>
+        public Pair()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3}"/> class.
+        /// </summary>
+        /// <param name="item1">The first item.</param>
+        /// <param name="item2">The second item.</param>
+        /// <param name="item3">The third item.</param>
+        public Pair(T1 item1, T2 item2, T3 item3)
+        {
+            Contract.AssertNotNull(item1);
+            Contract.AssertNotNull(item2);
+            Contract.AssertNotNull(item3);
+
+            this.Item1 = item1;
+            this.Item2 = item2;
+            this.Item3 = item3;
+        }
+
+        /// <summary>
         /// Convert a value tuple to a pair.
         /// </summary>
         /// <param name="value">The value.</param>
         public static implicit operator Pair<T1, T2, T3>((T1, T2, T3) value)
         {
-            return new Pair<T1, T2, T3>
-            {
-                Item1 = value.Item1,
-                Item2 = value.Item2,
-                Item3 = value.Item3,
-            };
+            return new Pair<T1, T2, T3>(value.Item1, value.Item2, value.Item3);
         }
 
         /// <summary>
@@ -192,18 +228,39 @@ namespace ZenLib
         public T4 Item4 { get; set; }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3, T4}"/> class.
+        /// </summary>
+        public Pair()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3, T4}"/> class.
+        /// </summary>
+        /// <param name="item1">The first item.</param>
+        /// <param name="item2">The second item.</param>
+        /// <param name="item3">The third item.</param>
+        /// <param name="item4">The fourth item.</param>
+        public Pair(T1 item1, T2 item2, T3 item3, T4 item4)
+        {
+            Contract.AssertNotNull(item1);
+            Contract.AssertNotNull(item2);
+            Contract.AssertNotNull(item3);
+            Contract.AssertNotNull(item4);
+
+            this.Item1 = item1;
+            this.Item2 = item2;
+            this.Item3 = item3;
+            this.Item4 = item4;
+        }
+
+        /// <summary>
         /// Convert a value tuple to a pair.
         /// </summary>
         /// <param name="value">The value.</param>
         public static implicit operator Pair<T1, T2, T3, T4>((T1, T2, T3, T4) value)
         {
-            return new Pair<T1, T2, T3, T4>
-            {
-                Item1 = value.Item1,
-                Item2 = value.Item2,
-                Item3 = value.Item3,
-                Item4 = value.Item4,
-            };
+            return new Pair<T1, T2, T3, T4>(value.Item1, value.Item2, value.Item3, value.Item4);
         }
 
         /// <summary>
@@ -288,19 +345,42 @@ namespace ZenLib
         public T5 Item5 { get; set; }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3, T4, T5}"/> class.
+        /// </summary>
+        public Pair()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Pair{T1, T2, T3, T4, T5}"/> class.
+        /// </summary>
+        /// <param name="item1">The first item.</param>
+        /// <param name="item2">The second item.</param>
+        /// <param name="item3">The third item.</param>
+        /// <param name="item4">The fourth item.</param>
+        /// <param name="item5">The fifth item.</param>
+        public Pair(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5)
+        {
+            Contract.AssertNotNull(item1);
+            Contract.AssertNotNull(item2);
+            Contract.AssertNotNull(item3);
+            Contract.AssertNotNull(item4);
+            Contract.AssertNotNull(item5);
+
+            this.Item1 = item1;
+            this.Item2 = item2;
+            this.Item3 = item3;
+            this.Item4 = item4;
+            this.Item5 = item5;
+        }
+
+        /// <summary>
         /// Convert a value tuple to a pair.
         /// </summary>
         /// <param name="value">The value.</param>
         public static implicit operator Pair<T1, T2, T3, T4, T5>((T1, T2, T3, T4, T5) value)
         {
-            return new Pair<T1, T2, T3, T4, T5>
-            {
-                Item1 = value.Item1,
-                Item2 = value.Item2,
-                Item3 = value.Item3,
-                Item4 = value.Item4,
-                Item5 = value.Item5,
-            };
+            return new Pair<T1, T2, T3, T4, T5>(value.Item1, value.Item2, value.Item3, value.Item4, value.Item5);
         }
 
         /// <summary>

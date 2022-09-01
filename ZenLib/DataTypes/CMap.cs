@@ -43,6 +43,7 @@ namespace ZenLib
         /// <param name="dictionary">The dictionary of initial values.</param>
         internal CMap(ImmutableDictionary<TKey, TValue> dictionary)
         {
+            Contract.AssertNotNull(dictionary);
             this.Values = dictionary;
         }
 
@@ -58,6 +59,9 @@ namespace ZenLib
         /// <param name="value">The value to add.</param>
         public CMap<TKey, TValue> Set(TKey key, TValue value)
         {
+            Contract.AssertNotNull(key);
+            Contract.AssertNotNull(value);
+
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
             d = value.Equals(defaultValue) ? d.Remove(key) : d.SetItem(key, value);
             return new CMap<TKey, TValue>(d);
@@ -70,6 +74,8 @@ namespace ZenLib
         /// <returns></returns>
         public TValue Get(TKey key)
         {
+            Contract.AssertNotNull(key);
+
             if (this.Values.TryGetValue(key, out var value))
             {
                 return value;

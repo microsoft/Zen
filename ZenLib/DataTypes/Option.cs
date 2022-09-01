@@ -54,6 +54,7 @@ namespace ZenLib
         /// <returns>A new option with the function mapped over the value.</returns>
         public Option<TResult> Select<TResult>(Func<T, TResult> function)
         {
+            Contract.AssertNotNull(function);
             return this.HasValue ? Option.Some(function(this.Value)) : Option.None<TResult>();
         }
 
@@ -64,6 +65,8 @@ namespace ZenLib
         /// <returns>A new option that is filtered to None if the predicate matches.</returns>
         public Option<T> Where(Func<T, bool> function)
         {
+            Contract.AssertNotNull(function);
+
             if (this.HasValue && !function(this.Value))
             {
                 return Option.None<T>();

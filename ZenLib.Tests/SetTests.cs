@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,6 +20,87 @@ namespace ZenLib.Tests
     [ExcludeFromCodeCoverage]
     public class SetTests
     {
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetAddNull()
+        {
+            new Set<string>().Add(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetDeleteNull()
+        {
+            new Set<string>().Delete(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetContainsNull()
+        {
+            new Set<string>().Contains(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetConstructorNull()
+        {
+            IEnumerable<string> elements = null;
+            new Set<string>(elements);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetUnionNull()
+        {
+            new Set<string>().Union(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetIntersectNull()
+        {
+            new Set<string>().Intersect(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetDifferenceNull()
+        {
+            new Set<string>().Difference(null);
+        }
+
+        /// <summary>
+        /// Exception thrown when adding null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestSetSubsetNull()
+        {
+            new Set<string>().IsSubsetOf(null);
+        }
+
         /// <summary>
         /// Test set symbolic evaluation with delete.
         /// </summary>
@@ -737,7 +819,7 @@ namespace ZenLib.Tests
             var r1 = solution.Get(s1);
             var r2 = solution.Get(s2);
 
-            Assert.IsTrue(r1.Contains(new Pair<char, Real> { Item1 = 'a', Item2 = new Real(3) }));
+            Assert.IsTrue(r1.Contains(new Pair<char, Real>('a', new Real(3))));
             Assert.IsTrue(r1.Count() <= r2.Count());
             Assert.IsTrue(r1.IsSubsetOf(r2));
         }

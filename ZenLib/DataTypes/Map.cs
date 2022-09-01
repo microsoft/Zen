@@ -88,6 +88,9 @@ namespace ZenLib
         /// <param name="value">The value to add.</param>
         public Map<TKey, TValue> Set(TKey key, TValue value)
         {
+            Contract.AssertNotNull(key);
+            Contract.AssertNotNull(value);
+
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
             return new Map<TKey, TValue>(d.SetItem(key, value), this.Negated);
         }
@@ -98,6 +101,8 @@ namespace ZenLib
         /// <param name="key">The key to add.</param>
         public Map<TKey, TValue> Delete(TKey key)
         {
+            Contract.AssertNotNull(key);
+
             var d = (ImmutableDictionary<TKey, TValue>)this.Values;
             return new Map<TKey, TValue>(d.Remove(key), this.Negated);
         }
@@ -109,6 +114,8 @@ namespace ZenLib
         /// <returns>True or false.</returns>
         public bool ContainsKey(TKey key)
         {
+            Contract.AssertNotNull(key);
+
             return this.Values.ContainsKey(key);
         }
 
@@ -119,6 +126,8 @@ namespace ZenLib
         /// <returns></returns>
         public Option<TValue> Get(TKey key)
         {
+            Contract.AssertNotNull(key);
+
             if (this.Values.TryGetValue(key, out var value))
             {
                 return Option.Some(value);

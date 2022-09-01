@@ -519,18 +519,6 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public override Expression VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Map<TKey, TValue>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The Zen expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>An expression tree.</returns>
         public override Expression VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionConverterEnvironment parameter)
         {
             var dict = Convert(expression.MapExpr, parameter);
@@ -630,18 +618,6 @@ namespace ZenLib.Compilation
             var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
             var method = typeof(CMap<TKey, TValue>).GetMethodCached("Get");
             return Expression.Call(mapExpr, method, key);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The Zen expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>An expression tree.</returns>
-        public override Expression VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(Seq<T>).GetConstructor(new Type[] { });
-            return Expression.New(c);
         }
 
         /// <summary>

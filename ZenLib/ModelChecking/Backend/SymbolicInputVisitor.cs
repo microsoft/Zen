@@ -32,11 +32,6 @@ namespace ZenLib.ModelChecking
         private static MethodInfo arbitrarySeqMethod = typeof(Zen).GetMethod("ArbitrarySeq", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
-        /// The method for creating and if expression at runtime.
-        /// </summary>
-        private static MethodInfo ifConditionMethod = typeof(Zen).GetMethod("If");
-
-        /// <summary>
         /// Name of the function used to create an object via reflection.
         /// </summary>
         private static MethodInfo createMethod = typeof(Zen).GetMethod("Create");

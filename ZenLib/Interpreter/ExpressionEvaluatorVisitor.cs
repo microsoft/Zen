@@ -534,17 +534,6 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public override object VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return new Map<TKey, TValue>();
-        }
-
-        /// <summary>
-        /// Visit a Zen expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>The C# object.</returns>
         public override object VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Map<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
@@ -625,17 +614,6 @@ namespace ZenLib.Interpretation
         {
             var e1 = (CMap<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
             return e1.Get(expression.Key);
-        }
-
-        /// <summary>
-        /// Visit a Zen expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>The C# object.</returns>
-        public override object VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return new Seq<T>();
         }
 
         /// <summary>

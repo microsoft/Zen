@@ -18,6 +18,38 @@ namespace ZenLib.Tests
     public class PairTests
     {
         /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestPair2Null1()
+        {
+            new Pair<string, string>(null, "a");
+        }
+
+        /// <summary>
+        /// Exception thrown when using null.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ZenException))]
+        public void TestPair2Null2()
+        {
+            new Pair<string, string>("a", null);
+        }
+
+        /// <summary>
+        /// Test that pair constructors work.
+        /// </summary>
+        [TestMethod]
+        public void TestPairConstructors()
+        {
+            new Pair<string, string>();
+            new Pair<string, string, string>();
+            new Pair<string, string, string, string>();
+            new Pair<string, string, string, string, string>();
+        }
+
+        /// <summary>
         /// Test getting items from a pair.
         /// </summary>
         [TestMethod]
@@ -104,7 +136,7 @@ namespace ZenLib.Tests
         public void TestValueTupleEvaluateSwap2()
         {
             var f = new ZenFunction<Pair<int, int>, Pair<int, int>>(x => Pair.Create(x.Item2(), x.Item1()));
-            var r = f.Evaluate(new Pair<int, int> { Item1 = 1, Item2 = 2 });
+            var r = f.Evaluate(new Pair<int, int>(1, 2));
             Assert.AreEqual(r.Item1, 2);
             Assert.AreEqual(r.Item2, 1);
         }

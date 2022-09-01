@@ -29,7 +29,7 @@ namespace ZenLib.Tests
             Assert.AreEqual("Cons(new Option`1(HasValue=True, Value=1), [])", FSeq.Empty<int>().AddBack(1).ToString());
             Assert.AreEqual("new Set`1(Values=Set({}, 1, new SetUnit()))", Set.Empty<int>().Add(1).ToString());
             Assert.AreEqual("Unit(1)", Seq.Empty<int>().Add(1).ToString());
-            Assert.AreEqual("Concat(Unit(1), Unit(2))", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
+            Assert.AreEqual("Concat(Unit(1), [2])", (Seq.Empty<int>().Add(1) + new Seq<int>(2)).ToString());
             Assert.AreEqual("(x == y)", (Zen.Symbolic<int>("x") == Zen.Symbolic<int>("y")).ToString());
             Assert.AreEqual("(x <= y)", (Zen.Symbolic<int>("x") <= Zen.Symbolic<int>("y")).ToString());
             Assert.AreEqual("(x >= y)", (Zen.Symbolic<int>("x") >= Zen.Symbolic<int>("y")).ToString());
@@ -137,6 +137,7 @@ namespace ZenLib.Tests
             Console.WriteLine(s1.Concat(s2).Concat(Zen.Symbolic<Seq<string>>("seq")).Format());
             Console.WriteLine(Seq.Concat(s1, Seq.Concat(s2, Zen.Symbolic<Seq<string>>("seq"))).Format());
             Console.WriteLine(Zen.Symbolic<Seq<byte>>().MatchesRegex(Regex.ParseAscii("abc")).Format());
+            Console.WriteLine(Seq.Empty<int>().Add(1).Format());
         }
 
         /// <summary>

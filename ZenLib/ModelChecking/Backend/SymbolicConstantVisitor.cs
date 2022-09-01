@@ -168,7 +168,15 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
-            throw new ZenUnreachableException();
+            var result = this.solver.DictEmpty(keyType, valueType);
+            dynamic map = parameter;
+            foreach (var kv in map.Values)
+            {
+                var keyExpr = this.Visit(keyType, kv.Key);
+                var valueExpr = this.Visit(valueType, kv.Value);
+                result = this.solver.DictSet(result, keyExpr, valueExpr, keyType, valueType);
+            }
+            return new SymbolicMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
         }
 
         /// <summary>
@@ -178,10 +186,18 @@ namespace ZenLib.ModelChecking
         /// <param name="fields">The fields and their types.</param>
         /// <param name="parameter">The C# constant.</param>
         /// <returns>A symbolic value for the constant.</returns>
-        [ExcludeFromCodeCoverage]
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitObject(Type objectType, SortedDictionary<string, Type> fields, object parameter)
         {
-            throw new ZenUnreachableException();
+            var result = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
+            foreach (var field in fields)
+            {
+                var fieldName = field.Key;
+                var fieldType = field.Value;
+                var fieldValue = ReflectionUtilities.GetFieldOrProperty(parameter, fieldName);
+                result = result.Add(fieldName, this.Visit(fieldType, fieldValue));
+            }
+
+            return new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(objectType, this.solver, result);
         }
 
         /// <summary>
@@ -204,10 +220,24 @@ namespace ZenLib.ModelChecking
         /// <returns>A symbolic value for the constant.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitSeq(Type sequenceType, Type innerType, object parameter)
         {
-            Contract.Assert(sequenceType == typeof(Seq<char>));
-            var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<char>)parameter);
-            var s = this.solver.CreateStringConst(escapedString);
-            return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, s);
+            if (sequenceType == typeof(Seq<char>))
+            {
+                var escapedString = CommonUtilities.ConvertCShaprStringToZ3((Seq<char>)parameter);
+                var s = this.solver.CreateStringConst(escapedString);
+                return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, s);
+            }
+            else
+            {
+                var result = this.solver.SeqEmpty(innerType);
+                dynamic seq = parameter;
+                foreach (var value in seq.Values)
+                {
+                    var element = this.Visit(innerType, value);
+                    result = this.solver.SeqConcat(result, this.solver.SeqUnit(element, innerType));
+                }
+
+                return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, result);
+            }
         }
 
         /// <summary>
@@ -229,7 +259,10 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitString(object parameter)
         {
-            throw new ZenUnreachableException();
+            var seq = Seq.FromString((string)parameter);
+            var escapedString = CommonUtilities.ConvertCShaprStringToZ3(seq);
+            var s = this.solver.CreateStringConst(escapedString);
+            return new SymbolicSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, s);
         }
 
         /// <summary>

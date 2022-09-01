@@ -10,7 +10,6 @@ namespace ZenLib
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Numerics;
-    using System.Text;
 
     /// <summary>
     /// A class representing an arbitrary sized sequence.
@@ -39,8 +38,29 @@ namespace ZenLib
             this.Values = ImmutableList<T>.Empty.Add(value);
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Set{TKey}"/> class.
+        /// </summary>
+        public Seq(params T[] values) : this((IEnumerable<T>)values)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Set{TKey}"/> class.
+        /// </summary>
+        public Seq(IEnumerable<T> values)
+        {
+            Contract.Assert(values != null);
+            this.Values = ImmutableList<T>.Empty.AddRange(values);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Seq{T}"/> class.
+        /// </summary>
+        /// <param name="values">The backing values.</param>
         internal Seq(ImmutableList<T> values)
         {
+            Contract.AssertNotNull(values);
             this.Values = values;
         }
 
@@ -60,6 +80,7 @@ namespace ZenLib
         /// <returns>True if the regex matches the sequence.</returns>
         public bool MatchesRegex(Regex<T> regex)
         {
+            Contract.AssertNotNull(regex);
             return regex.IsMatch(this.Values);
         }
 
@@ -71,6 +92,9 @@ namespace ZenLib
         /// <returns>A new seq.</returns>
         public Seq<T> ReplaceFirst(Seq<T> match, Seq<T> replace)
         {
+            Contract.AssertNotNull(match);
+            Contract.AssertNotNull(replace);
+
             if (match.Length() == 0)
             {
                 return replace.Concat(this);
@@ -122,6 +146,7 @@ namespace ZenLib
         /// <returns>Index of the first match or -1.</returns>
         public int IndexOf(Seq<T> other)
         {
+            Contract.AssertNotNull(other);
             return this.IndexOf(other, 0);
         }
 
@@ -134,6 +159,8 @@ namespace ZenLib
         /// <returns>Index of the first match or -1.</returns>
         public int IndexOf(Seq<T> other, int offset)
         {
+            Contract.AssertNotNull(other);
+
             if (offset < 0 || offset > this.Length() || other.Length() > this.Length())
             {
                 return -1;
@@ -165,6 +192,8 @@ namespace ZenLib
         /// <returns>Index of the first match or -1.</returns>
         internal BigInteger IndexOfBigInteger(Seq<T> other, BigInteger offset)
         {
+            Contract.AssertNotNull(other);
+
             return new BigInteger(this.IndexOf(other, int.Parse(offset.ToString())));
         }
 
@@ -175,6 +204,8 @@ namespace ZenLib
         /// <returns>True if the other sequence is a subsequence of this one.</returns>
         public bool Contains(Seq<T> other)
         {
+            Contract.AssertNotNull(other);
+
             if (other.Length() == 0)
             {
                 return true;
@@ -197,8 +228,16 @@ namespace ZenLib
             return false;
         }
 
+        /// <summary>
+        /// Determines if this sequence matches another at an index.
+        /// </summary>
+        /// <param name="other">The other sequence.</param>
+        /// <param name="index">The index.</param>
+        /// <returns></returns>
         private bool IsMatch(Seq<T> other, int index)
         {
+            Contract.AssertNotNull(other);
+
             for (int i = index; i < index + other.Length(); i++)
             {
                 if (!this.Values[i].Equals(other.Values[i - index]))
@@ -217,6 +256,8 @@ namespace ZenLib
         /// <returns>True if this sequence has the other sequence as a prefix.</returns>
         public bool HasPrefix(Seq<T> other)
         {
+            Contract.AssertNotNull(other);
+
             if (other.Length() > this.Length())
             {
                 return false;
@@ -240,6 +281,8 @@ namespace ZenLib
         /// <returns>True if this sequence has the other sequence as a suffix.</returns>
         public bool HasSuffix(Seq<T> other)
         {
+            Contract.AssertNotNull(other);
+
             if (other.Length() > this.Length())
             {
                 return false;
@@ -299,17 +342,19 @@ namespace ZenLib
         /// <returns>The concatenated sequence.</returns>
         public Seq<T> Concat(Seq<T> other)
         {
+            Contract.AssertNotNull(other);
             return new Seq<T>(this.Values.AddRange(other.Values));
         }
 
         /// <summary>
         /// Concatenate this sequence with another.
         /// </summary>
-        /// <param name="other">The other sequence.</param>
+        /// <param name="element">The element.</param>
         /// <returns>The concatenated sequence.</returns>
-        public Seq<T> Add(T other)
+        public Seq<T> Add(T element)
         {
-            return new Seq<T>(this.Values.Add(other));
+            Contract.AssertNotNull(element);
+            return new Seq<T>(this.Values.Add(element));
         }
 
         /// <summary>
@@ -432,7 +477,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<Seq<T>> Empty<T>()
         {
-            return ZenSeqEmptyExpr<T>.Instance;
+            return Zen.Constant(new Seq<T>());
         }
 
         /// <summary>

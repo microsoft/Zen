@@ -314,18 +314,6 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
-        public override InterleavingResult VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
-        }
-
-        /// <summary>
-        /// Evaluate an expression.
-        /// </summary>
-        /// <param name="expression">The zen expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The interleaving result.</returns>
-        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitMapSet<TKey, TValue>(ZenMapSetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid map type used with Decision Diagram backend.");
@@ -389,18 +377,6 @@ namespace ZenLib.ModelChecking
         public override InterleavingResult VisitConstMapGet<TKey, TValue>(ZenConstMapGetExpr<TKey, TValue> expression, Dictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid map type used with Decision Diagram backend.");
-        }
-
-        /// <summary>
-        /// Evaluate an expression.
-        /// </summary>
-        /// <param name="expression">The zen expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The interleaving result.</returns>
-        [ExcludeFromCodeCoverage]
-        public override InterleavingResult VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Dictionary<long, object> parameter)
-        {
-            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
         }
 
         /// <summary>

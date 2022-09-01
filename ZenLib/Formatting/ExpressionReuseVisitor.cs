@@ -153,17 +153,6 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
-        public override Unit VisitMapEmpty<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression, Unit parameter)
-        {
-            return parameter;
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns></returns>
         public override Unit VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.Expr, parameter);
@@ -259,17 +248,6 @@ namespace ZenLib.Generation
         {
             this.Visit(expression.ListExpr, parameter);
             this.Visit(expression.EmptyExpr, parameter);
-            return parameter;
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns></returns>
-        public override Unit VisitSeqEmpty<T>(ZenSeqEmptyExpr<T> expression, Unit parameter)
-        {
             return parameter;
         }
 

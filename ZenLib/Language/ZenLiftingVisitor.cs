@@ -283,18 +283,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The Zen value representing the seq.</returns>
         internal Zen<Seq<T>> CreateZenSeqConstant<T>(Seq<T> value)
         {
-            if (typeof(T) == typeof(char))
-            {
-                return ZenConstantExpr<Seq<T>>.Create(value);
-            }
-
-            Zen<Seq<T>> seq = ZenSeqEmptyExpr<T>.Instance;
-            foreach (var elt in value.Values)
-            {
-                seq = ZenSeqConcatExpr<T>.Create(seq, ZenSeqUnitExpr<T>.Create(elt));
-            }
-
-            return seq;
+            return ZenConstantExpr<Seq<T>>.Create(value);
         }
 
         /// <summary>
@@ -321,14 +310,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The Zen value representing the list.</returns>
         internal Zen<Map<TKey, TValue>> CreateZenMapConstant<TKey, TValue>(Map<TKey, TValue> value)
         {
-            Zen<Map<TKey, TValue>> map = ZenMapEmptyExpr<TKey, TValue>.Instance;
-            foreach (var elt in value.Values)
-            {
-                Contract.AssertNullConversion(elt.Key, "element", typeof(Map<TKey, TValue>));
-                map = ZenMapSetExpr<TKey, TValue>.Create(map, elt.Key, elt.Value);
-            }
-
-            return map;
+            return ZenConstantExpr<Map<TKey, TValue>>.Create(value);
         }
 
         /// <summary>

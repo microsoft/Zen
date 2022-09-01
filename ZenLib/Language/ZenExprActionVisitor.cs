@@ -145,16 +145,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Visit a MapEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        public virtual void Visit<TKey, TValue>(ZenMapEmptyExpr<TKey, TValue> expression)
-        {
-            return;
-        }
-
-        /// <summary>
         /// Visit a MapSetExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -230,16 +220,6 @@ namespace ZenLib
             // TODO: how to handle cons case.
             VisitCached(expression.ListExpr);
             VisitCached(expression.EmptyExpr);
-        }
-
-        /// <summary>
-        /// Visit a SeqEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenSeqEmptyExpr<T> expression)
-        {
-            return;
         }
 
         /// <summary>
