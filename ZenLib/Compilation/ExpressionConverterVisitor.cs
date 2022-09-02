@@ -118,17 +118,18 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
-        /// Compile a lambda to a C# function.
+        /// Compile a lambda to an expression.
         /// </summary>
         /// <typeparam name="TSrc">The parameter type.</typeparam>
         /// <typeparam name="TDst">The return type.</typeparam>
         /// <param name="lambda">The Zen lambda.</param>
         /// <param name="recursiveDefinition">The recursive definition of the lambda.</param>
+        /// <param name="parameter">The parameter.</param>
         /// <returns>A C# function.</returns>
-        public Expression CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda, Expression recursiveDefinition)
+        public Expression CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda, Expression recursiveDefinition, ExpressionConverterEnvironment parameter)
         {
             var param = Expression.Parameter(typeof(TSrc));
-            var paramExprs = ImmutableDictionary<long, Expression>.Empty.Add(lambda.Parameter.ParameterId, param);
+            var paramExprs = parameter.ArgumentAssignment.Add(lambda.Parameter.ParameterId, param);
             var environment = new ExpressionConverterEnvironment(paramExprs);
             var expr = CodeGenerator.CompileToBlock(
                 lambda.Body,
@@ -140,6 +141,26 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
+        /// Compile a lambda to an expression.
+        /// </summary>
+        /// <typeparam name="TSrc">The parameter type.</typeparam>
+        /// <typeparam name="TDst">The return type.</typeparam>
+        /// <param name="lambda">The Zen lambda.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A C# function.</returns>
+        public Expression CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda, ExpressionConverterEnvironment parameter)
+        {
+            if (!this.Lambdas.TryGetValue(lambda, out var lambdaExpression))
+            {
+                var lambdaVar = Expression.Variable(typeof(Func<TSrc, TDst>));
+                var lambdaFunction = CompileLambda(lambda, lambdaVar, parameter);
+                lambdaExpression = Expression.Block(new[] { lambdaVar }, Expression.Assign(lambdaVar, lambdaFunction), lambdaVar);
+            }
+
+            return lambdaExpression;
+        }
+
+        /// <summary>
         /// Visit an expression.
         /// </summary>
         /// <param name="expression">The Zen expression.</param>
@@ -147,13 +168,7 @@ namespace ZenLib.Compilation
         /// <returns>An expression tree.</returns>
         public override Expression VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionConverterEnvironment parameter)
         {
-            // build the lambda if we haven't already
-            if (!this.Lambdas.TryGetValue(expression.Lambda, out var lambdaExpression))
-            {
-                var lambdaVar = Expression.Variable(typeof(Func<TSrc, TDst>));
-                var lambdaFunction = CompileLambda(expression.Lambda, lambdaVar);
-                lambdaExpression = Expression.Block(new[] { lambdaVar }, Expression.Assign(lambdaVar, lambdaFunction), lambdaVar);
-            }
+            var lambdaExpression = CompileLambda(expression.Lambda, parameter);
 
             var argument = CodeGenerator.CompileToBlock(
                 expression.ArgumentExpr,
@@ -494,60 +509,20 @@ namespace ZenLib.Compilation
             var hdExpr = Expression.PropertyOrField(splitVariable, "Item1");
             var tlExpr = Expression.PropertyOrField(splitVariable, "Item2");
 
-            // compile the empty expression
+            // compile the empty expression.
             var emptyExpr = Convert(expression.EmptyExpr, parameter);
 
-            // run the cons lambda
-            var runMethod = typeof(Interpreter)
-                .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(Pair<Option<TList>, FSeq<TList>>), typeof(TResult));
+            // compile the cons lambda function.
+            var consLambdaExpression = this.CompileLambda(expression.ConsCase, parameter);
 
-            // create the bound arguments by constructing the immutable list
-            var dictType = typeof(ImmutableDictionary<long, object>);
-            var dictField = dictType.GetFieldCached("Empty");
-            Expression argsExpr = Expression.Field(null, dictField);
-            var dictAddMethod = dictType.GetMethodCached("Add");
-
-            foreach (var kv in parameter.ArgumentAssignment)
-            {
-                argsExpr = Expression.Call(
-                    argsExpr,
-                    dictAddMethod,
-                    Expression.Constant(kv.Key),
-                    Expression.Convert(kv.Value, typeof(object)));
-            }
-
-            // pair constructor
+            // create a pair from the list hd and tl.
             var constructor = typeof(Pair<Option<TList>, FSeq<TList>>).GetConstructor(new Type[] { typeof(Option<TList>), typeof(FSeq<TList>) });
             var pairExpr = Expression.New(constructor, hdExpr, tlExpr);
-
-            // either unroll the match one level, or hand off the the interpreter.
-            Expression consExpr;
-            if (this.currentMatchUnrollingDepth == this.maxMatchUnrollingDepth)
-            {
-                var function = Expression.PropertyOrField(Expression.Constant(expression.ConsCase), "Function");
-                consExpr = Expression.Call(runMethod, function, pairExpr, argsExpr);
-            }
-            else
-            {
-                var newAssignment = parameter.ArgumentAssignment;
-                newAssignment = newAssignment.SetItem(
-                    expression.ConsCase.Parameter.ParameterId,
-                    pairExpr);
-
-                consExpr = CodeGenerator.CompileToBlock(
-                    expression.ConsCase.Body,
-                    new ExpressionConverterEnvironment(newAssignment),
-                    this.SubexpressionCache,
-                    this.Lambdas,
-                    this.currentMatchUnrollingDepth + 1,
-                    this.maxMatchUnrollingDepth);
-            }
 
             var nonEmptyBlock = Expression.Block(
                 new List<ParameterExpression> { splitVariable },
                 Expression.Assign(splitVariable, splitExpr),
-                consExpr);
+                Expression.Invoke(consLambdaExpression, pairExpr));
 
             return Expression.Condition(isEmptyExpr, emptyExpr, nonEmptyBlock);
         }
