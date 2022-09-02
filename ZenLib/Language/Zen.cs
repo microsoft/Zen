@@ -1396,11 +1396,11 @@ namespace ZenLib
         /// Solves for an assignment to Arbitrary variables in a boolean expression.
         /// </summary>
         /// <param name="expr">The boolean expression.</param>
-        /// <param name="backend">The solver backend to use.</param>
+        /// <param name="solverType">The solver type to use.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType backend = Solver.SolverType.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType solverType = Solver.SolverType.Z3)
         {
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), solverType));
             return new ZenSolution(model);
         }
 

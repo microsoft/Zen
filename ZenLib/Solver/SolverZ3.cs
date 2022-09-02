@@ -1277,10 +1277,7 @@ namespace ZenLib.Solver
         public Model Solve(BoolExpr x)
         {
             this.Assert(x);
-            Console.WriteLine(this.Solver);
-            var t = System.Diagnostics.Stopwatch.StartNew();
             var status = this.Solver.Check();
-            Console.WriteLine($"Time: {t.ElapsedMilliseconds}ms");
             if (status == Status.UNSATISFIABLE)
             {
                 return null;

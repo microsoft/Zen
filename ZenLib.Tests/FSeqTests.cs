@@ -675,7 +675,7 @@ namespace ZenLib.Tests
                 var l3 = l2.Reverse().Append(l1.Reverse()).Reverse();
                 var l4 = l1.Append(l2);
                 return Implies(Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
-            });
+            }, runBdds: false);
         }
 
         /// <summary>

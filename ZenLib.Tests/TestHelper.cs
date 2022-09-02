@@ -5,7 +5,6 @@
 namespace ZenLib.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -95,18 +94,15 @@ namespace ZenLib.Tests
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { SolverType = SolverType.DecisionDiagrams, Simplify = true, ListSize = bddListSize },
-                    new TestParameter { SolverType = SolverType.DecisionDiagrams, Simplify = false, ListSize = 1 },
-                    new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
-                    new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.DecisionDiagrams, ListSize = 1 },
+                    new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
                 };
             }
             else
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
-                    new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
                 };
             }
         }
@@ -115,8 +111,7 @@ namespace ZenLib.Tests
         {
             return new TestParameter[]
             {
-                new TestParameter { SolverType = SolverType.Z3, Simplify = true, ListSize = 5 },
-                new TestParameter { SolverType = SolverType.Z3, Simplify = false, ListSize = 5 },
+                new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
             };
         }
 
@@ -176,17 +171,23 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
+                var t = System.Diagnostics.Stopwatch.StartNew();
                 var f = Zen.Function<T1, T2, bool>(function);
                 var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
+                Console.WriteLine(t.ElapsedMilliseconds);
 
                 // compare input with evaluation
                 result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
+                Console.WriteLine(t.ElapsedMilliseconds);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
+                Console.WriteLine(t.ElapsedMilliseconds);
                 f.Compile();
+                Console.WriteLine(t.ElapsedMilliseconds);
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
+                Console.WriteLine(t.ElapsedMilliseconds);
             }
         }
 
@@ -630,8 +631,6 @@ namespace ZenLib.Tests
         private class TestParameter
         {
             public SolverType SolverType { get; set; }
-
-            public bool Simplify { get; set; }
 
             public int ListSize { get; set; }
         }

@@ -20,9 +20,17 @@ namespace ZenLibBench
         {
             ZenSettings.UseLargeStack = true;
 
-            var l = Zen.Symbolic<FSeq<byte>>(depth: 2);
-            var sol = l.Contains(1).Solve();
-            Console.WriteLine(sol.Get(l));
+            for (int i = 0; i < 20; i++)
+            {
+                var zf = new ZenFunction<FSeq<byte>, FSeq<byte>, bool>((l1, l2) =>
+                {
+                    var l3 = l2.Reverse().Append(l1.Reverse()).Reverse();
+                    var l4 = l1.Append(l2);
+                    return Zen.Implies(Zen.Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
+                });
+
+                zf.Find((l1, l2, b) => Zen.Not(b));
+            }
 
             // BenchmarkSets();
             // BenchmarkComparisons();

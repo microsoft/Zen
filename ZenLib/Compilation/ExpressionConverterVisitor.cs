@@ -110,6 +110,20 @@ namespace ZenLib.Compilation
         }
 
         /// <summary>
+        /// Compile a lambda to a C# function.
+        /// </summary>
+        /// <typeparam name="TSrc">The parameter type.</typeparam>
+        /// <typeparam name="TDst">The return type.</typeparam>
+        /// <param name="lambda">The Zen lambda.</param>
+        /// <returns>A C# function.</returns>
+        public Func<TSrc, TDst> CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda)
+        {
+            var param = Expression.Parameter(typeof(TSrc));
+            var paramExprs = ImmutableDictionary<long, Expression>.Empty.Add(lambda.Parameter.ParameterId, param);
+            return CodeGenerator.Compile<TSrc, TDst>(lambda.Body, paramExprs, param, this.maxMatchUnrollingDepth);
+        }
+
+        /// <summary>
         /// Visit an expression.
         /// </summary>
         /// <param name="expression">The Zen expression.</param>
@@ -117,21 +131,28 @@ namespace ZenLib.Compilation
         /// <returns>An expression tree.</returns>
         public override Expression VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionConverterEnvironment parameter)
         {
-            var left = CodeGenerator.CompileToBlock(
+            var lambdaFunction = CompileLambda(expression.Lambda);
+            Expression<Func<TSrc, TDst>> lambdaExpression = (x) => lambdaFunction(x);
+
+            var argument = CodeGenerator.CompileToBlock(
                 expression.ArgumentExpr,
                 parameter,
                 this.SubexpressionCache,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
-            var newAssignment = parameter.ArgumentAssignment.SetItem(expression.Lambda.Parameter.ParameterId, left);
+            return Expression.Invoke(lambdaExpression, argument);
+
+            /* var newAssignment = parameter.ArgumentAssignment.SetItem(expression.Lambda.Parameter.ParameterId, left);
+
+            Console.WriteLine(expression.Lambda.GetHashCode());
 
             return CodeGenerator.CompileToBlock(
                 expression.Lambda.Body,
                 new ExpressionConverterEnvironment(newAssignment),
                 this.SubexpressionCache,
                 this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth);
+                this.maxMatchUnrollingDepth); */
         }
 
         /// <summary>
