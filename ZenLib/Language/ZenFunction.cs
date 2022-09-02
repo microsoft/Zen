@@ -116,7 +116,7 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T1> Argument1;
+        internal static ZenParameterExpr<T1> Argument1;
 
         /// <summary>
         /// The expression for the function body.
@@ -152,7 +152,7 @@ namespace ZenLib
             this.Function = function;
             lock (argumentLock)
             {
-                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
+                Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
             }
             this.FunctionBodyExpr = this.Function(Argument1);
         }
@@ -169,7 +169,7 @@ namespace ZenLib
                 return CompiledFunction(value);
             }
 
-            var args = new Dictionary<long, object> { { Argument1.ArgumentId, value } };
+            var args = new Dictionary<long, object> { { Argument1.ParameterId, value } };
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
         }
 
@@ -188,7 +188,7 @@ namespace ZenLib
 
             var param1 = Expression.Parameter(typeof(T1));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(Argument1.ArgumentId, param1);
+                .Add(Argument1.ParameterId, param1);
             this.CompiledFunction = CodeGenerator.Compile<T1, T2>(this.FunctionBodyExpr, args, param1, maxUnrollingDepth);
         }
 
@@ -230,7 +230,7 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input },
+                { Argument1.ParameterId, input },
             };
 
             var result = invariant(Argument1, this.FunctionBodyExpr);
@@ -254,7 +254,7 @@ namespace ZenLib
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input },
+                { Argument1.ParameterId, input },
             };
 
             var result = invariant(input, this.FunctionBodyExpr);
@@ -311,12 +311,12 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T1> Argument1;
+        internal static ZenParameterExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T2> Argument2;
+        internal static ZenParameterExpr<T2> Argument2;
 
         /// <summary>
         /// Function body expression.
@@ -352,8 +352,8 @@ namespace ZenLib
             this.Function = function;
             lock (argumentLock)
             {
-                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
+                Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
+                Argument2 = Argument2 ?? new ZenParameterExpr<T2>();
             }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2);
         }
@@ -373,8 +373,8 @@ namespace ZenLib
 
             var args = new Dictionary<long, object>()
             {
-                { Argument1.ArgumentId, value1 },
-                { Argument2.ArgumentId, value2 },
+                { Argument1.ParameterId, value1 },
+                { Argument2.ParameterId, value2 },
             };
 
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
@@ -396,8 +396,8 @@ namespace ZenLib
             var param1 = Expression.Parameter(typeof(T1));
             var param2 = Expression.Parameter(typeof(T2));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(Argument1.ArgumentId, param1)
-                .Add(Argument2.ArgumentId, param2);
+                .Add(Argument1.ParameterId, param1)
+                .Add(Argument2.ParameterId, param2);
             this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.FunctionBodyExpr, args, param1, param2, maxUnrollingDepth);
         }
 
@@ -443,8 +443,8 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
             };
 
             var result = invariant(Argument1, Argument2, this.FunctionBodyExpr);
@@ -471,8 +471,8 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
             };
 
             var result = invariant(input1, input2, this.FunctionBodyExpr);
@@ -534,17 +534,17 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T1> Argument1;
+        internal static ZenParameterExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T2> Argument2;
+        internal static ZenParameterExpr<T2> Argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T3> Argument3;
+        internal static ZenParameterExpr<T3> Argument3;
 
         /// <summary>
         /// Function body expression.
@@ -580,9 +580,9 @@ namespace ZenLib
             this.Function = function;
             lock (argumentLock)
             {
-                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
-                Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
+                Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
+                Argument2 = Argument2 ?? new ZenParameterExpr<T2>();
+                Argument3 = Argument3 ?? new ZenParameterExpr<T3>();
             }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3);
         }
@@ -603,9 +603,9 @@ namespace ZenLib
 
             var args = new Dictionary<long, object>()
             {
-                { Argument1.ArgumentId, value1 },
-                { Argument2.ArgumentId, value2 },
-                { Argument3.ArgumentId, value3 },
+                { Argument1.ParameterId, value1 },
+                { Argument2.ParameterId, value2 },
+                { Argument3.ParameterId, value3 },
             };
 
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
@@ -628,9 +628,9 @@ namespace ZenLib
             var param2 = Expression.Parameter(typeof(T2));
             var param3 = Expression.Parameter(typeof(T3));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(Argument1.ArgumentId, param1)
-                .Add(Argument2.ArgumentId, param2)
-                .Add(Argument3.ArgumentId, param3);
+                .Add(Argument1.ParameterId, param1)
+                .Add(Argument2.ParameterId, param2)
+                .Add(Argument3.ParameterId, param3);
             this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.FunctionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
         }
 
@@ -679,9 +679,9 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
-                { Argument3.ArgumentId, input3 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
+                { Argument3.ParameterId, input3 },
             };
 
             var result = invariant(Argument1, Argument2, Argument3, this.FunctionBodyExpr);
@@ -711,9 +711,9 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
-                { Argument3.ArgumentId, input3 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
+                { Argument3.ParameterId, input3 },
             };
 
             var result = invariant(input1, input2, input3, this.FunctionBodyExpr);
@@ -779,22 +779,22 @@ namespace ZenLib
         /// <summary>
         /// First argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T1> Argument1;
+        internal static ZenParameterExpr<T1> Argument1;
 
         /// <summary>
         /// Second argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T2> Argument2;
+        internal static ZenParameterExpr<T2> Argument2;
 
         /// <summary>
         /// Third argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T3> Argument3;
+        internal static ZenParameterExpr<T3> Argument3;
 
         /// <summary>
         /// Fourth argument expression.
         /// </summary>
-        internal static ZenArgumentExpr<T4> Argument4;
+        internal static ZenParameterExpr<T4> Argument4;
 
         /// <summary>
         /// Function body expression.
@@ -830,10 +830,10 @@ namespace ZenLib
             this.Function = function;
             lock (argumentLock)
             {
-                Argument1 = Argument1 ?? new ZenArgumentExpr<T1>();
-                Argument2 = Argument2 ?? new ZenArgumentExpr<T2>();
-                Argument3 = Argument3 ?? new ZenArgumentExpr<T3>();
-                Argument4 = Argument4 ?? new ZenArgumentExpr<T4>();
+                Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
+                Argument2 = Argument2 ?? new ZenParameterExpr<T2>();
+                Argument3 = Argument3 ?? new ZenParameterExpr<T3>();
+                Argument4 = Argument4 ?? new ZenParameterExpr<T4>();
             }
             this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3, Argument4);
         }
@@ -855,10 +855,10 @@ namespace ZenLib
 
             var args = new Dictionary<long, object>()
             {
-                { Argument1.ArgumentId, value1 },
-                { Argument2.ArgumentId, value2 },
-                { Argument3.ArgumentId, value3 },
-                { Argument4.ArgumentId, value4 },
+                { Argument1.ParameterId, value1 },
+                { Argument2.ParameterId, value2 },
+                { Argument3.ParameterId, value3 },
+                { Argument4.ParameterId, value4 },
             };
 
             return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
@@ -882,10 +882,10 @@ namespace ZenLib
             var param3 = Expression.Parameter(typeof(T3));
             var param4 = Expression.Parameter(typeof(T4));
             var args = ImmutableDictionary<long, Expression>.Empty
-                .Add(Argument1.ArgumentId, param1)
-                .Add(Argument2.ArgumentId, param2)
-                .Add(Argument3.ArgumentId, param3)
-                .Add(Argument4.ArgumentId, param4);
+                .Add(Argument1.ParameterId, param1)
+                .Add(Argument2.ParameterId, param2)
+                .Add(Argument3.ParameterId, param3)
+                .Add(Argument4.ParameterId, param4);
             this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.FunctionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
         }
 
@@ -937,10 +937,10 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
-                { Argument3.ArgumentId, input3 },
-                { Argument4.ArgumentId, input4 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
+                { Argument3.ParameterId, input3 },
+                { Argument4.ParameterId, input4 },
             };
 
             var result = invariant(Argument1, Argument2, Argument3, Argument4, this.FunctionBodyExpr);
@@ -973,10 +973,10 @@ namespace ZenLib
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
             var args = new Dictionary<long, object>
             {
-                { Argument1.ArgumentId, input1 },
-                { Argument2.ArgumentId, input2 },
-                { Argument3.ArgumentId, input3 },
-                { Argument4.ArgumentId, input4 },
+                { Argument1.ParameterId, input1 },
+                { Argument2.ParameterId, input2 },
+                { Argument3.ParameterId, input3 },
+                { Argument4.ParameterId, input4 },
             };
 
             var result = invariant(input1, input2, input3, input4, this.FunctionBodyExpr);

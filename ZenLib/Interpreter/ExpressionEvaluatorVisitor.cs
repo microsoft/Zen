@@ -71,6 +71,18 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
+        public override object VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e = (TSrc)this.Visit(expression.ArgumentExpr, parameter);
+            return (TDst)this.Visit(expression.Lambda.Body, parameter.AddBinding(expression.Lambda.Parameter.ParameterId, e));
+        }
+
+        /// <summary>
+        /// Visit a Zen expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>The C# object.</returns>
         public override object VisitLogicalBinop(ZenLogicalBinopExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (bool)this.Visit(expression.Expr1, parameter);
@@ -92,9 +104,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public override object VisitArgument<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitParameter<T>(ZenParameterExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return parameter.ArgumentAssignment[expression.ArgumentId];
+            return parameter.ArgumentAssignment[expression.ParameterId];
         }
 
         /// <summary>
@@ -487,20 +499,16 @@ namespace ZenLib.Interpretation
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-                var argHd = new ZenArgumentExpr<Option<T>>();
-                var argTl = new ZenArgumentExpr<FSeq<T>>();
-                parameter.ArgumentAssignment[argHd.ArgumentId] = hd;
-                parameter.ArgumentAssignment[argTl.ArgumentId] = tl;
+                var parameterId = expression.ConsCase.Parameter.ParameterId;
 
                 if (this.trackBranches)
                 {
                     this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
-                    this.PathConstraintSymbolicEnvironment[argHd.ArgumentId] = expression.ListExpr.Head();
-                    this.PathConstraintSymbolicEnvironment[argTl.ArgumentId] = expression.ListExpr.Tail();
+                    this.PathConstraintSymbolicEnvironment[parameterId] = Pair.Create(expression.ListExpr.Head(), expression.ListExpr.Tail());
                 }
 
-                var c = expression.ConsCase.Invoke(argHd, argTl);
-                return (TResult)this.Visit(c, parameter);
+                parameter = parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl));
+                return (TResult)this.Visit(expression.ConsCase.Body, parameter);
             }
         }
 

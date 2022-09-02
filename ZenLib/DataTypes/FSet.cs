@@ -456,10 +456,17 @@ namespace ZenLib
         /// <returns>The count of unique elements.</returns>
         private static Zen<ushort> Size<T>(Zen<FSeq<T>> seqExpr)
         {
-            return seqExpr.Case(0, (hd, tl) =>
-            {
-                return Size(tl) + If<ushort>(And(hd.IsSome(), Not(tl.Contains(hd.Value()))), 1, 0);
-            });
+            var lambda = Zen.Lambda<FSeq<T>, ushort>();
+            lambda.Initialize(x => x.Case(
+                empty: 0,
+                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
+                {
+                    var hd = arg.Item1();
+                    var tl = arg.Item2();
+                    return lambda.Apply(tl) + If<ushort>(And(hd.IsSome(), Not(tl.Contains(hd.Value()))), 1, 0);
+                })));
+
+            return lambda.Apply(seqExpr);
         }
     }
 }

@@ -88,14 +88,28 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> Visit<T>(Zen<T> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            if (this.cache.TryGetValue((expression.Id, null), out var value))
+            if (this.cache.TryGetValue((expression.Id, parameter), out var value))
             {
                 return value;
             }
 
             var result = expression.Accept(this, parameter);
-            this.cache[(expression.Id, null)] = result;
+            this.cache[(expression.Id, parameter)] = result;
             return result;
+        }
+
+        /// <summary>
+        /// Visit the expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The symbolic value.</returns>
+        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        {
+            var v1 = this.Visit(expression.ArgumentExpr, parameter);
+            var args = parameter.ArgumentsToValue.SetItem(expression.Lambda.Parameter.ParameterId, v1);
+            var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
+            return this.Visit(expression.Lambda.Body, newEnv);
         }
 
         /// <summary>
@@ -137,9 +151,9 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The symbolic value.</returns>
-        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitArgument<T1>(ZenArgumentExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitParameter<T1>(ZenParameterExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
-            if (parameter.ArgumentsToExpr.TryGetValue(expression.ArgumentId, out var expr))
+            if (parameter.ArgumentsToExpr.TryGetValue(expression.ParameterId, out var expr))
             {
                 try
                 {
@@ -156,7 +170,7 @@ namespace ZenLib.ModelChecking
             }
             else
             {
-                return parameter.ArgumentsToValue[expression.ArgumentId];
+                return parameter.ArgumentsToValue[expression.ParameterId];
             }
         }
 
@@ -502,21 +516,26 @@ namespace ZenLib.ModelChecking
             var (hd, tl) = CommonUtilities.SplitHeadHelper(list.Value);
 
             // get the symbolic value for the tail.
-            var rest = new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, tl);
+            var symbolicTl = new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, tl);
 
-            // execute the cons case with placeholder values to get a new Zen value.
-            var arg1 = new ZenArgumentExpr<Option<T>>();
-            var arg2 = new ZenArgumentExpr<FSeq<T>>();
+            // create a symbolic value for the head of the list.
             var mapping = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty
                 .Add("HasValue", new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, hd.Item1))
                 .Add("Value", hd.Item2);
-            var hdArg = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<T>), this.Solver, mapping);
-            var args = parameter.ArgumentsToValue.Add(arg1.ArgumentId, hdArg).Add(arg2.ArgumentId, rest);
+            var symbolicHd = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Option<T>), this.Solver, mapping);
+
+            // create a symbolic value for the pair of the head and tail of the list.
+            var pairMapping = ImmutableSortedDictionary<string, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty
+                .Add("Item1", symbolicHd)
+                .Add("Item2", symbolicTl);
+            var pair = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Pair<Option<T>, FSeq<T>>), this.Solver, pairMapping);
+
+            // update the arguments to assign this value to the cons lambda parameter.
+            var args = parameter.ArgumentsToValue.SetItem(expression.ConsCase.Parameter.ParameterId, pair);
             var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
-            var newExpression = expression.ConsCase(arg1, arg2);
 
             // model check the resulting value using the computed values for the placeholders.
-            return this.Visit(newExpression, newEnv);
+            return this.Visit(expression.ConsCase.Body, newEnv);
         }
 
         /// <summary>

@@ -49,7 +49,7 @@ namespace ZenLib.ModelChecking
                 return (T)value;
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(VariableAssignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(VariableAssignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, interpreterEnv);
         }

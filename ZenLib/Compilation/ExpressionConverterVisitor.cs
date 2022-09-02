@@ -94,7 +94,8 @@ namespace ZenLib.Compilation
         /// <returns>The result of the computation.</returns>
         public Expression Convert<T>(Zen<T> obj, ExpressionConverterEnvironment parameter)
         {
-            if (this.SubexpressionCache.TryGetValue(obj, out var value))
+            var key = (obj, parameter);
+            if (this.SubexpressionCache.TryGetValue(key, out var value))
             {
                 return value;
             }
@@ -104,8 +105,33 @@ namespace ZenLib.Compilation
             var assign = Expression.Assign(variable, result);
             this.Variables.Add(variable);
             this.BlockExpressions.Add(assign);
-            this.SubexpressionCache = this.SubexpressionCache.Add(obj, variable);
+            this.SubexpressionCache = this.SubexpressionCache.Add(key, variable);
             return variable;
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public override Expression VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionConverterEnvironment parameter)
+        {
+            var left = CodeGenerator.CompileToBlock(
+                expression.ArgumentExpr,
+                parameter,
+                this.SubexpressionCache,
+                this.currentMatchUnrollingDepth,
+                this.maxMatchUnrollingDepth);
+
+            var newAssignment = parameter.ArgumentAssignment.SetItem(expression.Lambda.Parameter.ParameterId, left);
+
+            return CodeGenerator.CompileToBlock(
+                expression.Lambda.Body,
+                new ExpressionConverterEnvironment(newAssignment),
+                this.SubexpressionCache,
+                this.currentMatchUnrollingDepth,
+                this.maxMatchUnrollingDepth);
         }
 
         /// <summary>
@@ -157,9 +183,9 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public override Expression VisitArgument<T>(ZenArgumentExpr<T> expression, ExpressionConverterEnvironment parameter)
+        public override Expression VisitParameter<T>(ZenParameterExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            return parameter.ArgumentAssignment[expression.ArgumentId];
+            return parameter.ArgumentAssignment[expression.ParameterId];
         }
 
         /// <summary>
@@ -438,7 +464,7 @@ namespace ZenLib.Compilation
             // run the cons lambda
             var runMethod = typeof(Interpreter)
                 .GetMethodCached("CompileRunHelper")
-                .MakeGenericMethod(typeof(Option<TList>), typeof(FSeq<TList>), typeof(TResult));
+                .MakeGenericMethod(typeof(Pair<Option<TList>, FSeq<TList>>), typeof(TResult));
 
             // create the bound arguments by constructing the immutable list
             var dictType = typeof(ImmutableDictionary<long, object>);
@@ -455,26 +481,26 @@ namespace ZenLib.Compilation
                     Expression.Convert(kv.Value, typeof(object)));
             }
 
+            // pair constructor
+            var constructor = typeof(Pair<Option<TList>, FSeq<TList>>).GetConstructor(new Type[] { typeof(Option<TList>), typeof(FSeq<TList>) });
+            var pairExpr = Expression.New(constructor, hdExpr, tlExpr);
+
             // either unroll the match one level, or hand off the the interpreter.
             Expression consExpr;
             if (this.currentMatchUnrollingDepth == this.maxMatchUnrollingDepth)
             {
-                var function = Expression.Constant(expression.ConsCase);
-                consExpr = Expression.Call(runMethod, function, hdExpr, tlExpr, argsExpr);
+                var function = Expression.PropertyOrField(Expression.Constant(expression.ConsCase), "Function");
+                consExpr = Expression.Call(runMethod, function, pairExpr, argsExpr);
             }
             else
             {
                 var newAssignment = parameter.ArgumentAssignment;
-
-                var argHd = new ZenArgumentExpr<Option<TList>>();
-                newAssignment = newAssignment.Add(argHd.ArgumentId, hdExpr);
-                var argTl = new ZenArgumentExpr<FSeq<TList>>();
-                newAssignment = newAssignment.Add(argTl.ArgumentId, tlExpr);
-
-                var zenConsExpr = expression.ConsCase(argHd, argTl);
+                newAssignment = newAssignment.SetItem(
+                    expression.ConsCase.Parameter.ParameterId,
+                    pairExpr);
 
                 consExpr = CodeGenerator.CompileToBlock(
-                    zenConsExpr,
+                    expression.ConsCase.Body,
                     new ExpressionConverterEnvironment(newAssignment),
                     this.SubexpressionCache,
                     this.currentMatchUnrollingDepth + 1,

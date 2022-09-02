@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using DecisionDiagrams;
@@ -17,11 +18,6 @@ namespace ZenLib.ModelChecking
     /// </summary>
     internal static class StateSetTransformerFactory
     {
-        /// <summary>
-        /// Empty arguments for interleaving heuristic.
-        /// </summary>
-        private static Dictionary<long, object> arguments = new Dictionary<long, object>();
-
         /// <summary>
         /// Default manager object will allocate all objects.
         /// </summary>
@@ -62,7 +58,7 @@ namespace ZenLib.ModelChecking
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristicVisitor();
-            var mustInterleave = heuristic.GetInterleavedVariables(newExpression, arguments);
+            var mustInterleave = heuristic.GetInterleavedVariables(newExpression, ImmutableDictionary<long, object>.Empty);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // optimization: if there are no variable ordering dependencies,
@@ -96,7 +92,7 @@ namespace ZenLib.ModelChecking
 
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(arguments);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(new Dictionary<long, object>());
             var symbolicValue = symbolicEvaluator.Compute(newExpression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;
@@ -192,7 +188,7 @@ namespace ZenLib.ModelChecking
 
             // initialize the decision diagram solver
             var heuristic = new InterleavingHeuristicVisitor();
-            var mustInterleave = heuristic.GetInterleavedVariables(expression, arguments);
+            var mustInterleave = heuristic.GetInterleavedVariables(expression, ImmutableDictionary<long, object>.Empty);
             var solver = new SolverDD<BDDNode>(manager.DecisionDiagramManager, mustInterleave);
 
             // if we already have canonical values for this type, we should use those.
@@ -209,7 +205,7 @@ namespace ZenLib.ModelChecking
 
             // get the decision diagram representing the equality.
             var symbolicEvaluator = new SymbolicEvaluationVisitor<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(solver);
-            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(arguments);
+            var env = new SymbolicEvaluationEnvironment<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>(new Dictionary<long, object>());
             var symbolicValue = symbolicEvaluator.Compute(expression, env);
             var symbolicResult = (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicValue;
             DD result = (DD)(object)symbolicResult.Value;

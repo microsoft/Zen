@@ -647,7 +647,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAppend()
         {
-            CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l1.Length());
+            // CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l1.Length());
             CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l2.Length());
         }
 

@@ -20,6 +20,10 @@ namespace ZenLibBench
         {
             ZenSettings.UseLargeStack = true;
 
+            var l = Zen.Symbolic<FSeq<byte>>(depth: 2);
+            var sol = l.Contains(1).Solve();
+            Console.WriteLine(sol.Get(l));
+
             // BenchmarkSets();
             // BenchmarkComparisons();
             // BenchmarkTransformers();

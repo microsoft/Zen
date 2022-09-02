@@ -49,6 +49,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Visit a ApplyExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public virtual void Visit<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression)
+        {
+            VisitCached(expression.ArgumentExpr);
+            VisitCached(expression.Lambda.Body);
+        }
+
+        /// <summary>
         /// Visit a LogicalBinopExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -394,7 +405,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenArgumentExpr<T> expression)
+        public virtual void Visit<T>(ZenParameterExpr<T> expression)
         {
             if (!this.arguments.ContainsKey(expression.Id))
             {
@@ -403,7 +414,7 @@ namespace ZenLib
 
             try
             {
-                var expr = this.arguments[expression.ArgumentId];
+                var expr = this.arguments[expression.ParameterId];
                 var type = expr.GetType().BaseType.GetGenericArgumentsCached()[0];
                 var evaluateMethod = this.GetType()
                     .GetMethodCached("VisitCached")

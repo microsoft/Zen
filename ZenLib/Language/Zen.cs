@@ -1159,6 +1159,41 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Apply a lambda to an argument.
+        /// </summary>
+        /// <param name="lambda">A lambda function.</param>
+        /// <param name="argument">The function argument.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<TDst> Apply<TSrc, TDst>(this ZenLambda<TSrc, TDst> lambda, Zen<TSrc> argument)
+        {
+            Contract.AssertNotNull(argument);
+
+            return ZenApplyExpr<TSrc, TDst>.Create(lambda, argument);
+        }
+
+        /// <summary>
+        /// Create an uninitialized lambda function.
+        /// </summary>
+        /// <returns>Zen lambda.</returns>
+        public static ZenLambda<TSrc, TDst> Lambda<TSrc, TDst>()
+        {
+            return new ZenLambda<TSrc, TDst>();
+        }
+
+        /// <summary>
+        /// Create an initialized lambda function.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        /// <returns>Zen lambda.</returns>
+        public static ZenLambda<TSrc, TDst> Lambda<TSrc, TDst>(Func<Zen<TSrc>, Zen<TDst>> function)
+        {
+            Contract.AssertNotNull(function);
+            var lambda = new ZenLambda<TSrc, TDst>();
+            lambda.Initialize(function);
+            return lambda;
+        }
+
+        /// <summary>
         /// Get a field from a Zen value.
         /// </summary>
         /// <param name="expr">Zen object expression.</param>
@@ -1771,7 +1806,7 @@ namespace ZenLib
             }
 
             var solution = constraints.Solve();
-            var environment = new ExpressionEvaluatorEnvironment(solution.VariableAssignment);
+            var environment = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(solution.VariableAssignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, environment);
         }

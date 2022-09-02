@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib
+/* namespace ZenLib
 {
     using System;
     using System.Collections.Immutable;
@@ -338,4 +338,4 @@ namespace ZenLib
             return FString.Create(f(s.GetCharacters()));
         }
     }
-}
+} */

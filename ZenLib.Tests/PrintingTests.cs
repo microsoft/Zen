@@ -149,7 +149,7 @@ namespace ZenLib.Tests
             var s1 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
             var s2 = Zen.Constant(new FSeq<string>("a").AddFront("b"));
             var s3 = Zen.Symbolic<FSeq<string>>();
-            var s4 = new ZenArgumentExpr<FSeq<string>>();
+            var s4 = new ZenParameterExpr<FSeq<string>>();
 
             Console.WriteLine(s1.Length().Format());
             Console.WriteLine(s2.Append(s3).Format());
@@ -197,7 +197,7 @@ namespace ZenLib.Tests
             var x = Zen.Symbolic<int>("x");
             var y = Zen.Symbolic<int>("y");
 
-            Console.WriteLine(new ZenArgumentExpr<int>().Format());
+            Console.WriteLine(new ZenParameterExpr<int>().Format());
             Console.WriteLine(Zen.Not(a).Format());
             Console.WriteLine(Zen.If(a, x, y).Format());
             Console.WriteLine(Zen.Symbolic<Map<int, int>>("x").Set(1, 2).Set(3, 4).Format());

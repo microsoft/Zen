@@ -54,6 +54,19 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
+        public override Unit VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, Unit parameter)
+        {
+            this.Visit(expression.Lambda.Body, parameter);
+            this.Visit(expression.ArgumentExpr, parameter);
+            return parameter;
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitLogicalBinop(ZenLogicalBinopExpr expression, Unit parameter)
         {
             this.Visit(expression.Expr1, parameter);
@@ -442,7 +455,7 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
-        public override Unit VisitArgument<T>(ZenArgumentExpr<T> expression, Unit parameter)
+        public override Unit VisitParameter<T>(ZenParameterExpr<T> expression, Unit parameter)
         {
             return parameter;
         }

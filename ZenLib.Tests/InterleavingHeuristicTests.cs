@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -29,7 +30,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (a == b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -45,7 +46,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (a + b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -61,7 +62,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (a - b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -77,7 +78,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (a ^ b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -93,7 +94,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<char>();
             var expr = (a == b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -109,7 +110,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (a & b);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[0].Contains(b));
@@ -126,7 +127,7 @@ namespace ZenLib.Tests
             var c = Arbitrary<ushort>();
             var expr = And(a == 1, Or(b == 2, c == 3));
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(3, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(a));
             Assert.IsTrue(disjointSets[1].Contains(b));
@@ -144,7 +145,7 @@ namespace ZenLib.Tests
             var c = Arbitrary<ushort>();
             var expr = If(c == 2, And(a == b), Not(a == 3));
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
             Assert.AreEqual(2, disjointSets.Count);
             Assert.IsTrue(disjointSets[1].Contains(a));
@@ -163,7 +164,7 @@ namespace ZenLib.Tests
             var c = Arbitrary<int>();
             var expr = If(c == 2, a, b) == If(c == 3, b, a);
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(2, disjointSets.Count);
             Assert.IsTrue(disjointSets[1].Contains(a));
             Assert.IsTrue(disjointSets[1].Contains(b));
@@ -180,7 +181,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<Object2>();
             var expr = a == b;
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
             Assert.AreEqual(2, disjointSets.Count);
 
@@ -203,7 +204,7 @@ namespace ZenLib.Tests
             var d = Arbitrary<int>();
             var expr = If(c, a, b).GetField<Object2, int>("Field2") == d;
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
             Assert.AreEqual(4, disjointSets.Count);
             Assert.AreEqual(3, disjointSets[2].Count);
             Assert.IsTrue(disjointSets[2].Contains(d));
@@ -219,7 +220,7 @@ namespace ZenLib.Tests
             var b = Arbitrary<int>();
             var expr = (b == 3) == a;
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
             Assert.AreEqual(2, disjointSets.Count);
             Assert.IsTrue(disjointSets[1].Contains(a));
@@ -235,7 +236,7 @@ namespace ZenLib.Tests
             var c = Arbitrary<char>();
             var expr = (c == 'a');
             var i = new InterleavingHeuristicVisitor();
-            var disjointSets = i.GetInterleavedVariables(expr, new Dictionary<long, object>());
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
             Assert.AreEqual(1, disjointSets.Count);
             Assert.IsTrue(disjointSets[0].Contains(c));

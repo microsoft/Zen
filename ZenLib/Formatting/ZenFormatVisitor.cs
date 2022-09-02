@@ -668,9 +668,9 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A formatted string.</returns>
-        public override (LazyString, bool) VisitArgument<T>(ZenArgumentExpr<T> expression, Parameter parameter)
+        public override (LazyString, bool) VisitParameter<T>(ZenParameterExpr<T> expression, Parameter parameter)
         {
-            return (new LazyString($"Argument({expression.ArgumentId})"), true);
+            return (new LazyString($"Parameter({expression.ParameterId})"), true);
         }
 
         /// <summary>
@@ -697,6 +697,21 @@ namespace ZenLib.Generation
             var indent = parameter.Indent();
             var e1 = Format(expression.SourceExpr, indent);
             return FormatFunction(parameter, "Cast", e1, (new LazyString(typeof(TValue).ToString()), true));
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, Parameter parameter)
+        {
+            var indent = parameter.Indent();
+            var e1 = Format(expression.Lambda.Parameter, indent);
+            var e2 = Format(expression.Lambda.Body, indent);
+            var e3 = Format(expression.ArgumentExpr, indent);
+            return FormatFunction(parameter, "Apply", e1, e2, e3);
         }
     }
 

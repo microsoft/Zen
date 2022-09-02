@@ -64,7 +64,7 @@ namespace ZenLib.ModelChecking
             sb.Append("{");
             foreach (var kv in this.Fields)
             {
-                sb.Append($"{kv.Key} = {kv.Value}");
+                sb.Append($"{kv.Key} = {kv.Value}, ");
             }
 
             sb.Append("}");
