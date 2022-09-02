@@ -42,22 +42,6 @@ namespace ZenLib.Compilation
         private int nextVariableId = 0;
 
         /// <summary>
-        /// Create an instance of the <see cref="ExpressionConverterVisitor"/> class.
-        /// </summary>
-        /// <param name="subexpressionCache">In scope zen expression to variable cache.</param>
-        /// <param name="currentMatchUnrollingDepth">The current unrolling depth.</param>
-        /// <param name="maxMatchUnrollingDepth">The maximum allowed unrolling depth.</param>
-        public ExpressionConverterVisitor(
-            ImmutableDictionary<object, Expression> subexpressionCache,
-            int currentMatchUnrollingDepth,
-            int maxMatchUnrollingDepth)
-        {
-            this.SubexpressionCache = subexpressionCache;
-            this.currentMatchUnrollingDepth = currentMatchUnrollingDepth;
-            this.maxMatchUnrollingDepth = maxMatchUnrollingDepth;
-        }
-
-        /// <summary>
         /// List of all variables introduced.
         /// </summary>
         public List<ParameterExpression> Variables = new List<ParameterExpression>();
@@ -75,6 +59,11 @@ namespace ZenLib.Compilation
         public ImmutableDictionary<object, Expression> SubexpressionCache;
 
         /// <summary>
+        /// The lambda expressions in scope (e.g., for recursive references).
+        /// </summary>
+        public ImmutableDictionary<object, Expression> Lambdas;
+
+        /// <summary>
         /// The current match unrolling depth.
         /// </summary>
         private int currentMatchUnrollingDepth;
@@ -83,6 +72,25 @@ namespace ZenLib.Compilation
         /// The current match unrolling depth.
         /// </summary>
         private int maxMatchUnrollingDepth;
+
+        /// <summary>
+        /// Create an instance of the <see cref="ExpressionConverterVisitor"/> class.
+        /// </summary>
+        /// <param name="subexpressionCache">In scope zen expression to variable cache.</param>
+        /// <param name="lambdas">The lambda expressions in scope.</param>
+        /// <param name="currentMatchUnrollingDepth">The current unrolling depth.</param>
+        /// <param name="maxMatchUnrollingDepth">The maximum allowed unrolling depth.</param>
+        public ExpressionConverterVisitor(
+            ImmutableDictionary<object, Expression> subexpressionCache,
+            ImmutableDictionary<object, Expression> lambdas,
+            int currentMatchUnrollingDepth,
+            int maxMatchUnrollingDepth)
+        {
+            this.SubexpressionCache = subexpressionCache;
+            this.Lambdas = lambdas;
+            this.currentMatchUnrollingDepth = currentMatchUnrollingDepth;
+            this.maxMatchUnrollingDepth = maxMatchUnrollingDepth;
+        }
 
         /// <summary>
         /// Lookup an existing variable for the expression if defined.
@@ -115,12 +123,20 @@ namespace ZenLib.Compilation
         /// <typeparam name="TSrc">The parameter type.</typeparam>
         /// <typeparam name="TDst">The return type.</typeparam>
         /// <param name="lambda">The Zen lambda.</param>
+        /// <param name="recursiveDefinition">The recursive definition of the lambda.</param>
         /// <returns>A C# function.</returns>
-        public Func<TSrc, TDst> CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda)
+        public Expression CompileLambda<TSrc, TDst>(ZenLambda<TSrc, TDst> lambda, Expression recursiveDefinition)
         {
             var param = Expression.Parameter(typeof(TSrc));
             var paramExprs = ImmutableDictionary<long, Expression>.Empty.Add(lambda.Parameter.ParameterId, param);
-            return CodeGenerator.Compile<TSrc, TDst>(lambda.Body, paramExprs, param, this.maxMatchUnrollingDepth);
+            var environment = new ExpressionConverterEnvironment(paramExprs);
+            var expr = CodeGenerator.CompileToBlock(
+                lambda.Body,
+                environment,
+                ImmutableDictionary<object, Expression>.Empty,
+                this.Lambdas.Add(lambda, recursiveDefinition),
+                0, this.maxMatchUnrollingDepth);
+            return Expression.Lambda<Func<TSrc, TDst>>(expr, new ParameterExpression[] { param });
         }
 
         /// <summary>
@@ -131,28 +147,23 @@ namespace ZenLib.Compilation
         /// <returns>An expression tree.</returns>
         public override Expression VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionConverterEnvironment parameter)
         {
-            var lambdaFunction = CompileLambda(expression.Lambda);
-            Expression<Func<TSrc, TDst>> lambdaExpression = (x) => lambdaFunction(x);
+            // build the lambda if we haven't already
+            if (!this.Lambdas.TryGetValue(expression.Lambda, out var lambdaExpression))
+            {
+                var lambdaVar = Expression.Variable(typeof(Func<TSrc, TDst>));
+                var lambdaFunction = CompileLambda(expression.Lambda, lambdaVar);
+                lambdaExpression = Expression.Block(new[] { lambdaVar }, Expression.Assign(lambdaVar, lambdaFunction), lambdaVar);
+            }
 
             var argument = CodeGenerator.CompileToBlock(
                 expression.ArgumentExpr,
                 parameter,
                 this.SubexpressionCache,
+                this.Lambdas,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
             return Expression.Invoke(lambdaExpression, argument);
-
-            /* var newAssignment = parameter.ArgumentAssignment.SetItem(expression.Lambda.Parameter.ParameterId, left);
-
-            Console.WriteLine(expression.Lambda.GetHashCode());
-
-            return CodeGenerator.CompileToBlock(
-                expression.Lambda.Body,
-                new ExpressionConverterEnvironment(newAssignment),
-                this.SubexpressionCache,
-                this.currentMatchUnrollingDepth,
-                this.maxMatchUnrollingDepth); */
         }
 
         /// <summary>
@@ -167,6 +178,7 @@ namespace ZenLib.Compilation
                 expression.Expr1,
                 parameter,
                 this.SubexpressionCache,
+                this.Lambdas,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
@@ -174,6 +186,7 @@ namespace ZenLib.Compilation
                 expression.Expr2,
                 parameter,
                 this.SubexpressionCache,
+                this.Lambdas,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
@@ -347,6 +360,7 @@ namespace ZenLib.Compilation
                 expression.TrueExpr,
                 parameter,
                 this.SubexpressionCache,
+                this.Lambdas,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
@@ -354,6 +368,7 @@ namespace ZenLib.Compilation
                 expression.FalseExpr,
                 parameter,
                 this.SubexpressionCache,
+                this.Lambdas,
                 this.currentMatchUnrollingDepth,
                 this.maxMatchUnrollingDepth);
 
@@ -524,6 +539,7 @@ namespace ZenLib.Compilation
                     expression.ConsCase.Body,
                     new ExpressionConverterEnvironment(newAssignment),
                     this.SubexpressionCache,
+                    this.Lambdas,
                     this.currentMatchUnrollingDepth + 1,
                     this.maxMatchUnrollingDepth);
             }
