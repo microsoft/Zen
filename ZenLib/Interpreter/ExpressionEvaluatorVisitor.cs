@@ -307,6 +307,7 @@ namespace ZenLib.Interpretation
             {
                 if (this.trackBranches)
                 {
+                    Console.WriteLine("Visited guard true");
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
 
@@ -316,6 +317,7 @@ namespace ZenLib.Interpretation
             {
                 if (this.trackBranches)
                 {
+                    Console.WriteLine("Visited guard false");
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
 
@@ -491,6 +493,8 @@ namespace ZenLib.Interpretation
             {
                 if (this.trackBranches)
                 {
+                    Console.WriteLine("Visited list case empty");
+                    Console.WriteLine($"added constraint: {expression.ListExpr.IsEmpty()}");
                     this.PathConstraint.Add(expression.ListExpr.IsEmpty());
                 }
 
@@ -499,16 +503,17 @@ namespace ZenLib.Interpretation
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-                var parameterId = expression.ConsCase.Parameter.ParameterId;
+                var parameterId = expression.ConsLambda.Parameter.ParameterId;
 
                 if (this.trackBranches)
                 {
+                    Console.WriteLine("Okay, here we go!");
                     this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
                     this.PathConstraintSymbolicEnvironment[parameterId] = Pair.Create(expression.ListExpr.Head(), expression.ListExpr.Tail());
                 }
 
                 parameter = parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl));
-                return (TResult)this.Visit(expression.ConsCase.Body, parameter);
+                return (TResult)this.Visit(expression.ConsLambda.Body, parameter);
             }
         }
 

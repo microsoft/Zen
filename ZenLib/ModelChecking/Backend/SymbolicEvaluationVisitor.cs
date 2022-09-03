@@ -55,6 +55,12 @@ namespace ZenLib.ModelChecking
         private SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> mergeVisitor;
 
         /// <summary>
+        /// Note that we have to cache arbitrary expressions separately to ensure they always return the same symbolic
+        /// regardless of the environment.
+        /// </summary>
+        private Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>> arbitraryCache;
+
+        /// <summary>
         /// Creates a new instance of the <see cref="SymbolicEvaluationVisitor{TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal}"/> class.
         /// </summary>
         /// <param name="solver">The solver.</param>
@@ -65,6 +71,7 @@ namespace ZenLib.ModelChecking
             this.ArbitraryVariables = new Dictionary<object, TVar>();
             this.ConstMapAssignment = new Dictionary<object, Dictionary<object, object>>();
             this.mergeVisitor = new SymbolicMergeVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this);
+            this.arbitraryCache = new Dictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>();
         }
 
         /// <summary>
@@ -141,8 +148,15 @@ namespace ZenLib.ModelChecking
         /// <returns>The symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitArbitrary<T1>(ZenArbitraryExpr<T1> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
         {
+            if (this.arbitraryCache.TryGetValue(expression, out var result))
+            {
+                return result;
+            }
+
             var arbitraryVisitor = new SymbolicArbitraryVisitor<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this, parameter);
-            return arbitraryVisitor.Visit(typeof(T1), expression);
+            result = arbitraryVisitor.Visit(typeof(T1), expression);
+            this.arbitraryCache[expression] = result;
+            return result;
         }
 
         /// <summary>
@@ -157,11 +171,8 @@ namespace ZenLib.ModelChecking
             {
                 try
                 {
-                    var innerType = expr.GetType().BaseType.GetGenericArgumentsCached()[0];
-                    var method = evaluateMethod.MakeGenericMethod(innerType);
-                    var result = (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)method.Invoke(this, new object[] { expr, parameter });
-                    this.cache[(expression.Id, null)] = result;
-                    return result;
+                    var method = evaluateMethod.MakeGenericMethod(typeof(T1));
+                    return (SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)method.Invoke(this, new object[] { expr, parameter });
                 }
                 catch (TargetInvocationException e)
                 {
@@ -531,11 +542,11 @@ namespace ZenLib.ModelChecking
             var pair = new SymbolicObject<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(typeof(Pair<Option<T>, FSeq<T>>), this.Solver, pairMapping);
 
             // update the arguments to assign this value to the cons lambda parameter.
-            var args = parameter.ArgumentsToValue.SetItem(expression.ConsCase.Parameter.ParameterId, pair);
+            var args = parameter.ArgumentsToValue.SetItem(expression.ConsLambda.Parameter.ParameterId, pair);
             var newEnv = new SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(parameter.ArgumentsToExpr, args);
 
             // model check the resulting value using the computed values for the placeholders.
-            return this.Visit(expression.ConsCase.Body, newEnv);
+            return this.Visit(expression.ConsLambda.Body, newEnv);
         }
 
         /// <summary>

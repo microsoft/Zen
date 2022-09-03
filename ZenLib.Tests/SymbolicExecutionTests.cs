@@ -100,6 +100,10 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionFSeqIndexOf()
         {
             var f = new ZenFunction<FSeq<int>, short>(x => x.IndexOf(3));
+            foreach (var input in f.GenerateInputs(depth: 5))
+            {
+                Console.WriteLine(input);
+            }
             Assert.AreEqual(6, f.GenerateInputs(depth: 5).Count());
         }
 

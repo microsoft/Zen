@@ -24,7 +24,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the cons lambda.
         /// </summary>
-        public ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> ConsCase { get; }
+        public ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> ConsLambda { get; }
 
         /// <summary>
         /// Simplify and create a new ZenListCaseExpr.
@@ -80,7 +80,7 @@ namespace ZenLib
         {
             this.ListExpr = listExpr;
             this.EmptyExpr = empty;
-            this.ConsCase = cons;
+            this.ConsLambda = cons;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Case({this.ListExpr}, {this.EmptyExpr}, <lambda>)";
+            return $"Case({this.ListExpr}, {this.EmptyExpr}, <lambda>={this.ConsLambda.GetHashCode()})";
         }
 
         /// <summary>

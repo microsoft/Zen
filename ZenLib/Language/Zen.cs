@@ -1189,7 +1189,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(function);
             var lambda = new ZenLambda<TSrc, TDst>();
-            lambda.Initialize(function);
+            lambda.SetFunction(function);
             return lambda;
         }
 

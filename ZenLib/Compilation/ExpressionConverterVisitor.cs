@@ -513,7 +513,7 @@ namespace ZenLib.Compilation
             var emptyExpr = Convert(expression.EmptyExpr, parameter);
 
             // compile the cons lambda function.
-            var consLambdaExpression = this.CompileLambda(expression.ConsCase, parameter);
+            var consLambdaExpression = this.CompileLambda(expression.ConsLambda, parameter);
 
             // create a pair from the list hd and tl.
             var constructor = typeof(Pair<Option<TList>, FSeq<TList>>).GetConstructor(new Type[] { typeof(Option<TList>), typeof(FSeq<TList>) });

@@ -48,7 +48,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symchar>";
+            return $"<symchar>={this.Value}";
         }
     }
 }

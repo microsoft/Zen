@@ -345,6 +345,34 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test FSeq All.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqAnySolve()
+        {
+            var l = Zen.Symbolic<FSeq<byte>>("l", depth: 1);
+            var b = Zen.Symbolic<byte>("b");
+            var sol = And(b > 0, l.Any(y => b == y)).Solve();
+
+            Assert.IsTrue(sol.IsSatisfiable());
+            var sl = sol.Get(l);
+            var sb = sol.Get(b);
+            Assert.IsTrue(sl.ToList().Any(v => v == sb));
+        }
+
+        /// <summary>
+        /// Test FSeq Fold.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqFoldSolve()
+        {
+            var zf = Zen.Constraint<FSeq<byte>, byte>((l, b) => And(b == 0, l.Fold(b, (x, acc) => acc + x) == 3));
+            var result = zf.Find();
+            Assert.IsTrue(result.HasValue);
+            Assert.AreEqual(3, result.Value.Item2 + result.Value.Item1.ToList().Select(x => (int)x).Sum() % 256);
+        }
+
+        /// <summary>
         /// Test FSeq Drop.
         /// </summary>
         [TestMethod]
@@ -391,6 +419,18 @@ namespace ZenLib.Tests
             var sol = (l.At(0) == Option.None<byte>()).Solve();
             Assert.IsTrue(sol.IsSatisfiable());
             Assert.IsTrue(sol.Get(l).Count() == 0);
+        }
+
+        /// <summary>
+        /// Test if conditions work with FSeq.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqIfConstants()
+        {
+            var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
+            var result = f.Find((b, r) => r == 2);
+            Assert.IsTrue(result.HasValue);
+            Assert.IsTrue(result.Value);
         }
 
         /// <summary>

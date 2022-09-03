@@ -77,7 +77,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Appy({this.Lambda}, {this.ArgumentExpr})";
+            return $"Apply({this.Lambda.GetHashCode()}:{this.Lambda}, {this.ArgumentExpr})";
         }
 
         /// <summary>

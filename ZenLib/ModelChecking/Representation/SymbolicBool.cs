@@ -57,7 +57,7 @@ namespace ZenLib.ModelChecking
                 return "true";
             }
 
-            return "<symbool>";
+            return $"<symbool>={this.Value}";
         }
     }
 }
