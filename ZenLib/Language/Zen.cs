@@ -1188,8 +1188,9 @@ namespace ZenLib
         public static ZenLambda<TSrc, TDst> Lambda<TSrc, TDst>(Func<Zen<TSrc>, Zen<TDst>> function)
         {
             Contract.AssertNotNull(function);
+
             var lambda = new ZenLambda<TSrc, TDst>();
-            lambda.SetFunction(function);
+            lambda.Initialize(function);
             return lambda;
         }
 

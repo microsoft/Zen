@@ -313,6 +313,35 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Match and deconstruct a Zen sequence.
+        /// </summary>
+        /// <param name="seqExpr">The sequence expression.</param>
+        /// <param name="empty">The empty case.</param>
+        /// <param name="cons">The cons case.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<TResult> CaseStrict<T, TResult>(
+            this Zen<FSeq<T>> seqExpr,
+            Zen<TResult> empty,
+            ZenLambda<Pair<T, FSeq<T>>, TResult> cons)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(empty);
+            Contract.AssertNotNull(cons);
+
+            var lambda = Zen.Lambda<FSeq<T>, TResult>();
+            lambda.Initialize(x => x.Case(
+                empty: empty,
+                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, TResult>(arg =>
+                {
+                    var hd = arg.Item1();
+                    var tl = arg.Item2();
+                    return If(hd.IsSome(), cons.Apply(Pair.Create(hd.Value(), tl)), lambda.Apply(tl));
+                })));
+
+            return lambda.Apply(seqExpr);
+        }
+
+        /// <summary>
         /// Find an element that satisfies a predicate.
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
@@ -323,17 +352,17 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(predicate);
 
-            var findLambda = Zen.Lambda<FSeq<T>, Option<T>>();
-            findLambda.SetFunction(x => x.Case(
+            var lambda = Zen.Lambda<FSeq<T>, Option<T>>();
+            lambda.Initialize(x => x.Case(
                 empty: Option.Null<T>(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, Option<T>>(arg =>
                 {
                     var hd = arg.Item1();
                     var tl = arg.Item2();
-                    return If(And(hd.IsSome(), predicate(hd.Value())), hd, findLambda.Apply(tl));
+                    return If(And(hd.IsSome(), predicate(hd.Value())), hd, lambda.Apply(tl));
                 })));
 
-            return findLambda.Apply(seqExpr);
+            return lambda.Apply(seqExpr);
         }
 
         /// <summary>
@@ -382,7 +411,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.LengthLambda == null)
             {
                 FSeqLambdas<T>.LengthLambda = Zen.Lambda<FSeq<T>, ushort>();
-                FSeqLambdas<T>.LengthLambda.SetFunction(x => x.Case(
+                FSeqLambdas<T>.LengthLambda.Initialize(x => x.Case(
                     empty: 0,
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
                     {
@@ -407,7 +436,7 @@ namespace ZenLib
             Contract.AssertNotNull(function);
 
             var lambda = Zen.Lambda<FSeq<T1>, FSeq<T2>>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: FSeq.Empty<T2>(),
                 cons: Zen.Lambda<Pair<Option<T1>, FSeq<T1>>, FSeq<T2>>(arg =>
                 {
@@ -431,7 +460,7 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             var lambda = Zen.Lambda<FSeq<T>, FSeq<T>>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: FSeq.Empty<T>(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                 {
@@ -455,7 +484,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.IsEmptyLambda == null)
             {
                 FSeqLambdas<T>.IsEmptyLambda = Zen.Lambda<FSeq<T>, bool>();
-                FSeqLambdas<T>.IsEmptyLambda.SetFunction(x => x.Case(
+                FSeqLambdas<T>.IsEmptyLambda.Initialize(x => x.Case(
                     empty: Zen.True(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, bool>(arg =>
                     {
@@ -494,7 +523,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr2);
 
             var lambda = Zen.Lambda<FSeq<T>, FSeq<T>>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: seqExpr2,
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                 {
@@ -532,7 +561,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.ReverseLambda == null)
             {
                 FSeqLambdas<T>.ReverseLambda = Zen.Lambda<Pair<FSeq<T>, FSeq<T>>, FSeq<T>>();
-                FSeqLambdas<T>.ReverseLambda.SetFunction(x => x.Item1().Case(
+                FSeqLambdas<T>.ReverseLambda.Initialize(x => x.Item1().Case(
                     empty: x.Item2(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                     {
@@ -558,7 +587,7 @@ namespace ZenLib
             Contract.AssertNotNull(valueExpr);
 
             var lambda = Zen.Lambda<FSeq<T>, ushort>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: Constant<ushort>(0),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
                 {
@@ -598,7 +627,7 @@ namespace ZenLib
             Contract.AssertNotNull(function);
 
             var lambda = Zen.Lambda<Pair<FSeq<T1>, T2>, T2>();
-            lambda.SetFunction(x => x.Item1().Case(
+            lambda.Initialize(x => x.Item1().Case(
                 empty: x.Item2(),
                 cons: Zen.Lambda<Pair<Option<T1>, FSeq<T1>>, T2>(arg =>
                 {
@@ -626,7 +655,7 @@ namespace ZenLib
             Contract.AssertNotNull(function);
 
             var lambda = Zen.Lambda<Pair<FSeq<T1>, T2>, T2>();
-            lambda.SetFunction(x => x.Item1().Case(
+            lambda.Initialize(x => x.Item1().Case(
                 empty: x.Item2(),
                 cons: Zen.Lambda<Pair<Option<T1>, FSeq<T1>>, T2>(arg =>
                 {
@@ -652,7 +681,7 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             var lambda = Zen.Lambda<FSeq<T>, bool>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: Zen.False(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, bool>(arg =>
                 {
@@ -676,7 +705,7 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             var lambda = Zen.Lambda<FSeq<T>, bool>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: Zen.True(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, bool>(arg =>
                 {
@@ -718,7 +747,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.TakeLambda == null)
             {
                 FSeqLambdas<T>.TakeLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
-                FSeqLambdas<T>.TakeLambda.SetFunction(x => x.Item1().Case(
+                FSeqLambdas<T>.TakeLambda.Initialize(x => x.Item1().Case(
                     empty: FSeq.Empty<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                     {
@@ -748,7 +777,7 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             var lambda = Zen.Lambda<FSeq<T>, FSeq<T>>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: FSeq.Empty<T>(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                 {
@@ -790,7 +819,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.DropLambda == null)
             {
                 FSeqLambdas<T>.DropLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
-                FSeqLambdas<T>.DropLambda.SetFunction(x => x.Item1().Case(
+                FSeqLambdas<T>.DropLambda.Initialize(x => x.Item1().Case(
                     empty: FSeq.Empty<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                     {
@@ -820,7 +849,7 @@ namespace ZenLib
             Contract.AssertNotNull(predicate);
 
             var lambda = Zen.Lambda<FSeq<T>, FSeq<T>>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: FSeq.Empty<T>(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                 {
@@ -862,7 +891,7 @@ namespace ZenLib
             if (FSeqLambdas<T>.AtLambda == null)
             {
                 FSeqLambdas<T>.AtLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, Option<T>>();
-                FSeqLambdas<T>.AtLambda.SetFunction(x => x.Item1().Case(
+                FSeqLambdas<T>.AtLambda.Initialize(x => x.Item1().Case(
                     empty: Option.Null<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, Option<T>>(arg =>
                     {
@@ -912,7 +941,7 @@ namespace ZenLib
             Contract.AssertNotNull(i);
 
             var lambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
-            lambda.SetFunction(x => x.Item1().Case(
+            lambda.Initialize(x => x.Item1().Case(
                 empty: x.Item1(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
                 {
@@ -957,7 +986,7 @@ namespace ZenLib
             Contract.AssertNotNull(i);
 
             var lambda = Zen.Lambda<Pair<FSeq<T>, short>, short>();
-            lambda.SetFunction(x => x.Item1().Case(
+            lambda.Initialize(x => x.Item1().Case(
                 empty: -1,
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, short>(arg =>
                 {

@@ -30,7 +30,7 @@ namespace ZenLib
         /// <summary>
         /// Initializes the lambda.
         /// </summary>
-        public void SetFunction(Func<Zen<TSrc>, Zen<TDst>> function)
+        public void Initialize(Func<Zen<TSrc>, Zen<TDst>> function)
         {
             this.Function = function;
             this.Parameter = new ZenParameterExpr<TSrc>();

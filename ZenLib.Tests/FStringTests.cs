@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-/* namespace ZenLib.Tests
+namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -360,4 +360,4 @@
             Assert.IsFalse(ex.HasValue);
         }
     }
-} */
+}

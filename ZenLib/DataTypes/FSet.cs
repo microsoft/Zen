@@ -457,7 +457,7 @@ namespace ZenLib
         private static Zen<ushort> Size<T>(Zen<FSeq<T>> seqExpr)
         {
             var lambda = Zen.Lambda<FSeq<T>, ushort>();
-            lambda.SetFunction(x => x.Case(
+            lambda.Initialize(x => x.Case(
                 empty: 0,
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
                 {

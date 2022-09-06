@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-/* namespace ZenLib
+namespace ZenLib
 {
     using System;
     using System.Collections.Immutable;
@@ -153,7 +153,7 @@
         public static Zen<FString> Create(Zen<ushort> b)
         {
             Contract.AssertNotNull(b);
-            return Create(FSeq.Create(b));
+            return Create(FSeq.Singleton(b));
         }
     }
 
@@ -222,11 +222,29 @@
         /// <returns></returns>
         private static Zen<bool> StartsWith(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> pre)
         {
-            return pre.CaseStrict(
-                empty: true,
-                cons: (hd1, tl1) => s.CaseStrict(
-                    empty: false,
-                    cons: (hd2, tl2) => And(hd1 == hd2, StartsWith(tl2, tl1))));
+            var lambda = Zen.Lambda<Pair<FSeq<ushort>, FSeq<ushort>>, bool>();
+            lambda.Initialize(arg =>
+            {
+                var str = arg.Item1();
+                var prefix = arg.Item2();
+                return prefix.CaseStrict(
+                    empty: true,
+                    cons: Zen.Lambda<Pair<ushort, FSeq<ushort>>, bool>(x =>
+                    {
+                        var hd1 = x.Item1();
+                        var tl1 = x.Item2();
+                        return str.CaseStrict(
+                            empty: false,
+                            cons: Zen.Lambda<Pair<ushort, FSeq<ushort>>, bool>(y =>
+                            {
+                                var hd2 = y.Item1();
+                                var tl2 = y.Item2();
+                                return And(hd1 == hd2, lambda.Apply(Pair.Create(tl2, tl1)));
+                            }));
+                    }));
+            });
+
+            return lambda.Apply(Pair.Create(s, pre));
         }
 
         /// <summary>
@@ -262,10 +280,20 @@
         /// <returns>The substring.</returns>
         private static Zen<FString> At(Zen<FSeq<ushort>> s, Zen<ushort> i, Zen<ushort> current)
         {
-            return s.Case(
+            var lambda = Zen.Lambda<Pair<FSeq<ushort>, ushort, ushort>, FString>();
+            lambda.Initialize(x => x.Item1().Case(
                 empty: FString.Create(""),
-                cons: (hd, tl) =>
-                    If(And(hd.IsSome(), i == current), FString.Create(hd.Value()), At(tl, i, Zen.If(hd.IsNone(), current, current + 1))));
+                cons: Zen.Lambda<Pair<Option<ushort>, FSeq<ushort>>, FString>(arg =>
+                {
+                    var hd = arg.Item1();
+                    var tl = arg.Item2();
+                    return If(
+                        And(hd.IsSome(), x.Item2() == x.Item3()),
+                        FString.Create(hd.Value()),
+                        lambda.Apply(Pair.Create(tl, x.Item2(), Zen.If(hd.IsNone(), x.Item3(), x.Item3() + 1))));
+                })));
+
+            return lambda.Apply(Pair.Create(s, i, current));
         }
 
         /// <summary>
@@ -287,9 +315,17 @@
         /// <returns></returns>
         private static Zen<bool> Contains(Zen<FSeq<ushort>> s, Zen<FSeq<ushort>> sub)
         {
-            return s.Case(
+            var lambda = Zen.Lambda<FSeq<ushort>, bool>();
+            lambda.Initialize(x => x.Case(
                 empty: sub.IsEmpty(),
-                cons: (hd, tl) => Or(StartsWith(s, sub), Contains(tl, sub)));
+                cons: Zen.Lambda<Pair<Option<ushort>, FSeq<ushort>>, bool>(arg =>
+                {
+                    var hd = arg.Item1();
+                    var tl = arg.Item2();
+                    return Or(And(hd.IsSome(), StartsWith(x, sub)), lambda.Apply(tl));
+                })));
+
+            return lambda.Apply(s);
         }
 
         /// <summary>
@@ -338,4 +374,4 @@
             return FString.Create(f(s.GetCharacters()));
         }
     }
-} */
+}
