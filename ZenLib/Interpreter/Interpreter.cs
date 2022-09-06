@@ -29,14 +29,5 @@ namespace ZenLib.Interpretation
             var result = (T)interpreter.Visit(expression, environment);
             return (result, interpreter.PathConstraint);
         }
-
-        public static T2 CompileRunHelper<T1, T2>(
-            Func<Zen<T1>, Zen<T2>> function,
-            T1 value1,
-            ImmutableDictionary<long, object> args)
-        {
-            var expression = function(Constant(value1));
-            return Run(expression, new Dictionary<long, object>(args), false).Item1;
-        }
     }
 }

@@ -4,6 +4,7 @@
 
 namespace ZenLib
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace ZenLib
 
             if (e is ZenFSeqAddFrontExpr<T> l2)
             {
-                return consCase.Function(Pair.Create(l2.ElementExpr, l2.Expr));
+                return consCase.Function(Pair.Create(l2.ElementExpr, l2.ListExpr));
             }
 
             return new ZenFSeqCaseExpr<T, TResult>(e, emptyCase, consCase);

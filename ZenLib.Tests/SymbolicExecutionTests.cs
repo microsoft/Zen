@@ -76,17 +76,19 @@ namespace ZenLib.Tests
         /// Test symbolic execution for lists.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqContains()
         {
-            ZenSettings.PreserveBranches = true;
+            // ZenSettings.PreserveBranches = true;
             Assert.AreEqual(1, Zen.GenerateInputs<FSeq<int>, bool>(x => x.Contains(3)).Count());
-            ZenSettings.PreserveBranches = false;
+            // ZenSettings.PreserveBranches = false;
         }
 
         /// <summary>
         /// Test symbolic execution for lists.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqFilter()
         {
             var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
@@ -97,13 +99,10 @@ namespace ZenLib.Tests
         /// Test symbolic execution for fseq.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqIndexOf()
         {
             var f = new ZenFunction<FSeq<int>, short>(x => x.IndexOf(3));
-            foreach (var input in f.GenerateInputs(depth: 5))
-            {
-                Console.WriteLine(input);
-            }
             Assert.AreEqual(6, f.GenerateInputs(depth: 5).Count());
         }
 
@@ -111,6 +110,7 @@ namespace ZenLib.Tests
         /// Test symbolic execution for fseq.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqCase()
         {
             var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
@@ -285,6 +285,7 @@ namespace ZenLib.Tests
         /// Test symbolic execution with preconditions.
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionPrecondition()
         {
             var f = new ZenFunction<FSeq<byte>, bool>(l => l.Contains(3));

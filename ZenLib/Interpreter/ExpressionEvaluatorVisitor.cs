@@ -73,6 +73,7 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionEvaluatorEnvironment parameter)
         {
+            Contract.Assert(!this.trackBranches, "Symbolic execution currently not supported with FSeq operations.");
             var e = (TSrc)this.Visit(expression.ArgumentExpr, parameter);
             return (TDst)this.Visit(expression.Lambda.Body, parameter.AddBinding(expression.Lambda.Parameter.ParameterId, e));
         }
@@ -307,7 +308,6 @@ namespace ZenLib.Interpretation
             {
                 if (this.trackBranches)
                 {
-                    Console.WriteLine("Visited guard true");
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
 
@@ -317,7 +317,6 @@ namespace ZenLib.Interpretation
             {
                 if (this.trackBranches)
                 {
-                    Console.WriteLine("Visited guard false");
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
 
@@ -474,7 +473,7 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (FSeq<T>)this.Visit(expression.Expr, parameter);
+            var e1 = (FSeq<T>)this.Visit(expression.ListExpr, parameter);
             var e2 = (Option<T>)this.Visit(expression.ElementExpr, parameter);
             return e1.AddFrontOption(e2);
         }
@@ -487,31 +486,18 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitListCase<T, TResult>(ZenFSeqCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
+            Contract.Assert(!this.trackBranches, "Symbolic execution currently not supported with FSeq operations.");
+
             var e = (FSeq<T>)this.Visit(expression.ListExpr, parameter);
 
             if (e.Count() == 0)
             {
-                if (this.trackBranches)
-                {
-                    Console.WriteLine("Visited list case empty");
-                    Console.WriteLine($"added constraint: {expression.ListExpr.IsEmpty()}");
-                    this.PathConstraint.Add(expression.ListExpr.IsEmpty());
-                }
-
                 return this.Visit(expression.EmptyExpr, parameter);
             }
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
                 var parameterId = expression.ConsLambda.Parameter.ParameterId;
-
-                if (this.trackBranches)
-                {
-                    Console.WriteLine("Okay, here we go!");
-                    this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
-                    this.PathConstraintSymbolicEnvironment[parameterId] = Pair.Create(expression.ListExpr.Head(), expression.ListExpr.Tail());
-                }
-
                 parameter = parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl));
                 return (TResult)this.Visit(expression.ConsLambda.Body, parameter);
             }

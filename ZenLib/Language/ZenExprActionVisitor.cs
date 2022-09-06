@@ -151,7 +151,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         public virtual void Visit<T>(ZenFSeqAddFrontExpr<T> expression)
         {
-            VisitCached(expression.Expr);
+            VisitCached(expression.ListExpr);
             VisitCached(expression.ElementExpr);
         }
 

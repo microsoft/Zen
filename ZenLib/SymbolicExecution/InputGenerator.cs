@@ -178,7 +178,6 @@ namespace ZenLib.SymbolicExecution
             {
                 var (expr, environment, bound) = queue.Dequeue();
                 var example = findFunction(expr, environment);
-                Console.WriteLine(example);
 
                 if (!example.HasValue)
                 {

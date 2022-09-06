@@ -1057,7 +1057,7 @@ namespace ZenLib.Tests
         public void TestSingletonException()
         {
             Zen<int> x = null;
-            FSeq.Create(x);
+            FSeq.Singleton(x);
         }
 
         /// <summary>

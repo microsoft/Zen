@@ -354,7 +354,7 @@ namespace ZenLib.Generation
         {
             var indent = parameter.Indent();
             var e1 = Format(expression.ElementExpr, indent);
-            var e2 = Format(expression.Expr, indent);
+            var e2 = Format(expression.ListExpr, indent);
             return FormatFunction(parameter, "Cons", e1, e2);
         }
 

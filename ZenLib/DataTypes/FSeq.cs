@@ -218,7 +218,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="element">Zen element.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> Create<T>(Zen<T> element)
+        public static Zen<FSeq<T>> Singleton<T>(Zen<T> element)
         {
             Contract.AssertNotNull(element);
 

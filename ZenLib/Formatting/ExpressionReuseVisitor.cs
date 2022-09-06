@@ -168,7 +168,7 @@ namespace ZenLib.Generation
         /// <returns></returns>
         public override Unit VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Unit parameter)
         {
-            this.Visit(expression.Expr, parameter);
+            this.Visit(expression.ListExpr, parameter);
             this.Visit(expression.ElementExpr, parameter);
             return parameter;
         }

@@ -459,7 +459,7 @@ namespace ZenLib.Compilation
         /// <returns>An expression tree.</returns>
         public override Expression VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
-            var list = Convert(expression.Expr, parameter);
+            var list = Convert(expression.ListExpr, parameter);
             var element = Convert(expression.ElementExpr, parameter);
             var fseqExpr = Expression.Convert(list, typeof(FSeq<T>));
             var method = typeof(FSeq<T>).GetMethodCached("AddFrontOption");

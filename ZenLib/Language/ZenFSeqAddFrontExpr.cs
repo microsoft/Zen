@@ -25,7 +25,7 @@ namespace ZenLib
         /// <summary>
         /// Gets the list expr.
         /// </summary>
-        public Zen<FSeq<T>> Expr { get; }
+        public Zen<FSeq<T>> ListExpr { get; }
 
         /// <summary>
         /// Gets the element to add.
@@ -55,7 +55,7 @@ namespace ZenLib
         /// <param name="element">The expression for the element to add.</param>
         private ZenFSeqAddFrontExpr(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
-            this.Expr = expr;
+            this.ListExpr = expr;
             this.ElementExpr = element;
         }
 
@@ -66,7 +66,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Cons({this.ElementExpr}, {this.Expr})";
+            return $"Cons({this.ElementExpr}, {this.ListExpr})";
         }
 
         /// <summary>

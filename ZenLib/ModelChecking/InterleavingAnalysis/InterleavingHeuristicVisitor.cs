@@ -167,7 +167,7 @@ namespace ZenLib.ModelChecking
         public override InterleavingResult VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             var x = this.Visit(expression.ElementExpr, parameter);
-            var y = this.Visit(expression.Expr, parameter);
+            var y = this.Visit(expression.ListExpr, parameter);
             return x.Union(y);
         }
 

@@ -687,8 +687,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAppend()
         {
-            // CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l1.Length());
-            CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() >= l2.Length());
+            CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() == l1.Length() + l2.Length());
         }
 
         /// <summary>
@@ -716,6 +715,18 @@ namespace ZenLib.Tests
                 var l4 = l1.Append(l2);
                 return Implies(Not(l3.IsEmpty()), l3.At(0).Value() == l4.At(0).Value());
             }, runBdds: false);
+        }
+
+        /// <summary>
+        /// Test FSeq singleton.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqSingleton()
+        {
+            var fs = Zen.Symbolic<FSeq<int>>();
+            var sol = (fs == FSeq.Singleton<int>(1)).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.AreEqual(new FSeq<int>(1), sol.Get(fs));
         }
 
         /// <summary>
