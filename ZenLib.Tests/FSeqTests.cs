@@ -378,11 +378,53 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqDropSolve()
         {
-            var l = Zen.Symbolic<FSeq<byte>>();
+            var l = Zen.Symbolic<FSeq<byte>>("l");
             var sol = (l.Drop(1) == new FSeq<byte>(1, 2)).Solve();
             Assert.IsTrue(sol.IsSatisfiable());
             Assert.IsTrue(sol.Get(l).ToList()[1] == 1);
             Assert.IsTrue(sol.Get(l).ToList()[2] == 2);
+        }
+
+        /// <summary>
+        /// Test FSeq Equals.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqEqualsSolve1()
+        {
+            var l = Zen.Symbolic<FSeq<byte>>();
+            var sol = (l == new FSeq<byte>(1, 2)).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList()[0] == 1);
+            Assert.IsTrue(sol.Get(l).ToList()[1] == 2);
+        }
+
+        /// <summary>
+        /// Test FSeq Equals.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqEqualsSolve2()
+        {
+            var l = Zen.Symbolic<FSeq<byte>>(depth: 20);
+            var sol = (l == new FSeq<byte>(1, 2)).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList()[0] == 1);
+            Assert.IsTrue(sol.Get(l).ToList()[1] == 2);
+        }
+
+        /// <summary>
+        /// Test FSeq Inequality.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqNotEqualsSolve()
+        {
+            var l = Zen.Symbolic<FSeq<byte>>();
+            var sol = And(
+                l.Length() == 2,
+                l.At(0) == Option.Some<byte>(1),
+                l.At(1) == Option.Some<byte>(2),
+                l != new FSeq<byte>(1, 2)).Solve();
+
+            Assert.IsFalse(sol.IsSatisfiable());
         }
 
         /// <summary>

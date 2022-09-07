@@ -1276,7 +1276,7 @@ namespace ZenLib.Solver
         /// <returns>A model, if satisfiable.</returns>
         public Model Solve(BoolExpr x)
         {
-            this.Assert(x);
+            this.Assert((BoolExpr)x.Simplify());
             var status = this.Solver.Check();
             if (status == Status.UNSATISFIABLE)
             {
