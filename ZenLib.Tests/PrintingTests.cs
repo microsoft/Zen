@@ -133,6 +133,7 @@ namespace ZenLib.Tests
             Console.WriteLine(s1.IndexOf(s3).Format());
             Console.WriteLine(s1.Slice(new BigInteger(10), Zen.Symbolic<BigInteger>()).Format());
             Console.WriteLine(s1.At(Zen.Symbolic<BigInteger>()).Format());
+            Console.WriteLine(s1.Nth(Zen.Symbolic<BigInteger>()).Format());
             Console.WriteLine(s1.Concat(s2).Concat(Zen.Symbolic<Seq<string>>("seq")).Format());
             Console.WriteLine(Seq.Concat(s1, Seq.Concat(s2, Zen.Symbolic<Seq<string>>("seq"))).Format());
             Console.WriteLine(Zen.Symbolic<Seq<byte>>().MatchesRegex(Regex.ParseAscii("abc")).Format());

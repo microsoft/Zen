@@ -82,9 +82,10 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The list element type.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitList(Type listType, Type innerType, Unit parameter)
         {
-            return this.Visit(typeof(Option<>).MakeGenericType(innerType), parameter);
+            throw new ZenException($"FSeq type not supported in DD backend.");
         }
 
         /// <summary>

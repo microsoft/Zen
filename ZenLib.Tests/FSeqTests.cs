@@ -413,6 +413,19 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test FSeq Equals.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqEqualsSolve3()
+        {
+            var l = Zen.Symbolic<FSeq<byte>>(depth: 20);
+            var sol = (new FSeq<byte>(1, 2) == l).Solve();
+            Assert.IsTrue(sol.IsSatisfiable());
+            Assert.IsTrue(sol.Get(l).ToList()[0] == 1);
+            Assert.IsTrue(sol.Get(l).ToList()[1] == 2);
+        }
+
+        /// <summary>
         /// Test FSeq Inequality.
         /// </summary>
         [TestMethod]

@@ -262,7 +262,7 @@ namespace ZenLib.Tests
         [DataRow("abcdefg", 0, 100, "abcdefg")]
         public void TestSubstring(string s, int offset, int len, string expected)
         {
-            var f = new ZenFunction<FString, FString>(fs => fs.SubString((BigInteger)offset, (BigInteger)len));
+            var f = new ZenFunction<FString, FString>(fs => fs.SubString(offset, len));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
