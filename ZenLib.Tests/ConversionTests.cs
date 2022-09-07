@@ -35,8 +35,8 @@ namespace ZenLib.Tests
             CheckAgreement<Option<int>>(x => x == Option.Some(3));
             CheckAgreement<Pair<int, int>>(x => x == new Pair<int, int>(1, 2));
             CheckAgreement<(int, int)>(x => x == (1, 2));
-            CheckAgreement<FSeq<int>>(x => x == FSeq.FromRange(new List<int>() { 1, 2, 3 }));
-            CheckAgreement<FSeq<FSeq<int>>>(x => x == new FSeq<FSeq<int>>(new FSeq<int>(1)));
+            CheckAgreement<FSeq<int>>(x => x == FSeq.FromRange(new List<int>() { 1, 2, 3 }), runBdds: false);
+            CheckAgreement<FSeq<FSeq<int>>>(x => x == new FSeq<FSeq<int>>(new FSeq<int>(1)), runBdds: false);
             CheckAgreement<Object2>(x => x == new Object2 { Field1 = 1, Field2 = 2 });
             // CheckAgreement<FString>(x => x == new FString("hello"));
         }

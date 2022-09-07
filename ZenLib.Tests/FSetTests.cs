@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
@@ -146,7 +147,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSetSizeEvaluation()
         {
-            var zf = new ZenFunction<FSet<int>, ushort>(b => b.Size());
+            var zf = new ZenFunction<FSet<int>, BigInteger>(b => b.Size());
 
             Assert.AreEqual(b1.Size(), (int)zf.Evaluate(b1));
             Assert.AreEqual(b3.Size(), (int)zf.Evaluate(b3));
@@ -209,12 +210,12 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSetSizingAnnotation()
         {
-            var zf = new ZenFunction<FSet<byte>, bool>(l => l.Size() == 5);
+            var zf = new ZenFunction<FSet<byte>, bool>(l => l.Size() == (BigInteger)5);
             var example1 = zf.Find((l, b) => b, depth: 5);
             Assert.IsTrue(example1.HasValue);
             Assert.AreEqual(5, example1.Value.Values.Values.Count);
 
-            zf = new ZenFunction<FSet<byte>, bool>(l => l.Size() == 3);
+            zf = new ZenFunction<FSet<byte>, bool>(l => l.Size() == (BigInteger)3);
             var example2 = zf.Find((l, b) => b, depth: 5);
             Assert.IsTrue(example2.HasValue);
             Assert.AreEqual(5, example1.Value.Values.Values.Count);
@@ -262,7 +263,7 @@ namespace ZenLib.Tests
         public void TestFSetWhere()
         {
             var b = Symbolic<FSet<uint>>(depth: 5);
-            var c = b.Where(i => i < 10).Size() == 4;
+            var c = b.Where(i => i < 10).Size() == (BigInteger)4;
             var solution = c.Solve();
             var r = solution.Get(b);
             Assert.IsTrue(solution.IsSatisfiable());
@@ -280,7 +281,7 @@ namespace ZenLib.Tests
         public void TestFSetSelect()
         {
             var b = Symbolic<FSet<uint>>(depth: 5);
-            var c = b.Select(i => If<char>(i < 10, 'a', 'b')).Where(x => x == 'a').Size() == 3;
+            var c = b.Select(i => If<char>(i < 10, 'a', 'b')).Where(x => x == 'a').Size() == (BigInteger)3;
             var solution = c.Solve();
             Assert.IsFalse(solution.IsSatisfiable());
         }
@@ -330,7 +331,7 @@ namespace ZenLib.Tests
         public void TestFSetAddExample()
         {
             var zf = new ZenFunction<FSet<byte>, FSet<byte>>(l => l.Add(7));
-            var example = zf.Find((l, b) => l.Size() == 3);
+            var example = zf.Find((l, b) => l.Size() == (BigInteger)3);
             Assert.IsTrue(example.HasValue);
 
             var output = zf.Evaluate(example.Value);

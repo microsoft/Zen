@@ -174,13 +174,13 @@ namespace ZenLib.ModelChecking
             var elts2 = new (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)[length];
 
             // track the symbolic index for every element.
-            var zero = this.solver.CreateShortConst(0);
-            var one = this.solver.CreateShortConst(1);
+            var zero = this.solver.CreateBigIntegerConst(0);
+            var one = this.solver.CreateBigIntegerConst(1);
 
             var currentIndex1 = zero;
             var currentIndex2 = zero;
-            var indices1 = new TBitvec[length];
-            var indices2 = new TBitvec[length];
+            var indices1 = new TInt[length];
+            var indices2 = new TInt[length];
 
             for (int i = 0; i < length; i++)
             {

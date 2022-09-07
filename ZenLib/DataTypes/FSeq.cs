@@ -9,6 +9,7 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using static ZenLib.Zen;
 
     /// <summary>
@@ -404,20 +405,20 @@ namespace ZenLib
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ushort> Length<T>(this Zen<FSeq<T>> seqExpr)
+        public static Zen<BigInteger> Length<T>(this Zen<FSeq<T>> seqExpr)
         {
             Contract.AssertNotNull(seqExpr);
 
             if (FSeqLambdas<T>.LengthLambda == null)
             {
-                FSeqLambdas<T>.LengthLambda = Zen.Lambda<FSeq<T>, ushort>();
+                FSeqLambdas<T>.LengthLambda = Zen.Lambda<FSeq<T>, BigInteger>();
                 FSeqLambdas<T>.LengthLambda.Initialize(x => x.Case(
-                    empty: 0,
-                    cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
+                    empty: BigInteger.Zero,
+                    cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, BigInteger>(arg =>
                     {
                         var hd = arg.Item1();
                         var tl = arg.Item2();
-                        return FSeqLambdas<T>.LengthLambda.Apply(tl) + If<ushort>(hd.IsSome(), 1, 0);
+                        return FSeqLambdas<T>.LengthLambda.Apply(tl) + If<BigInteger>(hd.IsSome(), BigInteger.One, BigInteger.Zero);
                     })));
             }
 
@@ -581,19 +582,19 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="valueExpr">Zen expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<ushort> Duplicates<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
+        public static Zen<BigInteger> Duplicates<T>(this Zen<FSeq<T>> seqExpr, Zen<T> valueExpr)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(valueExpr);
 
-            var lambda = Zen.Lambda<FSeq<T>, ushort>();
+            var lambda = Zen.Lambda<FSeq<T>, BigInteger>();
             lambda.Initialize(x => x.Case(
-                empty: Constant<ushort>(0),
-                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, ushort>(arg =>
+                empty: BigInteger.Zero,
+                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, BigInteger>(arg =>
                 {
                     var hd = arg.Item1();
                     var tl = arg.Item2();
-                    return lambda.Apply(tl) + If<ushort>(And(hd.IsSome(), hd.Value() == valueExpr), 1, 0);
+                    return lambda.Apply(tl) + If<BigInteger>(And(hd.IsSome(), hd.Value() == valueExpr), BigInteger.One, BigInteger.Zero);
                 })));
 
             return lambda.Apply(seqExpr);
@@ -723,12 +724,26 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="numElements">The number of elements to take.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements)
+        public static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, int numElements)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(numElements);
 
-            return Take(seqExpr, numElements, 0);
+            return Take(seqExpr, (BigInteger)numElements);
+        }
+
+        /// <summary>
+        /// Take n elements from a sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="numElements">The number of elements to take.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> numElements)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(numElements);
+
+            return Take(seqExpr, numElements, BigInteger.Zero);
         }
 
         /// <summary>
@@ -738,7 +753,7 @@ namespace ZenLib
         /// <param name="numElements">The number of elements to take.</param>
         /// <param name="i">The current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements, Zen<ushort> i)
+        private static Zen<FSeq<T>> Take<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> numElements, Zen<BigInteger> i)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(numElements);
@@ -746,7 +761,7 @@ namespace ZenLib
 
             if (FSeqLambdas<T>.TakeLambda == null)
             {
-                FSeqLambdas<T>.TakeLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
+                FSeqLambdas<T>.TakeLambda = Zen.Lambda<Pair<FSeq<T>, BigInteger, BigInteger>, FSeq<T>>();
                 FSeqLambdas<T>.TakeLambda.Initialize(x => x.Item1().Case(
                     empty: FSeq.Empty<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
@@ -758,7 +773,7 @@ namespace ZenLib
                         return If(
                             idx == numElts,
                             FSeq.Empty<T>(),
-                            FSeqLambdas<T>.TakeLambda.Apply(Pair.Create(tl, numElts, If(hd.IsNone(), idx, idx + 1))).AddFrontOption(hd));
+                            FSeqLambdas<T>.TakeLambda.Apply(Pair.Create(tl, numElts, If(hd.IsNone(), idx, idx + BigInteger.One))).AddFrontOption(hd));
                     })));
             }
 
@@ -795,12 +810,26 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="numElements">The number of elements to take.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements)
+        public static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, int numElements)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(numElements);
 
-            return Drop(seqExpr, numElements, 0);
+            return Drop(seqExpr, (BigInteger)numElements);
+        }
+
+        /// <summary>
+        /// Drop n elements from a sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="numElements">The number of elements to take.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> numElements)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(numElements);
+
+            return Drop(seqExpr, numElements, BigInteger.Zero);
         }
 
         /// <summary>
@@ -810,7 +839,7 @@ namespace ZenLib
         /// <param name="numElements">The number of elements to take.</param>
         /// <param name="i">The current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> numElements, Zen<ushort> i)
+        private static Zen<FSeq<T>> Drop<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> numElements, Zen<BigInteger> i)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(numElements);
@@ -818,7 +847,7 @@ namespace ZenLib
 
             if (FSeqLambdas<T>.DropLambda == null)
             {
-                FSeqLambdas<T>.DropLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
+                FSeqLambdas<T>.DropLambda = Zen.Lambda<Pair<FSeq<T>, BigInteger, BigInteger>, FSeq<T>>();
                 FSeqLambdas<T>.DropLambda.Initialize(x => x.Item1().Case(
                     empty: FSeq.Empty<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
@@ -830,7 +859,7 @@ namespace ZenLib
                         return If(
                             idx == numElts,
                             x.Item1(),
-                            FSeqLambdas<T>.DropLambda.Apply(Pair.Create(tl, numElts, If(hd.IsNone(), idx, idx + 1))));
+                            FSeqLambdas<T>.DropLambda.Apply(Pair.Create(tl, numElts, If(hd.IsNone(), idx, idx + BigInteger.One))));
                     })));
             }
 
@@ -867,12 +896,26 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="index">Zen index expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index)
+        public static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, int index)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(index);
 
-            return At(seqExpr, index, 0);
+            return At(seqExpr, (BigInteger)index);
+        }
+
+        /// <summary>
+        /// Get the value of a sequence at an index.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> index)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(index);
+
+            return At(seqExpr, index, BigInteger.Zero);
         }
 
         /// <summary>
@@ -882,7 +925,7 @@ namespace ZenLib
         /// <param name="index">Zen index expression.</param>
         /// <param name="i">Current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index, Zen<ushort> i)
+        private static Zen<Option<T>> At<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> index, Zen<BigInteger> i)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(index);
@@ -890,7 +933,7 @@ namespace ZenLib
 
             if (FSeqLambdas<T>.AtLambda == null)
             {
-                FSeqLambdas<T>.AtLambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, Option<T>>();
+                FSeqLambdas<T>.AtLambda = Zen.Lambda<Pair<FSeq<T>, BigInteger, BigInteger>, Option<T>>();
                 FSeqLambdas<T>.AtLambda.Initialize(x => x.Item1().Case(
                     empty: Option.Null<T>(),
                     cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, Option<T>>(arg =>
@@ -902,7 +945,7 @@ namespace ZenLib
                         return If(
                             And(iP == indexP, hd.IsSome()),
                             hd,
-                            FSeqLambdas<T>.AtLambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + 1))));
+                            FSeqLambdas<T>.AtLambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + BigInteger.One))));
                     })));
             }
 
@@ -913,16 +956,32 @@ namespace ZenLib
         /// Sets the value of the sequence at a given index and returns a new sequence.
         /// </summary>
         /// <param name="seqExpr">Zen sequence expression.</param>
-        /// <param name="index">Zen index expression.</param>
+        /// <param name="index">The index.</param>
         /// <param name="value">Zen value expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<ushort> index, Zen<T> value)
+        public static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, int index, Zen<T> value)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(index);
             Contract.AssertNotNull(value);
 
-            return Set(seqExpr, value, index, 0);
+            return Set(seqExpr, (BigInteger)index, value);
+        }
+
+        /// <summary>
+        /// Sets the value of the sequence at a given index and returns a new sequence.
+        /// </summary>
+        /// <param name="seqExpr">Zen sequence expression.</param>
+        /// <param name="index">Zen index expression.</param>
+        /// <param name="value">Zen value expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<BigInteger> index, Zen<T> value)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(index);
+            Contract.AssertNotNull(value);
+
+            return Set(seqExpr, value, index, BigInteger.Zero);
         }
 
         /// <summary>
@@ -933,14 +992,14 @@ namespace ZenLib
         /// <param name="value">Zen value expression.</param>
         /// <param name="i">Current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value, Zen<ushort> index, Zen<ushort> i)
+        private static Zen<FSeq<T>> Set<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value, Zen<BigInteger> index, Zen<BigInteger> i)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(index);
             Contract.AssertNotNull(value);
             Contract.AssertNotNull(i);
 
-            var lambda = Zen.Lambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>>();
+            var lambda = Zen.Lambda<Pair<FSeq<T>, BigInteger, BigInteger>, FSeq<T>>();
             lambda.Initialize(x => x.Item1().Case(
                 empty: x.Item1(),
                 cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, FSeq<T>>(arg =>
@@ -951,7 +1010,7 @@ namespace ZenLib
                     var tl = arg.Item2();
                     var guard = And(iP == indexP, hd.IsSome());
                     var trueCase = tl.AddFrontOption(Option.Create(value));
-                    var falseCase = lambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + 1))).AddFrontOption(hd);
+                    var falseCase = lambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + BigInteger.One))).AddFrontOption(hd);
                     return If(guard, trueCase, falseCase);
                 })));
 
@@ -964,12 +1023,12 @@ namespace ZenLib
         /// <param name="seqExpr">Zen sequence expression.</param>
         /// <param name="value">Zen value expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<short> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value)
+        public static Zen<BigInteger> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(value);
 
-            return IndexOf(seqExpr, value, 0);
+            return IndexOf(seqExpr, value, BigInteger.Zero);
         }
 
         /// <summary>
@@ -979,21 +1038,21 @@ namespace ZenLib
         /// <param name="value">Zen value expression.</param>
         /// <param name="i">The current index.</param>
         /// <returns>Zen value.</returns>
-        private static Zen<short> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value, Zen<short> i)
+        private static Zen<BigInteger> IndexOf<T>(this Zen<FSeq<T>> seqExpr, Zen<T> value, Zen<BigInteger> i)
         {
             Contract.AssertNotNull(seqExpr);
             Contract.AssertNotNull(value);
             Contract.AssertNotNull(i);
 
-            var lambda = Zen.Lambda<Pair<FSeq<T>, short>, short>();
+            var lambda = Zen.Lambda<Pair<FSeq<T>, BigInteger>, BigInteger>();
             lambda.Initialize(x => x.Item1().Case(
-                empty: -1,
-                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, short>(arg =>
+                empty: new BigInteger(-1),
+                cons: Zen.Lambda<Pair<Option<T>, FSeq<T>>, BigInteger>(arg =>
                 {
                     var idx = x.Item2();
                     var hd = arg.Item1();
                     var tl = arg.Item2();
-                    return If(hd == Option.Create(value), idx, lambda.Apply(Pair.Create(tl, If(hd.IsNone(), idx, idx + 1))));
+                    return If(hd == Option.Create(value), idx, lambda.Apply(Pair.Create(tl, If(hd.IsNone(), idx, idx + BigInteger.One))));
                 })));
 
             return lambda.Apply(Pair.Create(seqExpr, i));
@@ -1023,7 +1082,7 @@ namespace ZenLib
         /// <summary>
         /// The lambda for the length operation.
         /// </summary>
-        internal static ZenLambda<FSeq<T>, ushort> LengthLambda;
+        internal static ZenLambda<FSeq<T>, BigInteger> LengthLambda;
 
         /// <summary>
         /// The lambda for the isempty operation.
@@ -1033,16 +1092,16 @@ namespace ZenLib
         /// <summary>
         /// The lambda for the take operation.
         /// </summary>
-        internal static ZenLambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>> TakeLambda;
+        internal static ZenLambda<Pair<FSeq<T>, BigInteger, BigInteger>, FSeq<T>> TakeLambda;
 
         /// <summary>
         /// The lambda for the drop operation.
         /// </summary>
-        internal static ZenLambda<Pair<FSeq<T>, ushort, ushort>, FSeq<T>> DropLambda;
+        internal static ZenLambda<Pair<FSeq<T>, BigInteger, BigInteger>, FSeq<T>> DropLambda;
 
         /// <summary>
         /// The lambda for the at operation.
         /// </summary>
-        internal static ZenLambda<Pair<FSeq<T>, ushort, ushort>, Option<T>> AtLambda;
+        internal static ZenLambda<Pair<FSeq<T>, BigInteger, BigInteger>, Option<T>> AtLambda;
     }
 }

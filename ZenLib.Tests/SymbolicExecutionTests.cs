@@ -102,7 +102,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqIndexOf()
         {
-            var f = new ZenFunction<FSeq<int>, short>(x => x.IndexOf(3));
+            var f = new ZenFunction<FSeq<int>, BigInteger>(x => x.IndexOf(3));
             Assert.AreEqual(6, f.GenerateInputs(depth: 5).Count());
         }
 
@@ -113,7 +113,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestSymbolicExecutionFSeqCase()
         {
-            var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
+            var f = new ZenFunction<bool, BigInteger>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
             Assert.AreEqual(2, f.GenerateInputs(depth: 5).Count());
         }
 

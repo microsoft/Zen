@@ -8,6 +8,7 @@ namespace ZenLib
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using System.Text;
     using static ZenLib.Zen;
 
@@ -198,7 +199,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="s">The string.</param>
         /// <returns>The length.</returns>
-        public static Zen<ushort> Length(this Zen<FString> s)
+        public static Zen<BigInteger> Length(this Zen<FString> s)
         {
             return s.GetCharacters().Length();
         }
@@ -265,9 +266,21 @@ namespace ZenLib
         /// <param name="s">The string.</param>
         /// <param name="i">The index.</param>
         /// <returns>The substring.</returns>
-        public static Zen<FString> At(this Zen<FString> s, Zen<ushort> i)
+        public static Zen<FString> At(this Zen<FString> s, int i)
         {
-            return At(s.GetCharacters(), i, 0);
+            return At(s, (BigInteger)i);
+        }
+
+        /// <summary>
+        /// Substring of length 1 at the offset.
+        /// Empty if the offset is invalid.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="i">The index.</param>
+        /// <returns>The substring.</returns>
+        public static Zen<FString> At(this Zen<FString> s, Zen<BigInteger> i)
+        {
+            return At(s.GetCharacters(), i, BigInteger.Zero);
         }
 
         /// <summary>
@@ -278,9 +291,9 @@ namespace ZenLib
         /// <param name="i">The index.</param>
         /// <param name="current">The current index.</param>
         /// <returns>The substring.</returns>
-        private static Zen<FString> At(Zen<FSeq<ushort>> s, Zen<ushort> i, Zen<ushort> current)
+        private static Zen<FString> At(Zen<FSeq<ushort>> s, Zen<BigInteger> i, Zen<BigInteger> current)
         {
-            var lambda = Zen.Lambda<Pair<FSeq<ushort>, ushort, ushort>, FString>();
+            var lambda = Zen.Lambda<Pair<FSeq<ushort>, BigInteger, BigInteger>, FString>();
             lambda.Initialize(x => x.Item1().Case(
                 empty: FString.Create(""),
                 cons: Zen.Lambda<Pair<Option<ushort>, FSeq<ushort>>, FString>(arg =>
@@ -290,7 +303,7 @@ namespace ZenLib
                     return If(
                         And(hd.IsSome(), x.Item2() == x.Item3()),
                         FString.Create(hd.Value()),
-                        lambda.Apply(Pair.Create(tl, x.Item2(), Zen.If(hd.IsNone(), x.Item3(), x.Item3() + 1))));
+                        lambda.Apply(Pair.Create(tl, x.Item2(), Zen.If(hd.IsNone(), x.Item3(), x.Item3() + BigInteger.One))));
                 })));
 
             return lambda.Apply(Pair.Create(s, i, current));
@@ -335,7 +348,19 @@ namespace ZenLib
         /// <param name="offset">The offset.</param>
         /// <param name="len">The length.</param>
         /// <returns>An index.</returns>
-        public static Zen<FString> SubString(this Zen<FString> s, Zen<ushort> offset, Zen<ushort> len)
+        public static Zen<FString> SubString(this Zen<FString> s, int offset, int len)
+        {
+            return SubString(s, (BigInteger)offset, (BigInteger)len);
+        }
+
+        /// <summary>
+        /// Gets the substring at an offset and for a given length.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="len">The length.</param>
+        /// <returns>An index.</returns>
+        public static Zen<FString> SubString(this Zen<FString> s, Zen<BigInteger> offset, Zen<BigInteger> len)
         {
             return FString.Create(s.GetCharacters().Drop(offset).Take(len));
         }

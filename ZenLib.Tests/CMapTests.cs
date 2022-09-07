@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
@@ -519,7 +520,7 @@ namespace ZenLib.Tests
         {
             var x = Zen.Symbolic<CMap<int, FSeq<int>>>();
             var y = Zen.Symbolic<CMap<int, FSeq<int>>>();
-            var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == 2).Solve();
+            var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == (BigInteger)2).Solve();
 
             Assert.IsTrue(solution.Get(x).Get(1).ToList().Contains(3));
             Assert.IsTrue(solution.Get(y).Get(1).ToList().Contains(3));

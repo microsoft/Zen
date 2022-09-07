@@ -5,6 +5,7 @@
 namespace ZenLib.Tests
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using ZenLib.Tests.Network;
@@ -215,7 +216,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToSequenceValid2()
         {
-            CheckValid<Option<int>>(o => Implies(o.IsSome(), o.ToSequence().Length() == 1));
+            CheckValid<Option<int>>(o => Implies(o.IsSome(), o.ToSequence().Length() == (BigInteger)1), runBdds: false);
         }
 
         /// <summary>

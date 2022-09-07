@@ -8,6 +8,7 @@ namespace ZenLib.Tests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
@@ -55,10 +56,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqLengthEval()
         {
-            var zf = Zen.Function<FSeq<int>, ushort>(l => l.Length());
-            Assert.AreEqual(2, zf.Evaluate(new FSeq<int>(1, 2)));
-            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1)));
-            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>()));
+            var zf = Zen.Function<FSeq<int>, BigInteger>(l => l.Length());
+            Assert.AreEqual((BigInteger)2, zf.Evaluate(new FSeq<int>(1, 2)));
+            Assert.AreEqual((BigInteger)1, zf.Evaluate(new FSeq<int>(1)));
+            Assert.AreEqual((BigInteger)0, zf.Evaluate(new FSeq<int>()));
         }
 
         /// <summary>
@@ -189,7 +190,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqIndexOfEval()
         {
-            var zf = Zen.Function<FSeq<int>, int, short>((l, x) => l.IndexOf(x));
+            var zf = Zen.Function<FSeq<int>, int, BigInteger>((l, x) => l.IndexOf(x));
             Assert.AreEqual(-1, zf.Evaluate(new FSeq<int>(1, 2), 3));
             Assert.AreEqual(0, zf.Evaluate(new FSeq<int>(1, 2), 1));
             Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2), 2));
@@ -201,10 +202,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqDuplicatesEval()
         {
-            var zf = Zen.Function<FSeq<int>, int, ushort>((l, x) => l.Duplicates(x));
-            Assert.AreEqual(0, zf.Evaluate(new FSeq<int>(1, 2), 3));
-            Assert.AreEqual(1, zf.Evaluate(new FSeq<int>(1, 2), 1));
-            Assert.AreEqual(2, zf.Evaluate(new FSeq<int>(1, 2, 1), 1));
+            var zf = Zen.Function<FSeq<int>, int, BigInteger>((l, x) => l.Duplicates(x));
+            Assert.AreEqual((BigInteger)0, zf.Evaluate(new FSeq<int>(1, 2), 3));
+            Assert.AreEqual((BigInteger)1, zf.Evaluate(new FSeq<int>(1, 2), 1));
+            Assert.AreEqual((BigInteger)2, zf.Evaluate(new FSeq<int>(1, 2, 1), 1));
         }
 
         /// <summary>
@@ -213,7 +214,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqTakeEval()
         {
-            var zf = Zen.Function<FSeq<int>, ushort, FSeq<int>>((l, x) => l.Take(x));
+            var zf = Zen.Function<FSeq<int>, BigInteger, FSeq<int>>((l, x) => l.Take(x));
             Assert.AreEqual(new FSeq<int>(), zf.Evaluate(new FSeq<int>(1, 2), 0));
             Assert.AreEqual(new FSeq<int>(1), zf.Evaluate(new FSeq<int>(1, 2), 1));
             Assert.AreEqual(new FSeq<int>(1, 1), zf.Evaluate(new FSeq<int>(1, 1, 2), 2));
@@ -239,7 +240,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqDropEval()
         {
-            var zf = Zen.Function<FSeq<int>, ushort, FSeq<int>>((l, x) => l.Drop(x));
+            var zf = Zen.Function<FSeq<int>, BigInteger, FSeq<int>>((l, x) => l.Drop(x));
             Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), 0));
             Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 2), 1));
             Assert.AreEqual(new FSeq<int>(2), zf.Evaluate(new FSeq<int>(1, 1, 2), 2));
@@ -266,7 +267,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAtEval()
         {
-            var zf = Zen.Function<FSeq<int>, ushort, Option<int>>((l, x) => l.At(x));
+            var zf = Zen.Function<FSeq<int>, BigInteger, Option<int>>((l, x) => l.At(x));
             Assert.AreEqual(Option.Some(1), zf.Evaluate(new FSeq<int>(1, 2), 0));
             Assert.AreEqual(Option.Some(2), zf.Evaluate(new FSeq<int>(1, 2), 1));
             Assert.AreEqual(Option.None<int>(), zf.Evaluate(new FSeq<int>(1, 2), 2));
@@ -278,7 +279,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqSetEval()
         {
-            var zf = Zen.Function<FSeq<int>, ushort, int, FSeq<int>>((l, x, y) => l.Set(x, y));
+            var zf = Zen.Function<FSeq<int>, BigInteger, int, FSeq<int>>((l, x, y) => l.Set(x, y));
             Assert.AreEqual(new FSeq<int>(3, 2), zf.Evaluate(new FSeq<int>(1, 2), 0, 3));
             Assert.AreEqual(new FSeq<int>(1, 3), zf.Evaluate(new FSeq<int>(1, 2), 1, 3));
             Assert.AreEqual(new FSeq<int>(1, 2), zf.Evaluate(new FSeq<int>(1, 2), 2, 3));
@@ -419,7 +420,7 @@ namespace ZenLib.Tests
         {
             var l = Zen.Symbolic<FSeq<byte>>();
             var sol = And(
-                l.Length() == 2,
+                l.Length() == (BigInteger)2,
                 l.At(0) == Option.Some<byte>(1),
                 l.At(1) == Option.Some<byte>(2),
                 l != new FSeq<byte>(1, 2)).Solve();
@@ -469,8 +470,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqIfConstants()
         {
-            var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
-            var result = f.Find((b, r) => r == 2);
+            var f = new ZenFunction<bool, BigInteger>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
+            var result = f.Find((b, r) => r == (BigInteger)2);
             Assert.IsTrue(result.HasValue);
             Assert.IsTrue(result.Value);
         }
@@ -565,7 +566,7 @@ namespace ZenLib.Tests
         public void TestFSeqIndexOf()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x) >= 0)));
+                Implies(l.Contains(Constant<byte>(x)), l.IndexOf(x) >= (BigInteger)0), runBdds: false));
         }
 
         /// <summary>
@@ -575,10 +576,10 @@ namespace ZenLib.Tests
         public void TestFSeqAt()
         {
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() >= 2, l.At(1).IsSome()));
+                Implies(l.Length() >= (BigInteger)2, l.At(1).IsSome()), runBdds: false);
 
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() == 0, Not(l.At(0).IsSome())));
+                Implies(l.Length() == (BigInteger)0, Not(l.At(0).IsSome())), runBdds: false);
         }
 
         /// <summary>
@@ -588,13 +589,13 @@ namespace ZenLib.Tests
         public void TestFSeqSet()
         {
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() >= 2, l.Set(1, 7).Contains(7)));
+                Implies(l.Length() >= (BigInteger)2, l.Set(1, 7).Contains(7)), runBdds: false);
 
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() >= 2, l.Set(1, 7).At(1).Value() == 7));
+                Implies(l.Length() >= (BigInteger)2, l.Set(1, 7).At(1).Value() == 7), runBdds: false);
 
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() == 0, l.Set(1, 7) == l));
+                Implies(l.Length() == (BigInteger)0, l.Set(1, 7) == l), runBdds: false);
         }
 
         /// <summary>
@@ -603,7 +604,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqLength()
         {
-            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.AddFront(x).Length() > 0));
+            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.AddFront(x).Length() > (BigInteger)0, runBdds: false));
         }
 
         /// <summary>
@@ -612,7 +613,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqLength2()
         {
-            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.AddBack(x).Length() > 0));
+            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.AddBack(x).Length() > (BigInteger)0, runBdds: false));
         }
 
         /// <summary>
@@ -639,7 +640,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqRemoveAllSmaller()
         {
-            RandomBytes(x => CheckValid<FSeq<byte>>(l => l.RemoveAll(x).Length() <= l.Length()));
+            RandomBytes(x => CheckValid<FSeq<byte>>(l => l.RemoveAll(x).Length() <= l.Length(), runBdds: false));
         }
 
         /// <summary>
@@ -649,7 +650,7 @@ namespace ZenLib.Tests
         public void TestFSeqRemoveFirstCount()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(
-                l => Implies(l.Contains(x), l.RemoveAll(x).Duplicates(x) != l.Duplicates(x))));
+                l => Implies(l.Contains(x), l.RemoveAll(x).Duplicates(x) != l.Duplicates(x)), runBdds: false));
         }
 
         /// <summary>
@@ -658,7 +659,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqTakeSmaller()
         {
-            RandomBytes(x => CheckValid<FSeq<byte>>(l => l.Take(x).Length() <= l.Length()));
+            RandomBytes(x => CheckValid<FSeq<byte>>(l => l.Take(x).Length() <= l.Length(), runBdds: false));
         }
 
         /// <summary>
@@ -671,7 +672,7 @@ namespace ZenLib.Tests
             {
                 var len = (ushort)(x % 4);
                 CheckValid<FSeq<byte>>(l =>
-                    If(len <= l.Length(), l.Take(len).Length() == len, true));
+                    If((BigInteger)len <= l.Length(), l.Take(len).Length() == (BigInteger)len, true), runBdds: false);
             });
         }
 
@@ -681,8 +682,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqDropSmaller()
         {
-            RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                l.Drop(x).Length() <= l.Length()));
+            RandomBytes(x => CheckValid<FSeq<byte>>(l => l.Drop(x).Length() <= l.Length(), runBdds: false));
         }
 
         /// <summary>
@@ -692,7 +692,7 @@ namespace ZenLib.Tests
         public void TestFSeqDropExact()
         {
             CheckValid<FSeq<byte>>(l =>
-                Implies(l.Length() >= 2, l.At(1).Value() == l.Drop(1).At(0).Value()));
+                Implies(l.Length() >= (BigInteger)2, l.At(1).Value() == l.Drop(1).At(0).Value()), runBdds: false);
         }
 
         /// <summary>
@@ -706,7 +706,7 @@ namespace ZenLib.Tests
                 var dropped = l.DropWhile(b => b > 0);
                 var first = dropped.At(0);
                 return Implies(first.IsSome(), first.Value() == 0);
-            });
+            }, runBdds: false);
         }
 
         /// <summary>
@@ -720,7 +720,7 @@ namespace ZenLib.Tests
                 var dropped = l.TakeWhile(b => b > 0);
                 var first = dropped.At(0);
                 return Implies(first.IsSome(), first.Value() > 0);
-            });
+            }, runBdds: false);
         }
 
         /// <summary>
@@ -729,7 +729,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAppend()
         {
-            CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() == l1.Length() + l2.Length());
+            CheckValid<FSeq<byte>, FSeq<byte>>((l1, l2) => l1.Append(l2).Length() == l1.Length() + l2.Length(), runBdds: false);
         }
 
         /// <summary>
@@ -777,11 +777,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqSizeConstraints()
         {
-            var zf = new ZenFunction<FSeq<byte>, bool>(l => l.Length() == 4);
+            var zf = new ZenFunction<FSeq<byte>, bool>(l => l.Length() == (BigInteger)4);
             var example1 = zf.Find((l, b) => b, depth: 3);
             Assert.IsFalse(example1.HasValue);
 
-            var zfNested = new ZenFunction<FSeq<FSeq<byte>>, bool>(l => l.Any(x => x.Length() == 4));
+            var zfNested = new ZenFunction<FSeq<FSeq<byte>>, bool>(l => l.Any(x => x.Length() == (BigInteger)4));
             var example2 = zfNested.Find((l, b) => b, depth: 3);
             Assert.IsFalse(example2.HasValue);
         }
