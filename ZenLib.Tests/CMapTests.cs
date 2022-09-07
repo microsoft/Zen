@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
@@ -553,14 +554,15 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test maps fail with lists.
+        /// Test maps do not fail with lists.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestCMapInFSeqFail()
+        public void TestCMapInFSeqWorks()
         {
             var zf = Zen.Constraint<CMap<string, int>, FSeq<int>>((m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4);
             var res = zf.Find();
+            Assert.IsTrue(res.HasValue);
+            Assert.IsTrue(res.Value.Item2.ToList().Count * res.Value.Item1.Get("a") == 4);
         }
 
         /// <summary>
