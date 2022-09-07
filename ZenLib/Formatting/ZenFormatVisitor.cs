@@ -517,6 +517,20 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitSeqNth<T>(ZenSeqNthExpr<T> expression, Parameter parameter)
+        {
+            var indent = parameter.Indent();
+            var e1 = Format(expression.SeqExpr, indent);
+            var e2 = Format(expression.IndexExpr, indent);
+            return FormatFunction(parameter, "Nth", e1, e2);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();

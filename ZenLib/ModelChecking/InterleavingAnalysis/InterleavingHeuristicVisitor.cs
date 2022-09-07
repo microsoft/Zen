@@ -443,6 +443,18 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
+        public override InterleavingResult VisitSeqNth<T>(ZenSeqNthExpr<T> expression, ImmutableDictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");
+        }
+
+        /// <summary>
+        /// Evaluate an expression.
+        /// </summary>
+        /// <param name="expression">The zen expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The interleaving result.</returns>
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");

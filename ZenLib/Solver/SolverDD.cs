@@ -854,6 +854,18 @@ namespace ZenLib.Solver
         }
 
         /// <summary>
+        /// The seq 'Nth' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage]
+        public object SeqNth(Unit x, Unit y)
+        {
+            throw new ZenException("Decision diagram backend does not support string operations. Use Z3 backend.");
+        }
+
+        /// <summary>
         /// The seq 'Length' operation.
         /// </summary>
         /// <param name="x">The seq expression.</param>

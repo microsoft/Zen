@@ -320,6 +320,19 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
+        public override Unit VisitSeqNth<T>(ZenSeqNthExpr<T> expression, Unit parameter)
+        {
+            this.Visit(expression.SeqExpr, parameter);
+            this.Visit(expression.IndexExpr, parameter);
+            return parameter;
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns></returns>
         public override Unit VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, Unit parameter)
         {
             this.Visit(expression.SeqExpr, parameter);

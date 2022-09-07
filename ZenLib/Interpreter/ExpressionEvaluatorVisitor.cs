@@ -671,6 +671,19 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
+        public override object VisitSeqNth<T>(ZenSeqNthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (BigInteger)this.Visit(expression.IndexExpr, parameter);
+            return e1.NthBigInteger(e2);
+        }
+
+        /// <summary>
+        /// Visit a Zen expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>The C# object.</returns>
         public override object VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);

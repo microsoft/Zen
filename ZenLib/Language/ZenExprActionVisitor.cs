@@ -276,6 +276,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Visit a ZenSeqNthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public virtual void Visit<T>(ZenSeqNthExpr<T> expression)
+        {
+            VisitCached(expression.SeqExpr);
+            VisitCached(expression.IndexExpr);
+        }
+
+        /// <summary>
         /// Visit a ZenSeqContainsExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

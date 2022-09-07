@@ -188,6 +188,14 @@ namespace ZenLib
         public abstract TReturn VisitSeqAt<T>(ZenSeqAtExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ZenSeqNthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        public abstract TReturn VisitSeqNth<T>(ZenSeqNthExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a ZenSeqContainsExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

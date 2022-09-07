@@ -720,6 +720,20 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
+        public override Expression VisitSeqNth<T>(ZenSeqNthExpr<T> expression, ExpressionConverterEnvironment parameter)
+        {
+            var e1 = Convert(expression.SeqExpr, parameter);
+            var e2 = Convert(expression.IndexExpr, parameter);
+            var m = typeof(Seq<T>).GetMethod("NthBigInteger", BindingFlags.Instance | BindingFlags.NonPublic);
+            return Expression.Call(e1, m, new Expression[] { e2 });
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
         public override Expression VisitSeqContains<T>(ZenSeqContainsExpr<T> expression, ExpressionConverterEnvironment parameter)
         {
             var e1 = Convert(expression.SeqExpr, parameter);
