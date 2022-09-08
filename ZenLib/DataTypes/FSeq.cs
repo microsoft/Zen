@@ -1009,9 +1009,8 @@ namespace ZenLib
                     var hd = arg.Item1();
                     var tl = arg.Item2();
                     var guard = And(iP == indexP, hd.IsSome());
-                    var trueCase = tl.AddFrontOption(Option.Create(value));
-                    var falseCase = lambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + BigInteger.One))).AddFrontOption(hd);
-                    return If(guard, trueCase, falseCase);
+                    var newTl = lambda.Apply(Pair.Create(tl, indexP, If(hd.IsNone(), iP, iP + BigInteger.One)));
+                    return newTl.AddFrontOption(If(guard, Option.Create(value), hd));
                 })));
 
             return lambda.Apply(Pair.Create(seqExpr, index, i));
