@@ -73,9 +73,8 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            Contract.Assert(!this.trackBranches, "Symbolic execution currently not supported with FSeq operations.");
             var e = (TSrc)this.Visit(expression.ArgumentExpr, parameter);
-            return (TDst)this.Visit(expression.Lambda.Body, parameter.AddBinding(expression.Lambda.Parameter.ParameterId, e));
+            return (TDst)this.Visit(expression.Lambda.Body, parameter.AddBinding(expression.Lambda.Parameter.ParameterId, e).SetInLambda());
         }
 
         /// <summary>
@@ -303,10 +302,11 @@ namespace ZenLib.Interpretation
         public override object VisitIf<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (bool)this.Visit(expression.GuardExpr, parameter);
+            var track = this.trackBranches && !parameter.InLambda;
 
             if (e1)
             {
-                if (this.trackBranches)
+                if (track)
                 {
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
@@ -315,7 +315,7 @@ namespace ZenLib.Interpretation
             }
             else
             {
-                if (this.trackBranches)
+                if (track)
                 {
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
@@ -486,8 +486,6 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitListCase<T, TResult>(ZenFSeqCaseExpr<T, TResult> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            Contract.Assert(!this.trackBranches, "Symbolic execution currently not supported with FSeq operations.");
-
             var e = (FSeq<T>)this.Visit(expression.ListExpr, parameter);
 
             if (e.Count() == 0)
@@ -498,8 +496,9 @@ namespace ZenLib.Interpretation
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
                 var parameterId = expression.ConsLambda.Parameter.ParameterId;
-                parameter = parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl));
-                return (TResult)this.Visit(expression.ConsLambda.Body, parameter);
+                return (TResult)this.Visit(
+                    expression.ConsLambda.Body,
+                    parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl)).SetInLambda());
             }
         }
 

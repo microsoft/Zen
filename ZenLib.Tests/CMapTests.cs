@@ -559,8 +559,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCMapInFSeqWorks()
         {
-            var zf = Zen.Constraint<CMap<string, int>, FSeq<int>>((m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4);
-            var res = zf.Find();
+            var res = Zen.Constraint<CMap<string, int>, FSeq<int>>(
+                (m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4).Find();
             Assert.IsTrue(res.HasValue);
             Assert.IsTrue(res.Value.Item2.ToList().Count * res.Value.Item1.Get("a") == 4);
         }

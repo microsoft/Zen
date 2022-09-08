@@ -22,15 +22,35 @@ namespace ZenLib.Interpretation
         public ImmutableDictionary<object, object> ArbitraryAssignment { get; set; }
 
         /// <summary>
+        /// Whether we are in a lambda.
+        /// </summary>
+        public bool InLambda = false;
+
+        /// <summary>
         /// Creates a new environment with the binding added.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A new environment.</returns>
         public ExpressionEvaluatorEnvironment AddBinding(long id, object value)
         {
             return new ExpressionEvaluatorEnvironment
             {
                 ArgumentAssignment = this.ArgumentAssignment.SetItem(id, value),
                 ArbitraryAssignment = this.ArbitraryAssignment,
+                InLambda = this.InLambda,
+            };
+        }
+
+        /// <summary>
+        /// Creates a new environment noting that it is under a lambda.
+        /// </summary>
+        /// <returns>A new environment.</returns>
+        public ExpressionEvaluatorEnvironment SetInLambda()
+        {
+            return new ExpressionEvaluatorEnvironment
+            {
+                ArgumentAssignment = this.ArgumentAssignment,
+                ArbitraryAssignment = this.ArbitraryAssignment,
+                InLambda = true,
             };
         }
     }
