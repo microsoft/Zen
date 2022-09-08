@@ -392,7 +392,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSetAddContains()
         {
-            RandomBytes(x => CheckValid<FSet<byte>>(l => l.Add(x).Contains(x)));
+            RandomBytes(x => CheckValid<FSet<byte>>(l => l.Add(x).Contains(x), runBdds: false));
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSetRemoveContains()
         {
-            RandomBytes(x => CheckValid<FSet<byte>>(l => Not(l.Remove(x).Contains(x))));
+            RandomBytes(x => CheckValid<FSet<byte>>(l => Not(l.Remove(x).Contains(x)), runBdds: false));
         }
 
         /// <summary>

@@ -135,16 +135,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Visit a ListEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenFSeqEmptyExpr<T> expression)
-        {
-            return;
-        }
-
-        /// <summary>
         /// Visit a ListAddFrontExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

@@ -84,14 +84,6 @@ namespace ZenLib
         public abstract TReturn VisitBitwiseBinop<T>(ZenBitwiseBinopExpr<T> expression, TParam parameter);
 
         /// <summary>
-        /// Visit a FSeqEmptyExpr.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A return value.</returns>
-        public abstract TReturn VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, TParam parameter);
-
-        /// <summary>
         /// Visit a ListAddFrontExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

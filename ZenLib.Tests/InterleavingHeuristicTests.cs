@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -175,6 +176,38 @@ namespace ZenLib.Tests
         /// Test that the heuristic works for if conditions.
         /// </summary>
         [TestMethod]
+        public void TestHeuristicWithBooleans()
+        {
+            var a = Arbitrary<bool>();
+            var b = Arbitrary<int>();
+            var expr = (b == 3) == a;
+            var i = new InterleavingHeuristicVisitor();
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
+
+            Assert.AreEqual(2, disjointSets.Count);
+            Assert.IsTrue(disjointSets[1].Contains(a));
+            Assert.IsTrue(disjointSets[0].Contains(b));
+        }
+
+        /// <summary>
+        /// Test that the heuristic works for if conditions.
+        /// </summary>
+        [TestMethod]
+        public void TestHeuristicWithConstants()
+        {
+            var c = Arbitrary<char>();
+            var expr = (c == 'a');
+            var i = new InterleavingHeuristicVisitor();
+            var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
+
+            Assert.AreEqual(1, disjointSets.Count);
+            Assert.IsTrue(disjointSets[0].Contains(c));
+        }
+
+        /// <summary>
+        /// Test that the heuristic works for if conditions.
+        /// </summary>
+        [TestMethod]
         public void TestHeuristicWithObjects1()
         {
             var a = Arbitrary<Object2>();
@@ -211,35 +244,36 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test that the heuristic works for if conditions.
+        /// Test that the heuristic works for objects.
         /// </summary>
         [TestMethod]
-        public void TestHeuristicWithBooleans()
+        public void TestHeuristicWithObjects3()
         {
-            var a = Arbitrary<bool>();
-            var b = Arbitrary<int>();
-            var expr = (b == 3) == a;
+            var a = Arbitrary<TestHelper.Object2>();
+            var b = Arbitrary<TestHelper.Object2>();
+            var expr = (a == b);
             var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
             Assert.AreEqual(2, disjointSets.Count);
-            Assert.IsTrue(disjointSets[1].Contains(a));
-            Assert.IsTrue(disjointSets[0].Contains(b));
+            Assert.IsTrue(disjointSets[0].Count == 2);
+            Assert.IsTrue(disjointSets[1].Count == 2);
         }
 
         /// <summary>
-        /// Test that the heuristic works for if conditions.
+        /// Test that the heuristic works for objects.
         /// </summary>
         [TestMethod]
-        public void TestHeuristicWithConstants()
+        public void TestHeuristicWithObjects4()
         {
-            var c = Arbitrary<char>();
-            var expr = (c == 'a');
+            var a = Arbitrary<Pair<int, Object2>>();
+            var b = Arbitrary<Pair<int, Object2>>();
+            var g = Arbitrary<bool>();
+            var expr = Zen.If(g, a, b) == new Pair<int, Object2>(1, new Object2 { Field1 = 0, Field2 = 1 });
             var i = new InterleavingHeuristicVisitor();
             var disjointSets = i.GetInterleavedVariables(expr, ImmutableDictionary<long, object>.Empty);
 
-            Assert.AreEqual(1, disjointSets.Count);
-            Assert.IsTrue(disjointSets[0].Contains(c));
+            Assert.AreEqual(7, disjointSets.Count);
         }
     }
 }

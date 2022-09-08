@@ -207,7 +207,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToSequenceValid1()
         {
-            CheckAgreement<Option<int>>(o => o.ToSequence().IsEmpty());
+            CheckAgreement<Option<int>>(o => o.ToFSeq().IsEmpty(), runBdds: false);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToSequenceValid2()
         {
-            CheckValid<Option<int>>(o => Implies(o.IsSome(), o.ToSequence().Length() == (BigInteger)1), runBdds: false);
+            CheckValid<Option<int>>(o => Implies(o.IsSome(), o.ToFSeq().Length() == (BigInteger)1), runBdds: false);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestOptionToSequence()
         {
-            var zf = new ZenFunction<Option<int>, FSeq<int>>(o => o.ToSequence());
+            var zf = new ZenFunction<Option<int>, FSeq<int>>(o => o.ToFSeq());
 
             Assert.AreEqual(1, zf.Evaluate(Option.Some(1)).ToList().Count);
             Assert.AreEqual(0, zf.Evaluate(Option.None<int>()).ToList().Count);

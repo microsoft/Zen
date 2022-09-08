@@ -1117,7 +1117,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestToSeqException()
         {
-            Option.ToSequence<int>(null);
+            Option.ToFSeq<int>(null);
         }
 
         /// <summary>

@@ -44,9 +44,10 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ImmutableDictionary<long, object> parameter)
         {
-            return this.Visit(expression.Lambda.Body, parameter.SetItem(expression.Lambda.Parameter.ParameterId, expression.ArgumentExpr));
+            throw new ZenException($"FSeq type not supported in DD backend.");
         }
 
         /// <summary>
@@ -152,17 +153,6 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
-        public override InterleavingResult VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, ImmutableDictionary<long, object> parameter)
-        {
-            return emptySetVisitor.Visit(typeof(Option<T>), Unit.Instance);
-        }
-
-        /// <summary>
-        /// Evaluate an expression.
-        /// </summary>
-        /// <param name="expression">The zen expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
@@ -176,12 +166,11 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="expression">The zen expression.</param>
         /// <param name="parameter">The parameter.</param>
-        /// <returns>The interleaving result.</returns>
+        /// <returns>The interleaving result.</returns>\
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, ImmutableDictionary<long, object> parameter)
         {
-            var _ = this.Visit(expression.ListExpr, parameter);
-            var e = this.Visit(expression.EmptyExpr, parameter);
-            return e; // no easy way to evaluate cons case.
+            throw new ZenException($"FSeq type not supported in DD backend.");
         }
 
         /// <summary>

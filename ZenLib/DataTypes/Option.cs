@@ -277,7 +277,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The expression.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<FSeq<T>> ToSequence<T>(this Zen<Option<T>> expr)
+        public static Zen<FSeq<T>> ToFSeq<T>(this Zen<Option<T>> expr)
         {
             Contract.AssertNotNull(expr);
 

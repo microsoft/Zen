@@ -293,14 +293,7 @@ namespace ZenLib.ZenLanguage
         /// <returns>The Zen value representing the list.</returns>
         internal Zen<FSeq<T>> CreateZenListConstant<T>(FSeq<T> value)
         {
-            Zen<FSeq<T>> list = ZenFSeqEmptyExpr<T>.Instance;
-            foreach (var elt in value.ToList().Reverse())
-            {
-                Contract.AssertNullConversion(elt, "element", typeof(FSeq<T>));
-                list = ZenFSeqAddFrontExpr<T>.Create(list, Option.Create<T>(elt));
-            }
-
-            return list;
+            return ZenConstantExpr<FSeq<T>>.Create(value);
         }
 
         /// <summary>

@@ -129,7 +129,7 @@ namespace ZenLib.Tests
         /// Test that converting a value with a null dictionary key does not work.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
+        [ExpectedException(typeof(NullReferenceException))]
         public void TestConvertNullListValue()
         {
             FSeq<Object1> o = FSeq.FromRange(new List<Object1> { { null } });

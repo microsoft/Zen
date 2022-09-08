@@ -339,17 +339,6 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A formatted string.</returns>
-        public override (LazyString, bool) VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, Parameter parameter)
-        {
-            return (new LazyString("[]"), true);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, Parameter parameter)
         {
             var indent = parameter.Indent();
