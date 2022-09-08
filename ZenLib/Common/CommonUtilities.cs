@@ -285,18 +285,6 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Gets the integer size for a given integer type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The size of the integer.</returns>
-        public static int IntegerSize(Type type)
-        {
-            var c = type.GetConstructor(constructorTypes);
-            var integer = (dynamic)c.Invoke(constructorArgs);
-            return integer.Size;
-        }
-
-        /// <summary>
         /// Copies the elements of the values stored right to left to a new array
         /// of the target size. If the target size is larger than the current array,
         /// it fills the left-most values with the provided default.

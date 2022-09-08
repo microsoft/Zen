@@ -754,7 +754,7 @@ namespace ZenLib.Interpretation
             {
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TKey)));
                 Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(TValue)));
-                return IntN.CastFiniteInteger<TKey, TValue>((TKey)e);
+                return Bitvec.CastFiniteInteger<TKey, TValue>((TKey)e);
             }
         }
 

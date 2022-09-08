@@ -4,7 +4,6 @@
 
 namespace ZenLib.Solver
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.Z3;
 
@@ -13,13 +12,26 @@ namespace ZenLib.Solver
     /// </summary>
     internal class Z3RegexConverter<T> : IRegexExprVisitor<T, Sort, ReExpr>
     {
+        /// <summary>
+        /// The Z3 solver.
+        /// </summary>
         private SolverZ3 solver;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Z3RegexConverter{T}"/> class.
+        /// </summary>
+        /// <param name="solver"></param>
         public Z3RegexConverter(SolverZ3 solver)
         {
             this.solver = solver;
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The regex expression.</param>
+        /// <param name="parameter">The Z3 sort.</param>
+        /// <returns>A Z3 regex expression.</returns>
         public ReExpr Visit(RegexEmptyExpr<T> expression, Sort parameter)
         {
             var seqSort = SolverZ3.Context.MkSeqSort(parameter);
@@ -27,6 +39,12 @@ namespace ZenLib.Solver
             return SolverZ3.Context.MkEmptyRe(regexSort);
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The regex expression.</param>
+        /// <param name="parameter">The Z3 sort.</param>
+        /// <returns>A Z3 regex expression.</returns>
         public ReExpr Visit(RegexEpsilonExpr<T> expression, Sort parameter)
         {
             var seqSort = SolverZ3.Context.MkSeqSort(parameter);
@@ -34,6 +52,12 @@ namespace ZenLib.Solver
             return SolverZ3.Context.MkToRe(seq);
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The regex expression.</param>
+        /// <param name="parameter">The Z3 sort.</param>
+        /// <returns>A Z3 regex expression.</returns>
         public ReExpr Visit(RegexRangeExpr<T> expression, Sort parameter)
         {
             if (expression.CharacterRange.Low.Equals(expression.CharacterRange.High))
@@ -57,10 +81,16 @@ namespace ZenLib.Solver
             }
         }
 
+        /// <summary>
+        /// Get a sequence constant.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns>A singleton sequence.</returns>
         private Expr GetSeqConstant(object obj)
         {
             var type = typeof(T);
 
+            // convert primitive types.
             if (type == ReflectionUtilities.ByteType)
                 return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 8));
             if (type == ReflectionUtilities.CharType)
@@ -72,9 +102,11 @@ namespace ZenLib.Solver
             if (type == ReflectionUtilities.LongType || type == ReflectionUtilities.UlongType)
                 return SolverZ3.Context.MkUnit(SolverZ3.Context.MkBV(obj.ToString(), 64));
 
+            // convert Int<N> and UInt<N>
             Contract.Assert(ReflectionUtilities.IsFixedIntegerType(type));
+            var size = ReflectionUtilities.IntegerSize(type);
+            var bits = new bool[size];
             dynamic value = obj;
-            var bits = new bool[value.Size];
             for (int i = 0; i < bits.Length; i++)
             {
                 bits[bits.Length - i - 1] = value.GetBit(i);

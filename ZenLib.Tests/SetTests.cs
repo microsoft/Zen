@@ -145,9 +145,9 @@ namespace ZenLib.Tests
             CheckValid<Set<byte>, byte>((d, e) => d.Delete(e).Add(e) == d.Add(e), runBdds: false);
             CheckValid<Set<byte>, byte>((d, e) => Implies(d.Contains(e), d.Add(e) == d), runBdds: false);
             CheckValid<Set<byte>, byte>((d, e) => Implies(Not(d.Contains(e)), d.Delete(e) == d), runBdds: false);
-            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), s2.Contains(e)) == s1.Intersect(s2).Contains(e), runBdds: false);
-            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => Or(s1.Contains(e), s2.Contains(e)) == s1.Union(s2).Contains(e), runBdds: false);
-            CheckValid<Set<UInt3>, Set<UInt3>, UInt3>((s1, s2, e) => And(s1.Contains(e), Not(s2.Contains(e))) == s1.Difference(s2).Contains(e), runBdds: false);
+            CheckValid<Set<UInt<_3>>, Set<UInt<_3>>, UInt<_3>>((s1, s2, e) => And(s1.Contains(e), s2.Contains(e)) == s1.Intersect(s2).Contains(e), runBdds: false);
+            CheckValid<Set<UInt<_3>>, Set<UInt<_3>>, UInt<_3>>((s1, s2, e) => Or(s1.Contains(e), s2.Contains(e)) == s1.Union(s2).Contains(e), runBdds: false);
+            CheckValid<Set<UInt<_3>>, Set<UInt<_3>>, UInt<_3>>((s1, s2, e) => And(s1.Contains(e), Not(s2.Contains(e))) == s1.Difference(s2).Contains(e), runBdds: false);
         }
 
         /// <summary>
@@ -441,11 +441,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetWithFixedInteger1()
         {
-            var zf = new ZenConstraint<Set<UInt3>>(d => d.Contains(new UInt3(2)));
+            var zf = new ZenConstraint<Set<UInt<_3>>>(d => d.Contains(new UInt<_3>(2)));
             var result = zf.Find();
 
             Assert.AreEqual(1, result.Value.Count());
-            Assert.IsTrue(result.Value.Contains(new UInt3(2)));
+            Assert.IsTrue(result.Value.Contains(new UInt<_3>(2)));
         }
 
         /// <summary>
@@ -454,11 +454,11 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSetWithFixedInteger2()
         {
-            var zf = new ZenConstraint<Set<Int10>>(d => d.Contains(new Int10(-2)));
+            var zf = new ZenConstraint<Set<Int<_10>>>(d => d.Contains(new Int<_10>(-2)));
             var result = zf.Find();
 
             Assert.AreEqual(1, result.Value.Count());
-            Assert.IsTrue(result.Value.Contains(new Int10(-2)));
+            Assert.IsTrue(result.Value.Contains(new Int<_10>(-2)));
         }
 
         /// <summary>

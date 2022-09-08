@@ -471,7 +471,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMapWithFixedIntegers()
         {
-            var sat = new ZenConstraint<Map<uint, UInt3>>(m => m.Get(10).IsSome()).Find();
+            var sat = new ZenConstraint<Map<uint, UInt<_3>>>(m => m.Get(10).IsSome()).Find();
             Assert.IsTrue(sat.Value.ContainsKey(10));
         }
 

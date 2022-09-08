@@ -160,7 +160,7 @@ namespace ZenLib.Solver
         /// <returns>A sort for the type.</returns>
         public override Sort VisitFixedInteger(Type intType, Unit parameter)
         {
-            int size = ((dynamic)Activator.CreateInstance(intType, 0L)).Size;
+            var size = ReflectionUtilities.IntegerSize(intType);
             return SolverZ3.Context.MkBitVecSort((uint)size);
         }
 

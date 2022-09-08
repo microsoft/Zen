@@ -224,7 +224,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCastingFixedIntegers1()
         {
-            var zf = new ZenFunction<byte, UInt64>(x => Zen.Cast<byte, UInt64>(x));
+            var zf = new ZenFunction<byte, UInt<_64>>(x => Zen.Cast<byte, UInt<_64>>(x));
             Assert.AreEqual(5L, zf.Evaluate(5).ToLong());
             zf.Compile();
             Assert.AreEqual(5L, zf.Evaluate(5).ToLong());
@@ -236,10 +236,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCastingFixedIntegers2()
         {
-            var zf = new ZenFunction<UInt16, UInt8>(x => Zen.Cast<UInt16, UInt8>(x));
-            Assert.AreEqual(1, zf.Evaluate(new UInt16(257)).ToLong());
+            var zf = new ZenFunction<UInt<_16>, UInt<_8>>(x => Zen.Cast<UInt<_16>, UInt<_8>>(x));
+            Assert.AreEqual(1, zf.Evaluate(new UInt<_16>(257)).ToLong());
             zf.Compile();
-            Assert.AreEqual(1, zf.Evaluate(new UInt16(257)).ToLong());
+            Assert.AreEqual(1, zf.Evaluate(new UInt<_16>(257)).ToLong());
         }
 
         /// <summary>
@@ -248,10 +248,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCastingFixedIntegers3()
         {
-            var zf = new ZenFunction<UInt16, byte>(x => Zen.Cast<UInt16, byte>(x));
-            Assert.AreEqual((byte)1, zf.Evaluate(new UInt16(257)));
+            var zf = new ZenFunction<UInt<_16>, byte>(x => Zen.Cast<UInt<_16>, byte>(x));
+            Assert.AreEqual((byte)1, zf.Evaluate(new UInt<_16>(257)));
             zf.Compile();
-            Assert.AreEqual((byte)1, zf.Evaluate(new UInt16(257)));
+            Assert.AreEqual((byte)1, zf.Evaluate(new UInt<_16>(257)));
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCastingFixedIntegers4()
         {
-            var zf = new ZenFunction<byte, Int3>(x => Zen.Cast<byte, Int3>(x));
+            var zf = new ZenFunction<byte, Int<_3>>(x => Zen.Cast<byte, Int<_3>>(x));
             Assert.AreEqual(-1, zf.Evaluate(7).ToLong());
             zf.Compile();
             Assert.AreEqual(-1, zf.Evaluate(7).ToLong());
@@ -272,10 +272,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCastingFixedIntegers5()
         {
-            var zf = new ZenFunction<Int3, UInt8>(x => Zen.Cast<Int3, UInt8>(x));
-            Assert.AreEqual(7, zf.Evaluate(new Int3(-1)).ToLong());
+            var zf = new ZenFunction<Int<_3>, UInt<_8>>(x => Zen.Cast<Int<_3>, UInt<_8>>(x));
+            Assert.AreEqual(7, zf.Evaluate(new Int<_3>(-1)).ToLong());
             zf.Compile();
-            Assert.AreEqual(7, zf.Evaluate(new Int3(-1)).ToLong());
+            Assert.AreEqual(7, zf.Evaluate(new Int<_3>(-1)).ToLong());
         }
 
         /// <summary>
@@ -369,14 +369,14 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFixedIntegerCastConversion1()
         {
-            var zf = new ZenFunction<UInt16, ulong>(x => Zen.Cast<UInt16, ulong>(x));
+            var zf = new ZenFunction<UInt<_16>, ulong>(x => Zen.Cast<UInt<_16>, ulong>(x));
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((u, s) => u == new UInt16(ushort.MaxValue), backend: backend);
+                var example = zf.Find((u, s) => u == new UInt<_16>(ushort.MaxValue), backend: backend);
                 Assert.IsTrue(example.HasValue);
-                Assert.AreEqual(new UInt16(ushort.MaxValue), example.Value);
-                Assert.AreEqual((ulong)ushort.MaxValue, zf.Evaluate(new UInt16(ushort.MaxValue)));
+                Assert.AreEqual(new UInt<_16>(ushort.MaxValue), example.Value);
+                Assert.AreEqual((ulong)ushort.MaxValue, zf.Evaluate(new UInt<_16>(ushort.MaxValue)));
             }
         }
 
@@ -386,7 +386,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFixedIntegerCastConversion2()
         {
-            var zf = new ZenConstraint<UInt3>(x => Zen.Cast<UInt3, Int3>(x) < new Int3(0));
+            var zf = new ZenConstraint<UInt<_3>>(x => Zen.Cast<UInt<_3>, Int<_3>>(x) < new Int<_3>(0));
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {

@@ -619,7 +619,7 @@ namespace ZenLib.Tests
 
         internal class ObjectWithInt
         {
-            public UInt10 Field1;
+            public UInt<_10> Field1;
         }
 
         private class TestParameter

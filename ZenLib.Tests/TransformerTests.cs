@@ -207,9 +207,9 @@ namespace ZenLib.Tests
         public void TestTransformerFixedWidthInteger()
         {
             var manager = new StateSetTransformerManager(0);
-            var t = new ZenFunction<Int5, bool>(i => i <= new Int5(0)).Transformer(manager);
+            var t = new ZenFunction<Int<_5>, bool>(i => i <= new Int<_5>(0)).Transformer(manager);
             var set = t.InputSet((x, y) => y);
-            Assert.IsTrue(set.Element() <= new Int5(0));
+            Assert.IsTrue(set.Element() <= new Int<_5>(0));
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace ZenLib.Tests
         public void TestTransformerObjectWithInt()
         {
             var manager = new StateSetTransformerManager(0);
-            var t = new ZenFunction<TestHelper.ObjectWithInt, bool>(o => o.GetField<TestHelper.ObjectWithInt, UInt10>("Field1") == new UInt10(1))
+            var t = new ZenFunction<TestHelper.ObjectWithInt, bool>(o => o.GetField<TestHelper.ObjectWithInt, UInt<_10>>("Field1") == new UInt<_10>(1))
                 .Transformer(manager);
             var set = t.InputSet((p, o) => o);
             Assert.AreEqual(1L, set.Element().Field1.ToLong());

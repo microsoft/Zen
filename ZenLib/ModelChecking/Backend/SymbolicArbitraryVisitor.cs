@@ -132,7 +132,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitFixedInteger(Type intType, object parameter)
         {
-            var size = CommonUtilities.IntegerSize(intType);
+            var size = ReflectionUtilities.IntegerSize(intType);
             var (v, e) = this.solver.CreateBitvecVar(parameter, (uint)size);
             this.evaluationVisitor.Variables.Add(v);
             this.evaluationVisitor.ArbitraryVariables[parameter] = v;
