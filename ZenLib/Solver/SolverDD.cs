@@ -114,7 +114,7 @@ namespace ZenLib.Solver
                         type.GetGenericTypeDefinitionCached() == typeof(ZenArbitraryExpr<>) &&
                         ReflectionUtilities.IsFixedIntegerType(type.GetGenericArgumentsCached()[0]))
                     {
-                        var size = CommonUtilities.IntegerSize(type.GetGenericArgumentsCached()[0]);
+                        var size = ReflectionUtilities.IntegerSize(type.GetGenericArgumentsCached()[0]);
 
                         if (!objsFixedInt.TryGetValue(size, out List<object> list))
                         {

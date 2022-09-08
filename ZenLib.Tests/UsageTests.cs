@@ -922,7 +922,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestMultiplyException3()
         {
-            Zen.Multiply(Constant(new UInt9(0)), Constant(new UInt9(0)));
+            Zen.Multiply(Constant(new UInt<_9>(0)), Constant(new UInt<_9>(0)));
         }
 
         /// <summary>

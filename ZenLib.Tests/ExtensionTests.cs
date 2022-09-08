@@ -136,13 +136,13 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSolveFixedIntegers()
         {
-            var a = Arbitrary<UInt128>();
-            var b = Arbitrary<Int128>();
-            var expr = And(a == new UInt128(1), b == new Int128(-3));
+            var a = Arbitrary<UInt<_128>>();
+            var b = Arbitrary<Int<_128>>();
+            var expr = And(a == new UInt<_128>(1), b == new Int<_128>(-3));
             var solution = expr.Solve();
 
-            Assert.AreEqual(new UInt128(1), solution.Get(a));
-            Assert.AreEqual(new Int128(-3), solution.Get(b));
+            Assert.AreEqual(new UInt<_128>(1), solution.Get(a));
+            Assert.AreEqual(new Int<_128>(-3), solution.Get(b));
         }
 
         /// <summary>

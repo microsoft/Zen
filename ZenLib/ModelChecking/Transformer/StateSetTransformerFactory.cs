@@ -304,7 +304,7 @@ namespace ZenLib.ModelChecking
 
             if (ReflectionUtilities.IsFixedIntegerType(zenType))
             {
-                var size = CommonUtilities.IntegerSize(zenType);
+                var size = ReflectionUtilities.IntegerSize(zenType);
                 var (v, _) = solver.CreateBitvecVar(zenExpr, (uint)size);
                 zenExprToVariable[zenExpr] = v;
                 return;

@@ -119,7 +119,7 @@ namespace ZenLib
         /// <summary>
         /// Type of a fixed size integer.
         /// </summary>
-        public readonly static Type IntNType = typeof(IntN<,>);
+        public readonly static Type IntNType = typeof(Bitvec<,>);
 
         /// <summary>
         /// Cache of generic arguments.
@@ -838,9 +838,29 @@ namespace ZenLib
             if (type == LongType || type == UlongType)
                 return 64;
             Contract.Assert(IsFixedIntegerType(type));
-            var c = type.GetConstructor(new Type[] { typeof(long) });
-            dynamic obj = (T)c.Invoke(new object[] { 0L });
-            return obj.Size;
+            return IntegerSize(typeof(T));
+        }
+
+        /// <summary>
+        /// Gets the integer size for a given integer type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The size of the integer.</returns>
+        public static int IntegerSize(Type type)
+        {
+            var p = type.BaseType.GetProperty("Size", BindingFlags.Static | BindingFlags.Public);
+            return (int)p.GetValue(null);
+        }
+
+        /// <summary>
+        /// Gets the integer size for a given integer type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The size of the integer.</returns>
+        public static bool IntegerIsSigned(Type type)
+        {
+            var p = type.BaseType.GetProperty("Signed", BindingFlags.Static | BindingFlags.Public);
+            return (bool)p.GetValue(null);
         }
 
         /// <summary>
@@ -871,9 +891,10 @@ namespace ZenLib
                 return (T)(object)ulong.MinValue;
 
             Contract.Assert(IsFixedIntegerType(type));
+            var signed = IntegerIsSigned(type);
             var c = type.GetConstructor(new Type[] { typeof(long) });
             dynamic obj = (T)c.Invoke(new object[] { 0L });
-            obj.SetBit(0, obj.Signed);
+            obj.SetBit(0, signed);
             return obj;
         }
 
@@ -905,10 +926,12 @@ namespace ZenLib
                 return (T)(object)ulong.MaxValue;
 
             Contract.Assert(IsFixedIntegerType(type));
+            var signed = IntegerIsSigned(type);
+            var size = IntegerSize(type);
             var c = type.GetConstructor(new Type[] { typeof(long) });
             dynamic obj = (T)c.Invoke(new object[] { 0L });
-            obj.SetBit(0, !obj.Signed);
-            for (int i = 1; i < obj.Size; i++)
+            obj.SetBit(0, !signed);
+            for (int i = 1; i < size; i++)
             {
                 obj.SetBit(i, true);
             }
@@ -1010,11 +1033,20 @@ namespace ZenLib
         /// <param name="x">The first value.</param>
         /// <param name="i">The second value.</param>
         /// <returns>The result.</returns>
-        public static T Add<T, TSign>(IntN<T, TSign> x, int i)
+        public static Int<TSize> Add<TSize>(Int<TSize> x, int i)
         {
-            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
-            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
-            return x.Add(instance);
+            return x.Add(new Int<TSize>(i));
+        }
+
+        /// <summary>
+        /// Add two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
+        public static UInt<TSize> Add<TSize>(UInt<TSize> x, int i)
+        {
+            return x.Add(new UInt<TSize>(i));
         }
 
         /// <summary>
@@ -1111,11 +1143,20 @@ namespace ZenLib
         /// <param name="x">The first value.</param>
         /// <param name="i">The second value.</param>
         /// <returns>The result.</returns>
-        public static T Subtract<T, TSign>(IntN<T, TSign> x, int i)
+        public static Int<TSize> Subtract<TSize>(Int<TSize> x, int i)
         {
-            var c = typeof(T).GetConstructor(new Type[] { typeof(long) });
-            var instance = (IntN<T, TSign>)c.Invoke(new object[] { (long)i });
-            return x.Subtract(instance);
+            return x.Subtract(new Int<TSize>(i));
+        }
+
+        /// <summary>
+        /// Subtract two values.
+        /// </summary>
+        /// <param name="x">The first value.</param>
+        /// <param name="i">The second value.</param>
+        /// <returns>The result.</returns>
+        public static UInt<TSize> Subtract<TSize>(UInt<TSize> x, int i)
+        {
+            return x.Subtract(new UInt<TSize>(i));
         }
     }
 }

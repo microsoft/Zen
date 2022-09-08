@@ -89,60 +89,60 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestCharRangeWithFixedSizeIntegers()
         {
-            var r1 = new CharRange<UInt9>();
-            var r2 = new CharRange<UInt9>(new UInt9(10), new UInt9(20));
-            var r3 = new CharRange<Int9>();
-            var r4 = new CharRange<Int9>(new Int9(-5), new Int9(5));
+            var r1 = new CharRange<UInt<_9>>();
+            var r2 = new CharRange<UInt<_9>>(new UInt<_9>(10), new UInt<_9>(20));
+            var r3 = new CharRange<Int<_9>>();
+            var r4 = new CharRange<Int<_9>>(new Int<_9>(-5), new Int<_9>(5));
 
-            Assert.IsTrue(r1.Contains(new UInt9(0)));
-            Assert.IsTrue(r1.Contains(new UInt9(1)));
-            Assert.IsTrue(r1.Contains(new UInt9(510)));
-            Assert.IsTrue(r1.Contains(new UInt9(511)));
+            Assert.IsTrue(r1.Contains(new UInt<_9>(0)));
+            Assert.IsTrue(r1.Contains(new UInt<_9>(1)));
+            Assert.IsTrue(r1.Contains(new UInt<_9>(510)));
+            Assert.IsTrue(r1.Contains(new UInt<_9>(511)));
 
-            Assert.IsTrue(r2.Contains(new UInt9(10)));
-            Assert.IsTrue(r2.Contains(new UInt9(11)));
-            Assert.IsTrue(r2.Contains(new UInt9(19)));
-            Assert.IsTrue(r2.Contains(new UInt9(20)));
-            Assert.IsFalse(r2.Contains(new UInt9(9)));
-            Assert.IsFalse(r2.Contains(new UInt9(21)));
-            Assert.IsFalse(r2.Contains(new UInt9(511)));
+            Assert.IsTrue(r2.Contains(new UInt<_9>(10)));
+            Assert.IsTrue(r2.Contains(new UInt<_9>(11)));
+            Assert.IsTrue(r2.Contains(new UInt<_9>(19)));
+            Assert.IsTrue(r2.Contains(new UInt<_9>(20)));
+            Assert.IsFalse(r2.Contains(new UInt<_9>(9)));
+            Assert.IsFalse(r2.Contains(new UInt<_9>(21)));
+            Assert.IsFalse(r2.Contains(new UInt<_9>(511)));
 
-            Assert.IsTrue(r3.Contains(new Int9(0)));
-            Assert.IsTrue(r3.Contains(new Int9(-1)));
-            Assert.IsTrue(r3.Contains(new Int9(1)));
-            Assert.IsTrue(r3.Contains(new Int9(-5)));
-            Assert.IsTrue(r3.Contains(new Int9(5)));
-            Assert.IsTrue(r3.Contains(new Int9(-6)));
-            Assert.IsTrue(r3.Contains(new Int9(6)));
-            Assert.IsTrue(r3.Contains(new Int9(-256)));
-            Assert.IsTrue(r3.Contains(new Int9(255)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(0)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(-1)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(1)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(-5)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(5)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(-6)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(6)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(-256)));
+            Assert.IsTrue(r3.Contains(new Int<_9>(255)));
 
-            Assert.IsTrue(r4.Contains(new Int9(0)));
-            Assert.IsTrue(r4.Contains(new Int9(-1)));
-            Assert.IsTrue(r4.Contains(new Int9(1)));
-            Assert.IsTrue(r4.Contains(new Int9(-5)));
-            Assert.IsTrue(r4.Contains(new Int9(5)));
-            Assert.IsFalse(r4.Contains(new Int9(-6)));
-            Assert.IsFalse(r4.Contains(new Int9(6)));
-            Assert.IsFalse(r4.Contains(new Int9(-256)));
-            Assert.IsFalse(r4.Contains(new Int9(255)));
+            Assert.IsTrue(r4.Contains(new Int<_9>(0)));
+            Assert.IsTrue(r4.Contains(new Int<_9>(-1)));
+            Assert.IsTrue(r4.Contains(new Int<_9>(1)));
+            Assert.IsTrue(r4.Contains(new Int<_9>(-5)));
+            Assert.IsTrue(r4.Contains(new Int<_9>(5)));
+            Assert.IsFalse(r4.Contains(new Int<_9>(-6)));
+            Assert.IsFalse(r4.Contains(new Int<_9>(6)));
+            Assert.IsFalse(r4.Contains(new Int<_9>(-256)));
+            Assert.IsFalse(r4.Contains(new Int<_9>(255)));
 
             var rs1 = r2.Complement();
             Assert.AreEqual(2, rs1.Length);
-            Assert.AreEqual(new UInt9(0), rs1[0].Low);
-            Assert.AreEqual(new UInt9(9), rs1[0].High);
-            Assert.AreEqual(new UInt9(21), rs1[1].Low);
-            Assert.AreEqual(new UInt9(511), rs1[1].High);
+            Assert.AreEqual(new UInt<_9>(0), rs1[0].Low);
+            Assert.AreEqual(new UInt<_9>(9), rs1[0].High);
+            Assert.AreEqual(new UInt<_9>(21), rs1[1].Low);
+            Assert.AreEqual(new UInt<_9>(511), rs1[1].High);
 
             var rs2 = r1.Complement();
             Assert.AreEqual(0, rs2.Length);
 
             var rs3 = r4.Complement();
             Assert.AreEqual(2, rs3.Length);
-            Assert.AreEqual(new Int9(-256), rs3[0].Low);
-            Assert.AreEqual(new Int9(-6), rs3[0].High);
-            Assert.AreEqual(new Int9(6), rs3[1].Low);
-            Assert.AreEqual(new Int9(255), rs3[1].High);
+            Assert.AreEqual(new Int<_9>(-256), rs3[0].Low);
+            Assert.AreEqual(new Int<_9>(-6), rs3[0].High);
+            Assert.AreEqual(new Int<_9>(6), rs3[1].Low);
+            Assert.AreEqual(new Int<_9>(255), rs3[1].High);
 
             var rs4 = r3.Complement();
             Assert.AreEqual(0, rs4.Length);

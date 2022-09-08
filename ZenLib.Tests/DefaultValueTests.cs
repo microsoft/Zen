@@ -53,10 +53,10 @@ namespace ZenLib.Tests
             CheckDefault<uint>(0U);
             CheckDefault<long>(0L);
             CheckDefault<ulong>(0UL);
-            CheckDefault<Int1>(new Int1(0));
-            CheckDefault<Int2>(new Int2(0));
-            CheckDefault<UInt1>(new UInt1(0));
-            CheckDefault<UInt2>(new UInt2(0));
+            CheckDefault<Int<_1>>(new Int<_1>(0));
+            CheckDefault<Int<_2>>(new Int<_2>(0));
+            CheckDefault<UInt<_1>>(new UInt<_1>(0));
+            CheckDefault<UInt<_2>>(new UInt<_2>(0));
             CheckDefault<string>(string.Empty);
             CheckDefault<BigInteger>(new BigInteger(0));
             CheckDefault<Real>(new Real(0));

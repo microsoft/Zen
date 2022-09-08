@@ -50,8 +50,8 @@ namespace ZenLib.Tests
             Assert.AreEqual("x", Zen.Arbitrary<uint>("x").ToString());
             Assert.AreEqual("x", Zen.Arbitrary<long>("x").ToString());
             Assert.AreEqual("x", Zen.Arbitrary<ulong>("x").ToString());
-            Assert.AreEqual("x", Zen.Arbitrary<Int128>("x").ToString());
-            Assert.AreEqual("x", Zen.Arbitrary<UInt128>("x").ToString());
+            Assert.AreEqual("x", Zen.Arbitrary<Int<_128>>("x").ToString());
+            Assert.AreEqual("x", Zen.Arbitrary<UInt<_128>>("x").ToString());
             Assert.AreEqual("(x as String)", Zen.Arbitrary<string>("x").ToString());
             Assert.AreEqual("(x as String)", Zen.Arbitrary<string>("x").ToString());
             Assert.AreEqual("x", Zen.Arbitrary<Map<int, int>>("x").ToString());
