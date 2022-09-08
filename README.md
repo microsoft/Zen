@@ -266,8 +266,8 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `uint`   | 32-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `long`   | 64-bit signed value  | :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
 | `ulong`  | 64-bit unsigned value| :heavy_check_mark:      | :heavy_check_mark:       | :heavy_check_mark: |
-| `Int1`, `Int2`, ..., `IntN` | N-bit signed value| :heavy_check_mark:      | :heavy_check_mark:  | :heavy_check_mark: |
-| `UInt1`, `UInt2`, ..., `UIntN` | N-bit unsigned value| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: |
+| `Int<_N>` | N-bit signed value| :heavy_check_mark:      | :heavy_check_mark:  | :heavy_check_mark: |
+| `UInt<_N>` | N-bit unsigned value| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: |
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, ...>`  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
@@ -280,7 +280,7 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Set<T>` | arbitrary size sets of values of type `T`. Same restrictions as with `Map<T1, T2>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `CMap<T1, T2>` | maps of constant keys of type `T1` to values of type `T2`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `CSet<T>` | sets of constants of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
-| `Array<T, TSize>` | Fixed size arrays of values of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `Array<T, _N>` | Fixed size arrays of values of type `T`. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `Seq<T>` | arbitrary size sequences of values of type `T`. Same restrictions as with `Set<T>`. Note that SMT solvers use heuristics to solve for sequences and are incomplete. | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 | `string` | arbitrary size strings. Implemented as `Seq<char>` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
 
@@ -301,27 +301,11 @@ var solution = And(c1, c2).Solve(); // x = -20, y = 105
 <a name="integer-types"></a>
 ## Integer types
 
-Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers as well as other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer). Out of the box, Zen provides the types `Int1`, `UInt1`, `Int2`, `UInt2`, `Int3`, `UInt3` ..., `Int64`, `UInt64` as well as the types `Int128`, `UInt128`, `Int256`, `UInt256`. You can also create a custom fixed-width integer of a given length. For example, to create a 65-bit integer, add the following code:
+Aside from primitive types, Zen also supports the `BigInteger` type found in `System.Numerics` for reasoning about ubounded integers as well as other types of integers with fixed, but non-standard bit width (for instance a 7-bit integer). Out of the box, Zen provides the types `Int<_N>` and `UInt<_N>` for `N`=1, 2, 3, ..., 99, 100, 128, 256, 512 ,1024. You can also create a custom integer size by simply declaring a new struct:
 
 ```csharp
-public class Int65 : IntN<Int65, Signed> 
-{ 
-    public override int Size { get { return 65; } } 
-    public Int65(byte[] bytes) : base(bytes) { } 
-    public Int65(long value) : base(value) { } 
-}
+public struct _101 { }
 ```
-The library should take care of the rest. Or equivalently, for unsigned integer semantics use `Unsigned`. As an example:
-
-```csharp
-var b = Symbolic<bool>();
-var x = Symbolic<BigInteger>();
-var y = Symbolic<UInt9>();
-var c1 = If(b, y < new UInt9(10), x == new BigInteger(3));
-var c2 = Implies(Not(b), (y & new UInt9(1)) == new UInt9(1));
-var solution = And(c1, c2).Solve(); // b = True, x = 0, y = 4
-```
-
 
 <a name="options-and-tuples"></a>
 ## Options, Tuples
@@ -506,7 +490,7 @@ public class Point
 <a name="enums"></a>
 ## Enumerated values
 
-Zen models `enum` values as their backing type, which is an `int` by default unless specified by the user. For example, Zen will model the following enum as a byte:
+Enums in C# are just structs that wrap some backing type. Zen will model enums like any other struct. For example, Zen will model the following enum as a byte:
 
 ```csharp
 public enum Origin : byte
@@ -522,8 +506,7 @@ By default, Zen does not constraint an enum value to only be one of the enumerat
 ```csharp
 public Zen<bool> IsValidOrigin(Zen<Origin> origin)
 {
-    var enumValues = Enum.GetValues<Origin>();
-    return Zen.Or(enumValues.Select(x => r.GetOrigin() == x).ToArray());
+    return Zen.Or(Enum.GetValues<Origin>().Select(x => origin == x));
 }
 ```
 
@@ -552,7 +535,7 @@ Note that this requires C# 9.0 and .NET 6 or later to work. In addition, you mus
 ```csharp
 public class Person
 {
-    [ZenSize(depth: 10, enumerationType: EnumerationType.FixedSize)]
+    [ZenSize(depth: 10)]
     public FSeq<string> Contacts { get; set; }
 }
 ```
