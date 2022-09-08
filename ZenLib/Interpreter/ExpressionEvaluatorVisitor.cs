@@ -460,17 +460,6 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public override object VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
-        {
-            return new FSeq<T>();
-        }
-
-        /// <summary>
-        /// Visit a Zen expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>The C# object.</returns>
         public override object VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (FSeq<T>)this.Visit(expression.ListExpr, parameter);

@@ -1240,7 +1240,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         internal static Zen<FSeq<T>> EmptyList<T>()
         {
-            return ZenFSeqEmptyExpr<T>.Instance;
+            return Constant(new FSeq<T>());
         }
 
         /// <summary>

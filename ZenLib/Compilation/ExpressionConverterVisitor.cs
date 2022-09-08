@@ -472,18 +472,6 @@ namespace ZenLib.Compilation
         /// <param name="expression">The Zen expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>An expression tree.</returns>
-        public override Expression VisitListEmpty<T>(ZenFSeqEmptyExpr<T> expression, ExpressionConverterEnvironment parameter)
-        {
-            var c = typeof(FSeq<T>).GetConstructor(new Type[] { });
-            return Expression.New(c);
-        }
-
-        /// <summary>
-        /// Visit an expression.
-        /// </summary>
-        /// <param name="expression">The Zen expression.</param>
-        /// <param name="parameter">The environment.</param>
-        /// <returns>An expression tree.</returns>
         public override Expression VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, ExpressionConverterEnvironment parameter)
         {
             var fseqType = typeof(FSeq<TList>);

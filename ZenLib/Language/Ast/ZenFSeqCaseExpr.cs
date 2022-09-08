@@ -36,7 +36,7 @@ namespace ZenLib
         /// <returns></returns>
         private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> consCase)
         {
-            if (e is ZenFSeqEmptyExpr<T>)
+            if (e is ZenConstantExpr<FSeq<T>> ce && ce.Value.IsEmpty())
             {
                 return emptyCase;
             }

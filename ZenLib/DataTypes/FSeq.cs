@@ -211,7 +211,7 @@ namespace ZenLib
         /// <returns>Zen value.</returns>
         public static Zen<FSeq<T>> Empty<T>()
         {
-            return ZenFSeqEmptyExpr<T>.Instance;
+            return Constant(new FSeq<T>());
         }
 
         /// <summary>

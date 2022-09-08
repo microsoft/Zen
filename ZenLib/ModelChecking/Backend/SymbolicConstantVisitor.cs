@@ -140,10 +140,16 @@ namespace ZenLib.ModelChecking
         /// <param name="innerType">The element type.</param>
         /// <param name="parameter">The C# constant.</param>
         /// <returns>A symbolic value for the constant.</returns>
-        [ExcludeFromCodeCoverage]
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitList(Type listType, Type innerType, object parameter)
         {
-            throw new ZenUnreachableException();
+            var list = ImmutableList<(TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)>.Empty;
+            dynamic constant = parameter;
+            foreach (var element in constant.ToList())
+            {
+                list = list.Add((this.solver.True(), this.Visit(innerType, element)));
+            }
+
+            return new SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.solver, list);
         }
 
         /// <summary>

@@ -133,15 +133,18 @@ namespace ZenLib.ModelChecking
         /// <param name="fields">The fields and their types.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An empty interleaving result set.</returns>
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitObject(Type objectType, SortedDictionary<string, Type> fields, Unit parameter)
         {
-            var result = ImmutableDictionary<string, InterleavingResult>.Empty;
+            throw new ZenUnreachableException();
+
+            /* var result = ImmutableDictionary<string, InterleavingResult>.Empty;
             foreach (var kv in fields)
             {
                 result = result.Add(kv.Key, this.Visit(kv.Value, parameter));
             }
 
-            return new InterleavingClass(result);
+            return new InterleavingClass(result); */
         }
 
         /// <summary>

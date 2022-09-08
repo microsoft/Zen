@@ -495,7 +495,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqContains()
         {
-            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => And(l.Contains(x), l.Contains(7))));
+            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => And(l.Contains(x), l.Contains(7)), runBdds: false));
         }
 
         /// <summary>
@@ -504,7 +504,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqContainsVariable()
         {
-            CheckAgreement<FSeq<byte>, byte>((l, x) => l.Contains(x), bddListSize: 2);
+            CheckAgreement<FSeq<byte>, byte>((l, x) => l.Contains(x), runBdds: false);
         }
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAll()
         {
-            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.All(e => e == x)));
+            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.All(e => e == x), runBdds: false));
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqAny()
         {
-            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.Any(e => e >= x)));
+            RandomBytes(x => CheckAgreement<FSeq<byte>>(l => l.Any(e => e >= x), runBdds: false));
         }
 
         /// <summary>
@@ -550,7 +550,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqMap()
         {
-            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Select(e => e + 1).Contains(x)));
+            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Select(e => e + 1).Contains(x), runBdds: false));
         }
 
         /// <summary>
@@ -559,7 +559,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqFilter()
         {
-            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Where(e => e < (x + 1)).Contains(x)));
+            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Where(e => e < (x + 1)).Contains(x), runBdds: false));
         }
 
         /// <summary>
@@ -569,7 +569,7 @@ namespace ZenLib.Tests
         public void TestFSeqContainsFind()
         {
             RandomBytes(x => CheckValid<FSeq<byte>>(l =>
-                Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).IsSome())));
+                Implies(l.Contains(Constant<byte>(x)), l.Find(v => v == x).IsSome()), runBdds: false));
         }
 
         /// <summary>
@@ -635,7 +635,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqReverse()
         {
-            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Reverse().Contains(x)));
+            RandomBytes(x => CheckAgreement<FSeq<int>>(l => l.Reverse().Contains(x), runBdds: false));
         }
 
         /// <summary>
@@ -644,7 +644,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFSeqRemoveAllNotContains()
         {
-            RandomBytes(x => CheckValid<FSeq<byte>>(l => Not(l.RemoveAll(Constant<byte>(x)).Contains(x))));
+            RandomBytes(x => CheckValid<FSeq<byte>>(l => Not(l.RemoveAll(Constant<byte>(x)).Contains(x)), runBdds: false));
         }
 
         /// <summary>
