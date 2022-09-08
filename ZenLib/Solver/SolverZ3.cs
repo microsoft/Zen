@@ -1060,6 +1060,17 @@ namespace ZenLib.Solver
         }
 
         /// <summary>
+        /// The seq 'Nth' operation.
+        /// </summary>
+        /// <param name="x">The seq expression.</param>
+        /// <param name="y">The index expression.</param>
+        /// <returns></returns>
+        public object SeqNth(SeqExpr x, IntExpr y)
+        {
+            return Context.MkNth(x, y);
+        }
+
+        /// <summary>
         /// The seq 'Length' operation.
         /// </summary>
         /// <param name="x">The seq expression.</param>
@@ -1276,7 +1287,7 @@ namespace ZenLib.Solver
         /// <returns>A model, if satisfiable.</returns>
         public Model Solve(BoolExpr x)
         {
-            this.Assert(x);
+            this.Assert((BoolExpr)x.Simplify());
             var status = this.Solver.Check();
             if (status == Status.UNSATISFIABLE)
             {

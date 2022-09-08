@@ -316,6 +316,18 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Simplify FSeq operations.
+        /// </summary>
+        [TestMethod]
+        public void TestFSeqSimplification()
+        {
+            var l1 = Zen.EmptyList<int>().AddFront(1).AddFront(2);
+            var l2 = Zen.EmptyList<int>();
+            Assert.AreEqual(False(), l1.Case(true, Zen.Lambda<Pair<Option<int>, FSeq<int>>, bool>(arg => false)));
+            Assert.AreEqual(True(), l2.Case(true, Zen.Lambda<Pair<Option<int>, FSeq<int>>, bool>(arg => false)));
+        }
+
+        /// <summary>
         /// Simplify unsigned integer operations.
         /// </summary>
         [TestMethod]

@@ -3,7 +3,7 @@
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rabeckett/6623db8f2d0c01f6b2bc880e6219f97f/raw/code-coverage.json)
 
 # Introduction
-Zen is a research library that provides high-level abstractions in .NET to make it easier to leverage constraint solvers such as Z3. Zen automates translations and optimizations to low-level constraint solvers and then automates their translation back to .NET objects. It makes it easier to construct complex encodings and manipulate complex symbolic objects. The Zen library comes equipped with a number of built-in tools for processing constraints and models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on Z3 and another based on Binary Decision Diagrams (BDDs).
+Zen is a constraint solving library for .NET. Zen simplifies expressing high-level symbolic computations and then translates these computations to low-level constraint solvers and back to .NET objects for the user. The Zen library comes equipped with a number of built-in tools for processing symbolic models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on the Z3 SMT solver and another based on Binary Decision Diagrams (BDDs).
 
 # Table of contents
 - [Introduction](#introduction)
@@ -67,12 +67,13 @@ var l = Zen.Symbolic<FSeq<int>>(depth: 10);
 var c1 = Zen.Or(b, i <= 10);
 var c2 = Zen.Or(Zen.Not(b), o == Option.Some(1UL));
 var c3 = Zen.Or(s.Contains("hello"), o.IsNone());
-var c4 = Zen.And(l.Where(x => x == i).Length() == 5, Zen.Not(l.All(x => x == i)));
+var c4 = Zen.And(
+        l.Where(x => x == i).Length() == (BigInteger)5,
+        Zen.Not(l.All(x => x == i)));
 var c5 = l.All(x => Zen.And(x >= 0, x <= 100));
-var expr = Zen.And(c1, c2, c3, c4, c5);
 
 // solve the constraints to get a solution
-var solution = expr.Solve();
+var solution = Zen.And(c1, c2, c3, c4, c5).Solve();
 
 System.Console.WriteLine("b: " + solution.Get(b));
 System.Console.WriteLine("i: " + solution.Get(i));
@@ -94,7 +95,7 @@ l: [10,38,38,38,38,38]
 <a name="computing-with-zen-expressions"></a>
 ## Zen Expressions
 
-`Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, consider the following code that computes a new integer from two integer inputs `x` and `y`:
+`Zen<T>` objects are just normal .NET objects, we can pass them and return them from functions. For instance, the following code computes a new symbolic integer from two integer inputs `x` and `y`:
 
 ```csharp
 Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
@@ -103,7 +104,7 @@ Zen<int> MultiplyAndAdd(Zen<int> x, Zen<int> y)
 }
 ```
 
-Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work over Zen values and supports implicit conversions to lift C# values to Zen values. Zen can represent a "function" like the one above to perform various symbolic tasks by creating a `ZenFunction` to wrap the `MultiplyAndAdd` function:
+Zen overloads common C# operators such as `&,|,^,<=, <, >, >=, +, -, *, true, false` to work with Zen values and supports implicit conversions to lift C# values (of type `T`) to Zen values (of type `Zen<T>`). Zen can represent a "function" like the one above to perform various symbolic tasks by creating a `ZenFunction` to wrap the `MultiplyAndAdd` function:
 
 ```csharp
 var function = new ZenFunction<int, int, int>(MultiplyAndAdd);
@@ -118,7 +119,7 @@ Zen can execute the function we have built on inputs by calling the `Evaluate` m
 var output = function.Evaluate(3, 2); // output = 11
 ```
 
-This will interpret the expression tree represented by the Zen function at runtime and return back a C# `int` value in this case. Of course doing so can be quite slow, so if you need to execute a function many times, Zen can compile the model using the C# `System.Reflection.Emit` API. This generates IL instructions that execute more efficiently. Doing so is easy, just call the `Compile` method on the function first:
+This will interpret the expression tree created by the Zen function at runtime and return back a C# `int` value in this case. Of course interpreting a tree is quite slow compared to multiplying a few numbers, so if you need to execute a function many times, Zen can compile the model using the C# `System.Reflection.Emit` API. This generates IL instructions that execute efficiently - as if the function had been written using actual `int` values. Doing so is easy, just call the `Compile` method on the function first:
 
 ```csharp
 function.Compile();
@@ -219,30 +220,22 @@ Internally, transformers leverage [binary decision diagrams](https://github.com/
 Zen can automatically generate test inputs for a given model by finding inputs that will lead to different execution paths. For instance, consider an insertion sort implementation. We can ask Zen to generate test inputs for the function that can then be used, for instance to test other sorting algorithms:
 
 ```csharp
-var f = new ZenFunction<FSeq<byte>, FSeq<byte>>(l => Sort(l));
+var f = new ZenFunction<Pair<int, int>, int>(pair => Zen.If<int>(pair.Item1() < pair.Item2(), 1, 2));
 
-foreach (var seq in f.GenerateInputs(depth: 3))
+foreach (var input in f.GenerateInputs())
 {
-    Console.WriteLine($"[{string.Join(",", seq)}]");
+    Console.WriteLine($"input: {input}");
 }
 ```
 
-In this case, we get the following output, which includes all permutations of relative orderings that may affect a sorting algorithm.
+In this case, we get the following output:
 
 ```text
-[]
-[0]
-[0,0]
-[0,0,0]
-[64,54]
-[0,64,54]
-[136,102,242]
-[32,64,30]
-[136,103,118]
-[144,111,14]
+input: (0, 0)
+input: (0, 1)
 ```
 
-The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path. Each `Zen.If` expression is treated as a program branch point (note: you can set the setting `Settings.PreserveBranches = true` to preserve branches if needed.).
+The test generation approach uses [symbolic execution](https://en.wikipedia.org/wiki/Symbolic_execution) to enumerate program paths and solve constraints on inputs that lead down each path. Each `Zen.If` expression is treated as a program branch point (note: you can set the setting `Settings.PreserveBranches = true` to prevent Zen from simplifying formulas involving `If` by default if you want to preserve the expression structure.).
 
 <a name="optimization"></a>
 ## Optimization
@@ -278,9 +271,9 @@ Zen currently supports a subset of .NET types and also introduces some of its ow
 | `Option<T>`    | an optional/nullable value of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `Pair<T1, ...>`  | pairs of different values | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:  |
 | `class`, `struct` | classes and structs with public fields and/or properties | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  |
-| `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
-| `FSet<T>`       | finite size set of elements of type `T` | :heavy_check_mark: | :heavy_check_mark: | :heavy_minus_sign:  |
-| `FString` | finite length string | :heavy_check_mark: | :heavy_check_mark:  | :heavy_minus_sign:  |
+| `FSeq<T>`       | finite length sequence of elements of type `T` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `FSet<T>`       | finite size set of elements of type `T` | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
+| `FString` | finite length string | :heavy_check_mark: | :heavy_minus_sign:  | :heavy_minus_sign:  |
 | `BigInteger` | arbitrary length integer| :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
 | `Real` | arbitrary precision rational number | :heavy_check_mark:           | :heavy_minus_sign:                 | :heavy_minus_sign:  |
 | `Map<T1, T2>` | arbitrary size maps of keys and values of type `T1` and `T2`. Note that `T1` and `T2` can not use finite sequences | :heavy_check_mark: | :heavy_minus_sign: | :heavy_minus_sign:  |
@@ -412,8 +405,7 @@ var solution = And(c1, c2).Solve(); // x = 0, m1 = m2 = {"a" => 1, _ => 0}
 
 Constant maps and sets have several limitations:
 * Inequality may not always give the expected result, as the constant maps do not have a canonical representation.
-* They can not be used as values in the `Map`, `Set`, or `Seq` types. This restriction may be relaxed int the future.
-* You can not use them in recursive `FSeq.Case` definitions.
+* They can not be used as values in the `Map`, `Set`, or `Seq` types. This restriction may be relaxed in the future.
 
 <a name="arrays"></a>
 ## Fixed Length Arrays
@@ -421,12 +413,11 @@ Constant maps and sets have several limitations:
 Zen can model fixed-length arrays of symbolic values using the `Array<T, TSize>` class. As an example:
 
 ```csharp
-Zen<Array<int, _10>> a = Zen.Symbolic<Array<int, _10>>();
-Zen<int>[] elements    = a.ToArray();
+var a = Zen.Symbolic<Array<int, _10>>();           // create a symbolic array of size 10
+Zen<int>[] elements = a.ToArray();                 // get the symbolic elements of the array
 var solution = Zen.And(
     elements.Aggregate(Zen.Plus) == 100,
-    a.All(x => Zen.And(x >= 1, x <= 20))).Solve();
-// a = [8,6,13,16,14,15,5,13,5,5]
+    a.All(x => Zen.And(x >= 1, x <= 20))).Solve(); // a = [8,6,13,16,14,15,5,13,5,5]
 ```
 
 The type parameter `TSize` specifies the size of the array. The types `_1` through `_100` are predefined in the library. To add a custom size, you can create a new struct following this naming convention:
@@ -439,7 +430,7 @@ struct _150 { }
 <a name="strings-and-sequences"></a>
 ## Sequences, Strings, and Regular Expressions
 
-Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. As there is no complete decision procedure for sequences, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given depth. Sequences also support matching against regular expressions. As an example:
+Zen has a `Seq<T>` type to represent arbitrarily large sequences of elements of type `T`. As there is no complete decision procedure for sequences in constraint solvers, queries for sequences may not always terminate, and you may need to use a timeout. If this is not acceptable, you can always use `FSeq` or `FString` instead, which will model a finite sequence up to a given size. Sequences also support matching against regular expressions. As an example:
 
 ```csharp
 Regex<int> r = Regex.Star(Regex.Char(1)); // zero or more 1s in a Seq<int>
@@ -454,7 +445,7 @@ var c4 = s1.Length() == s2.Length();
 var solution = And(c1, c2, c3, c4).Solve(); // s1 = [1], s2 = [0]
 ```
 
-Zen supports the `string` type for reasoning about unbounded strings (the `string` type is implemented as a `Seq<char>` for unicode strings). Strings also support matching regular expressions. Zen supports a limited subset of constructs currently - it supports anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
+Zen supports the `string` type for reasoning about unbounded strings (the `string` type is implemented as a `Seq<char>`). Strings also support matching regular expressions. Zen supports a limited subset of regex constructs currently - it supports anchors like `$` and `^` but not any other metacharacters like `\w,\s,\d,\D,\b` or backreferences `\1`. As an example:
 
 ```csharp
 Regex<char> r1 = Regex.Parse("[0-9a-z]+");

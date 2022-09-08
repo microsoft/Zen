@@ -6,6 +6,7 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
@@ -95,7 +96,7 @@ namespace ZenLib.Tests
         public void TestEmptyString()
         {
             // CheckValid<FString>(fs => (fs.Length() == 0) == (fs == new FString("")));
-            CheckValid<FString>(fs => (fs == new FString("")) == fs.IsEmpty());
+            CheckValid<FString>(fs => (fs == new FString("")) == fs.IsEmpty(), runBdds: false);
         }
 
         /// <summary>
@@ -109,9 +110,9 @@ namespace ZenLib.Tests
         [DataRow("", 0)]
         public void TestLength(string s, int expected)
         {
-            var f = new ZenFunction<FString, ushort>(fs => fs.Length());
+            var f = new ZenFunction<FString, BigInteger>(fs => fs.Length());
             var actual = f.Evaluate(s);
-            Assert.AreEqual(expected, (int)actual);
+            Assert.AreEqual(expected, (BigInteger)actual);
         }
 
         /// <summary>
@@ -120,10 +121,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestLengthRandom()
         {
-            var f = new ZenFunction<FString, ushort>(fs => fs.Length());
+            var f = new ZenFunction<FString, BigInteger>(fs => fs.Length());
             RandomStrings(s =>
             {
-                var ex = f.Find((fs, l) => l == (ushort)s.Length).Value.ToString();
+                var ex = f.Find((fs, l) => l == (BigInteger)s.Length).Value.ToString();
                 Assert.AreEqual(s.Length, ex.Length);
             });
         }
@@ -261,7 +262,7 @@ namespace ZenLib.Tests
         [DataRow("abcdefg", 0, 100, "abcdefg")]
         public void TestSubstring(string s, int offset, int len, string expected)
         {
-            var f = new ZenFunction<FString, FString>(fs => fs.SubString((ushort)offset, (ushort)len));
+            var f = new ZenFunction<FString, FString>(fs => fs.SubString(offset, len));
             var actual = f.Evaluate(s).ToString();
             Assert.AreEqual(expected, actual);
         }
@@ -342,8 +343,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestAtWithinBounds()
         {
-            var f = new ZenFunction<FString, ushort, bool>(
-                (fs, i) => Implies(i < fs.Length(), fs.At(i) != new FString("")));
+            var f = new ZenFunction<FString, BigInteger, bool>(
+                (fs, i) => Implies(And(i >= BigInteger.Zero, i < fs.Length()), fs.At(i) != new FString("")));
 
             var ex = f.Find((fs1, fs2, b) => Not(b));
             Assert.IsFalse(ex.HasValue);

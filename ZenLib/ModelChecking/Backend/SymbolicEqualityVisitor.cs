@@ -167,9 +167,22 @@ namespace ZenLib.ModelChecking
             var v2 = (SymbolicFSeq<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)parameter.Item2;
 
             object deflt = null;
-            var result = this.solver.True();
+            var length = Math.Max(v1.Value.Count, v2.Value.Count);
 
-            for (int i = 0; i < Math.Max(v1.Value.Count, v2.Value.Count); i++)
+            // the guarded symbolic values for every element in the list.
+            var elts1 = new (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)[length];
+            var elts2 = new (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)[length];
+
+            // track the symbolic index for every element.
+            var zero = this.solver.CreateBigIntegerConst(0);
+            var one = this.solver.CreateBigIntegerConst(1);
+
+            var currentIndex1 = zero;
+            var currentIndex2 = zero;
+            var indices1 = new TInt[length];
+            var indices2 = new TInt[length];
+
+            for (int i = 0; i < length; i++)
             {
                 (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt1;
                 (TBool, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>) elt2;
@@ -194,10 +207,26 @@ namespace ZenLib.ModelChecking
                     elt2 = (this.solver.False(), this.evaluationVisitor.Visit((dynamic)deflt, this.evaluationEnv));
                 }
 
-                var eqEnabled = this.solver.Iff(elt1.Item1, elt2.Item1);
-                var eqValues = this.Visit(innerType, (elt1.Item2, elt2.Item2));
-                var eqElements = this.solver.And(eqEnabled, this.solver.Or(this.solver.Not(elt1.Item1), eqValues));
-                result = this.solver.And(result, eqElements);
+                elts1[i] = elt1;
+                elts2[i] = elt2;
+                currentIndex1 = this.solver.Ite(elt1.Item1, this.solver.Add(currentIndex1, one), currentIndex1);
+                currentIndex2 = this.solver.Ite(elt2.Item1, this.solver.Add(currentIndex2, one), currentIndex2);
+                indices1[i] = currentIndex1;
+                indices2[i] = currentIndex2;
+            }
+
+            // check if the lists agree on all indices and have the same length.
+            var result = this.solver.Eq(currentIndex1, currentIndex2);
+            for (int i = 0; i < length; i++)
+            {
+                for (int j = 0; j < length; j++)
+                {
+                    var bothEnabled = this.solver.And(elts1[i].Item1, elts2[j].Item1);
+                    var eqIndices = this.solver.Eq(indices1[i], indices2[j]);
+                    var eqValues = this.Visit(innerType, (elts1[i].Item2, elts2[j].Item2));
+                    var implication = this.solver.Or(this.solver.Not(this.solver.And(bothEnabled, eqIndices)), eqValues);
+                    result = this.solver.And(result, implication);
+                }
             }
 
             return result;

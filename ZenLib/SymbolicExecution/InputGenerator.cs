@@ -42,7 +42,7 @@ namespace ZenLib.SymbolicExecution
             {
                 var assignment = ModelCheckerFactory.CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments).ModelCheck(input == e, emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
-                var env = new ExpressionEvaluatorEnvironment(assignment);
+                var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T2)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
@@ -76,7 +76,7 @@ namespace ZenLib.SymbolicExecution
                     .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
-                var env = new ExpressionEvaluatorEnvironment(assignment);
+                var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T3)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
@@ -112,7 +112,7 @@ namespace ZenLib.SymbolicExecution
                     .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
-                var env = new ExpressionEvaluatorEnvironment(assignment);
+                var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T4)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
@@ -150,7 +150,7 @@ namespace ZenLib.SymbolicExecution
                     .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
-                var env = new ExpressionEvaluatorEnvironment(assignment);
+                var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T5)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 

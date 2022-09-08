@@ -107,11 +107,7 @@ namespace ZenLib.ModelChecking
         /// <returns>A symbolic value.</returns>
         public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitConstMap(Type mapType, Type keyType, Type valueType, object parameter)
         {
-            if (!this.evaluationVisitor.MapConstants.TryGetValue(mapType, out var constants))
-            {
-                throw new ZenException("Unsupported const map operation detected");
-            }
-
+            var constants = this.evaluationVisitor.MapConstants[mapType];
             var arbitraryMethod = typeof(Zen).GetMethod("Symbolic").MakeGenericMethod(valueType);
 
             var assignment = new Dictionary<object, object>();

@@ -20,6 +20,14 @@ namespace ZenLib
         protected IDictionary<(long, TParam), TReturn> cache = new Dictionary<(long, TParam), TReturn>();
 
         /// <summary>
+        /// Visit a ApplyExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        public abstract TReturn VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a LogicalBinopExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -180,6 +188,14 @@ namespace ZenLib
         public abstract TReturn VisitSeqAt<T>(ZenSeqAtExpr<T> expression, TParam parameter);
 
         /// <summary>
+        /// Visit a ZenSeqNthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A return value.</returns>
+        public abstract TReturn VisitSeqNth<T>(ZenSeqNthExpr<T> expression, TParam parameter);
+
+        /// <summary>
         /// Visit a ZenSeqContainsExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -265,7 +281,7 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A return value.</returns>
-        public abstract TReturn VisitArgument<T>(ZenArgumentExpr<T> expression, TParam parameter);
+        public abstract TReturn VisitParameter<T>(ZenParameterExpr<T> expression, TParam parameter);
 
         /// <summary>
         /// Visit an ArbitraryExpr.

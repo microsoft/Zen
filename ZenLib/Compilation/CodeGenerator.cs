@@ -27,7 +27,7 @@ namespace ZenLib.Compilation
             int maxUnrollingDepth)
         {
             var env = new ExpressionConverterEnvironment(arguments);
-            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T>>(expr, new ParameterExpression[] { });
             return lambda.Compile();
         }
@@ -47,7 +47,7 @@ namespace ZenLib.Compilation
             int maxUnrollingDepth)
         {
             var env = new ExpressionConverterEnvironment(arguments);
-            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2>>(expr, new ParameterExpression[] { param1 });
             return lambda.Compile();
         }
@@ -69,7 +69,7 @@ namespace ZenLib.Compilation
             int maxUnrollingDepth)
         {
             var env = new ExpressionConverterEnvironment(arguments);
-            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3>>(expr, new ParameterExpression[] { param1, param2 });
             return lambda.Compile();
         }
@@ -93,7 +93,7 @@ namespace ZenLib.Compilation
             int maxUnrollingDepth)
         {
             var env = new ExpressionConverterEnvironment(arguments);
-            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4>>(expr, new ParameterExpression[] { param1, param2, param3 });
             return lambda.Compile();
         }
@@ -119,7 +119,7 @@ namespace ZenLib.Compilation
             int maxUnrollingDepth)
         {
             var env = new ExpressionConverterEnvironment(arguments);
-            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
+            var expr = CompileToBlock(expression, env, ImmutableDictionary<object, Expression>.Empty, ImmutableDictionary<object, Expression>.Empty, 0, maxUnrollingDepth);
             var lambda = Expression.Lambda<Func<T1, T2, T3, T4, T5>>(expr, new ParameterExpression[] { param1, param2, param3, param4 });
             return lambda.Compile();
         }
@@ -128,10 +128,11 @@ namespace ZenLib.Compilation
             Zen<T> zenExpression,
             ExpressionConverterEnvironment env,
             ImmutableDictionary<object, Expression> subexpressionCache,
+            ImmutableDictionary<object, Expression> lambdas,
             int currentMatchUnrollingDepth,
             int maxMatchUnrollingDepth)
         {
-            var converter = new ExpressionConverterVisitor(subexpressionCache, currentMatchUnrollingDepth, maxMatchUnrollingDepth);
+            var converter = new ExpressionConverterVisitor(subexpressionCache, lambdas, currentMatchUnrollingDepth, maxMatchUnrollingDepth);
             var expr = converter.Convert(zenExpression, env);
             converter.BlockExpressions.Add(expr);
             return Expression.Block(converter.Variables, converter.BlockExpressions.ToArray());

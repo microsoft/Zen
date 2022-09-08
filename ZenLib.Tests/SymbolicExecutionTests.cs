@@ -90,7 +90,7 @@ namespace ZenLib.Tests
         public void TestSymbolicExecutionFSeqFilter()
         {
             var f = new ZenFunction<FSeq<int>, FSeq<int>>(x => x.Where(e => e >= 4));
-            Assert.AreEqual(8, f.GenerateInputs(depth: 3).Count());
+            Assert.AreEqual(1, f.GenerateInputs(depth: 3).Count());
         }
 
         /// <summary>
@@ -99,8 +99,8 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionFSeqIndexOf()
         {
-            var f = new ZenFunction<FSeq<int>, short>(x => x.IndexOf(3));
-            Assert.AreEqual(6, f.GenerateInputs(depth: 5).Count());
+            var f = new ZenFunction<FSeq<int>, BigInteger>(x => x.IndexOf(3));
+            Assert.AreEqual(1, f.GenerateInputs(depth: 5).Count());
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestSymbolicExecutionFSeqCase()
         {
-            var f = new ZenFunction<bool, ushort>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
+            var f = new ZenFunction<bool, BigInteger>(b => Zen.If<FSeq<int>>(b, new FSeq<int>(1, 2), new FSeq<int>(3, 4, 5)).Length());
             Assert.AreEqual(2, f.GenerateInputs(depth: 5).Count());
         }
 

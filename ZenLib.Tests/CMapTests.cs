@@ -6,6 +6,8 @@ namespace ZenLib.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Numerics;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZenLib;
     using static ZenLib.Tests.TestHelper;
@@ -519,7 +521,7 @@ namespace ZenLib.Tests
         {
             var x = Zen.Symbolic<CMap<int, FSeq<int>>>();
             var y = Zen.Symbolic<CMap<int, FSeq<int>>>();
-            var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == 2).Solve();
+            var solution = Zen.And(x.Get(1).Contains(3), x.Get(1) == y.Get(1), y.Get(2).Length() == (BigInteger)2).Solve();
 
             Assert.IsTrue(solution.Get(x).Get(1).ToList().Contains(3));
             Assert.IsTrue(solution.Get(y).Get(1).ToList().Contains(3));
@@ -552,14 +554,15 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test maps fail with lists.
+        /// Test maps do not fail with lists.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ZenException))]
-        public void TestCMapInFSeqFail()
+        public void TestCMapInFSeqWorks()
         {
-            var zf = Zen.Constraint<CMap<string, int>, FSeq<int>>((m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4);
-            var res = zf.Find();
+            var res = Zen.Constraint<CMap<string, int>, FSeq<int>>(
+                (m, l) => l.Select(x => m.Get("a")).Fold<int, int>(0, Zen.Plus) == 4).Find();
+            Assert.IsTrue(res.HasValue);
+            Assert.IsTrue(res.Value.Item2.ToList().Count * res.Value.Item1.Get("a") == 4);
         }
 
         /// <summary>

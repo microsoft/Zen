@@ -16,6 +16,10 @@ namespace ZenLibBench
     /// </summary>
     class Program
     {
+        /// <summary>
+        /// Main entry point.
+        /// </summary>
+        /// <param name="args">Command line args.</param>
         static void Main(string[] args)
         {
             ZenSettings.UseLargeStack = true;
@@ -27,6 +31,9 @@ namespace ZenLibBench
             // BenchmarkAllocation();
         }
 
+        /// <summary>
+        /// Benchmark adding and removing from Set vs CSet.
+        /// </summary>
         private static void BenchmarkSets()
         {
             Benchmark("BenchmarkSets", 3, () =>
@@ -70,6 +77,9 @@ namespace ZenLibBench
             });
         }
 
+        /// <summary>
+        /// Benchmark comparison operations for BigIntegers.
+        /// </summary>
         private static void BenchmarkComparisons()
         {
             Benchmark(nameof(BenchmarkAllocation), 3, () =>
@@ -85,6 +95,9 @@ namespace ZenLibBench
             });
         }
 
+        /// <summary>
+        /// Benchmark building transformers.
+        /// </summary>
         private static void BenchmarkTransformers()
         {
             Benchmark(nameof(BenchmarkAllocation), 1, () =>
@@ -125,6 +138,9 @@ namespace ZenLibBench
             });
         }
 
+        /// <summary>
+        /// Benchmark to make sure transformer caching works.
+        /// </summary>
         private static void BenchmarkTransformerCache()
         {
             Benchmark(nameof(BenchmarkAllocation), 20000, () =>
@@ -135,6 +151,9 @@ namespace ZenLibBench
             });
         }
 
+        /// <summary>
+        /// Benchmark a large ACL with BDDs.
+        /// </summary>
         private static void BenchmarkAllocation()
         {
             Benchmark(nameof(BenchmarkAllocation), 30, () =>
@@ -147,6 +166,12 @@ namespace ZenLibBench
             });
         }
 
+        /// <summary>
+        /// Run a benchmark many times.
+        /// </summary>
+        /// <param name="name">The benchmark name.</param>
+        /// <param name="iterations">How many times to run.</param>
+        /// <param name="action">The benchmark action.</param>
         private static void Benchmark(string name, int iterations, Action action)
         {
             var timer = System.Diagnostics.Stopwatch.StartNew();

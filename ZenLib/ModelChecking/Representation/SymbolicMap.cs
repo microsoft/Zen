@@ -47,7 +47,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symdict>";
+            return $"<symmap>={this.Value}";
         }
     }
 }

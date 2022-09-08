@@ -1159,6 +1159,42 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Apply a lambda to an argument.
+        /// </summary>
+        /// <param name="lambda">A lambda function.</param>
+        /// <param name="argument">The function argument.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<TDst> Apply<TSrc, TDst>(this ZenLambda<TSrc, TDst> lambda, Zen<TSrc> argument)
+        {
+            Contract.AssertNotNull(argument);
+
+            return ZenApplyExpr<TSrc, TDst>.Create(lambda, argument);
+        }
+
+        /// <summary>
+        /// Create an uninitialized lambda function.
+        /// </summary>
+        /// <returns>Zen lambda.</returns>
+        public static ZenLambda<TSrc, TDst> Lambda<TSrc, TDst>()
+        {
+            return new ZenLambda<TSrc, TDst>();
+        }
+
+        /// <summary>
+        /// Create an initialized lambda function.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        /// <returns>Zen lambda.</returns>
+        public static ZenLambda<TSrc, TDst> Lambda<TSrc, TDst>(Func<Zen<TSrc>, Zen<TDst>> function)
+        {
+            Contract.AssertNotNull(function);
+
+            var lambda = new ZenLambda<TSrc, TDst>();
+            lambda.Initialize(function);
+            return lambda;
+        }
+
+        /// <summary>
         /// Get a field from a Zen value.
         /// </summary>
         /// <param name="expr">Zen object expression.</param>
@@ -1361,11 +1397,11 @@ namespace ZenLib
         /// Solves for an assignment to Arbitrary variables in a boolean expression.
         /// </summary>
         /// <param name="expr">The boolean expression.</param>
-        /// <param name="backend">The solver backend to use.</param>
+        /// <param name="solverType">The solver type to use.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType backend = Solver.SolverType.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType solverType = Solver.SolverType.Z3)
         {
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), backend));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), solverType));
             return new ZenSolution(model);
         }
 
@@ -1771,7 +1807,7 @@ namespace ZenLib
             }
 
             var solution = constraints.Solve();
-            var environment = new ExpressionEvaluatorEnvironment(solution.VariableAssignment);
+            var environment = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(solution.VariableAssignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, environment);
         }

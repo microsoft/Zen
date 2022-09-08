@@ -47,7 +47,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symseq>";
+            return $"<symseq>={this.Value}";
         }
     }
 }

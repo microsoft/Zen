@@ -5,6 +5,7 @@
 namespace ZenLib.ModelChecking
 {
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using DecisionDiagrams;
     using Microsoft.Z3;
     using ZenLib.Solver;
@@ -41,7 +42,8 @@ namespace ZenLib.ModelChecking
         private static IModelChecker CreateModelCheckerDD(Zen<bool> expression, Dictionary<long, object> arguments)
         {
             var heuristic = new InterleavingHeuristicVisitor();
-            var mustInterleave = heuristic.GetInterleavedVariables(expression, arguments);
+            var args = ImmutableDictionary<long, object>.Empty.AddRange(arguments);
+            var mustInterleave = heuristic.GetInterleavedVariables(expression, args);
             var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             solver.Init();

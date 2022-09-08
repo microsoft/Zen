@@ -137,8 +137,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestMapEqualsEmpty()
         {
-            var zf = new ZenConstraint<Map<int, int>>(d => d == Map.Empty<int, int>());
-            var result = zf.Find();
+            var result = Zen.Find<Map<int, int>>(d => d == Map.Empty<int, int>());
 
             Assert.AreEqual(0, result.Value.Count());
         }

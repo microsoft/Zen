@@ -17,12 +17,12 @@ namespace ZenLib
         /// <summary>
         /// The visited nodes.
         /// </summary>
-        private ISet<long> visited = new HashSet<long>();
+        internal ISet<long> Visited = new HashSet<long>();
 
         /// <summary>
         /// The argument mapping.
         /// </summary>
-        private Dictionary<long, object> arguments;
+        internal Dictionary<long, object> Arguments;
 
         /// <summary>
         /// Creates a new instance of the <see cref="ZenExprActionVisitor"/> class.
@@ -30,22 +30,33 @@ namespace ZenLib
         /// <param name="arguments"></param>
         protected ZenExprActionVisitor(Dictionary<long, object> arguments)
         {
-            this.arguments = arguments;
+            this.Arguments = arguments;
         }
 
         /// <summary>
         /// Execute the visitor.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        public void VisitCached<T>(Zen<T> expression)
+        public virtual void VisitCached<T>(Zen<T> expression)
         {
-            if (this.visited.Contains(expression.Id))
+            if (this.Visited.Contains(expression.Id))
             {
                 return;
             }
 
-            this.visited.Add(expression.Id);
+            this.Visited.Add(expression.Id);
             expression.Accept(this);
+        }
+
+        /// <summary>
+        /// Visit a ApplyExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public virtual void Visit<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression)
+        {
+            VisitCached(expression.ArgumentExpr);
+            VisitCached(expression.Lambda.Body);
         }
 
         /// <summary>
@@ -140,7 +151,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         public virtual void Visit<T>(ZenFSeqAddFrontExpr<T> expression)
         {
-            VisitCached(expression.Expr);
+            VisitCached(expression.ListExpr);
             VisitCached(expression.ElementExpr);
         }
 
@@ -217,9 +228,9 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         public virtual void Visit<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression)
         {
-            // TODO: how to handle cons case.
             VisitCached(expression.ListExpr);
             VisitCached(expression.EmptyExpr);
+            VisitCached(expression.ConsLambda.Body);
         }
 
         /// <summary>
@@ -259,6 +270,17 @@ namespace ZenLib
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
         public virtual void Visit<T>(ZenSeqAtExpr<T> expression)
+        {
+            VisitCached(expression.SeqExpr);
+            VisitCached(expression.IndexExpr);
+        }
+
+        /// <summary>
+        /// Visit a ZenSeqNthExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public virtual void Visit<T>(ZenSeqNthExpr<T> expression)
         {
             VisitCached(expression.SeqExpr);
             VisitCached(expression.IndexExpr);
@@ -394,16 +416,16 @@ namespace ZenLib
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>A return value.</returns>
-        public virtual void Visit<T>(ZenArgumentExpr<T> expression)
+        public virtual void Visit<T>(ZenParameterExpr<T> expression)
         {
-            if (!this.arguments.ContainsKey(expression.Id))
+            if (!this.Arguments.ContainsKey(expression.Id))
             {
                 return;
             }
 
             try
             {
-                var expr = this.arguments[expression.ArgumentId];
+                var expr = this.Arguments[expression.ParameterId];
                 var type = expr.GetType().BaseType.GetGenericArgumentsCached()[0];
                 var evaluateMethod = this.GetType()
                     .GetMethodCached("VisitCached")

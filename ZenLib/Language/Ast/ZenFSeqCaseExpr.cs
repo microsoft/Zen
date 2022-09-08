@@ -23,9 +23,9 @@ namespace ZenLib
         public Zen<TResult> EmptyExpr { get; }
 
         /// <summary>
-        /// Gets the element to add.
+        /// Gets the cons lambda.
         /// </summary>
-        public Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> ConsCase { get; }
+        public ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> ConsLambda { get; }
 
         /// <summary>
         /// Simplify and create a new ZenListCaseExpr.
@@ -34,7 +34,7 @@ namespace ZenLib
         /// <param name="emptyCase">The empty case.</param>
         /// <param name="consCase">The cons case.</param>
         /// <returns></returns>
-        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> consCase)
+        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> consCase)
         {
             if (e is ZenFSeqEmptyExpr<T>)
             {
@@ -43,7 +43,7 @@ namespace ZenLib
 
             if (e is ZenFSeqAddFrontExpr<T> l2)
             {
-                return consCase(l2.ElementExpr, l2.Expr);
+                return consCase.Function(Pair.Create(l2.ElementExpr, l2.ListExpr));
             }
 
             return new ZenFSeqCaseExpr<T, TResult>(e, emptyCase, consCase);
@@ -59,7 +59,7 @@ namespace ZenLib
         public static Zen<TResult> Create(
             Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)
+            ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> cons)
         {
             Contract.AssertNotNull(listExpr);
             Contract.AssertNotNull(empty);
@@ -77,11 +77,11 @@ namespace ZenLib
         private ZenFSeqCaseExpr(
             Zen<FSeq<T>> listExpr,
             Zen<TResult> empty,
-            Func<Zen<Option<T>>, Zen<FSeq<T>>, Zen<TResult>> cons)
+            ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> cons)
         {
             this.ListExpr = listExpr;
             this.EmptyExpr = empty;
-            this.ConsCase = cons;
+            this.ConsLambda = cons;
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Case({this.ListExpr}, {this.EmptyExpr}, <lambda>)";
+            return $"Case({this.ListExpr}, {this.EmptyExpr}, <lambda>={this.ConsLambda.GetHashCode()})";
         }
 
         /// <summary>

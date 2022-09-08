@@ -26,10 +26,10 @@ namespace ZenLib
         /// </summary>
         public readonly static Type UnicodeSequenceType = typeof(Seq<char>);
 
-        /// <summary>
+        /* /// <summary>
         /// The type of finite string values.
         /// </summary>
-        public readonly static Type FiniteStringType = typeof(FString);
+        public readonly static Type FiniteStringType = typeof(FString); */
 
         /// <summary>
         /// The type of set unit values.

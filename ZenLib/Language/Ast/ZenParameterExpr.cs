@@ -1,4 +1,4 @@
-﻿// <copyright file="ZenArgumentExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenParameterExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -11,19 +11,19 @@ namespace ZenLib
     /// A function argument placeholder expression..
     /// </summary>
     /// <typeparam name="T">Type of an underlying C# value.</typeparam>
-    internal sealed class ZenArgumentExpr<T> : Zen<T>
+    internal sealed class ZenParameterExpr<T> : Zen<T>
     {
         /// <summary>
         /// Gets the unique id for the object.
         /// </summary>
-        public long ArgumentId { get; }
+        public long ParameterId { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZenArgumentExpr{T}"/> class.
+        /// Initializes a new instance of the <see cref="ZenParameterExpr{T}"/> class.
         /// </summary>
-        public ZenArgumentExpr()
+        public ZenParameterExpr()
         {
-            this.ArgumentId = Interlocked.Increment(ref ZenArgumentId.nextId);
+            this.ParameterId = Interlocked.Increment(ref ZenArgumentId.nextId);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ZenLib
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return $"Arg({this.ArgumentId})";
+            return $"Param({this.ParameterId})";
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace ZenLib
         /// <returns>A return value.</returns>
         internal override TReturn Accept<TParam, TReturn>(ZenExprVisitor<TParam, TReturn> visitor, TParam parameter)
         {
-            return visitor.VisitArgument(this, parameter);
+            return visitor.VisitParameter(this, parameter);
         }
 
         /// <summary>

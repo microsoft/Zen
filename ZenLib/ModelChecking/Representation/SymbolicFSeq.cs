@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using ZenLib.Solver;
 
     /// <summary>
@@ -51,7 +52,7 @@ namespace ZenLib.ModelChecking
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return "<symlist>";
+            return $"<symlist>=[{string.Join(",", this.Value.Select(x => x.ToString()))}]";
         }
     }
 }

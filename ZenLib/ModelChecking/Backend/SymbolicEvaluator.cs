@@ -4,8 +4,8 @@
 
 namespace ZenLib.ModelChecking
 {
-    using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using ZenLib.Interpretation;
     using ZenLib.Solver;
 
@@ -76,7 +76,7 @@ namespace ZenLib.ModelChecking
                 return Option.None<T>();
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             var result = (T)interpreter.Visit(input, interpreterEnv);
             return Option.Some(result);
@@ -107,7 +107,7 @@ namespace ZenLib.ModelChecking
                 return Option.None<(T1, T2)>();
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);
@@ -140,7 +140,7 @@ namespace ZenLib.ModelChecking
                 return Option.None<(T1, T2, T3)>();
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);
@@ -176,7 +176,7 @@ namespace ZenLib.ModelChecking
                 return Option.None<(T1, T2, T3, T4)>();
             }
 
-            var interpreterEnv = new ExpressionEvaluatorEnvironment(assignment);
+            var interpreterEnv = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             var result1 = (T1)interpreter.Visit(input1, interpreterEnv);
             var result2 = (T2)interpreter.Visit(input2, interpreterEnv);

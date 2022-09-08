@@ -23,10 +23,10 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestFind()
         {
-            var a = Zen.Constraint<int>(x => x == 11).Find();
-            var b = Zen.Constraint<int, int>((x, y) => And(x == 11, y == 11)).Find();
-            var c = Zen.Constraint<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11)).Find();
-            var d = Zen.Constraint<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11)).Find();
+            var a = Zen.Find<int>(x => x == 11);
+            var b = Zen.Find<int, int>((x, y) => And(x == 11, y == 11));
+            var c = Zen.Find<int, int, int>((x, y, z) => And(x == 11, y == 11, z == 11));
+            var d = Zen.Find<int, int, int, int>((w, x, y, z) => And(w == 11, x == 11, y == 11, z == 11));
 
             Assert.AreEqual(11, a.Value);
             Assert.AreEqual(11, b.Value.Item1);

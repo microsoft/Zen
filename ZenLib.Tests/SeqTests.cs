@@ -240,6 +240,34 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test seq evaluation with at.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqNth()
+        {
+            var zf = new ZenFunction<Seq<int>, BigInteger, int>((s, i) => s.Nth(i));
+
+            Assert.AreEqual(0, zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(1, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(2, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(0, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(0, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+
+            zf.Compile();
+            Assert.AreEqual(0, zf.Evaluate(empty, new BigInteger(1)));
+            Assert.AreEqual(1, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(0)));
+            Assert.AreEqual(2, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(1)));
+            Assert.AreEqual(0, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(2)));
+            Assert.AreEqual(0, zf.Evaluate(empty.Concat(one).Concat(two), new BigInteger(-1)));
+
+            Assert.AreEqual(0, empty.Nth(1));
+            Assert.AreEqual(1, empty.Concat(one).Concat(two).Nth(0));
+            Assert.AreEqual(2, empty.Concat(one).Concat(two).Nth(1));
+            Assert.AreEqual(0, empty.Concat(one).Concat(two).Nth(2));
+            Assert.AreEqual(0, empty.Concat(one).Concat(two).Nth(-1));
+        }
+
+        /// <summary>
         /// Test seq evaluation with contains.
         /// </summary>
         [TestMethod]
@@ -561,6 +589,18 @@ namespace ZenLib.Tests
 
             result = new ZenConstraint<Seq<int>>(s => s.At(new BigInteger(2)) == Seq.Empty<int>()).Find();
             Assert.IsTrue(result.Value.Length() < 3 || result.Value.At(2) == new Seq<int>());
+        }
+
+        /// <summary>
+        /// Test seq find with nth.
+        /// </summary>
+        [TestMethod]
+        public void TestSeqFindNth()
+        {
+            var result = new ZenConstraint<Seq<int>>(s => And(s.Length() > (BigInteger)2, s.Nth(new BigInteger(2)) == 2)).Find();
+            Assert.IsTrue(result.HasValue);
+            Assert.IsTrue(result.Value.Length() > 2);
+            Assert.IsTrue(result.Value.Nth(2) == 2);
         }
 
         /// <summary>

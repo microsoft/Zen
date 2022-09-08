@@ -327,6 +327,31 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Get the value at a given index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The value at the index.</returns>
+        public T Nth(int index)
+        {
+            if (index >= this.Values.Count || index < 0)
+            {
+                return default(T);
+            }
+
+            return this.Values[index];
+        }
+
+        /// <summary>
+        /// Get the value at a given index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The value at the index.</returns>
+        internal T NthBigInteger(BigInteger index)
+        {
+            return Nth(int.Parse(index.ToString()));
+        }
+
+        /// <summary>
         /// Length of the sequence.
         /// </summary>
         /// <returns>The length as an integer.</returns>
@@ -544,6 +569,20 @@ namespace ZenLib
             Contract.AssertNotNull(indexExpr);
 
             return ZenSeqAtExpr<T>.Create(seqExpr, indexExpr);
+        }
+
+        /// <summary>
+        /// Gets the value at the given index, or any value if out of bounds.
+        /// </summary>
+        /// <param name="seqExpr">The sequence expr.</param>
+        /// <param name="indexExpr">The index expr.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<T> Nth<T>(this Zen<Seq<T>> seqExpr, Zen<BigInteger> indexExpr)
+        {
+            Contract.AssertNotNull(seqExpr);
+            Contract.AssertNotNull(indexExpr);
+
+            return ZenSeqNthExpr<T>.Create(seqExpr, indexExpr);
         }
 
         /// <summary>

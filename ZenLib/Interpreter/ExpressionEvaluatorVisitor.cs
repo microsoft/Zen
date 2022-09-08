@@ -71,6 +71,18 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
+        public override object VisitApply<TSrc, TDst>(ZenApplyExpr<TSrc, TDst> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e = (TSrc)this.Visit(expression.ArgumentExpr, parameter);
+            return (TDst)this.Visit(expression.Lambda.Body, parameter.AddBinding(expression.Lambda.Parameter.ParameterId, e).SetInLambda());
+        }
+
+        /// <summary>
+        /// Visit a Zen expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>The C# object.</returns>
         public override object VisitLogicalBinop(ZenLogicalBinopExpr expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (bool)this.Visit(expression.Expr1, parameter);
@@ -92,9 +104,9 @@ namespace ZenLib.Interpretation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The environment.</param>
         /// <returns>The C# object.</returns>
-        public override object VisitArgument<T>(ZenArgumentExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        public override object VisitParameter<T>(ZenParameterExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            return parameter.ArgumentAssignment[expression.ArgumentId];
+            return parameter.ArgumentAssignment[expression.ParameterId];
         }
 
         /// <summary>
@@ -290,10 +302,11 @@ namespace ZenLib.Interpretation
         public override object VisitIf<T>(ZenIfExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
             var e1 = (bool)this.Visit(expression.GuardExpr, parameter);
+            var track = this.trackBranches && !parameter.InLambda;
 
             if (e1)
             {
-                if (this.trackBranches)
+                if (track)
                 {
                     this.PathConstraint = this.PathConstraint.Add(expression.GuardExpr);
                 }
@@ -302,7 +315,7 @@ namespace ZenLib.Interpretation
             }
             else
             {
-                if (this.trackBranches)
+                if (track)
                 {
                     this.PathConstraint = this.PathConstraint.Add(ZenNotExpr.Create(expression.GuardExpr));
                 }
@@ -460,7 +473,7 @@ namespace ZenLib.Interpretation
         /// <returns>The C# object.</returns>
         public override object VisitListAdd<T>(ZenFSeqAddFrontExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
         {
-            var e1 = (FSeq<T>)this.Visit(expression.Expr, parameter);
+            var e1 = (FSeq<T>)this.Visit(expression.ListExpr, parameter);
             var e2 = (Option<T>)this.Visit(expression.ElementExpr, parameter);
             return e1.AddFrontOption(e2);
         }
@@ -477,30 +490,15 @@ namespace ZenLib.Interpretation
 
             if (e.Count() == 0)
             {
-                if (this.trackBranches)
-                {
-                    this.PathConstraint.Add(expression.ListExpr.IsEmpty());
-                }
-
                 return this.Visit(expression.EmptyExpr, parameter);
             }
             else
             {
                 var (hd, tl) = CommonUtilities.SplitHead(e);
-                var argHd = new ZenArgumentExpr<Option<T>>();
-                var argTl = new ZenArgumentExpr<FSeq<T>>();
-                parameter.ArgumentAssignment[argHd.ArgumentId] = hd;
-                parameter.ArgumentAssignment[argTl.ArgumentId] = tl;
-
-                if (this.trackBranches)
-                {
-                    this.PathConstraint.Add(Zen.Not(expression.ListExpr.IsEmpty()));
-                    this.PathConstraintSymbolicEnvironment[argHd.ArgumentId] = expression.ListExpr.Head();
-                    this.PathConstraintSymbolicEnvironment[argTl.ArgumentId] = expression.ListExpr.Tail();
-                }
-
-                var c = expression.ConsCase.Invoke(argHd, argTl);
-                return (TResult)this.Visit(c, parameter);
+                var parameterId = expression.ConsLambda.Parameter.ParameterId;
+                return (TResult)this.Visit(
+                    expression.ConsLambda.Body,
+                    parameter.AddBinding(parameterId, new Pair<Option<T>, FSeq<T>>(hd, tl)).SetInLambda());
             }
         }
 
@@ -664,6 +662,19 @@ namespace ZenLib.Interpretation
             var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
             var e2 = (BigInteger)this.Visit(expression.IndexExpr, parameter);
             return e1.AtBigInteger(e2);
+        }
+
+        /// <summary>
+        /// Visit a Zen expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>The C# object.</returns>
+        public override object VisitSeqNth<T>(ZenSeqNthExpr<T> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = (Seq<T>)this.Visit(expression.SeqExpr, parameter);
+            var e2 = (BigInteger)this.Visit(expression.IndexExpr, parameter);
+            return e1.NthBigInteger(e2);
         }
 
         /// <summary>

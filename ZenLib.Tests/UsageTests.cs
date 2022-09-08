@@ -1057,7 +1057,7 @@ namespace ZenLib.Tests
         public void TestSingletonException()
         {
             Zen<int> x = null;
-            FSeq.Create(x);
+            FSeq.Singleton(x);
         }
 
         /// <summary>
@@ -1288,7 +1288,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestExactSeqs()
         {
-            var f = new ZenFunction<FSeq<int>, ushort>(l => l.Length());
+            var f = new ZenFunction<FSeq<int>, BigInteger>(l => l.Length());
             f.Find((i, o) => true);
         }
 
