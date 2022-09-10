@@ -104,7 +104,7 @@ namespace ZenLib.Tests
             Assert.AreEqual(5, searchResults.Length);
             for (int i = 0; i < 5; i++)
             {
-                Assert.AreEqual(i, searchResults[i].Depth);
+                Assert.AreEqual(i + 1, searchResults[i].Depth);
             }
 
             foreach (var result in searchResults)
