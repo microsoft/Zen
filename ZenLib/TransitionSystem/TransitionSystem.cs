@@ -32,9 +32,9 @@ namespace ZenLib.TransitionSystem
         public Func<Zen<T>, Zen<T>, Zen<bool>> NextRelation { get; set; }
 
         /// <summary>
-        /// The safety checks to run.
+        /// The specification to check.
         /// </summary>
-        public Func<Zen<T>, Zen<bool>> SafetyChecks { get; set; }
+        public Spec<T> Specification { get; set; }
 
         /// <summary>
         /// Model check the transition system.
@@ -65,7 +65,7 @@ namespace ZenLib.TransitionSystem
                 var trace = task.Result;
                 if (trace == null)
                 {
-                    // if k-induction is enabled, check if we can prove safety.
+                    /* // if k-induction is enabled, check if we can prove safety.
                     if (useKInduction && k > 1)
                     {
                         // run the k-induction check.
@@ -84,7 +84,7 @@ namespace ZenLib.TransitionSystem
                             yield return new SearchResult<T>(k, SearchOutcome.SafetyProof, null, stats);
                             yield break;
                         }
-                    }
+                    } */
 
                     // we have neither found a counterexample nor a proof of safety, so continue.
                     yield return new SearchResult<T>(k, SearchOutcome.NoCounterExample, null, stats);
@@ -108,35 +108,86 @@ namespace ZenLib.TransitionSystem
             Contract.Assert(depth >= 1);
 
             // create one symbolic variable for each step.
-            var states = new Zen<T>[depth];
+            var states = new Zen<T>[depth + 1];
             var constraints = new List<Zen<bool>>();
-            for (int i = 0; i < depth; i++)
+            for (int i = 0; i <= depth; i++)
             {
                 states[i] = Zen.Symbolic<T>();
             }
 
             // enforce the safety and initial state invariants.
             constraints.Add(this.InitialStates(states[0]));
-            for (int i = 0; i < depth; i++)
+            for (int i = 0; i <= depth; i++)
             {
                 constraints.Add(this.Invariants(states[i]));
             }
 
             // enforce the next state relations.
-            for (int i = 0; i < depth - 1; i++)
+            for (int i = 0; i <= depth - 1; i++)
             {
                 constraints.Add(this.NextRelation(states[i], states[i + 1]));
             }
 
-            // try to find a safety violation.
-            constraints.Add(Zen.Not(this.SafetyChecks(states[depth - 1])));
+            var c = Zen.And(constraints);
 
-            // solve the problem and return a trace if there is a violation.
-            var solution = Zen.And(constraints).Solve();
-            return solution.IsSatisfiable() ? states.Select(solution.Get).ToArray() : null;
+            // try to find a violation of the spec without loops.
+            var withoutLoop = Zen.And(c, this.EncodeSpecWithoutLoops(states, states.Length - 2));
+            var solutionNoLoop = withoutLoop.Solve();
+            if (solutionNoLoop.IsSatisfiable())
+            {
+                return states.Select(solutionNoLoop.Get).SkipLast(1).ToArray();
+            }
+
+            // try with loops now.
+            var withLoop = Zen.And(c, this.EncodeSpecWithLoop(states, states.Length - 2));
+            var solutionLoop = withLoop.Solve();
+            if (solutionLoop.IsSatisfiable())
+            {
+                return states.Select(solutionLoop.Get).ToArray();
+            }
+
+            // there is no counter example.
+            return null;
         }
 
         /// <summary>
+        /// Encodes the specification.
+        /// </summary>
+        /// <returns>A symbolic boolean.</returns>
+        private Zen<bool> EncodeSpecWithoutLoops(Zen<T>[] states, int k)
+        {
+            Contract.Assert(k < states.Length);
+
+            var spec = Spec.Not(this.Specification).Nnf();
+            var result = Zen.False();
+            for (int l = 0; l <= k; l++)
+            {
+                result = Zen.Or(result, states[k + 1] == states[l]);
+            }
+
+            return Zen.And(Zen.Not(result), spec.EncodeLoopFree(states, 0, k));
+        }
+
+        /// <summary>
+        /// Encodes the specification.
+        /// </summary>
+        /// <returns>A symbolic boolean.</returns>
+        private Zen<bool> EncodeSpecWithLoop(Zen<T>[] states, int k)
+        {
+            Contract.Assert(k < states.Length);
+
+            var spec = Spec.Not(this.Specification).Nnf();
+
+            var result = Zen.False();
+            for (int l = 0; l <= k; l++)
+            {
+                result = Zen.Or(result, Zen.And(states[k + 1] == states[l], spec.EncodeLoop(states, l, 0, k)));
+            }
+
+            return result;
+        }
+
+        /* /// <summary>
         /// Check if the property is true from any initial state after k steps.
         /// </summary>
         /// <param name="depth">The number of transition steps.</param>
@@ -177,6 +228,6 @@ namespace ZenLib.TransitionSystem
             // if there is no example of this, then we have safety.
             var solution = Zen.And(constraints).Solve();
             return !solution.IsSatisfiable();
-        }
+        } */
     }
 }

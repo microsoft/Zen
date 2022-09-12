@@ -4,6 +4,7 @@
 
 namespace ZenLib.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,20 +19,22 @@ namespace ZenLib.Tests
     public class TransitionSystemTests
     {
         /// <summary>
-        /// Test that a basic transition system works.
+        /// Test that the always specification works.
         /// </summary>
         [TestMethod]
-        public void TestTransitionSystemBasic()
+        public void TestTransitionSystemAlways()
         {
             var ts = new TransitionSystem<uint>
             {
                 InitialStates = (s) => s <= 100,
                 Invariants = (s) => true,
                 NextRelation = (sOld, sNew) => sNew == sOld + 1,
-                SafetyChecks = (s) => s < 105,
+                Specification = Spec.Always(Spec.Predicate<uint>(s => s < 105)),
             };
 
             var searchResults = ts.ModelCheck(2000).ToArray();
+
+            Console.WriteLine(string.Join(",", searchResults.Last().CounterExample.Select(x => x.ToString())));
 
             Assert.AreEqual(6, searchResults.Length);
             for (int i = 0; i < 5; i++)
@@ -40,9 +43,87 @@ namespace ZenLib.Tests
             }
             Assert.IsTrue(searchResults[5].SearchOutcome == SearchOutcome.CounterExample);
             Assert.IsTrue(searchResults[5].CounterExample != null);
+            Assert.IsTrue(searchResults[5].CounterExample.Length == 6);
         }
 
         /// <summary>
+        /// Test that the always specification works.
+        /// </summary>
+        [TestMethod]
+        public void TestTransitionSystemEventually()
+        {
+            var ts = new TransitionSystem<uint>
+            {
+                InitialStates = (s) => s == 0,
+                Invariants = (s) => true,
+                NextRelation = (sOld, sNew) => sNew == Zen.If(sOld == 1, 0, sOld + 1),
+                Specification = Spec.Eventually(Spec.Predicate<uint>(s => s == 3)),
+            };
+
+            var searchResults = ts.ModelCheck(2000).ToArray();
+
+            Assert.AreEqual(2, searchResults.Length);
+            Assert.IsTrue(searchResults.Last().SearchOutcome == SearchOutcome.CounterExample);
+            Assert.IsTrue(searchResults.Last().CounterExample != null);
+            Assert.IsTrue(searchResults.Last().CounterExample[0] == 0);
+            Assert.IsTrue(searchResults.Last().CounterExample[1] == 1);
+            Assert.IsTrue(searchResults.Last().CounterExample[2] == 0);
+            Assert.IsTrue(searchResults.Last().CounterExample.Length == 3);
+        }
+
+        /// <summary>
+        /// Test that the always specification works.
+        /// </summary>
+        [TestMethod]
+        public void TestTransitionSystemPredicate()
+        {
+            var ts = new TransitionSystem<uint>
+            {
+                InitialStates = (s) => s == 0,
+                Invariants = (s) => true,
+                NextRelation = (sOld, sNew) => sNew == sOld + 1,
+                Specification = Spec.Predicate<uint>(s => s == 0),
+            };
+
+            var searchResults = ts.ModelCheck(2000).Take(3).ToArray();
+            Assert.AreEqual(3, searchResults.Length);
+            Assert.IsTrue(searchResults.Last().SearchOutcome == SearchOutcome.NoCounterExample);
+            Assert.IsTrue(searchResults.Last().CounterExample == null);
+        }
+
+        /// <summary>
+        /// Test that the always specification works.
+        /// </summary>
+        [TestMethod]
+        public void TestTransitionSystemAlwaysEventually()
+        {
+            var ts = new TransitionSystem<Pair<bool, uint>>
+            {
+                InitialStates = (s) => s == new Pair<bool, uint>(false, 0),
+                Invariants = (s) => true,
+                NextRelation = (sOld, sNew) =>
+                {
+                    var item1 = Zen.Or(sOld.Item1(), sOld.Item2() >= 2);
+                    var item2 = Zen.If(sOld.Item1(), 0, sOld.Item2() + 1);
+                    return sNew == Pair.Create(item1, item2);
+                },
+                Specification = Spec.Always(Spec.Eventually(Spec.Predicate<Pair<bool, uint>>(s => s.Item2() == 1))),
+            };
+
+            var searchResults = ts.ModelCheck(2000).ToArray();
+            Assert.AreEqual(5, searchResults.Length);
+            Assert.IsTrue(searchResults.Last().SearchOutcome == SearchOutcome.CounterExample);
+
+            var counterExample = searchResults.Last().CounterExample;
+            Assert.AreEqual(new Pair<bool, uint>(false, 0), counterExample[0]);
+            Assert.AreEqual(new Pair<bool, uint>(false, 1), counterExample[1]);
+            Assert.AreEqual(new Pair<bool, uint>(false, 2), counterExample[2]);
+            Assert.AreEqual(new Pair<bool, uint>(true, 3), counterExample[3]);
+            Assert.AreEqual(new Pair<bool, uint>(true, 0), counterExample[4]);
+            Assert.AreEqual(new Pair<bool, uint>(true, 0), counterExample[5]);
+        }
+
+        /* /// <summary>
         /// Test that k-induction works.
         /// </summary>
         [TestMethod]
@@ -53,7 +134,7 @@ namespace ZenLib.Tests
                 InitialStates = (s) => s <= 100,
                 Invariants = (s) => true,
                 NextRelation = (sOld, sNew) => sNew == Zen.If(sOld < 200, sOld + 1, 0),
-                SafetyChecks = (s) => s <= 200,
+                Specification = Spec.Always(Spec.Predicate<uint>(s => s <= 200)),
             };
 
             var searchResults = ts.ModelCheck(2000, useKInduction: true).ToArray();
@@ -63,7 +144,7 @@ namespace ZenLib.Tests
             Assert.IsTrue(searchResults[0].CounterExample == null);
             Assert.IsTrue(searchResults[1].SearchOutcome == SearchOutcome.SafetyProof);
             Assert.IsTrue(searchResults[1].CounterExample == null);
-        }
+        } */
 
         /// <summary>
         /// Test that timeouts work.
@@ -76,7 +157,7 @@ namespace ZenLib.Tests
                 InitialStates = (s) => s <= 100,
                 Invariants = (s) => true,
                 NextRelation = (sOld, sNew) => sNew == sOld + 1,
-                SafetyChecks = (s) => s <= 100000,
+                Specification = Spec.Always(Spec.Predicate<uint>(s => s <= 100000)),
             };
 
             var searchResults = ts.ModelCheck(timeoutMs: 10).ToArray();
@@ -96,7 +177,7 @@ namespace ZenLib.Tests
                 InitialStates = (s) => s <= 100,
                 Invariants = (s) => true,
                 NextRelation = (sOld, sNew) => sNew == sOld + 1,
-                SafetyChecks = (s) => s <= 100000,
+                Specification = Spec.Always(Spec.Predicate<uint>(s => s <= 100000)),
             };
 
             var searchResults = ts.ModelCheck().Take(5).ToArray();
@@ -114,7 +195,7 @@ namespace ZenLib.Tests
             }
         }
 
-        /// <summary>
+        /* /// <summary>
         /// Test that invariants work.
         /// </summary>
         [TestMethod]
@@ -125,7 +206,7 @@ namespace ZenLib.Tests
                 InitialStates = (s) => true,
                 Invariants = (s) => s <= 100,
                 NextRelation = (sOld, sNew) => sNew == sOld + 1,
-                SafetyChecks = (s) => s <= 200,
+                Specification = Spec.Always(Spec.Predicate<uint>(s => s <= 200)),
             };
 
             var searchResults = ts.ModelCheck(useKInduction: true).ToArray();
@@ -135,6 +216,6 @@ namespace ZenLib.Tests
             Assert.IsTrue(searchResults[0].CounterExample == null);
             Assert.IsTrue(searchResults[1].SearchOutcome == SearchOutcome.SafetyProof);
             Assert.IsTrue(searchResults[1].CounterExample == null);
-        }
+        } */
     }
 }
