@@ -429,7 +429,19 @@ namespace ZenLib
         /// <returns></returns>
         public static bool IsZenType(Type type)
         {
-            return type.IsGenericType && !typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached());
+            if (type.IsGenericType && typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached()))
+            {
+                return true;
+            }
+
+            if (type.BaseType == null)
+            {
+                return false;
+            }
+
+            return type.BaseType.IsGenericType && typeof(Zen<>).IsAssignableFrom(type.BaseType.GetGenericTypeDefinitionCached());
+            // return type.BaseType.Name == "Zen`1";
+            // return type.IsGenericType && !typeof(Zen<>).IsAssignableFrom(type.GetGenericTypeDefinitionCached());
         }
 
         /// <summary>

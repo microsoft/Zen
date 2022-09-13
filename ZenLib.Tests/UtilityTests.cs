@@ -116,6 +116,24 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that check zen types works.
+        /// </summary>
+        [TestMethod]
+        public void TestIsZenType()
+        {
+            Assert.IsFalse(ReflectionUtilities.IsZenType(typeof(int)));
+            Assert.IsFalse(ReflectionUtilities.IsZenType(typeof(string)));
+            Assert.IsFalse(ReflectionUtilities.IsZenType(typeof(object)));
+            Assert.IsFalse(ReflectionUtilities.IsZenType(typeof(Test)));
+            Assert.IsFalse(ReflectionUtilities.IsZenType(typeof(bool)));
+
+            Assert.IsTrue(ReflectionUtilities.IsZenType(typeof(Zen<int>)));
+            Assert.IsTrue(ReflectionUtilities.IsZenType(typeof(Zen<bool>)));
+            Assert.IsTrue(ReflectionUtilities.IsZenType(typeof(Zen<string>)));
+            Assert.IsTrue(ReflectionUtilities.IsZenType((Zen.Symbolic<int>() + Zen.Symbolic<int>()).GetType()));
+        }
+
+        /// <summary>
         /// Test that we don't throw a stack overflow exception.
         /// </summary>
         [TestMethod]
