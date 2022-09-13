@@ -118,11 +118,9 @@ namespace ZenLib.TransitionSystem
 
             // try to find a violation of the spec without loops.
             var property = this.EncodeSpec(LTL.Not(this.Specification), states);
-            Console.WriteLine("==========");
-            Console.WriteLine(property.Encoding.Format());
 
+            // find a solution and return a counterexample if any.
             var solution = Zen.And(Zen.And(constraints), property.Encoding).Solve();
-
             if (solution.IsSatisfiable())
             {
                 var trace = states.Select(solution.Get);
@@ -181,7 +179,7 @@ namespace ZenLib.TransitionSystem
         {
             var spec = specification.Nnf();
             var loops = this.CreateLoopTracking(states);
-            var specHolds = Zen.And(loops.Constraints, spec.EncodeSpec(states, loops.LoopStart, loops.InLoop, 0));
+            var specHolds = Zen.And(loops.Constraints, spec.Encode(states, loops.LoopStart, loops.InLoop, 0));
             return (specHolds, loops.InLoop[states.Length - 2]);
         }
     }

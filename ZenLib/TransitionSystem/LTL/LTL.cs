@@ -24,7 +24,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="i">The current index.</param>
         /// <param name="loopStart">Variables for whether at a loop start.</param>
         /// <param name="inLoop">Variables for whehter in a loop.</param>
-        internal abstract Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i);
+        internal abstract Zen<bool> Encode(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i);
     }
 
     /// <summary>

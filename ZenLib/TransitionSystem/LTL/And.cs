@@ -35,11 +35,11 @@ namespace ZenLib.TransitionSystem
         /// <param name="i">The current index.</param>
         /// <param name="loopStart">Variables for whether at a loop start.</param>
         /// <param name="inLoop">Variables for whehter in a loop.</param>
-        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
+        internal override Zen<bool> Encode(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
             return Zen.And(
-                this.Formula1.EncodeSpec(states, loopStart, inLoop, i),
-                this.Formula2.EncodeSpec(states, loopStart, inLoop, i));
+                this.Formula1.Encode(states, loopStart, inLoop, i),
+                this.Formula2.Encode(states, loopStart, inLoop, i));
         }
     }
 }

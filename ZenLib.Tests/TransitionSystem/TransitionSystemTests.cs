@@ -199,10 +199,10 @@ namespace ZenLib.Tests
                 Specification = LTL.Always(LTL.Predicate<uint>(s => s <= 100000)),
             };
 
-            var searchResults = ts.ModelCheck(timeoutMs: 10).ToArray();
+            var searchResults = ts.ModelCheck(timeoutMs: 100).ToArray();
 
             Assert.IsTrue(searchResults.Last().SearchOutcome == SearchOutcome.Timeout);
-            Assert.IsTrue(searchResults.Last().Stats.Time <= 100);
+            Assert.IsTrue(searchResults.Last().Stats.Time <= 200);
         }
 
         /// <summary>

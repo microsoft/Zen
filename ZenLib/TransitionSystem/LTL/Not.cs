@@ -45,13 +45,13 @@ namespace ZenLib.TransitionSystem
             // not(and(x, y)) == or(not(x), not(y))
             if (Formula is And<T> s4)
             {
-                return LTL.Or(LTL.Not(s4.Formula1).Nnf(), LTL.Not(s4.Formula2).Nnf());
+                return LTL.Or(LTL.Not(s4.Formula1), LTL.Not(s4.Formula2)).Nnf();
             }
 
             // not(or(x, y)) == and(not(x), not(y))
             if (Formula is Or<T> s5)
             {
-                return LTL.And(LTL.Not(s5.Formula1).Nnf(), LTL.Not(s5.Formula2).Nnf());
+                return LTL.And(LTL.Not(s5.Formula1), LTL.Not(s5.Formula2)).Nnf();
             }
 
             // not(f(s)) = f(not(s))
@@ -67,7 +67,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="loopStart">Variables for whether at a loop start.</param>
         /// <param name="inLoop">Variables for whehter in a loop.</param>
         [ExcludeFromCodeCoverage]
-        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
+        internal override Zen<bool> Encode(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
             throw new ZenUnreachableException();
         }
