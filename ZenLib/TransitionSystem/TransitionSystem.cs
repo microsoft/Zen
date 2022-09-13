@@ -87,90 +87,102 @@ namespace ZenLib.TransitionSystem
         /// <summary>
         /// Model check the transition system.
         /// </summary>
-        /// <param name="depth">The number of transition steps.</param>
+        /// <param name="k">The number of transition steps.</param>
         /// <returns>A counter example trace or null if none.</returns>
-        public T[] CheckBoundedSafety(int depth)
+        public T[] CheckBoundedSafety(int k)
         {
-            Contract.Assert(depth >= 1);
+            Contract.Assert(k >= 1);
 
             // create one symbolic variable for each step.
-            var states = new Zen<T>[depth + 1];
+            // there is a special last step k + 1 that is used to check for loops.
+            var states = new Zen<T>[k + 1];
+
             var constraints = new List<Zen<bool>>();
-            for (int i = 0; i <= depth; i++)
+            for (int i = 0; i <= k; i++)
             {
-                states[i] = Zen.Symbolic<T>();
+                states[i] = Zen.Symbolic<T>($"state_{i}");
             }
 
             // enforce the safety and initial state invariants.
             constraints.Add(this.InitialStates(states[0]));
-            for (int i = 0; i <= depth; i++)
+            for (int i = 0; i <= k; i++)
             {
                 constraints.Add(this.Invariants(states[i]));
             }
 
             // enforce the next state relations.
-            for (int i = 0; i <= depth - 1; i++)
+            for (int i = 0; i <= k - 1; i++)
             {
                 constraints.Add(this.NextRelation(states[i], states[i + 1]));
             }
 
-            var c = Zen.And(constraints);
-
             // try to find a violation of the spec without loops.
-            var withoutLoop = Zen.And(c, this.EncodeSpecWithoutLoops(states, states.Length - 2));
-            var solutionNoLoop = withoutLoop.Solve();
-            if (solutionNoLoop.IsSatisfiable())
+            var property = this.EncodeSpec(LTL.Not(this.Specification), states);
+            Console.WriteLine("==========");
+            Console.WriteLine(property.Encoding.Format());
+
+            var solution = Zen.And(Zen.And(constraints), property.Encoding).Solve();
+
+            if (solution.IsSatisfiable())
             {
-                return states.Select(solutionNoLoop.Get).SkipLast(1).ToArray();
+                var trace = states.Select(solution.Get);
+
+                if (solution.Get(property.LoopExistsVar))
+                {
+                    return trace.ToArray();
+                }
+
+                return trace.SkipLast(1).ToArray();
             }
 
-            // try with loops now.
-            var withLoop = Zen.And(c, this.EncodeSpecWithLoop(states, states.Length - 2));
-            var solutionLoop = withLoop.Solve();
-            if (solutionLoop.IsSatisfiable())
-            {
-                return states.Select(solutionLoop.Get).ToArray();
-            }
-
-            // there is no counter example.
             return null;
         }
 
         /// <summary>
-        /// Encodes the specification.
+        /// Creates the loop tracking variables and constraints.
         /// </summary>
-        /// <returns>A symbolic boolean.</returns>
-        private Zen<bool> EncodeSpecWithoutLoops(Zen<T>[] states, int k)
+        /// <param name="states">The states.</param>
+        /// <returns>The encoding used.</returns>
+        private (Zen<bool>[] LoopStart, Zen<bool>[] InLoop, Zen<bool> Constraints) CreateLoopTracking(Zen<T>[] states)
         {
-            Contract.Assert(k < states.Length);
+            var k = states.Length - 1;
+            var loopStart = new Zen<bool>[k];
+            var inLoop = new Zen<bool>[k];
 
-            var spec = LTL.Not(this.Specification).Nnf();
-            var result = Zen.False();
-            for (int l = 0; l <= k; l++)
+            for (var i = 0; i < k; i++)
             {
-                result = Zen.Or(result, states[k + 1] == states[l]);
+                loopStart[i] = Zen.Symbolic<bool>($"loop_start_{i}");
+                inLoop[i] = Zen.Symbolic<bool>($"in_loop_{i}");
             }
 
-            return Zen.And(Zen.Not(result), spec.EncodeLoopFree(states, 0, k));
+            var constraints = new List<Zen<bool>>();
+
+            for (int i = 0; i < k; i++)
+            {
+                constraints.Add(Zen.Implies(loopStart[i], states[k] == states[i]));
+                constraints.Add(inLoop[i] == Zen.Or(i == 0 ? Zen.False() : inLoop[i - 1], loopStart[i]));
+
+                if (i < k - 1)
+                {
+                    constraints.Add(Zen.Implies(inLoop[i], Zen.Not(loopStart[i + 1])));
+                }
+            }
+
+            return (loopStart, inLoop, Zen.And(constraints));
         }
 
         /// <summary>
         /// Encodes the specification.
         /// </summary>
+        /// <param name="specification">The specification to find an example for.</param>
+        /// <param name="states">The symbolic states.</param>
         /// <returns>A symbolic boolean.</returns>
-        private Zen<bool> EncodeSpecWithLoop(Zen<T>[] states, int k)
+        private (Zen<bool> Encoding, Zen<bool> LoopExistsVar) EncodeSpec(LTL<T> specification, Zen<T>[] states)
         {
-            Contract.Assert(k < states.Length);
-
-            var spec = LTL.Not(this.Specification).Nnf();
-
-            var result = Zen.False();
-            for (int l = 0; l <= k; l++)
-            {
-                result = Zen.Or(result, Zen.And(states[k + 1] == states[l], spec.EncodeLoop(states, l, 0, k)));
-            }
-
-            return result;
+            var spec = specification.Nnf();
+            var loops = this.CreateLoopTracking(states);
+            var specHolds = Zen.And(loops.Constraints, spec.EncodeSpec(states, loops.LoopStart, loops.InLoop, 0));
+            return (specHolds, loops.InLoop[states.Length - 2]);
         }
     }
 }

@@ -22,17 +22,9 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="states">The symbolic states.</param>
         /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal abstract Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k);
-
-        /// <summary>
-        /// Encode the loop condition.
-        /// </summary>
-        /// <param name="states">The symbolic states.</param>
-        /// <param name="l">The loop index.</param>
-        /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal abstract Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k);
+        /// <param name="loopStart">Variables for whether at a loop start.</param>
+        /// <param name="inLoop">Variables for whehter in a loop.</param>
+        internal abstract Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i);
     }
 
     /// <summary>
@@ -47,7 +39,7 @@ namespace ZenLib.TransitionSystem
         /// <returns>The new spec.</returns>
         public static LTL<T> Predicate<T>(Func<Zen<T>, Zen<bool>> spec)
         {
-            return new Predicate<T> { Spec = spec };
+            return new Predicate<T> { Function = spec };
         }
 
         /// <summary>
@@ -89,7 +81,7 @@ namespace ZenLib.TransitionSystem
         /// <returns>The new spec.</returns>
         public static LTL<T> Always<T>(LTL<T> spec)
         {
-            return new Always<T> { Spec = spec };
+            return new Always<T> { Formula = spec };
         }
 
         /// <summary>
@@ -99,7 +91,7 @@ namespace ZenLib.TransitionSystem
         /// <returns>The new spec.</returns>
         public static LTL<T> Eventually<T>(LTL<T> spec)
         {
-            return new Eventually<T> { Spec = spec };
+            return new Eventually<T> { Formula = spec };
         }
     }
 }

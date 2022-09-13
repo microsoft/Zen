@@ -14,7 +14,7 @@ namespace ZenLib.TransitionSystem
         /// <summary>
         /// The predicate for the state.
         /// </summary>
-        public Func<Zen<T>, Zen<bool>> Spec { get; internal set; }
+        public Func<Zen<T>, Zen<bool>> Function { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
@@ -30,22 +30,24 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="states">The symbolic states.</param>
         /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
+        /// <param name="loopStart">Variables for whether at a loop start.</param>
+        /// <param name="inLoop">Variables for whehter in a loop.</param>
+        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
-            return this.Spec(states[i]);
-        }
+            if (i + 1 == states.Length)
+            {
+                var result = Zen.False();
+                for (int j = 0; j < i; j++)
+                {
+                    result = Zen.Or(result, Zen.And(loopStart[j], this.Function(states[j])));
+                }
 
-        /// <summary>
-        /// Encode the loop condition.
-        /// </summary>
-        /// <param name="states">The symbolic states.</param>
-        /// <param name="l">The loop index.</param>
-        /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
-        {
-            return this.Spec(states[i]);
+                return result;
+            }
+            else
+            {
+                return this.Function(states[i]);
+            }
         }
     }
 }

@@ -4,8 +4,6 @@
 
 namespace ZenLib.TransitionSystem
 {
-    using System;
-
     /// <summary>
     /// A property that must eventually hold.
     /// </summary>
@@ -14,7 +12,7 @@ namespace ZenLib.TransitionSystem
         /// <summary>
         /// The spec that should hold on a future state.
         /// </summary>
-        public LTL<T> Spec { get; internal set; }
+        public LTL<T> Formula { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
@@ -22,7 +20,7 @@ namespace ZenLib.TransitionSystem
         /// <returns>A spec in nnf.</returns>
         internal override LTL<T> Nnf()
         {
-            return new Eventually<T> { Spec = this.Spec.Nnf() };
+            return new Eventually<T> { Formula = this.Formula.Nnf() };
         }
 
         /// <summary>
@@ -30,34 +28,26 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="states">The symbolic states.</param>
         /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
+        /// <param name="loopStart">Variables for whether at a loop start.</param>
+        /// <param name="inLoop">Variables for whehter in a loop.</param>
+        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
-            var result = Zen.False();
-            for (int j = i; j <= k; j++)
+            if (i + 1 == states.Length)
             {
-                result = Zen.Or(result, this.Spec.EncodeLoopFree(states, j, k));
+                var result = Zen.False();
+                for (int j = 0; j < i; j++)
+                {
+                    result = Zen.Or(result, Zen.And(inLoop[j], this.Formula.EncodeSpec(states, loopStart, inLoop, j)));
+                }
+
+                return result;
             }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Encode the loop condition.
-        /// </summary>
-        /// <param name="states">The symbolic states.</param>
-        /// <param name="l">The loop index.</param>
-        /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
-        {
-            var result = Zen.False();
-            for (int j = Math.Min(i, l); j <= k; j++)
+            else
             {
-                result = Zen.Or(result, this.Spec.EncodeLoop(states, l, j, k));
+                return Zen.Or(
+                    this.Formula.EncodeSpec(states, loopStart, inLoop, i),
+                    this.EncodeSpec(states, loopStart, inLoop, i + 1));
             }
-
-            return result;
         }
     }
 }

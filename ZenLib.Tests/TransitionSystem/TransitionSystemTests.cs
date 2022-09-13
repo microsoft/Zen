@@ -40,9 +40,12 @@ namespace ZenLib.Tests
             {
                 Assert.IsTrue(searchResults[i].CounterExample == null);
             }
+
+            Console.WriteLine(String.Join(",", searchResults.Last().CounterExample.Select(x => x.ToString())));
+
             Assert.IsTrue(searchResults[5].SearchOutcome == SearchOutcome.CounterExample);
             Assert.IsTrue(searchResults[5].CounterExample != null);
-            Assert.IsTrue(searchResults[5].CounterExample.Length == 6);
+            Assert.AreEqual(6, searchResults[5].CounterExample.Length);
         }
 
         /// <summary>

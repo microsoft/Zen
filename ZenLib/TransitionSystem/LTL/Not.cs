@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace ZenLib.TransitionSystem
 {
     /// <summary>
@@ -29,14 +31,14 @@ namespace ZenLib.TransitionSystem
             // not(eventually(x)) == always(not(x))
             if (Formula is Eventually<T> s2)
             {
-                var inner = LTL.Not(s2.Spec);
+                var inner = LTL.Not(s2.Formula);
                 return LTL.Always(inner.Nnf());
             }
 
             // not(always(x)) == eventually(not(x))
             if (Formula is Always<T> s3)
             {
-                var inner = LTL.Not(s3.Spec);
+                var inner = LTL.Not(s3.Formula);
                 return LTL.Eventually(inner.Nnf());
             }
 
@@ -52,7 +54,9 @@ namespace ZenLib.TransitionSystem
                 return LTL.And(LTL.Not(s5.Formula1).Nnf(), LTL.Not(s5.Formula2).Nnf());
             }
 
-            return this;
+            // not(f(s)) = f(not(s))
+            var s6 = (Predicate<T>)Formula;
+            return LTL.Predicate<T>(s => Zen.Not(s6.Function(s)));
         }
 
         /// <summary>
@@ -60,22 +64,12 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="states">The symbolic states.</param>
         /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
+        /// <param name="loopStart">Variables for whether at a loop start.</param>
+        /// <param name="inLoop">Variables for whehter in a loop.</param>
+        [ExcludeFromCodeCoverage]
+        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
-            return Zen.Not(this.Formula.EncodeLoopFree(states, i, k));
-        }
-
-        /// <summary>
-        /// Encode the loop condition.
-        /// </summary>
-        /// <param name="states">The symbolic states.</param>
-        /// <param name="l">The loop index.</param>
-        /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
-        {
-            return Zen.Not(this.Formula.EncodeLoop(states, l, i, k));
+            throw new ZenUnreachableException();
         }
     }
 }

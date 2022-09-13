@@ -33,22 +33,13 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="states">The symbolic states.</param>
         /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
+        /// <param name="loopStart">Variables for whether at a loop start.</param>
+        /// <param name="inLoop">Variables for whehter in a loop.</param>
+        internal override Zen<bool> EncodeSpec(Zen<T>[] states, Zen<bool>[] loopStart, Zen<bool>[] inLoop, int i)
         {
-            return Zen.Or(this.Formula1.EncodeLoopFree(states, i, k), this.Formula2.EncodeLoopFree(states, i, k));
-        }
-
-        /// <summary>
-        /// Encode the loop condition.
-        /// </summary>
-        /// <param name="states">The symbolic states.</param>
-        /// <param name="l">The loop index.</param>
-        /// <param name="i">The current index.</param>
-        /// <param name="k">The length of the prefix.</param>
-        internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
-        {
-            return Zen.Or(this.Formula1.EncodeLoop(states, l, i, k), this.Formula2.EncodeLoop(states, l, i, k));
+            return Zen.Or(
+                this.Formula1.EncodeSpec(states, loopStart, inLoop, i),
+                this.Formula2.EncodeSpec(states, loopStart, inLoop, i));
         }
     }
 }
