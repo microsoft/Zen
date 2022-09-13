@@ -9,13 +9,13 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A temporal logic specification over states of a given type.
     /// </summary>
-    public abstract class Spec<T>
+    public abstract class LTL<T>
     {
         /// <summary>
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal abstract Spec<T> Nnf();
+        internal abstract LTL<T> Nnf();
 
         /// <summary>
         /// Encode the loop-free condition.
@@ -38,14 +38,14 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// Smart constructors for building specs.
     /// </summary>
-    public static class Spec
+    public static class LTL
     {
         /// <summary>
         /// A base predicate.
         /// </summary>
         /// <param name="spec">The spec for the state.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> Predicate<T>(Func<Zen<T>, Zen<bool>> spec)
+        public static LTL<T> Predicate<T>(Func<Zen<T>, Zen<bool>> spec)
         {
             return new Predicate<T> { Spec = spec };
         }
@@ -55,9 +55,9 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="spec">The spec.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> Not<T>(Spec<T> spec)
+        public static LTL<T> Not<T>(LTL<T> spec)
         {
-            return new Not<T> { Spec = spec };
+            return new Not<T> { Formula = spec };
         }
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace ZenLib.TransitionSystem
         /// <param name="spec1">The first spec.</param>
         /// <param name="spec2">The second spec.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> And<T>(Spec<T> spec1, Spec<T> spec2)
+        public static LTL<T> And<T>(LTL<T> spec1, LTL<T> spec2)
         {
-            return new And<T> { Spec1 = spec1, Spec2 = spec2 };
+            return new And<T> { Formula1 = spec1, Formula2 = spec2 };
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace ZenLib.TransitionSystem
         /// <param name="spec1">The first spec.</param>
         /// <param name="spec2">The second spec.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> Or<T>(Spec<T> spec1, Spec<T> spec2)
+        public static LTL<T> Or<T>(LTL<T> spec1, LTL<T> spec2)
         {
-            return new Or<T> { Spec1 = spec1, Spec2 = spec2 };
+            return new Or<T> { Formula1 = spec1, Formula2 = spec2 };
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="spec">The spec.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> Always<T>(Spec<T> spec)
+        public static LTL<T> Always<T>(LTL<T> spec)
         {
             return new Always<T> { Spec = spec };
         }
@@ -97,7 +97,7 @@ namespace ZenLib.TransitionSystem
         /// </summary>
         /// <param name="spec">The spec.</param>
         /// <returns>The new spec.</returns>
-        public static Spec<T> Eventually<T>(Spec<T> spec)
+        public static LTL<T> Eventually<T>(LTL<T> spec)
         {
             return new Eventually<T> { Spec = spec };
         }

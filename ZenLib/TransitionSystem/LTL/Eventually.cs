@@ -9,18 +9,18 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A property that must eventually hold.
     /// </summary>
-    public class Eventually<T> : Spec<T>
+    public class Eventually<T> : LTL<T>
     {
         /// <summary>
         /// The spec that should hold on a future state.
         /// </summary>
-        public Spec<T> Spec { get; internal set; }
+        public LTL<T> Spec { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal override Spec<T> Nnf()
+        internal override LTL<T> Nnf()
         {
             return new Eventually<T> { Spec = this.Spec.Nnf() };
         }

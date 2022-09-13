@@ -7,25 +7,25 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A spec that takes the 'and' of two others.
     /// </summary>
-    public class And<T> : Spec<T>
+    public class And<T> : LTL<T>
     {
         /// <summary>
-        /// The first spec.
+        /// The first formula.
         /// </summary>
-        public Spec<T> Spec1 { get; internal set; }
+        public LTL<T> Formula1 { get; internal set; }
 
         /// <summary>
-        /// The second spec.
+        /// The second formula.
         /// </summary>
-        public Spec<T> Spec2 { get; internal set; }
+        public LTL<T> Formula2 { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal override Spec<T> Nnf()
+        internal override LTL<T> Nnf()
         {
-            return Spec.And(this.Spec1.Nnf(), this.Spec2.Nnf());
+            return LTL.And(this.Formula1.Nnf(), this.Formula2.Nnf());
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="k">The length of the prefix.</param>
         internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
         {
-            return Zen.And(this.Spec1.EncodeLoopFree(states, i, k), this.Spec2.EncodeLoopFree(states, i, k));
+            return Zen.And(this.Formula1.EncodeLoopFree(states, i, k), this.Formula2.EncodeLoopFree(states, i, k));
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="k">The length of the prefix.</param>
         internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
         {
-            return Zen.And(this.Spec1.EncodeLoop(states, l, i, k), this.Spec2.EncodeLoop(states, l, i, k));
+            return Zen.And(this.Formula1.EncodeLoop(states, l, i, k), this.Formula2.EncodeLoop(states, l, i, k));
         }
     }
 }

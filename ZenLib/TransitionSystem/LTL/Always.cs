@@ -10,18 +10,18 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A property that must always hold.
     /// </summary>
-    public class Always<T> : Spec<T>
+    public class Always<T> : LTL<T>
     {
         /// <summary>
         /// The spec that should hold on every state.
         /// </summary>
-        public Spec<T> Spec { get; internal set; }
+        public LTL<T> Spec { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal override Spec<T> Nnf()
+        internal override LTL<T> Nnf()
         {
             return new Always<T> { Spec = this.Spec.Nnf() };
         }

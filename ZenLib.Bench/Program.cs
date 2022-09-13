@@ -27,7 +27,7 @@ namespace ZenLibBench
                 InitialStates = (s) => s <= 100,
                 Invariants = (s) => true,
                 NextRelation = (sOld, sNew) => sNew == sOld + 1,
-                Specification = Spec.Always(Spec.Predicate<uint>(s => s < 105)),
+                Specification = LTL.Always(LTL.Predicate<uint>(s => s < 105)),
             };
 
             var searchResults = ts.ModelCheck(2000).ToArray();

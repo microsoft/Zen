@@ -9,7 +9,7 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A predicate that should hold on a state.
     /// </summary>
-    public class Predicate<T> : Spec<T>
+    public class Predicate<T> : LTL<T>
     {
         /// <summary>
         /// The predicate for the state.
@@ -20,7 +20,7 @@ namespace ZenLib.TransitionSystem
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal override Spec<T> Nnf()
+        internal override LTL<T> Nnf()
         {
             return this;
         }

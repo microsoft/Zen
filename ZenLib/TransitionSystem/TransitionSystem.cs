@@ -34,7 +34,7 @@ namespace ZenLib.TransitionSystem
         /// <summary>
         /// The specification to check.
         /// </summary>
-        public Spec<T> Specification { get; set; }
+        public LTL<T> Specification { get; set; }
 
         /// <summary>
         /// Model check the transition system.
@@ -45,14 +45,21 @@ namespace ZenLib.TransitionSystem
         public IEnumerable<SearchResult<T>> ModelCheck(int timeoutMs = -1, bool useKInduction = false)
         {
             Contract.Assert(timeoutMs >= -1);
+            var timer = new Stopwatch();
 
             for (int k = 1; true; k++)
             {
-                // check for a violation at the kth step.
-                var watch = Stopwatch.StartNew();
+                // compute the timer for this iteration.
+                var timeLeft = timeoutMs >= 0 ? Math.Max(0, timeoutMs - (int)timer.ElapsedMilliseconds) : timeoutMs;
+
+                // run the kth iteration and add to the current time.
+                timer.Start();
                 var task = Task.Factory.StartNew(() => this.CheckBoundedSafety(k));
-                task.Wait(timeoutMs);
-                var stats = new SearchStats(watch.ElapsedMilliseconds);
+                task.Wait(timeLeft);
+                timer.Stop();
+
+                // record any statistics.
+                var stats = new SearchStats(timer.ElapsedMilliseconds);
 
                 // if there is a timeout then we are done.
                 if (!task.IsCompleted)
@@ -65,27 +72,6 @@ namespace ZenLib.TransitionSystem
                 var trace = task.Result;
                 if (trace == null)
                 {
-                    /* // if k-induction is enabled, check if we can prove safety.
-                    if (useKInduction && k > 1)
-                    {
-                        // run the k-induction check.
-                        var task2 = Task.Factory.StartNew(() => this.CheckKInduction(k));
-                        task2.Wait(timeoutMs);
-
-                        // If there is a timeout, then we are done.
-                        if (!task2.IsCompleted)
-                        {
-                            yield return new SearchResult<T>(k, SearchOutcome.Timeout, null, stats);
-                            yield break;
-                        }
-                        // otherwise if we prove safety, then we are done.
-                        else if (task2.Result)
-                        {
-                            yield return new SearchResult<T>(k, SearchOutcome.SafetyProof, null, stats);
-                            yield break;
-                        }
-                    } */
-
                     // we have neither found a counterexample nor a proof of safety, so continue.
                     yield return new SearchResult<T>(k, SearchOutcome.NoCounterExample, null, stats);
                 }
@@ -158,7 +144,7 @@ namespace ZenLib.TransitionSystem
         {
             Contract.Assert(k < states.Length);
 
-            var spec = Spec.Not(this.Specification).Nnf();
+            var spec = LTL.Not(this.Specification).Nnf();
             var result = Zen.False();
             for (int l = 0; l <= k; l++)
             {
@@ -176,7 +162,7 @@ namespace ZenLib.TransitionSystem
         {
             Contract.Assert(k < states.Length);
 
-            var spec = Spec.Not(this.Specification).Nnf();
+            var spec = LTL.Not(this.Specification).Nnf();
 
             var result = Zen.False();
             for (int l = 0; l <= k; l++)
@@ -186,48 +172,5 @@ namespace ZenLib.TransitionSystem
 
             return result;
         }
-
-        /* /// <summary>
-        /// Check if the property is true from any initial state after k steps.
-        /// </summary>
-        /// <param name="depth">The number of transition steps.</param>
-        /// <returns>True if we can prove safety for k steps.</returns>
-        public bool CheckKInduction(int depth)
-        {
-            Contract.Assert(depth >= 1);
-
-            // create one symbolic variable for each step.
-            var states = new Zen<T>[depth];
-            var constraints = new List<Zen<bool>>();
-            for (int i = 0; i < depth; i++)
-            {
-                states[i] = Zen.Symbolic<T>();
-            }
-
-            // enforce the safety invariants.
-            for (int i = 0; i < depth; i++)
-            {
-                constraints.Add(this.Invariants(states[i]));
-            }
-
-            // property holds for the first k-1 steps.
-            for (int i = 0; i < depth - 1; i++)
-            {
-                constraints.Add(this.SafetyChecks(states[i]));
-            }
-
-            // but fails on the kth step.
-            constraints.Add(Zen.Not(this.SafetyChecks(states[depth - 1])));
-
-            // enforce the next state relations.
-            for (int i = 0; i < depth - 1; i++)
-            {
-                constraints.Add(this.NextRelation(states[i], states[i + 1]));
-            }
-
-            // if there is no example of this, then we have safety.
-            var solution = Zen.And(constraints).Solve();
-            return !solution.IsSatisfiable();
-        } */
     }
 }

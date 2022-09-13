@@ -7,62 +7,52 @@ namespace ZenLib.TransitionSystem
     /// <summary>
     /// A spec that negates another.
     /// </summary>
-    public class Not<T> : Spec<T>
+    public class Not<T> : LTL<T>
     {
         /// <summary>
-        /// The spec that negates another.
+        /// The formula that negates another.
         /// </summary>
-        public Spec<T> Spec { get; internal set; }
+        public LTL<T> Formula { get; internal set; }
 
         /// <summary>
         /// Convert the spec to negated normal form.
         /// </summary>
         /// <returns>A spec in nnf.</returns>
-        internal override Spec<T> Nnf()
+        internal override LTL<T> Nnf()
         {
             // not(not(s)) == s
-            if (Spec is Not<T> s1)
+            if (Formula is Not<T> s1)
             {
-                return this.Spec.Nnf();
+                return this.Formula.Nnf();
             }
 
             // not(eventually(x)) == always(not(x))
-            if (Spec is Eventually<T> s2)
+            if (Formula is Eventually<T> s2)
             {
-                var inner = new Not<T> { Spec = s2.Spec };
-                return new Always<T> { Spec = inner.Nnf()  };
+                var inner = LTL.Not(s2.Spec);
+                return LTL.Always(inner.Nnf());
             }
 
             // not(always(x)) == eventually(not(x))
-            if (Spec is Always<T> s3)
+            if (Formula is Always<T> s3)
             {
-                var inner = new Not<T> { Spec = s3.Spec };
-                return new Eventually<T> { Spec = inner.Nnf() };
+                var inner = LTL.Not(s3.Spec);
+                return LTL.Eventually(inner.Nnf());
             }
 
             // not(and(x, y)) == or(not(x), not(y))
-            if (Spec is And<T> s4)
+            if (Formula is And<T> s4)
             {
-                var left = new Not<T> { Spec = s4.Spec1 };
-                var right = new Not<T> { Spec = s4.Spec2 };
-                return new Or<T> { Spec1 = left.Nnf(), Spec2 = right.Nnf() };
+                return LTL.Or(LTL.Not(s4.Formula1).Nnf(), LTL.Not(s4.Formula2).Nnf());
             }
 
             // not(or(x, y)) == and(not(x), not(y))
-            if (Spec is Or<T> s5)
+            if (Formula is Or<T> s5)
             {
-                var left = new Not<T> { Spec = s5.Spec1 };
-                var right = new Not<T> { Spec = s5.Spec2 };
-                return new And<T> { Spec1 = left.Nnf(), Spec2 = right.Nnf() };
+                return LTL.And(LTL.Not(s5.Formula1).Nnf(), LTL.Not(s5.Formula2).Nnf());
             }
 
-            // not(p(s)) == p(not(s))
-            if (Spec is Predicate<T> p)
-            {
-                return new Predicate<T> { Spec = (s) => Zen.Not(p.Spec(s)) };
-            }
-
-            throw new ZenUnreachableException();
+            return this;
         }
 
         /// <summary>
@@ -73,7 +63,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="k">The length of the prefix.</param>
         internal override Zen<bool> EncodeLoopFree(Zen<T>[] states, int i, int k)
         {
-            return Zen.Not(this.Spec.EncodeLoopFree(states, i, k));
+            return Zen.Not(this.Formula.EncodeLoopFree(states, i, k));
         }
 
         /// <summary>
@@ -85,7 +75,7 @@ namespace ZenLib.TransitionSystem
         /// <param name="k">The length of the prefix.</param>
         internal override Zen<bool> EncodeLoop(Zen<T>[] states, int l, int i, int k)
         {
-            return Zen.Not(this.Spec.EncodeLoop(states, l, i, k));
+            return Zen.Not(this.Formula.EncodeLoop(states, l, i, k));
         }
     }
 }
