@@ -21,32 +21,68 @@ namespace ZenLib
             return regex.Accept(this, (Regex.All<T>(), Regex.All<T>()));
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         [ExcludeFromCodeCoverage]
         public Regex<T> Visit(RegexEmptyExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return expression;
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexEpsilonExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return Regex.Concat(parameter.Item1, parameter.Item2);
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexAnchorExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return Regex.Epsilon<T>();
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexRangeExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return Regex.Concat(parameter.Item1, Regex.Concat(expression, parameter.Item2));
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexUnopExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             return Regex.Concat(parameter.Item1, Regex.Concat(expression, parameter.Item2));
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexBinopExpr<T> expression, (Regex<T>, Regex<T>) parameter)
         {
             switch (expression.OpType)

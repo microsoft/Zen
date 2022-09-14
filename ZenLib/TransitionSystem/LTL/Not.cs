@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace ZenLib.TransitionSystem
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// A spec that negates another.
     /// </summary>

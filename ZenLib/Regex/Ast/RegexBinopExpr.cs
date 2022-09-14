@@ -23,6 +23,21 @@ namespace ZenLib
         private static HashConsTable<(long, long, int), Regex<T>> hashConsTable = new HashConsTable<(long, long, int), Regex<T>>();
 
         /// <summary>
+        /// Gets the first Regex expression.
+        /// </summary>
+        internal Regex<T> Expr1 { get; }
+
+        /// <summary>
+        /// Gets the second Regex expression.
+        /// </summary>
+        internal Regex<T> Expr2 { get; }
+
+        /// <summary>
+        /// Gets the Regex operation type.
+        /// </summary>
+        internal RegexBinopExprType OpType { get; }
+
+        /// <summary>
         /// Simplify a new RegexBinopExpr.
         /// </summary>
         /// <param name="e1">The first expr.</param>
@@ -220,21 +235,6 @@ namespace ZenLib
             this.Expr2 = expr2;
             this.OpType = opType;
         }
-
-        /// <summary>
-        /// Gets the first Regex expression.
-        /// </summary>
-        internal Regex<T> Expr1 { get; }
-
-        /// <summary>
-        /// Gets the second Regex expression.
-        /// </summary>
-        internal Regex<T> Expr2 { get; }
-
-        /// <summary>
-        /// Gets the Regex operation type.
-        /// </summary>
-        internal RegexBinopExprType OpType { get; }
 
         /// <summary>
         /// Convert the expression to a string.

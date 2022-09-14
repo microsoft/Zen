@@ -40,9 +40,8 @@ namespace ZenLib.TransitionSystem
         /// Model check the transition system.
         /// </summary>
         /// <param name="timeoutMs">The timeout for each depth in milliseconds.</param>
-        /// <param name="useKInduction">Whether to use k induction to prove safety.</param>
         /// <returns>A counterexample, or null if none.</returns>
-        public IEnumerable<SearchResult<T>> ModelCheck(int timeoutMs = -1, bool useKInduction = false)
+        public IEnumerable<SearchResult<T>> ModelCheck(int timeoutMs = -1)
         {
             Contract.Assert(timeoutMs >= -1);
             var timer = new Stopwatch();

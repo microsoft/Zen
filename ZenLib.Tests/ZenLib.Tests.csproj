@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZenLib\ZenLib.csproj" />
+	<ProjectReference Include="..\ZenLib.Generators\ZenLib.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <Import Project="..\.stylecop\StyleCop.props" />

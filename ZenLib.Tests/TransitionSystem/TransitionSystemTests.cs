@@ -233,5 +233,27 @@ namespace ZenLib.Tests
                 Assert.IsTrue(result.CounterExample == null);
             }
         }
+
+        /// <summary>
+        /// Test that the always specification works.
+        /// </summary>
+        [TestMethod]
+        public void TestDiningPhilosophersDeadlock()
+        {
+            var ts = new DiningPhilosophers(3).GetProblem();
+            var results = ts.ModelCheck(2000).Take(4).ToArray();
+
+            Assert.AreEqual(4, results.Length);
+            Assert.IsTrue(results.Last().SearchOutcome == SearchOutcome.CounterExample);
+
+            var ce = results.Last().CounterExample;
+
+            Assert.AreEqual(5, ce.Length);
+            Assert.AreEqual(0, ce[0].HasLeftFork.Count());
+            Assert.AreEqual(1, ce[1].HasLeftFork.Count());
+            Assert.AreEqual(2, ce[2].HasLeftFork.Count());
+            Assert.AreEqual(3, ce[3].HasLeftFork.Count());
+            Assert.AreEqual(3, ce[4].HasLeftFork.Count());
+        }
     }
 }

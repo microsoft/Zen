@@ -20,7 +20,7 @@ namespace ZenLib.TransitionSystem
         /// <returns>A spec in nnf.</returns>
         internal override LTL<T> Nnf()
         {
-            return new Eventually<T> { Formula = this.Formula.Nnf() };
+            return LTL.Eventually<T>(this.Formula.Nnf());
         }
 
         /// <summary>

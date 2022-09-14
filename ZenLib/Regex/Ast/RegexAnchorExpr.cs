@@ -22,6 +22,12 @@ namespace ZenLib
         public static Regex<T> EndInstance = new RegexAnchorExpr<T>(false);
 
         /// <summary>
+        /// Whether this is a begin anchor.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        public bool IsBegin { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RegexAnchorExpr{T}"/> class.
         /// </summary>
         /// <param name="isBegin">Whether this is a begin anchor.</param>
@@ -29,12 +35,6 @@ namespace ZenLib
         {
             this.IsBegin = isBegin;
         }
-
-        /// <summary>
-        /// Whether this is a begin anchor.
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool IsBegin { get; set; }
 
         /// <summary>
         /// Convert the expression to a string.

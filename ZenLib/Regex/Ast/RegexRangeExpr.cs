@@ -23,6 +23,11 @@ namespace ZenLib
         private static HashConsTable<(T, T), Regex<T>> hashConsTable = new HashConsTable<(T, T), Regex<T>>();
 
         /// <summary>
+        /// Gets the first Regex expression.
+        /// </summary>
+        internal CharRange<T> CharacterRange { get; }
+
+        /// <summary>
         /// Simplify a new RegexRangeExpr.
         /// </summary>
         /// <param name="low">The low character value.</param>
@@ -61,11 +66,6 @@ namespace ZenLib
         {
             this.CharacterRange = range;
         }
-
-        /// <summary>
-        /// Gets the first Regex expression.
-        /// </summary>
-        internal CharRange<T> CharacterRange { get; }
 
         /// <summary>
         /// Convert the expression to a string.

@@ -27,6 +27,12 @@ namespace ZenLib
             return regex.Accept(this, value);
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexBinopExpr<T> expression, T parameter)
         {
             var r = expression.Expr1;
@@ -48,6 +54,12 @@ namespace ZenLib
             }
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexRangeExpr<T> expression, T parameter)
         {
             if (expression.CharacterRange.Contains(parameter))
@@ -60,16 +72,34 @@ namespace ZenLib
             }
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexEmptyExpr<T> expression, T parameter)
         {
             return expression;
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexEpsilonExpr<T> expression, T parameter)
         {
             return Regex.Empty<T>();
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         public Regex<T> Visit(RegexUnopExpr<T> expression, T parameter)
         {
             switch (expression.OpType)
@@ -82,6 +112,12 @@ namespace ZenLib
             }
         }
 
+        /// <summary>
+        /// Visit a regex.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A regex.</returns>
         [ExcludeFromCodeCoverage]
         public Regex<T> Visit(RegexAnchorExpr<T> expression, T parameter)
         {
