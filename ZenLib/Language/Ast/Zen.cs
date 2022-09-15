@@ -326,7 +326,7 @@ namespace ZenLib
         /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Symbolic<T>(string name = "k!", int depth = 5)
+        public static Zen<T> Symbolic<T>(string name = "k!", int depth = 8)
         {
             return Arbitrary<T>(name, depth);
         }
@@ -337,7 +337,7 @@ namespace ZenLib
         /// <param name="name">An optional name for the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 5)
+        public static Zen<T> Arbitrary<T>(string name = "k!", int depth = 8)
         {
             var generator = new SymbolicInputVisitor();
             return Arbitrary<T>(generator, name, depth);
@@ -350,7 +350,7 @@ namespace ZenLib
         /// <param name="name">An optional name of the expression.</param>
         /// <param name="depth">Depth bound on the size of the object.</param>
         /// <returns></returns>
-        internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 5)
+        internal static Zen<T> Arbitrary<T>(SymbolicInputVisitor generator, string name = "k!", int depth = 8)
         {
             var parameter = new ZenGenerationConfiguration { Depth = depth, Name = GetName(name, typeof(T)) };
             return (Zen<T>)generator.Visit(typeof(T), parameter);
@@ -1652,7 +1652,7 @@ namespace ZenLib
         public static Option<T1> Find<T1>(
             Func<Zen<T1>, Zen<bool>> invariant,
             Zen<T1> input = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1>(invariant).Find(input, depth, backend);
@@ -1671,7 +1671,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, backend);
@@ -1692,7 +1692,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, backend);
@@ -1715,7 +1715,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, backend);
@@ -1732,7 +1732,7 @@ namespace ZenLib
         public static IEnumerable<T1> GenerateInputs<T1, T2>(
             Func<Zen<T1>, Zen<T2>> f,
             Func<Zen<T1>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, backend);
@@ -1749,7 +1749,7 @@ namespace ZenLib
         public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>> f,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, backend);
@@ -1766,7 +1766,7 @@ namespace ZenLib
         public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, backend);
@@ -1783,7 +1783,7 @@ namespace ZenLib
         public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, backend);

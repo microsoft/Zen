@@ -42,12 +42,17 @@ namespace ZenLib
             {
                 if (args.e1 is ZenConstantExpr<bool> x)
                 {
-                    return (x.Value ? args.e2 : args.e1);
+                    return x.Value ? args.e2 : args.e1;
                 }
 
                 if (args.e2 is ZenConstantExpr<bool> y)
                 {
-                    return (y.Value ? args.e1 : args.e2);
+                    return y.Value ? args.e1 : args.e2;
+                }
+
+                if (args.e1 is ZenNotExpr n1 && args.e2 is ZenNotExpr n2)
+                {
+                    return Zen.Not(Zen.Or(n1.Expr, n2.Expr));
                 }
             }
             else
@@ -55,12 +60,17 @@ namespace ZenLib
                 Contract.Assert(args.op == LogicalOp.Or);
                 if (args.e1 is ZenConstantExpr<bool> x)
                 {
-                    return (x.Value ? args.e1 : args.e2);
+                    return x.Value ? args.e1 : args.e2;
                 }
 
                 if (args.e2 is ZenConstantExpr<bool> y)
                 {
-                    return (y.Value ? args.e2 : args.e1);
+                    return y.Value ? args.e2 : args.e1;
+                }
+
+                if (args.e1 is ZenNotExpr n1 && args.e2 is ZenNotExpr n2)
+                {
+                    return Zen.Not(Zen.And(n1.Expr, n2.Expr));
                 }
             }
 

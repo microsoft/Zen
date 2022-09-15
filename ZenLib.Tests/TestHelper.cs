@@ -18,11 +18,6 @@ namespace ZenLib.Tests
     public static class TestHelper
     {
         /// <summary>
-        /// The default bdd list size.
-        /// </summary>
-        private static int defaultBddListSize = 4;
-
-        /// <summary>
         /// Number of random inputs to try per test.
         /// </summary>
         private static int numRandomTests = 8;
@@ -88,21 +83,21 @@ namespace ZenLib.Tests
             return expr;
         }
 
-        private static TestParameter[] GetBoundedParameters(int bddListSize, bool runBdds)
+        private static TestParameter[] GetBoundedParameters(bool runBdds)
         {
             if (runBdds)
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { SolverType = SolverType.DecisionDiagrams, ListSize = 1 },
-                    new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.DecisionDiagrams, FSeqSize = 1 },
+                    new TestParameter { SolverType = SolverType.Z3, FSeqSize = 8 },
                 };
             }
             else
             {
                 return new TestParameter[]
                 {
-                    new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
+                    new TestParameter { SolverType = SolverType.Z3, FSeqSize = 8 },
                 };
             }
         }
@@ -111,13 +106,13 @@ namespace ZenLib.Tests
         {
             return new TestParameter[]
             {
-                new TestParameter { SolverType = SolverType.Z3, ListSize = 5 },
+                new TestParameter { SolverType = SolverType.Z3, FSeqSize = 8 },
             };
         }
 
-        private static TestParameter[] SetParameters(int bddListSize, bool runBdds, params Type[] types)
+        private static TestParameter[] SetParameters(bool runBdds, params Type[] types)
         {
-            var ps = GetBoundedParameters(bddListSize, runBdds);
+            var ps = GetBoundedParameters(runBdds);
 
             foreach (var type in types)
             {
@@ -137,17 +132,17 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckValid<T1>(Func<Zen<T1>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(4, runBdds, typeof(T1));
+            var selectedParams = SetParameters(runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, o) => o, depth: p.ListSize, backend: p.SolverType);
+                result = f.Find((i1, o) => o, depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value));
@@ -166,17 +161,17 @@ namespace ZenLib.Tests
         public static void CheckValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, bool runBdds = true)
         {
             // If testing on strings, only use Z3 backend (DD does not support strings)
-            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
                 // prove that it is valid.
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation.
-                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
+                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -195,17 +190,17 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckValid<T1, T2, T3>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2), typeof(T3));
+            var selectedParams = SetParameters(runBdds, typeof(T1), typeof(T2), typeof(T3));
 
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
+                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -225,17 +220,17 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckValid<T1, T2, T3, T4>(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            var selectedParams = SetParameters(runBdds, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
 
             foreach (var p in selectedParams)
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
+                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -252,13 +247,13 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckNotValid<T1>(Func<Zen<T1>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1));
+            var selectedParams = SetParameters(runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
                 // prove that it is not valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -277,12 +272,12 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckNotValid<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(defaultBddListSize, runBdds, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -299,7 +294,7 @@ namespace ZenLib.Tests
         /// <param name="runBdds">Whether to run the bdd backend.</param>
         public static void CheckAgreement(Func<Zen<bool>> function, bool runBdds = true)
         {
-            foreach (var p in GetBoundedParameters(defaultBddListSize, runBdds))
+            foreach (var p in GetBoundedParameters(runBdds))
             {
                 var f = Zen.Function<bool>(function);
                 var result = f.Assert(o => Flatten(o, p), backend: p.SolverType);
@@ -314,16 +309,15 @@ namespace ZenLib.Tests
         /// Check that the backends agree on the result.
         /// </summary>
         /// <param name="function">The function.</param>
-        /// <param name="bddListSize">The list size for bdds.</param>
         /// <param name="runBdds">Whether to run the bdd backend.</param>
-        public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function, int bddListSize = 4, bool runBdds = true)
+        public static void CheckAgreement<T1>(Func<Zen<T1>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(bddListSize, runBdds, typeof(T1));
+            var selectedParams = SetParameters(runBdds, typeof(T1));
 
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
                 if (result.HasValue)
                 {
                     Assert.IsTrue(f.Evaluate(result.Value));
@@ -339,16 +333,15 @@ namespace ZenLib.Tests
         /// <typeparam name="T1">First input type.</typeparam>
         /// <typeparam name="T2">Second input type.</typeparam>
         /// <param name="function">The function.</param>
-        /// <param name="bddListSize">The maximum .</param>
         /// <param name="runBdds">Whether to run the bdd backend.</param>
-        public static void CheckAgreement<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, int bddListSize = 4, bool runBdds = true)
+        public static void CheckAgreement<T1, T2>(Func<Zen<T1>, Zen<T2>, Zen<bool>> function, bool runBdds = true)
         {
-            var selectedParams = SetParameters(bddListSize, runBdds, typeof(T1), typeof(T2));
+            var selectedParams = SetParameters(runBdds, typeof(T1), typeof(T2));
 
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.ListSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
 
                 if (result.HasValue)
                 {
@@ -617,16 +610,31 @@ namespace ZenLib.Tests
             }
         }
 
+        /// <summary>
+        /// An object with a single UInt field.
+        /// </summary>
         internal class ObjectWithInt
         {
+            /// <summary>
+            /// The field.
+            /// </summary>
             public UInt<_10> Field1;
         }
 
+        /// <summary>
+        /// A test parameter.
+        /// </summary>
         private class TestParameter
         {
+            /// <summary>
+            /// The solver type to use.
+            /// </summary>
             public SolverType SolverType { get; set; }
 
-            public int ListSize { get; set; }
+            /// <summary>
+            /// The list size.
+            /// </summary>
+            public int FSeqSize { get; set; }
         }
     }
 }
