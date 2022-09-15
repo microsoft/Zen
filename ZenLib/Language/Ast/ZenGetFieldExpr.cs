@@ -1,10 +1,9 @@
-﻿// <copyright file="ZenFieldExpr.cs" company="Microsoft">
+﻿// <copyright file="ZenGetFieldExpr.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenGetFieldExpr<T1, T2> : Zen<T2>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<T1>, string), Zen<T2>> createFunc = (v) => Simplify(v.Item1, v.Item2);
-
         /// <summary>
         /// Hash cons table for ZenGetFieldExpr.
         /// </summary>
@@ -35,32 +29,31 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenGetFieldExpr.
         /// </summary>
-        /// <param name="expr">The object expr.</param>
-        /// <param name="fieldName">The field name.</param>
-        /// <returns></returns>
-        private static Zen<T2> Simplify(Zen<T1> expr, string fieldName)
+        /// <param name="args">The arguments.</param>
+        /// <returns>The new expr.</returns>
+        private static Zen<T2> Simplify((Zen<T1> expr, string fieldName) args)
         {
             // get(with(o, name, f), name) == f
             // get(with(o, name', f), name) == get(o, name)
-            var type = expr.GetType();
+            var type = args.expr.GetType();
             if (type.GetGenericTypeDefinition() == typeof(ZenWithFieldExpr<,>))
             {
                 var fieldNameProperty = type.GetProperty("FieldName");
                 var fieldValueProperty = type.GetProperty("FieldExpr");
                 var exprProperty = type.GetProperty("Expr");
 
-                return ((string)fieldNameProperty.GetValue(expr) == fieldName) ?
-                        (Zen<T2>)fieldValueProperty.GetValue(expr) :
-                        Create((Zen<T1>)exprProperty.GetValue(expr), fieldName); // recurse
+                return ((string)fieldNameProperty.GetValue(args.expr) == args.fieldName) ?
+                        (Zen<T2>)fieldValueProperty.GetValue(args.expr) :
+                        Create((Zen<T1>)exprProperty.GetValue(args.expr), args.fieldName); // recurse
             }
 
             // get(createobject(p1, ..., pn), namei) == pi
-            if (expr is ZenCreateObjectExpr<T1> coe)
+            if (args.expr is ZenCreateObjectExpr<T1> coe)
             {
-                return (Zen<T2>)coe.Fields[fieldName];
+                return (Zen<T2>)coe.Fields[args.fieldName];
             }
 
-            return new ZenGetFieldExpr<T1, T2>(expr, fieldName);
+            return new ZenGetFieldExpr<T1, T2>(args.expr, args.fieldName);
         }
 
         /// <summary>
@@ -76,7 +69,7 @@ namespace ZenLib
             Contract.AssertFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName);
-            hashConsTable.GetOrAdd(key, (expr, fieldName), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr, fieldName), Simplify, out var value);
             return value;
         }
 

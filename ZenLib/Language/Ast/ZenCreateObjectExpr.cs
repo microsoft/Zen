@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
@@ -15,11 +14,6 @@ namespace ZenLib
     internal sealed class ZenCreateObjectExpr<TObject> : Zen<TObject>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(string, object)[], Zen<TObject>> createFunc = (v) => new ZenCreateObjectExpr<TObject>(v);
-
-        /// <summary>
         /// Hash cons table for ZenCreateObjectExpr.
         /// </summary>
         private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
@@ -28,6 +22,13 @@ namespace ZenLib
         /// The fields of the object.
         /// </summary>
         public SortedDictionary<string, object> Fields { get; }
+
+        /// <summary>
+        /// Simplify and create a new ZenCreateObjectExpr.
+        /// </summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns>The new expr.</returns>
+        private static Zen<TObject> Simplify((string, object)[] fields) => new ZenCreateObjectExpr<TObject>(fields);
 
         /// <summary>
         /// Creates a new ZenCreateObjectExpr.
@@ -58,7 +59,7 @@ namespace ZenLib
                 fieldIds[i] = (f.Item1, id);
             }
 
-            hashConsTable.GetOrAdd(fieldIds, fields, createFunc, out var value);
+            hashConsTable.GetOrAdd(fieldIds, fields, Simplify, out var value);
             return value;
         }
 

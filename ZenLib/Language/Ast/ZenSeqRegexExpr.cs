@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqRegexExpr<T> : Zen<bool>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Regex<T>), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2);
-
         /// <summary>
         /// Hash cons table for ZenSeqContainsExpr.
         /// </summary>
@@ -35,13 +29,9 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenSeqRegexExpr.
         /// </summary>
-        /// <param name="e1">The seq expr.</param>
-        /// <param name="e2">The Regex expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<bool> Simplify(Zen<Seq<T>> e1, Regex<T> e2)
-        {
-            return new ZenSeqRegexExpr<T>(e1, e2);
-        }
+        public static Zen<bool> Simplify((Zen<Seq<T>> e1, Regex<T> e2) args) => new ZenSeqRegexExpr<T>(args.e1, args.e2);
 
         /// <summary>
         /// Create a new ZenSeqRegexExpr.
@@ -55,7 +45,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
             return value;
         }
 

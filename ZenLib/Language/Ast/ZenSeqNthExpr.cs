@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,11 +12,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqNthExpr<T> : Zen<T>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<BigInteger>), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2);
-
         /// <summary>
         /// Hash cons table for ZenSeqAtExpr.
         /// </summary>
@@ -36,13 +30,9 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenSeqNthExpr.
         /// </summary>
-        /// <param name="e1">The seq expr.</param>
-        /// <param name="e2">The index expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<T> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2)
-        {
-            return new ZenSeqNthExpr<T>(e1, e2);
-        }
+        public static Zen<T> Simplify((Zen<Seq<T>> e1, Zen<BigInteger> e2) args) => new ZenSeqNthExpr<T>(args.e1, args.e2);
 
         /// <summary>
         /// Create a new ZenSeqAtExpr.
@@ -56,7 +46,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
             return value;
         }
 

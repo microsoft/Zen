@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,12 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenConstMapGetExpr<TKey, TValue> : Zen<TValue>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<CMap<TKey, TValue>>, TKey), Zen<TValue>> createFunc = (v) =>
-            Simplify(v.Item1, v.Item2);
-
         /// <summary>
         /// Hash cons table for ZenConstMapGetExpr.
         /// </summary>
@@ -37,17 +30,16 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenConstMapGetExpr.
         /// </summary>
-        /// <param name="map">The map expr.</param>
-        /// <param name="key">The key.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<TValue> Simplify(Zen<CMap<TKey, TValue>> map, TKey key)
+        private static Zen<TValue> Simplify((Zen<CMap<TKey, TValue>> map, TKey key) args)
         {
-            if (map is ZenConstMapSetExpr<TKey, TValue> e2 && e2.Key.Equals(key))
+            if (args.map is ZenConstMapSetExpr<TKey, TValue> e2 && e2.Key.Equals(args.key))
             {
                 return e2.ValueExpr;
             }
 
-            return new ZenConstMapGetExpr<TKey, TValue>(map, key);
+            return new ZenConstMapGetExpr<TKey, TValue>(args.map, args.key);
         }
 
         /// <summary>
@@ -62,7 +54,7 @@ namespace ZenLib
             Contract.AssertNotNull(key);
 
             var k = (mapExpr.Id, key);
-            hashConsTable.GetOrAdd(k, (mapExpr, key), createFunc, out var v);
+            hashConsTable.GetOrAdd(k, (mapExpr, key), Simplify, out var v);
             return v;
         }
 

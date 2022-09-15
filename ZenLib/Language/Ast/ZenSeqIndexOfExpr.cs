@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,11 +12,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqIndexOfExpr<T> : Zen<BigInteger>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<Seq<T>>, Zen<BigInteger>), Zen<BigInteger>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
         /// <summary>
         /// Hash cons table for ZenStringIndexOfExpr.
         /// </summary>
@@ -41,13 +35,11 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenSeqIndexOfExpr.
         /// </summary>
-        /// <param name="e1">The seq expr.</param>
-        /// <param name="e2">The subseq expr.</param>
-        /// <param name="e3">The offset expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns></returns>
-        public static Zen<BigInteger> Simplify(Zen<Seq<T>> e1, Zen<Seq<T>> e2, Zen<BigInteger> e3)
+        public static Zen<BigInteger> Simplify((Zen<Seq<T>> e1, Zen<Seq<T>> e2, Zen<BigInteger> e3) args)
         {
-            return new ZenSeqIndexOfExpr<T>(e1, e2, e3);
+            return new ZenSeqIndexOfExpr<T>(args.e1, args.e2, args.e3);
         }
 
         /// <summary>
@@ -64,7 +56,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), Simplify, out var value);
             return value;
         }
 

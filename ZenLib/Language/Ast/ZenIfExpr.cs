@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenIfExpr<T> : Zen<T>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<bool>, Zen<T>, Zen<T>), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
         /// <summary>
         /// Hash cons table for ZenIfExpr.
         /// </summary>
@@ -40,50 +34,48 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenIfExpr.
         /// </summary>
-        /// <param name="g">The guard expr.</param>
-        /// <param name="t">The true expr.</param>
-        /// <param name="f">The false expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<T> Simplify(Zen<bool> g, Zen<T> t, Zen<T> f)
+        private static Zen<T> Simplify((Zen<bool> g, Zen<T> t, Zen<T> f) args)
         {
             // if true then e1 else e2 = e1
             // if false then e1 else e2 = e2
-            if (g is ZenConstantExpr<bool> ce)
+            if (args.g is ZenConstantExpr<bool> ce)
             {
-                return ce.Value ? t : f;
+                return ce.Value ? args.t : args.f;
             }
 
             // if not e then x else y = if e then y else x
-            if (g is ZenNotExpr ne)
+            if (args.g is ZenNotExpr ne)
             {
-                return new ZenIfExpr<T>(ne.Expr, f, t);
+                return new ZenIfExpr<T>(ne.Expr, args.f, args.t);
             }
 
             if (!ZenSettings.PreserveBranches)
             {
                 // if g then e else e = e
-                if (ReferenceEquals(t, f))
+                if (ReferenceEquals(args.t, args.f))
                 {
-                    return t;
+                    return args.t;
                 }
 
                 if (typeof(T) == ReflectionUtilities.BoolType)
                 {
                     // if e1 then true else e2 = Or(e1, e2)
-                    if (t is ZenConstantExpr<bool> te && te.Value)
+                    if (args.t is ZenConstantExpr<bool> te && te.Value)
                     {
-                        return ZenLogicalBinopExpr.Create((dynamic)g, (dynamic)f, ZenLogicalBinopExpr.LogicalOp.Or);
+                        return ZenLogicalBinopExpr.Create((dynamic)args.g, (dynamic)args.f, ZenLogicalBinopExpr.LogicalOp.Or);
                     }
 
                     // if e1 then e2 else false = And(e1, e2)
-                    if (f is ZenConstantExpr<bool> fe && !fe.Value)
+                    if (args.f is ZenConstantExpr<bool> fe && !fe.Value)
                     {
-                        return ZenLogicalBinopExpr.Create((dynamic)g, (dynamic)t, ZenLogicalBinopExpr.LogicalOp.And);
+                        return ZenLogicalBinopExpr.Create((dynamic)args.g, (dynamic)args.t, ZenLogicalBinopExpr.LogicalOp.And);
                     }
                 }
             }
 
-            return new ZenIfExpr<T>(g, t, f);
+            return new ZenIfExpr<T>(args.g, args.t, args.f);
         }
 
         /// <summary>
@@ -100,7 +92,7 @@ namespace ZenLib
             Contract.AssertNotNull(falseExpr);
 
             var key = (guardExpr.Id, trueExpr.Id, falseExpr.Id);
-            hashConsTable.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), Simplify, out var value);
             return value;
         }
 

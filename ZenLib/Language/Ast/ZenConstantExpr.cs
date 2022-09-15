@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenConstantExpr<T> : Zen<T>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<T, Zen<T>> createFunc = (v) => new ZenConstantExpr<T>(v);
-
         /// <summary>
         /// Hash cons table.
         /// </summary>
@@ -28,13 +22,20 @@ namespace ZenLib
         internal T Value { get; }
 
         /// <summary>
+        /// Simplify and create a new ZenBitwiseNot expr.
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <returns>The new expr.</returns>
+        private static Zen<T> Simplify(T c) => new ZenConstantExpr<T>(c);
+
+        /// <summary>
         /// Create a new ZenConstantExpr.
         /// </summary>
         /// <param name="value">The constant value.</param>
         /// <returns>The Zen expr.</returns>
         public static Zen<T> Create(T value)
         {
-            hashConsTable.GetOrAdd(value, value, createFunc, out var v);
+            hashConsTable.GetOrAdd(value, value, Simplify, out var v);
             return v;
         }
 

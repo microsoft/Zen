@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenWithFieldExpr<T1, T2> : Zen<T1>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<T1>, string, Zen<T2>), Zen<T1>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
         /// <summary>
         /// Hash cons table for ZenWithFieldExpr.
         /// </summary>
@@ -40,26 +34,24 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenWithFieldExpr.
         /// </summary>
-        /// <param name="objectExpr">The object expr.</param>
-        /// <param name="fieldName">The field name.</param>
-        /// <param name="fieldExpr">The field value expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<T1> Simplify(Zen<T1> objectExpr, string fieldName, Zen<T2> fieldExpr)
+        public static Zen<T1> Simplify((Zen<T1> objectExpr, string fieldName, Zen<T2> fieldExpr) args)
         {
-            if (objectExpr is ZenCreateObjectExpr<T1> oe)
+            if (args.objectExpr is ZenCreateObjectExpr<T1> oe)
             {
                 int i = 0;
                 var newFields = new (string, object)[oe.Fields.Count];
                 foreach (var fieldValue in oe.Fields)
                 {
-                    var newValue = fieldValue.Key == fieldName ? fieldExpr : fieldValue.Value;
+                    var newValue = fieldValue.Key == args.fieldName ? args.fieldExpr : fieldValue.Value;
                     newFields[i++] = (fieldValue.Key, newValue);
                 }
 
                 return ZenCreateObjectExpr<T1>.Create(newFields);
             }
 
-            return new ZenWithFieldExpr<T1, T2>(objectExpr, fieldName, fieldExpr);
+            return new ZenWithFieldExpr<T1, T2>(args.objectExpr, args.fieldName, args.fieldExpr);
         }
 
         /// <summary>
@@ -77,7 +69,7 @@ namespace ZenLib
             Contract.AssertFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName, fieldValue.Id);
-            hashConsTable.GetOrAdd(key, (expr, fieldName, fieldValue), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr, fieldName, fieldValue), Simplify, out var value);
             return value;
         }
 

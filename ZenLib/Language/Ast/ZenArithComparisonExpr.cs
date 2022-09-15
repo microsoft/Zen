@@ -14,11 +14,6 @@ namespace ZenLib
     internal sealed class ZenArithComparisonExpr<T> : Zen<bool>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<T>, Zen<T>, ComparisonType), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
         /// Hash cons table for ZenComparisonExpr.
         /// </summary>
         private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
@@ -90,35 +85,33 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenComparisonExpr.
         /// </summary>
-        /// <param name="e1">The first expr.</param>
-        /// <param name="e2">The second expr.</param>
-        /// <param name="comparisonType">The comparison type.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>A new ZenComparisonExpr.</returns>
-        private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2, ComparisonType comparisonType)
+        private static Zen<bool> Simplify((Zen<T> e1, Zen<T> e2, ComparisonType comparisonType) args)
         {
-            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
+            if (args.e1 is ZenConstantExpr<BigInteger> be1 && args.e2 is ZenConstantExpr<BigInteger> be2)
             {
-                return Zen.Constant(constantBigIntFuncs[(int)comparisonType](be1.Value, be2.Value));
+                return Zen.Constant(constantBigIntFuncs[(int)args.comparisonType](be1.Value, be2.Value));
             }
 
-            if (e1 is ZenConstantExpr<ulong> ue1 && e2 is ZenConstantExpr<ulong> ue2)
+            if (args.e1 is ZenConstantExpr<ulong> ue1 && args.e2 is ZenConstantExpr<ulong> ue2)
             {
-                return Zen.Constant(constantUlongFuncs[(int)comparisonType](ue1.Value, ue2.Value));
+                return Zen.Constant(constantUlongFuncs[(int)args.comparisonType](ue1.Value, ue2.Value));
             }
 
-            if (e1 is ZenConstantExpr<Real> re1 && e2 is ZenConstantExpr<Real> re2)
+            if (args.e1 is ZenConstantExpr<Real> re1 && args.e2 is ZenConstantExpr<Real> re2)
             {
-                return Zen.Constant(constantRealFuncs[(int)comparisonType](re1.Value, re2.Value));
+                return Zen.Constant(constantRealFuncs[(int)args.comparisonType](re1.Value, re2.Value));
             }
 
-            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+            var x = ReflectionUtilities.GetConstantIntegerValue(args.e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(args.e2);
             if (x.HasValue && y.HasValue)
             {
-                return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)comparisonType](x.Value, y.Value));
+                return ReflectionUtilities.CreateConstantIntegerValue<bool>(constantFuncs[(int)args.comparisonType](x.Value, y.Value));
             }
 
-            return new ZenArithComparisonExpr<T>(e1, e2, comparisonType);
+            return new ZenArithComparisonExpr<T>(args.e1, args.e2, args.comparisonType);
         }
 
         /// <summary>
@@ -135,7 +128,7 @@ namespace ZenLib
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), createFunc, out var value);
+            hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), Simplify, out var value);
             return value;
         }
 

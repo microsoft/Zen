@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,12 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqConcatExpr<T> : Zen<Seq<T>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<Seq<T>>), Zen<Seq<T>>> createFunc = (v) =>
-            Simplify(v.Item1, v.Item2);
-
         /// <summary>
         /// Hash cons table for ZenSeqConcatExpr.
         /// </summary>
@@ -37,22 +30,21 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenSeqConcatExpr.
         /// </summary>
-        /// <param name="seqExpr1">The seq expr.</param>
-        /// <param name="seqExpr2">The seq expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<Seq<T>> Simplify(Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2)
+        private static Zen<Seq<T>> Simplify((Zen<Seq<T>> seqExpr1, Zen<Seq<T>> seqExpr2) args)
         {
-            if (seqExpr1 is ZenConstantExpr<Seq<T>> e1 && e1.Value.Length() == 0)
+            if (args.seqExpr1 is ZenConstantExpr<Seq<T>> e1 && e1.Value.Length() == 0)
             {
-                return seqExpr2;
+                return args.seqExpr2;
             }
 
-            if (seqExpr2 is ZenConstantExpr<Seq<T>> e2 && e2.Value.Length() == 0)
+            if (args.seqExpr2 is ZenConstantExpr<Seq<T>> e2 && e2.Value.Length() == 0)
             {
-                return seqExpr1;
+                return args.seqExpr1;
             }
 
-            return new ZenSeqConcatExpr<T>(seqExpr1, seqExpr2);
+            return new ZenSeqConcatExpr<T>(args.seqExpr1, args.seqExpr2);
         }
 
         /// <summary>
@@ -67,7 +59,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr2);
 
             var k = (seqExpr1.Id, seqExpr2.Id);
-            hashConsTable.GetOrAdd(k, (seqExpr1, seqExpr2), createFunc, out var v);
+            hashConsTable.GetOrAdd(k, (seqExpr1, seqExpr2), Simplify, out var v);
             return v;
         }
 
