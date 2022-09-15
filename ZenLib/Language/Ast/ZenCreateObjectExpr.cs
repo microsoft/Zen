@@ -16,7 +16,7 @@ namespace ZenLib
         /// <summary>
         /// Hash cons table for ZenCreateObjectExpr.
         /// </summary>
-        private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
+        private static Flyweight<(string, long)[], Zen<TObject>> hashConsTable = new Flyweight<(string, long)[], Zen<TObject>>(new ArrayComparer());
 
         /// <summary>
         /// The fields of the object.

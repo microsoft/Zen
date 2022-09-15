@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenSeqContainsExpr<T> : Zen<bool>
     {
         /// <summary>
-        /// Hash cons table for ZenSeqContainsExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
-
-        /// <summary>
         /// Gets the seq expression.
         /// </summary>
         internal Zen<Seq<T>> SeqExpr { get; }
@@ -54,7 +49,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)containmentType);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, containmentType), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenSeqContainsExpr<T>, (long, long, int), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, containmentType), Simplify, out var value);
             return value;
         }
 

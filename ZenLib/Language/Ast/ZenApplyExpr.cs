@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenApplyExpr<TSrc, TDst> : Zen<TDst>
     {
         /// <summary>
-        /// Hash cons table for ZenApplyExpr.
-        /// </summary>
-        private static HashConsTable<(object, long), Zen<TDst>> hashConsTable = new HashConsTable<(object, long), Zen<TDst>>();
-
-        /// <summary>
         /// Gets the first expression.
         /// </summary>
         internal ZenLambda<TSrc, TDst> Lambda { get; }
@@ -48,7 +43,8 @@ namespace ZenLib
             Contract.AssertNotNull(parameterExpr);
 
             var key = (lambda, parameterExpr.Id);
-            hashConsTable.GetOrAdd(key, (lambda, parameterExpr), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenApplyExpr<TSrc, TDst>, (object, long), Zen<TDst>>.Flyweight;
+            flyweight.GetOrAdd(key, (lambda, parameterExpr), Simplify, out var value);
             return value;
         }
 

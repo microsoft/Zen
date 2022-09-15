@@ -28,11 +28,6 @@ namespace ZenLib
         };
 
         /// <summary>
-        /// Hash cons table for ZenIntegerBinopExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<T>> hashConsTable = new HashConsTable<(long, long, int), Zen<T>>();
-
-        /// <summary>
         /// Gets the first expression.
         /// </summary>
         internal Zen<T> Expr1 { get; }
@@ -81,7 +76,8 @@ namespace ZenLib
 
             var type = typeof(T);
             var key = (expr1.Id, expr2.Id, (int)op);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenBitwiseBinopExpr<T>, (long, long, int), Zen<T>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }
 

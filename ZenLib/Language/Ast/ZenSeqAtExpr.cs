@@ -13,11 +13,6 @@ namespace ZenLib
     internal sealed class ZenSeqAtExpr<T> : Zen<Seq<T>>
     {
         /// <summary>
-        /// Hash cons table for ZenSeqAtExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long), Zen<Seq<T>>>();
-
-        /// <summary>
         /// Gets the seq expression.
         /// </summary>
         internal Zen<Seq<T>> SeqExpr { get; }
@@ -46,7 +41,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenSeqAtExpr<T>, (long, long), Zen<Seq<T>>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
             return value;
         }
 

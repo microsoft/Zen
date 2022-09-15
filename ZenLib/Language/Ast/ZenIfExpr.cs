@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenIfExpr<T> : Zen<T>
     {
         /// <summary>
-        /// Hash cons table for ZenIfExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, long), Zen<T>> hashConsTable = new HashConsTable<(long, long, long), Zen<T>>();
-
-        /// <summary>
         /// Gets the guard expression.
         /// </summary>
         internal Zen<bool> GuardExpr { get; }
@@ -92,7 +87,8 @@ namespace ZenLib
             Contract.AssertNotNull(falseExpr);
 
             var key = (guardExpr.Id, trueExpr.Id, falseExpr.Id);
-            hashConsTable.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenIfExpr<T>, (long, long, long), Zen<T>>.Flyweight;
+            flyweight.GetOrAdd(key, (guardExpr, trueExpr, falseExpr), Simplify, out var value);
             return value;
         }
 

@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenFSeqAddFrontExpr<T> : Zen<FSeq<T>>
     {
         /// <summary>
-        /// Hash cons table for ZenListAddFrontExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), Zen<FSeq<T>>> hashConsTable = new HashConsTable<(long, long), Zen<FSeq<T>>>();
-
-        /// <summary>
         /// Gets the list expr.
         /// </summary>
         public Zen<FSeq<T>> ListExpr { get; }
@@ -45,7 +40,8 @@ namespace ZenLib
             Contract.AssertNotNull(element);
 
             var key = (expr.Id, element.Id);
-            hashConsTable.GetOrAdd(key, (expr, element), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenFSeqAddFrontExpr<T>, (long, long), Zen<FSeq<T>>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr, element), Simplify, out var value);
             return value;
         }
 

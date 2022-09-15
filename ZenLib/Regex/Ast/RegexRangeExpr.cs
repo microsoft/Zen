@@ -20,7 +20,7 @@ namespace ZenLib
         /// <summary>
         /// Hash cons table for Regex terms.
         /// </summary>
-        private static HashConsTable<(T, T), Regex<T>> hashConsTable = new HashConsTable<(T, T), Regex<T>>();
+        private static Flyweight<(T, T), Regex<T>> hashConsTable = new Flyweight<(T, T), Regex<T>>();
 
         /// <summary>
         /// Gets the first Regex expression.

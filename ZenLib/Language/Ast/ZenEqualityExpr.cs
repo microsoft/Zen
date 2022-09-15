@@ -13,11 +13,6 @@ namespace ZenLib
     internal sealed class ZenEqualityExpr<T> : Zen<bool>
     {
         /// <summary>
-        /// Hash cons table for ZenEqualityExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
-
-        /// <summary>
         /// Gets the first expression.
         /// </summary>
         internal Zen<T> Expr1 { get; }
@@ -76,7 +71,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenEqualityExpr<T>, (long, long), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
             return value;
         }
 

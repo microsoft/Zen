@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,12 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenMapCombineExpr<TKey> : Zen<Map<TKey, SetUnit>>
     {
-        /// <summary>
-        /// Hash cons table for ZenMapCombineExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>> hashConsTable =
-            new HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>>();
-
         /// <summary>
         /// Gets the first map expr.
         /// </summary>
@@ -123,7 +116,8 @@ namespace ZenLib
             Contract.AssertNotNull(mapExpr2);
 
             var k = (mapExpr1.Id, mapExpr2.Id, (int)combineType);
-            hashConsTable.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), Simplify, out var v);
+            var flyweight = ZenAstCache<ZenMapCombineExpr<TKey>, (long, long, int), Zen<Map<TKey, SetUnit>>>.Flyweight;
+            flyweight.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), Simplify, out var v);
             return v;
         }
 

@@ -14,11 +14,6 @@ namespace ZenLib
     internal sealed class ZenArithComparisonExpr<T> : Zen<bool>
     {
         /// <summary>
-        /// Hash cons table for ZenComparisonExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
-
-        /// <summary>
         /// The strings for different comparison operations.
         /// </summary>
         private string[] opStrings = new string[] { ">=", "<=", ">", "<" };
@@ -128,7 +123,8 @@ namespace ZenLib
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, comparisonType), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenArithComparisonExpr<T>, (long, long, int), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, comparisonType), Simplify, out var value);
             return value;
         }
 

@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenLogicalBinopExpr : Zen<bool>
     {
         /// <summary>
-        /// Hash cons table for And terms.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
-
-        /// <summary>
         /// Gets the first expression.
         /// </summary>
         internal Zen<bool> Expr1 { get; }
@@ -85,7 +80,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)op);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenLogicalBinopExpr, (long, long, int), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }
 

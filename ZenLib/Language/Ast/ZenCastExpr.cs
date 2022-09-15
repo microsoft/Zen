@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenCastExpr<TSource, TTarget> : Zen<TTarget>
     {
         /// <summary>
-        /// Hash cons table for ZenCastExpr.
-        /// </summary>
-        private static HashConsTable<long, Zen<TTarget>> hashConsTable = new HashConsTable<long, Zen<TTarget>>();
-
-        /// <summary>
         /// Gets the source expr.
         /// </summary>
         public Zen<TSource> SourceExpr { get; }
@@ -38,7 +33,8 @@ namespace ZenLib
             Contract.AssertNotNull(sourceExpr);
             Contract.Assert(CommonUtilities.IsSafeCast(typeof(TSource), typeof(TTarget)), "Invalid cast");
 
-            hashConsTable.GetOrAdd(sourceExpr.Id, sourceExpr, Simplify, out var v);
+            var flyweight = ZenAstCache<ZenCastExpr<TSource, TTarget>, long, Zen<TTarget>>.Flyweight;
+            flyweight.GetOrAdd(sourceExpr.Id, sourceExpr, Simplify, out var v);
             return v;
         }
 

@@ -12,12 +12,6 @@ namespace ZenLib
     internal sealed class ZenConstMapGetExpr<TKey, TValue> : Zen<TValue>
     {
         /// <summary>
-        /// Hash cons table for ZenConstMapGetExpr.
-        /// </summary>
-        private static HashConsTable<(long, TKey), Zen<TValue>> hashConsTable =
-            new HashConsTable<(long, TKey), Zen<TValue>>();
-
-        /// <summary>
         /// Gets the map expr.
         /// </summary>
         public Zen<CMap<TKey, TValue>> MapExpr { get; }
@@ -54,7 +48,8 @@ namespace ZenLib
             Contract.AssertNotNull(key);
 
             var k = (mapExpr.Id, key);
-            hashConsTable.GetOrAdd(k, (mapExpr, key), Simplify, out var v);
+            var flyweight = ZenAstCache<ZenConstMapGetExpr<TKey, TValue>, (long, TKey), Zen<TValue>>.Flyweight;
+            flyweight.GetOrAdd(k, (mapExpr, key), Simplify, out var v);
             return v;
         }
 

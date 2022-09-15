@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenGetFieldExpr<T1, T2> : Zen<T2>
     {
         /// <summary>
-        /// Hash cons table for ZenGetFieldExpr.
-        /// </summary>
-        private static HashConsTable<(long, string), Zen<T2>> hashConsTable = new HashConsTable<(long, string), Zen<T2>>();
-
-        /// <summary>
         /// Gets the expression.
         /// </summary>
         public Zen<T1> Expr { get; }
@@ -69,7 +64,8 @@ namespace ZenLib
             Contract.AssertFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName);
-            hashConsTable.GetOrAdd(key, (expr, fieldName), Simplify, out var value);
+            var flyweight = ZenAstCache<ZenGetFieldExpr<T1, T2>, (long, string), Zen<T2>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr, fieldName), Simplify, out var value);
             return value;
         }
 

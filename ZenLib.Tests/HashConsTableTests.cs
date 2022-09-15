@@ -36,7 +36,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInsertion()
         {
-            var ht = new HashConsTable<int, object>();
+            var ht = new Flyweight<int, object>();
             Check(ht);
         }
 
@@ -46,7 +46,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestGarbageCollection()
         {
-            var ht = new HashConsTable<int, object>();
+            var ht = new Flyweight<int, object>();
             Check(ht);
             GC.Collect();
             Check(ht);
@@ -56,7 +56,7 @@ namespace ZenLib.Tests
         /// Checks insertion into the hash cons table.
         /// </summary>
         /// <param name="ht">The table to use.</param>
-        private void Check(HashConsTable<int, object> ht)
+        private void Check(Flyweight<int, object> ht)
         {
             Assert.IsTrue(ht.GetOrAdd(1, 1, (v) => v, out var _));
             Assert.IsTrue(ht.GetOrAdd(2, 2, (v) => v, out var _));
@@ -69,7 +69,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestInsertMany()
         {
-            var ht = new HashConsTable<int, object>();
+            var ht = new Flyweight<int, object>();
 
             for (int i = 0; i < 1000; i++)
             {

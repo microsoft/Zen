@@ -12,12 +12,6 @@ namespace ZenLib
     internal sealed class ZenSeqConcatExpr<T> : Zen<Seq<T>>
     {
         /// <summary>
-        /// Hash cons table for ZenSeqConcatExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), Zen<Seq<T>>> hashConsTable =
-            new HashConsTable<(long, long), Zen<Seq<T>>>();
-
-        /// <summary>
         /// Gets the first seq expr.
         /// </summary>
         public Zen<Seq<T>> SeqExpr1 { get; }
@@ -59,7 +53,8 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr2);
 
             var k = (seqExpr1.Id, seqExpr2.Id);
-            hashConsTable.GetOrAdd(k, (seqExpr1, seqExpr2), Simplify, out var v);
+            var flyweight = ZenAstCache<ZenSeqConcatExpr<T>, (long, long), Zen<Seq<T>>>.Flyweight;
+            flyweight.GetOrAdd(k, (seqExpr1, seqExpr2), Simplify, out var v);
             return v;
         }
 
