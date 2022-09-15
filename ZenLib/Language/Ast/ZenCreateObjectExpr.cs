@@ -14,11 +14,6 @@ namespace ZenLib
     internal sealed class ZenCreateObjectExpr<TObject> : Zen<TObject>
     {
         /// <summary>
-        /// Hash cons table for ZenCreateObjectExpr.
-        /// </summary>
-        private static Flyweight<(string, long)[], Zen<TObject>> hashConsTable = new Flyweight<(string, long)[], Zen<TObject>>(new ArrayComparer());
-
-        /// <summary>
         /// The fields of the object.
         /// </summary>
         public SortedDictionary<string, object> Fields { get; }
@@ -59,7 +54,8 @@ namespace ZenLib
                 fieldIds[i] = (f.Item1, id);
             }
 
-            hashConsTable.GetOrAdd(fieldIds, fields, Simplify, out var value);
+            var flyweight = ZenAstCache<ZenCreateObjectExpr<TObject>, (string, long), Zen<TObject>>.FlyweightArray;
+            flyweight.GetOrAdd(fieldIds, fields, Simplify, out var value);
             return value;
         }
 
@@ -117,43 +113,6 @@ namespace ZenLib
         internal override void Accept(ZenExprActionVisitor visitor)
         {
             visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Custom array comparer for ensuring hash consing uniqueness.
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        private class ArrayComparer : IEqualityComparer<(string, long)[]>
-        {
-            public bool Equals((string, long)[] a1, (string, long)[] a2)
-            {
-                if (a1.Length != a2.Length)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < a1.Length; i++)
-                {
-                    if (a1[i] != a2[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public int GetHashCode((string, long)[] array)
-            {
-                int result = 31;
-                for (int i = 0; i < array.Length; i++)
-                {
-                    var (s, o) = array[i];
-                    result = result * 7 + s.GetHashCode() + o.GetHashCode();
-                }
-
-                return result;
-            }
         }
     }
 }

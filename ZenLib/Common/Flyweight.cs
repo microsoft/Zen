@@ -25,7 +25,7 @@ namespace ZenLib
         private Dictionary<TKey, WeakReference<TValue>> table = new Dictionary<TKey, WeakReference<TValue>>();
 
         /// <summary>
-        /// Creates a new HashConsTable.
+        /// Creates a new instance of the <see cref="Flyweight{TKey, TValue}"/> class.
         /// </summary>
         /// <param name="comparer">An optional comparer.</param>
         public Flyweight(IEqualityComparer<TKey> comparer = null)

@@ -35,18 +35,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test hash consing of terms.
-        /// </summary>
-        [TestMethod]
-        public void TestHashCons()
-        {
-            Assert.IsTrue(ReferenceEquals(~Constant<int>(10), ~Constant<int>(10)));
-            Assert.IsTrue(ReferenceEquals(Constant<int>(10) - Constant<int>(10), Constant<int>(10) - Constant<int>(10)));
-            Assert.IsTrue(ReferenceEquals(Constant<int>(10) * Constant<int>(10), Constant<int>(10) * Constant<int>(10)));
-            Assert.IsTrue(ReferenceEquals(Option.Create<int>(1), Option.Create<int>(1)));
-        }
-
-        /// <summary>
         /// Simplify and with constants.
         /// </summary>
         [TestMethod]
@@ -351,92 +339,6 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
-        /// Test hash consing of concat.
-        /// </summary>
-        [TestMethod]
-        public void TestConcatHashCons()
-        {
-            var s = Arbitrary<string>();
-            var e1 = s + "ll";
-            var e2 = s + "ll";
-            var e3 = s + "lll";
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-        }
-
-        /// <summary>
-        /// Test hash consing of containment.
-        /// </summary>
-        [TestMethod]
-        public void TestContainsHashCons()
-        {
-            var s = Arbitrary<string>();
-            var e1 = s.Contains("ll");
-            var e2 = s.Contains("ll");
-            var e3 = s.EndsWith("ll");
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-        }
-
-        /// <summary>
-        /// Test hash consing of replacement.
-        /// </summary>
-        [TestMethod]
-        public void TestReplaceHashCons()
-        {
-            var s = Arbitrary<string>();
-            var e1 = s.ReplaceFirst("xx", "yy");
-            var e2 = s.ReplaceFirst("xx", "yy");
-            var e3 = s.ReplaceFirst("xx", "zz");
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-        }
-
-        /// <summary>
-        /// Test hash consing of substring.
-        /// </summary>
-        [TestMethod]
-        public void TestSubstringHashCons()
-        {
-            var s = Arbitrary<string>();
-            var e1 = s.Slice(new BigInteger(0), new BigInteger(1));
-            var e2 = s.Slice(new BigInteger(0), new BigInteger(1));
-            var e3 = s.Slice(new BigInteger(0), new BigInteger(2));
-            var e4 = s.Slice(new BigInteger(1), new BigInteger(1));
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-            Assert.IsFalse(ReferenceEquals(e1, e4));
-        }
-
-        /// <summary>
-        /// Test hash consing of length.
-        /// </summary>
-        [TestMethod]
-        public void TestLengthHashCons()
-        {
-            var e1 = Zen.Length("abc");
-            var e2 = Zen.Length("abc");
-            var e3 = Zen.Length("ab");
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-        }
-
-        /// <summary>
-        /// Test hash consing of indexof.
-        /// </summary>
-        [TestMethod]
-        public void TestIndexOfHashCons()
-        {
-            var e1 = Zen.IndexOf("abc", "a", new BigInteger(0));
-            var e2 = Zen.IndexOf("abc", "a", new BigInteger(0));
-            var e3 = Zen.IndexOf("abc", "a", new BigInteger(1));
-            var e4 = Zen.IndexOf("abc", "b", new BigInteger(0));
-            Assert.IsTrue(ReferenceEquals(e1, e2));
-            Assert.IsFalse(ReferenceEquals(e1, e3));
-            Assert.IsFalse(ReferenceEquals(e1, e4));
-        }
-
-        /// <summary>
         /// Simplify if conditions.
         /// </summary>
         [TestMethod]
@@ -709,11 +611,109 @@ namespace ZenLib.Tests
         /// Exception thrown since implicit conversion won't work with object fields.
         /// </summary>
         [TestMethod]
-        public void TestHashconsingWorksForCreate()
+        public void TestFlyweightWorksForCreate()
         {
             var x = Create<Object2>(("Field1", Constant(0)), ("Field2", Constant(0)));
             var y = Create<Object2>(("Field2", Constant(0)), ("Field1", Constant(0)));
             Assert.AreEqual(x, y);
+        }
+
+        /// <summary>
+        /// Test hash consing of terms.
+        /// </summary>
+        [TestMethod]
+        public void TestFlyweight()
+        {
+            Assert.IsTrue(ReferenceEquals(~Constant<int>(10), ~Constant<int>(10)));
+            Assert.IsTrue(ReferenceEquals(Constant<int>(10) - Constant<int>(10), Constant<int>(10) - Constant<int>(10)));
+            Assert.IsTrue(ReferenceEquals(Constant<int>(10) * Constant<int>(10), Constant<int>(10) * Constant<int>(10)));
+            Assert.IsTrue(ReferenceEquals(Option.Create<int>(1), Option.Create<int>(1)));
+        }
+
+        /// <summary>
+        /// Test hash consing of concat.
+        /// </summary>
+        [TestMethod]
+        public void TestConcatFlyweight()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s + "ll";
+            var e2 = s + "ll";
+            var e3 = s + "lll";
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of containment.
+        /// </summary>
+        [TestMethod]
+        public void TestContainsFlyweight()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.Contains("ll");
+            var e2 = s.Contains("ll");
+            var e3 = s.EndsWith("ll");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of replacement.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceFlyweight()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.ReplaceFirst("xx", "yy");
+            var e2 = s.ReplaceFirst("xx", "yy");
+            var e3 = s.ReplaceFirst("xx", "zz");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of substring.
+        /// </summary>
+        [TestMethod]
+        public void TestSubstringFlyweight()
+        {
+            var s = Arbitrary<string>();
+            var e1 = s.Slice(new BigInteger(0), new BigInteger(1));
+            var e2 = s.Slice(new BigInteger(0), new BigInteger(1));
+            var e3 = s.Slice(new BigInteger(0), new BigInteger(2));
+            var e4 = s.Slice(new BigInteger(1), new BigInteger(1));
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+            Assert.IsFalse(ReferenceEquals(e1, e4));
+        }
+
+        /// <summary>
+        /// Test hash consing of length.
+        /// </summary>
+        [TestMethod]
+        public void TestLengthFlyweight()
+        {
+            var e1 = Zen.Length("abc");
+            var e2 = Zen.Length("abc");
+            var e3 = Zen.Length("ab");
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+        }
+
+        /// <summary>
+        /// Test hash consing of indexof.
+        /// </summary>
+        [TestMethod]
+        public void TestIndexOfFlyweight()
+        {
+            var e1 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e2 = Zen.IndexOf("abc", "a", new BigInteger(0));
+            var e3 = Zen.IndexOf("abc", "a", new BigInteger(1));
+            var e4 = Zen.IndexOf("abc", "b", new BigInteger(0));
+            Assert.IsTrue(ReferenceEquals(e1, e2));
+            Assert.IsFalse(ReferenceEquals(e1, e3));
+            Assert.IsFalse(ReferenceEquals(e1, e4));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq.Expressions;
+    using ZenLib;
     using ZenLib.Compilation;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
@@ -51,8 +52,8 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T>> function)
         {
             Contract.AssertNotNull(function);
-            this.Function = function;
-            this.FunctionBodyExpr = this.Function();
+            Function = function;
+            FunctionBodyExpr = Function();
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace ZenLib
             }
 
             var args = new Dictionary<long, object>();
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, Expression>.Empty;
-            this.CompiledFunction = CodeGenerator.Compile(this.FunctionBodyExpr, args, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile(FunctionBodyExpr, args, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace ZenLib
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            var result = invariant(this.Function());
+            var result = invariant(Function());
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend) != null);
         }
     }
@@ -149,12 +150,12 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>> function)
         {
             Contract.AssertNotNull(function);
-            this.Function = function;
+            Function = function;
             lock (argumentLock)
             {
                 Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
             }
-            this.FunctionBodyExpr = this.Function(Argument1);
+            FunctionBodyExpr = Function(Argument1);
         }
 
         /// <summary>
@@ -170,7 +171,7 @@ namespace ZenLib
             }
 
             var args = new Dictionary<long, object> { { Argument1.ParameterId, value } };
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -189,7 +190,7 @@ namespace ZenLib
             var param1 = Expression.Parameter(typeof(T1));
             var args = ImmutableDictionary<long, Expression>.Empty
                 .Add(Argument1.ParameterId, param1);
-            this.CompiledFunction = CodeGenerator.Compile<T1, T2>(this.FunctionBodyExpr, args, param1, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2>(FunctionBodyExpr, args, param1, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -201,13 +202,13 @@ namespace ZenLib
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
 
-            var key = (typeof((T1, T2)), this.FunctionBodyExpr.Id);
+            var key = (typeof((T1, T2)), FunctionBodyExpr.Id);
             if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
                 return (StateSetTransformer<T1, T2>)transformer;
             }
 
-            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(this.Function, manager));
+            var result = CommonUtilities.RunWithLargeStack(() => StateSetTransformerFactory.CreateTransformer(Function, manager));
             manager.TransformerCache.Add(key, result);
             return result;
         }
@@ -233,7 +234,7 @@ namespace ZenLib
                 { Argument1.ParameterId, input },
             };
 
-            var result = invariant(Argument1, this.FunctionBodyExpr);
+            var result = invariant(Argument1, FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, backend));
         }
 
@@ -257,7 +258,7 @@ namespace ZenLib
                 { Argument1.ParameterId, input },
             };
 
-            var result = invariant(input, this.FunctionBodyExpr);
+            var result = invariant(input, FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -291,7 +292,7 @@ namespace ZenLib
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
             precondition = precondition == null ? (x) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input, backend));
         }
     }
 
@@ -349,13 +350,13 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>> function)
         {
             Contract.AssertNotNull(function);
-            this.Function = function;
+            Function = function;
             lock (argumentLock)
             {
                 Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
                 Argument2 = Argument2 ?? new ZenParameterExpr<T2>();
             }
-            this.FunctionBodyExpr = this.Function(Argument1, Argument2);
+            FunctionBodyExpr = Function(Argument1, Argument2);
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace ZenLib
                 { Argument2.ParameterId, value2 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -398,7 +399,7 @@ namespace ZenLib
             var args = ImmutableDictionary<long, Expression>.Empty
                 .Add(Argument1.ParameterId, param1)
                 .Add(Argument2.ParameterId, param2);
-            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(this.FunctionBodyExpr, args, param1, param2, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(FunctionBodyExpr, args, param1, param2, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -410,13 +411,13 @@ namespace ZenLib
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
 
-            var key = (typeof((Pair<T1, T2>, T3)), this.FunctionBodyExpr.Id);
+            var key = (typeof((Pair<T1, T2>, T3)), FunctionBodyExpr.Id);
             if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
                 return (StateSetTransformer<Pair<T1, T2>, T3>)transformer;
             }
 
-            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => this.Function(p.Item1(), p.Item2());
+            Func<Zen<Pair<T1, T2>>, Zen<T3>> f = p => Function(p.Item1(), p.Item2());
             var result = StateSetTransformerFactory.CreateTransformer(f, manager);
             manager.TransformerCache.Add(key, result);
             return result;
@@ -447,7 +448,7 @@ namespace ZenLib
                 { Argument2.ParameterId, input2 },
             };
 
-            var result = invariant(Argument1, Argument2, this.FunctionBodyExpr);
+            var result = invariant(Argument1, Argument2, FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend));
         }
 
@@ -475,7 +476,7 @@ namespace ZenLib
                 { Argument2.ParameterId, input2 },
             };
 
-            var result = invariant(input1, input2, this.FunctionBodyExpr);
+            var result = invariant(input1, input2, FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -513,7 +514,7 @@ namespace ZenLib
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             precondition = precondition == null ? (x, y) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, backend));
         }
     }
 
@@ -577,14 +578,14 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function)
         {
             Contract.AssertNotNull(function);
-            this.Function = function;
+            Function = function;
             lock (argumentLock)
             {
                 Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
                 Argument2 = Argument2 ?? new ZenParameterExpr<T2>();
                 Argument3 = Argument3 ?? new ZenParameterExpr<T3>();
             }
-            this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3);
+            FunctionBodyExpr = Function(Argument1, Argument2, Argument3);
         }
 
         /// <summary>
@@ -608,7 +609,7 @@ namespace ZenLib
                 { Argument3.ParameterId, value3 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -631,7 +632,7 @@ namespace ZenLib
                 .Add(Argument1.ParameterId, param1)
                 .Add(Argument2.ParameterId, param2)
                 .Add(Argument3.ParameterId, param3);
-            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(this.FunctionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(FunctionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -643,13 +644,13 @@ namespace ZenLib
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
 
-            var key = (typeof((Pair<T1, T2, T3>, T4)), this.FunctionBodyExpr.Id);
+            var key = (typeof((Pair<T1, T2, T3>, T4)), FunctionBodyExpr.Id);
             if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
                 return (StateSetTransformer<Pair<T1, T2, T3>, T4>)transformer;
             }
 
-            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3());
+            Func<Zen<Pair<T1, T2, T3>>, Zen<T4>> f = p => Function(p.Item1(), p.Item2(), p.Item3());
             var result = StateSetTransformerFactory.CreateTransformer(f, manager);
             manager.TransformerCache.Add(key, result);
             return result;
@@ -684,7 +685,7 @@ namespace ZenLib
                 { Argument3.ParameterId, input3 },
             };
 
-            var result = invariant(Argument1, Argument2, Argument3, this.FunctionBodyExpr);
+            var result = invariant(Argument1, Argument2, Argument3, FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend));
         }
 
@@ -716,7 +717,7 @@ namespace ZenLib
                 { Argument3.ParameterId, input3 },
             };
 
-            var result = invariant(input1, input2, input3, this.FunctionBodyExpr);
+            var result = invariant(input1, input2, input3, FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -757,7 +758,7 @@ namespace ZenLib
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             precondition = precondition == null ? (x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, backend));
         }
     }
 
@@ -827,7 +828,7 @@ namespace ZenLib
         public ZenFunction(Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function)
         {
             Contract.AssertNotNull(function);
-            this.Function = function;
+            Function = function;
             lock (argumentLock)
             {
                 Argument1 = Argument1 ?? new ZenParameterExpr<T1>();
@@ -835,7 +836,7 @@ namespace ZenLib
                 Argument3 = Argument3 ?? new ZenParameterExpr<T3>();
                 Argument4 = Argument4 ?? new ZenParameterExpr<T4>();
             }
-            this.FunctionBodyExpr = this.Function(Argument1, Argument2, Argument3, Argument4);
+            FunctionBodyExpr = Function(Argument1, Argument2, Argument3, Argument4);
         }
 
         /// <summary>
@@ -861,7 +862,7 @@ namespace ZenLib
                 { Argument4.ParameterId, value4 },
             };
 
-            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(this.FunctionBodyExpr, args).Item1);
+            return CommonUtilities.RunWithLargeStack(() => Interpreter.Run(FunctionBodyExpr, args).Item1);
         }
 
         /// <summary>
@@ -886,7 +887,7 @@ namespace ZenLib
                 .Add(Argument2.ParameterId, param2)
                 .Add(Argument3.ParameterId, param3)
                 .Add(Argument4.ParameterId, param4);
-            this.CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(this.FunctionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(FunctionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
         }
 
         /// <summary>
@@ -898,13 +899,13 @@ namespace ZenLib
         {
             manager = StateSetTransformerFactory.GetOrDefaultManager(manager);
 
-            var key = (typeof((Pair<T1, T2, T3, T4>, T5)), this.FunctionBodyExpr.Id);
+            var key = (typeof((Pair<T1, T2, T3, T4>, T5)), FunctionBodyExpr.Id);
             if (manager.TransformerCache.TryGetValue(key, out var transformer))
             {
                 return (StateSetTransformer<Pair<T1, T2, T3, T4>, T5>)transformer;
             }
 
-            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => this.Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
+            Func<Zen<Pair<T1, T2, T3, T4>>, Zen<T5>> f = p => Function(p.Item1(), p.Item2(), p.Item3(), p.Item4());
             var result = StateSetTransformerFactory.CreateTransformer(f, manager);
             manager.TransformerCache.Add(key, result);
             return result;
@@ -943,7 +944,7 @@ namespace ZenLib
                 { Argument4.ParameterId, input4 },
             };
 
-            var result = invariant(Argument1, Argument2, Argument3, Argument4, this.FunctionBodyExpr);
+            var result = invariant(Argument1, Argument2, Argument3, Argument4, FunctionBodyExpr);
             return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend));
         }
 
@@ -979,7 +980,7 @@ namespace ZenLib
                 { Argument4.ParameterId, input4 },
             };
 
-            var result = invariant(input1, input2, input3, input4, this.FunctionBodyExpr);
+            var result = invariant(input1, input2, input3, input4, FunctionBodyExpr);
 
             Zen<bool> blocking = false;
 
@@ -1023,7 +1024,7 @@ namespace ZenLib
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
             precondition = precondition == null ? (w, x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(this.Function, precondition, input1, input2, input3, input4, backend));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, input4, backend));
         }
     }
 }

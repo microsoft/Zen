@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace ZenLib.ZenLanguage
+namespace ZenLib
 {
     using System;
     using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿// <copyright file="HashConsTableTests.cs" company="Microsoft">
+﻿// <copyright file="FlyweightTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -13,7 +13,7 @@ namespace ZenLib.Tests
     /// </summary>
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class HashConsTableTests
+    public class FlyweightTests
     {
         /// <summary>
         /// Test that Zen ids are working.

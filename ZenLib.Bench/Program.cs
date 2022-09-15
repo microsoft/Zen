@@ -4,15 +4,12 @@
 
 namespace ZenLibBench
 {
-    using System;
-    using System.Linq;
     using ZenLib;
-    using ZenLib.TransitionSystem;
  
     /// <summary>
     /// Run a collection of benchmarks for Zen.
     /// </summary>
-    class Program
+    public class Program
     {
         /// <summary>
         /// Main entry point.
