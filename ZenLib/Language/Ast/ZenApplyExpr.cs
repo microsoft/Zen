@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,16 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenApplyExpr<TSrc, TDst> : Zen<TDst>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(ZenLambda<TSrc, TDst>, Zen<TSrc>), Zen<TDst>> createFunc = (v) => Simplify(v.Item1, v.Item2);
-
-        /// <summary>
-        /// Hash cons table for ZenApplyExpr.
-        /// </summary>
-        private static HashConsTable<(object, long), Zen<TDst>> hashConsTable = new HashConsTable<(object, long), Zen<TDst>>();
-
         /// <summary>
         /// Gets the first expression.
         /// </summary>
@@ -35,12 +24,11 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenApplyExpr.
         /// </summary>
-        /// <param name="lambda">The lambda expression.</param>
-        /// <param name="parameterExpr">The parameter expression.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new expr.</returns>
-        private static Zen<TDst> Simplify(ZenLambda<TSrc, TDst> lambda, Zen<TSrc> parameterExpr)
+        private static Zen<TDst> Simplify((ZenLambda<TSrc, TDst> lambda, Zen<TSrc> parameterExpr) args)
         {
-            return new ZenApplyExpr<TSrc, TDst>(lambda, parameterExpr);
+            return new ZenApplyExpr<TSrc, TDst>(args.lambda, args.parameterExpr);
         }
 
         /// <summary>
@@ -55,7 +43,8 @@ namespace ZenLib
             Contract.AssertNotNull(parameterExpr);
 
             var key = (lambda, parameterExpr.Id);
-            hashConsTable.GetOrAdd(key, (lambda, parameterExpr), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenApplyExpr<TSrc, TDst>, (object, long), Zen<TDst>>.Flyweight;
+            flyweight.GetOrAdd(key, (lambda, parameterExpr), Simplify, out var value);
             return value;
         }
 

@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenNotExpr : Zen<bool>
     {
         /// <summary>
-        /// Hash cons table for ZenNotExpr.
-        /// </summary>
-        private static HashConsTable<long, Zen<bool>> hashConsTable = new HashConsTable<long, Zen<bool>>();
-
-        /// <summary>
         /// Gets the expression.
         /// </summary>
         internal Zen<bool> Expr { get; }
@@ -50,7 +45,8 @@ namespace ZenLib
         {
             Contract.AssertNotNull(expr);
 
-            hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
+            var flyweight = ZenAstCache<ZenNotExpr, long, Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }
 

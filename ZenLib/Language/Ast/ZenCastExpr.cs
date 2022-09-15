@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,19 +12,16 @@ namespace ZenLib
     internal sealed class ZenCastExpr<TSource, TTarget> : Zen<TTarget>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<Zen<TSource>, Zen<TTarget>> createFunc = (v) => new ZenCastExpr<TSource, TTarget>(v);
-
-        /// <summary>
-        /// Hash cons table for ZenCastExpr.
-        /// </summary>
-        private static HashConsTable<long, Zen<TTarget>> hashConsTable = new HashConsTable<long, Zen<TTarget>>();
-
-        /// <summary>
         /// Gets the source expr.
         /// </summary>
         public Zen<TSource> SourceExpr { get; }
+
+        /// <summary>
+        /// Simplify and create a new ZenCastExpr expr.
+        /// </summary>
+        /// <param name="e">The expr to cast.</param>
+        /// <returns>The new expr.</returns>
+        private static Zen<TTarget> Simplify(Zen<TSource> e) => new ZenCastExpr<TSource, TTarget>(e);
 
         /// <summary>
         /// Create a new ZenCastExpr.
@@ -37,7 +33,8 @@ namespace ZenLib
             Contract.AssertNotNull(sourceExpr);
             Contract.Assert(CommonUtilities.IsSafeCast(typeof(TSource), typeof(TTarget)), "Invalid cast");
 
-            hashConsTable.GetOrAdd(sourceExpr.Id, sourceExpr, createFunc, out var v);
+            var flyweight = ZenAstCache<ZenCastExpr<TSource, TTarget>, long, Zen<TTarget>>.Flyweight;
+            flyweight.GetOrAdd(sourceExpr.Id, sourceExpr, Simplify, out var v);
             return v;
         }
 

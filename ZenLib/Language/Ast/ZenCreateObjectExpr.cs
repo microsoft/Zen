@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
@@ -15,19 +14,16 @@ namespace ZenLib
     internal sealed class ZenCreateObjectExpr<TObject> : Zen<TObject>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(string, object)[], Zen<TObject>> createFunc = (v) => new ZenCreateObjectExpr<TObject>(v);
-
-        /// <summary>
-        /// Hash cons table for ZenCreateObjectExpr.
-        /// </summary>
-        private static HashConsTable<(string, long)[], Zen<TObject>> hashConsTable = new HashConsTable<(string, long)[], Zen<TObject>>(new ArrayComparer());
-
-        /// <summary>
         /// The fields of the object.
         /// </summary>
         public SortedDictionary<string, object> Fields { get; }
+
+        /// <summary>
+        /// Simplify and create a new ZenCreateObjectExpr.
+        /// </summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns>The new expr.</returns>
+        private static Zen<TObject> Simplify((string, object)[] fields) => new ZenCreateObjectExpr<TObject>(fields);
 
         /// <summary>
         /// Creates a new ZenCreateObjectExpr.
@@ -58,7 +54,8 @@ namespace ZenLib
                 fieldIds[i] = (f.Item1, id);
             }
 
-            hashConsTable.GetOrAdd(fieldIds, fields, createFunc, out var value);
+            var flyweight = ZenAstCache<ZenCreateObjectExpr<TObject>, (string, long), Zen<TObject>>.FlyweightArray;
+            flyweight.GetOrAdd(fieldIds, fields, Simplify, out var value);
             return value;
         }
 
@@ -116,43 +113,6 @@ namespace ZenLib
         internal override void Accept(ZenExprActionVisitor visitor)
         {
             visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Custom array comparer for ensuring hash consing uniqueness.
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        private class ArrayComparer : IEqualityComparer<(string, long)[]>
-        {
-            public bool Equals((string, long)[] a1, (string, long)[] a2)
-            {
-                if (a1.Length != a2.Length)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < a1.Length; i++)
-                {
-                    if (a1[i] != a2[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public int GetHashCode((string, long)[] array)
-            {
-                int result = 31;
-                for (int i = 0; i < array.Length; i++)
-                {
-                    var (s, o) = array[i];
-                    result = result * 7 + s.GetHashCode() + o.GetHashCode();
-                }
-
-                return result;
-            }
         }
     }
 }

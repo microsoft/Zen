@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,16 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenLogicalBinopExpr : Zen<bool>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<bool>, Zen<bool>, LogicalOp), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
-        /// Hash cons table for And terms.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
-
         /// <summary>
         /// Gets the first expression.
         /// </summary>
@@ -40,44 +29,42 @@ namespace ZenLib
         /// <summary>
         /// Simplify a new ZenAndExpr.
         /// </summary>
-        /// <param name="e1">The first expr.</param>
-        /// <param name="e2">The second expr.</param>
-        /// <param name="op">The operation.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<bool> Simplify(Zen<bool> e1, Zen<bool> e2, LogicalOp op)
+        private static Zen<bool> Simplify((Zen<bool> e1, Zen<bool> e2, LogicalOp op) args)
         {
-            if (ReferenceEquals(e1, e2))
+            if (ReferenceEquals(args.e1, args.e2))
             {
-                return e1;
+                return args.e1;
             }
 
-            if (op == LogicalOp.And)
+            if (args.op == LogicalOp.And)
             {
-                if (e1 is ZenConstantExpr<bool> x)
+                if (args.e1 is ZenConstantExpr<bool> x)
                 {
-                    return (x.Value ? e2 : e1);
+                    return (x.Value ? args.e2 : args.e1);
                 }
 
-                if (e2 is ZenConstantExpr<bool> y)
+                if (args.e2 is ZenConstantExpr<bool> y)
                 {
-                    return (y.Value ? e1 : e2);
+                    return (y.Value ? args.e1 : args.e2);
                 }
             }
             else
             {
-                Contract.Assert(op == LogicalOp.Or);
-                if (e1 is ZenConstantExpr<bool> x)
+                Contract.Assert(args.op == LogicalOp.Or);
+                if (args.e1 is ZenConstantExpr<bool> x)
                 {
-                    return (x.Value ? e1 : e2);
+                    return (x.Value ? args.e1 : args.e2);
                 }
 
-                if (e2 is ZenConstantExpr<bool> y)
+                if (args.e2 is ZenConstantExpr<bool> y)
                 {
-                    return (y.Value ? e2 : e1);
+                    return (y.Value ? args.e2 : args.e1);
                 }
             }
 
-            return new ZenLogicalBinopExpr(e1, e2, op);
+            return new ZenLogicalBinopExpr(args.e1, args.e2, args.op);
         }
 
         /// <summary>
@@ -93,7 +80,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)op);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenLogicalBinopExpr, (long, long, int), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }
 

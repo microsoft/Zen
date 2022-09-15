@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,16 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenFSeqAddFrontExpr<T> : Zen<FSeq<T>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<FSeq<T>>, Zen<Option<T>>), ZenFSeqAddFrontExpr<T>> createFunc = (v) => new ZenFSeqAddFrontExpr<T>(v.Item1, v.Item2);
-
-        /// <summary>
-        /// Hash cons table for ZenListAddFrontExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), ZenFSeqAddFrontExpr<T>> hashConsTable = new HashConsTable<(long, long), ZenFSeqAddFrontExpr<T>>();
-
         /// <summary>
         /// Gets the list expr.
         /// </summary>
@@ -33,18 +22,26 @@ namespace ZenLib
         public Zen<Option<T>> ElementExpr { get; }
 
         /// <summary>
+        /// Simplify and create a ZenFSeqAddFrontExpr.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>A new expr.</returns>
+        private static Zen<FSeq<T>> Simplify((Zen<FSeq<T>> e1, Zen<Option<T>> e2) args) => new ZenFSeqAddFrontExpr<T>(args.e1, args.e2);
+
+        /// <summary>
         /// Create a new ZenListAddFrontExpr.
         /// </summary>
         /// <param name="expr">The list expr.</param>
         /// <param name="element">The element expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenFSeqAddFrontExpr<T> Create(Zen<FSeq<T>> expr, Zen<Option<T>> element)
+        public static Zen<FSeq<T>> Create(Zen<FSeq<T>> expr, Zen<Option<T>> element)
         {
             Contract.AssertNotNull(expr);
             Contract.AssertNotNull(element);
 
             var key = (expr.Id, element.Id);
-            hashConsTable.GetOrAdd(key, (expr, element), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenFSeqAddFrontExpr<T>, (long, long), Zen<FSeq<T>>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr, element), Simplify, out var value);
             return value;
         }
 

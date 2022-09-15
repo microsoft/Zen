@@ -12,11 +12,6 @@ namespace ZenLib
     internal sealed class ZenBitwiseNotExpr<T> : Zen<T>
     {
         /// <summary>
-        /// Hash cons table for ZenBitwiseNot expr.
-        /// </summary>
-        private static HashConsTable<long, Zen<T>> hashConsTable = new HashConsTable<long, Zen<T>>();
-
-        /// <summary>
         /// Gets the expression.
         /// </summary>
         internal Zen<T> Expr { get; }
@@ -53,7 +48,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr);
             Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(T)));
 
-            hashConsTable.GetOrAdd(expr.Id, expr, Simplify, out var value);
+            var flyweight = ZenAstCache<ZenBitwiseNotExpr<T>, long, Zen<T>>.Flyweight;
+            flyweight.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }
 

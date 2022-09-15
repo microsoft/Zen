@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,18 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenMapCombineExpr<TKey> : Zen<Map<TKey, SetUnit>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Map<TKey, SetUnit>>, Zen<Map<TKey, SetUnit>>, CombineType), Zen<Map<TKey, SetUnit>>> createFunc = (v) =>
-            Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
-        /// Hash cons table for ZenMapCombineExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>> hashConsTable =
-            new HashConsTable<(long, long, int), Zen<Map<TKey, SetUnit>>>();
-
         /// <summary>
         /// Gets the first map expr.
         /// </summary>
@@ -42,79 +29,75 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenMapCombineExpr.
         /// </summary>
-        /// <param name="map1">The map expr.</param>
-        /// <param name="map2">The map expr.</param>
-        /// <param name="combinationType">The combination type.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
         private static Zen<Map<TKey, SetUnit>> Simplify(
-            Zen<Map<TKey, SetUnit>> map1,
-            Zen<Map<TKey, SetUnit>> map2,
-            CombineType combinationType)
+            (Zen<Map<TKey, SetUnit>> map1, Zen<Map<TKey, SetUnit>> map2, CombineType combinationType) args)
         {
             // a union a = a
             // a inter a = a
             // a minus a = {}
-            if (map1.Equals(map2))
+            if (args.map1.Equals(args.map2))
             {
-                return combinationType == CombineType.Difference ? Zen.EmptyMap<TKey, SetUnit>() : map1;
+                return args.combinationType == CombineType.Difference ? Zen.EmptyMap<TKey, SetUnit>() : args.map1;
             }
 
             // {} union a == a
             // {} inter a == {}
             // {} minus a == {}
-            if (map1 is ZenConstantExpr<Map<TKey, SetUnit>> ce1 && ce1.Value.Values.Count == 0)
+            if (args.map1 is ZenConstantExpr<Map<TKey, SetUnit>> ce1 && ce1.Value.Values.Count == 0)
             {
-                return combinationType == CombineType.Union ? map2 : map1;
+                return args.combinationType == CombineType.Union ? args.map2 : args.map1;
             }
 
             // a union {} == a
             // a inter {} == {}
             // a minus {} == a
-            if (map2 is ZenConstantExpr<Map<TKey, SetUnit>> ce2 && ce2.Value.Values.Count == 0)
+            if (args.map2 is ZenConstantExpr<Map<TKey, SetUnit>> ce2 && ce2.Value.Values.Count == 0)
             {
-                return combinationType == CombineType.Intersect ? map2 : map1;
+                return args.combinationType == CombineType.Intersect ? args.map2 : args.map1;
             }
 
             // (a union b) union b == (a union b)
             // (a union b) union a == (a union b)
             // (a inter b) inter b == (a inter b)
             // (a inter b) inter a == (a inter b)
-            if (map1 is ZenMapCombineExpr<TKey> e1 &&
-                e1.CombinationType == combinationType &&
-                combinationType != CombineType.Difference &&
-                (e1.MapExpr1.Equals(map2) || e1.MapExpr2.Equals(map2)))
+            if (args.map1 is ZenMapCombineExpr<TKey> e1 &&
+                e1.CombinationType == args.combinationType &&
+                args.combinationType != CombineType.Difference &&
+                (e1.MapExpr1.Equals(args.map2) || e1.MapExpr2.Equals(args.map2)))
             {
-                return map1;
+                return args.map1;
             }
 
             // a union (a union b) == (a union b)
             // b union (a union b) == (a union b)
             // a inter (a inter b) == (a inter b)
             // b inter (a inter b) == (a inter b)
-            if (map2 is ZenMapCombineExpr<TKey> e2 &&
-                e2.CombinationType == combinationType &&
-                combinationType != CombineType.Difference &&
-                (e2.MapExpr1.Equals(map1) || e2.MapExpr2.Equals(map1)))
+            if (args.map2 is ZenMapCombineExpr<TKey> e2 &&
+                e2.CombinationType == args.combinationType &&
+                args.combinationType != CombineType.Difference &&
+                (e2.MapExpr1.Equals(args.map1) || e2.MapExpr2.Equals(args.map1)))
             {
-                return map2;
+                return args.map2;
             }
 
             // (a minus b) minus a == {}
             // (a minus b) minus b == a minus b
-            if (map1 is ZenMapCombineExpr<TKey> e3 && combinationType == CombineType.Difference)
+            if (args.map1 is ZenMapCombineExpr<TKey> e3 && args.combinationType == CombineType.Difference)
             {
-                if (e3.CombinationType == CombineType.Difference && e3.MapExpr1.Equals(map2))
+                if (e3.CombinationType == CombineType.Difference && e3.MapExpr1.Equals(args.map2))
                 {
                     return Zen.EmptyMap<TKey, SetUnit>();
                 }
 
-                if (e3.CombinationType == CombineType.Difference && e3.MapExpr2.Equals(map2))
+                if (e3.CombinationType == CombineType.Difference && e3.MapExpr2.Equals(args.map2))
                 {
-                    return map1;
+                    return args.map1;
                 }
             }
 
-            return new ZenMapCombineExpr<TKey>(map1, map2, combinationType);
+            return new ZenMapCombineExpr<TKey>(args.map1, args.map2, args.combinationType);
         }
 
         /// <summary>
@@ -133,7 +116,8 @@ namespace ZenLib
             Contract.AssertNotNull(mapExpr2);
 
             var k = (mapExpr1.Id, mapExpr2.Id, (int)combineType);
-            hashConsTable.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), createFunc, out var v);
+            var flyweight = ZenAstCache<ZenMapCombineExpr<TKey>, (long, long, int), Zen<Map<TKey, SetUnit>>>.Flyweight;
+            flyweight.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), Simplify, out var v);
             return v;
         }
 

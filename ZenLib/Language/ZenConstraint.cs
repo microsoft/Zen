@@ -33,7 +33,7 @@ namespace ZenLib
             int listSize = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.Find((i, o) => o, input, listSize, backend);
+            return Find((i, o) => o, input, listSize, backend);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ZenLib
             int depth = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.FindAll((i, o) => o, input, depth, backend);
+            return FindAll((i, o) => o, input, depth, backend);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ZenLib
         /// <returns>The set of values.</returns>
         public StateSet<T> StateSet()
         {
-            return this.Transformer().InputSet((i, o) => o);
+            return Transformer().InputSet((i, o) => o);
         }
     }
 
@@ -88,7 +88,7 @@ namespace ZenLib
             int listSize = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.Find((i1, i2, o) => o, input1, input2, listSize, backend);
+            return Find((i1, i2, o) => o, input1, input2, listSize, backend);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace ZenLib
             int depth = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.FindAll((i1, i2, o) => o, input1, input2, depth, backend);
+            return FindAll((i1, i2, o) => o, input1, input2, depth, backend);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace ZenLib
         /// <returns>The set of values.</returns>
         public StateSet<Pair<T1, T2>> StateSet()
         {
-            return this.Transformer().InputSet((i, o) => o);
+            return Transformer().InputSet((i, o) => o);
         }
     }
 
@@ -147,7 +147,7 @@ namespace ZenLib
             int listSize = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.Find((i1, i2, i3, o) => o, input1, input2, input3, listSize, backend);
+            return Find((i1, i2, i3, o) => o, input1, input2, input3, listSize, backend);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace ZenLib
             int depth = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, backend);
+            return FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, backend);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace ZenLib
         /// <returns>The set of values.</returns>
         public StateSet<Pair<T1, T2, T3>> StateSet()
         {
-            return this.Transformer().InputSet((i, o) => o);
+            return Transformer().InputSet((i, o) => o);
         }
     }
 
@@ -210,7 +210,7 @@ namespace ZenLib
             int depth = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, backend);
+            return Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, backend);
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace ZenLib
             int listSize = 5,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
-            return this.FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, listSize, backend);
+            return FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, listSize, backend);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace ZenLib
         /// <returns>The set of values.</returns>
         public StateSet<Pair<T1, T2, T3, T4>> StateSet()
         {
-            return this.Transformer().InputSet((i, o) => o);
+            return Transformer().InputSet((i, o) => o);
         }
     }
 }

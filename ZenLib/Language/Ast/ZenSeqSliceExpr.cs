@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,16 +12,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqSliceExpr<T> : Zen<Seq<T>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<BigInteger>, Zen<BigInteger>), Zen<Seq<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
-        /// Hash cons table for ZenSeqSliceExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long, long), Zen<Seq<T>>>();
-
         /// <summary>
         /// Gets the seq expression.
         /// </summary>
@@ -41,13 +30,11 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenSeqSliceExpr.
         /// </summary>
-        /// <param name="e1">The seq expression.</param>
-        /// <param name="e2">The offset expression.</param>
-        /// <param name="e3">The length expression.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<Seq<T>> Simplify(Zen<Seq<T>> e1, Zen<BigInteger> e2, Zen<BigInteger> e3)
+        public static Zen<Seq<T>> Simplify((Zen<Seq<T>> e1, Zen<BigInteger> e2, Zen<BigInteger> e3) args)
         {
-            return new ZenSeqSliceExpr<T>(e1, e2, e3);
+            return new ZenSeqSliceExpr<T>(args.e1, args.e2, args.e3);
         }
 
         /// <summary>
@@ -64,7 +51,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenSeqSliceExpr<T>, (long, long, long), Zen<Seq<T>>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, expr3), Simplify, out var value);
             return value;
         }
 

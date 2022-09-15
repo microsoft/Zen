@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,16 +12,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenEqualityExpr<T> : Zen<bool>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<T>, Zen<T>), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2);
-
-        /// <summary>
-        /// Hash cons table for ZenEqualityExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), Zen<bool>> hashConsTable = new HashConsTable<(long, long), Zen<bool>>();
-
         /// <summary>
         /// Gets the first expression.
         /// </summary>
@@ -36,39 +25,38 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenEqualityExpr.
         /// </summary>
-        /// <param name="e1">The first expr.</param>
-        /// <param name="e2">The second expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>A new ZenEqualityExpr.</returns>
-        private static Zen<bool> Simplify(Zen<T> e1, Zen<T> e2)
+        private static Zen<bool> Simplify((Zen<T> e1, Zen<T> e2) args)
         {
-            if (e1 is ZenConstantExpr<BigInteger> be1 && e2 is ZenConstantExpr<BigInteger> be2)
+            if (args.e1 is ZenConstantExpr<BigInteger> be1 && args.e2 is ZenConstantExpr<BigInteger> be2)
             {
                 return Zen.Constant(be1.Value == be2.Value);
             }
 
-            if (e1 is ZenConstantExpr<ulong> ue1 && e2 is ZenConstantExpr<ulong> ue2)
+            if (args.e1 is ZenConstantExpr<ulong> ue1 && args.e2 is ZenConstantExpr<ulong> ue2)
             {
                 return Zen.Constant(ue1.Value == ue2.Value);
             }
 
-            if (e1 is ZenConstantExpr<bool> b1)
+            if (args.e1 is ZenConstantExpr<bool> b1)
             {
-                return b1.Value ? (Zen<bool>)(object)e2 : Zen.Not((Zen<bool>)(object)e2);
+                return b1.Value ? (Zen<bool>)(object)args.e2 : Zen.Not((Zen<bool>)(object)args.e2);
             }
 
-            if (e2 is ZenConstantExpr<bool> b2)
+            if (args.e2 is ZenConstantExpr<bool> b2)
             {
-                return b2.Value ? (Zen<bool>)(object)e1 : Zen.Not((Zen<bool>)(object)e1);
+                return b2.Value ? (Zen<bool>)(object)args.e1 : Zen.Not((Zen<bool>)(object)args.e1);
             }
 
-            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+            var x = ReflectionUtilities.GetConstantIntegerValue(args.e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(args.e2);
             if (x.HasValue && y.HasValue)
             {
                 return Zen.Constant(x.Value == y.Value);
             }
 
-            return new ZenEqualityExpr<T>(e1, e2);
+            return new ZenEqualityExpr<T>(args.e1, args.e2);
         }
 
         /// <summary>
@@ -83,7 +71,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenEqualityExpr<T>, (long, long), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2), Simplify, out var value);
             return value;
         }
 

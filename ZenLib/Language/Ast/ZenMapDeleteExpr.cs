@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,18 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenMapDeleteExpr<TKey, TValue> : Zen<Map<TKey, TValue>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Map<TKey, TValue>>, Zen<TKey>), ZenMapDeleteExpr<TKey, TValue>> createFunc = (v) =>
-            new ZenMapDeleteExpr<TKey, TValue>(v.Item1, v.Item2);
-
-        /// <summary>
-        /// Hash cons table for ZenMapDeleteExpr.
-        /// </summary>
-        private static HashConsTable<(long, long), ZenMapDeleteExpr<TKey, TValue>> hashConsTable =
-            new HashConsTable<(long, long), ZenMapDeleteExpr<TKey, TValue>>();
-
         /// <summary>
         /// Gets the map expr.
         /// </summary>
@@ -35,18 +22,26 @@ namespace ZenLib
         public Zen<TKey> KeyExpr { get; }
 
         /// <summary>
+        /// Simplify and create a ZenMapDeleteExpr.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>A new Zen expr.</returns>
+        private static Zen<Map<TKey, TValue>> Simplify((Zen<Map<TKey, TValue>> e1, Zen<TKey> e2) args) => new ZenMapDeleteExpr<TKey, TValue>(args.e1, args.e2);
+
+        /// <summary>
         /// Create a new ZenMapDeleteExpr.
         /// </summary>
         /// <param name="mapExpr">The map expr.</param>
         /// <param name="key">The key expr.</param>
         /// <returns>The new expr.</returns>
-        public static ZenMapDeleteExpr<TKey, TValue> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key)
+        public static Zen<Map<TKey, TValue>> Create(Zen<Map<TKey, TValue>> mapExpr, Zen<TKey> key)
         {
             Contract.AssertNotNull(mapExpr);
             Contract.AssertNotNull(key);
 
             var k = (mapExpr.Id, key.Id);
-            hashConsTable.GetOrAdd(k, (mapExpr, key), createFunc, out var v);
+            var flyweight = ZenAstCache<ZenMapDeleteExpr<TKey, TValue>, (long, long), Zen<Map<TKey, TValue>>>.Flyweight;
+            flyweight.GetOrAdd(k, (mapExpr, key), Simplify, out var v);
             return v;
         }
 

@@ -13,11 +13,6 @@ namespace ZenLib
     internal sealed class ZenBitwiseBinopExpr<T> : Zen<T>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<T>, Zen<T>, BitwiseOp), Zen<T>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
         /// The operation strings for integer operations.
         /// </summary>
         private static string[] opStrings = new string[] { "&", "|", "^" };
@@ -31,11 +26,6 @@ namespace ZenLib
             (x, y) => x | y,
             (x, y) => x ^ y,
         };
-
-        /// <summary>
-        /// Hash cons table for ZenIntegerBinopExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<T>> hashConsTable = new HashConsTable<(long, long, int), Zen<T>>();
 
         /// <summary>
         /// Gets the first expression.
@@ -55,22 +45,20 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenBitwiseBinopExpr.
         /// </summary>
-        /// <param name="e1">The first expr.</param>
-        /// <param name="e2">The second expr.</param>
-        /// <param name="op">The integer operation.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new expr.</returns>
-        private static Zen<T> Simplify(Zen<T> e1, Zen<T> e2, BitwiseOp op)
+        private static Zen<T> Simplify((Zen<T> e1, Zen<T> e2, BitwiseOp op) args)
         {
-            var x = ReflectionUtilities.GetConstantIntegerValue(e1);
-            var y = ReflectionUtilities.GetConstantIntegerValue(e2);
+            var x = ReflectionUtilities.GetConstantIntegerValue(args.e1);
+            var y = ReflectionUtilities.GetConstantIntegerValue(args.e2);
 
             if (x.HasValue && y.HasValue)
             {
-                var f = constantFuncs[(int)op];
+                var f = constantFuncs[(int)args.op];
                 return ReflectionUtilities.CreateConstantIntegerValue<T>(f(x.Value, y.Value));
             }
 
-            return new ZenBitwiseBinopExpr<T>(e1, e2, op);
+            return new ZenBitwiseBinopExpr<T>(args.e1, args.e2, args.op);
         }
 
         /// <summary>
@@ -88,7 +76,8 @@ namespace ZenLib
 
             var type = typeof(T);
             var key = (expr1.Id, expr2.Id, (int)op);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, op), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenBitwiseBinopExpr<T>, (long, long, int), Zen<T>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }
 

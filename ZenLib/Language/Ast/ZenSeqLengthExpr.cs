@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
 
@@ -13,17 +12,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqLengthExpr<T> : Zen<BigInteger>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<Zen<Seq<T>>, Zen<BigInteger>> createFunc = (v) => Simplify(v);
-
-        /// <summary>
-        /// Hash cons table for ZenSeqLengthExpr.
-        /// </summary>
-        private static HashConsTable<long, Zen<BigInteger>> hashConsTable =
-            new HashConsTable<long, Zen<BigInteger>>();
-
         /// <summary>
         /// Gets the seq expr.
         /// </summary>
@@ -34,10 +22,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="seqExpr">The seq expr.</param>
         /// <returns>The new Zen expr.</returns>
-        private static Zen<BigInteger> Simplify(Zen<Seq<T>> seqExpr)
-        {
-            return new ZenSeqLengthExpr<T>(seqExpr);
-        }
+        private static Zen<BigInteger> Simplify(Zen<Seq<T>> seqExpr) => new ZenSeqLengthExpr<T>(seqExpr);
 
         /// <summary>
         /// Create a new ZenSeqLengthExpr.
@@ -48,7 +33,8 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            hashConsTable.GetOrAdd(seqExpr.Id, seqExpr, createFunc, out var v);
+            var flyweight = ZenAstCache<ZenSeqLengthExpr<T>, long, Zen<BigInteger>>.Flyweight;
+            flyweight.GetOrAdd(seqExpr.Id, seqExpr, Simplify, out var v);
             return v;
         }
 

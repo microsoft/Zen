@@ -1,4 +1,4 @@
-﻿// <copyright file="HashConsTable.cs" company="Microsoft">
+﻿// <copyright file="Flyweight.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -8,11 +8,11 @@ namespace ZenLib
     using System.Collections.Generic;
 
     /// <summary>
-    /// A hash cons table that is able to reclaim memory.
+    /// A flyweight table that is able to reclaim memory.
     /// It uses weak references to Zen values and overrides
     /// values that have been garbage collected when inserting.
     /// </summary>
-    internal sealed class HashConsTable<TKey, TValue> where TValue : class
+    internal sealed class Flyweight<TKey, TValue> where TValue : class
     {
         /// <summary>
         /// Lock object for the hash cons table.
@@ -20,15 +20,15 @@ namespace ZenLib
         private object lockObj = new object();
 
         /// <summary>
-        /// The table of hash consed elements.
+        /// The table of flyweight elements.
         /// </summary>
         private Dictionary<TKey, WeakReference<TValue>> table = new Dictionary<TKey, WeakReference<TValue>>();
 
         /// <summary>
-        /// Creates a new HashConsTable.
+        /// Creates a new instance of the <see cref="Flyweight{TKey, TValue}"/> class.
         /// </summary>
         /// <param name="comparer">An optional comparer.</param>
-        public HashConsTable(IEqualityComparer<TKey> comparer = null)
+        public Flyweight(IEqualityComparer<TKey> comparer = null)
         {
             if (comparer == null)
             {

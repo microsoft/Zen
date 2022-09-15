@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,16 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqReplaceFirstExpr<T> : Zen<Seq<T>>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<Seq<T>>, Zen<Seq<T>>), Zen<Seq<T>>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
-        /// Hash cons table for ZenSeqReplaceFirstExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, long), Zen<Seq<T>>> hashConsTable = new HashConsTable<(long, long, long), Zen<Seq<T>>>();
-
         /// <summary>
         /// Gets the seq expression.
         /// </summary>
@@ -40,13 +29,11 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenSeqReplaceFirstExpr.
         /// </summary>
-        /// <param name="e1">The seq expr.</param>
-        /// <param name="e2">The subseq expr.</param>
-        /// <param name="e3">The replacement expr.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<Seq<T>> Simplify(Zen<Seq<T>> e1, Zen<Seq<T>> e2, Zen<Seq<T>> e3)
+        public static Zen<Seq<T>> Simplify((Zen<Seq<T>> e1, Zen<Seq<T>> e2, Zen<Seq<T>> e3) args)
         {
-            return new ZenSeqReplaceFirstExpr<T>(e1, e2, e3);
+            return new ZenSeqReplaceFirstExpr<T>(args.e1, args.e2, args.e3);
         }
 
         /// <summary>
@@ -63,7 +50,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, expr3), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenSeqReplaceFirstExpr<T>, (long, long, long), Zen<Seq<T>>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, expr3), Simplify, out var value);
             return value;
         }
 

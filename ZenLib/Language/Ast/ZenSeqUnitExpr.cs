@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -13,19 +12,16 @@ namespace ZenLib
     internal sealed class ZenSeqUnitExpr<T> : Zen<Seq<T>>
     {
         /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<Zen<T>, Zen<Seq<T>>> createFunc = (v) => new ZenSeqUnitExpr<T>(v);
-
-        /// <summary>
-        /// Hash cons table for ZenSeqUnitExpr.
-        /// </summary>
-        private static HashConsTable<long, Zen<Seq<T>>> hashConsTable = new HashConsTable<long, Zen<Seq<T>>>();
-
-        /// <summary>
         /// Gets the value expr.
         /// </summary>
         public Zen<T> ValueExpr { get; }
+
+        /// <summary>
+        /// Simplify and create a ZenSeqUnitExpr.
+        /// </summary>
+        /// <param name="e">The expression.</param>
+        /// <returns>A new Zen expr.</returns>
+        private static Zen<Seq<T>> Simplify(Zen<T> e) => new ZenSeqUnitExpr<T>(e);
 
         /// <summary>
         /// Create a new ZenSeqUnitExpr.
@@ -36,7 +32,8 @@ namespace ZenLib
         {
             Contract.AssertNotNull(valueExpr);
 
-            hashConsTable.GetOrAdd(valueExpr.Id, valueExpr, createFunc, out var v);
+            var flyweight = ZenAstCache<ZenSeqUnitExpr<T>, long, Zen<Seq<T>>>.Flyweight;
+            flyweight.GetOrAdd(valueExpr.Id, valueExpr, Simplify, out var v);
             return v;
         }
 

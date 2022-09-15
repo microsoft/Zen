@@ -8,7 +8,6 @@ namespace ZenLib
     using System.Collections.Generic;
     using System.Numerics;
     using System.Reflection;
-    using ZenLib.ZenLanguage;
 
     /// <summary>
     /// A collection of helper functions for manipulating Zen
@@ -25,11 +24,6 @@ namespace ZenLib
         /// The type of byte sequences values.
         /// </summary>
         public readonly static Type UnicodeSequenceType = typeof(Seq<char>);
-
-        /* /// <summary>
-        /// The type of finite string values.
-        /// </summary>
-        public readonly static Type FiniteStringType = typeof(FString); */
 
         /// <summary>
         /// The type of set unit values.

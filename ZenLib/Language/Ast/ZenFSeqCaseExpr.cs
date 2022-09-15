@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -30,23 +29,21 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a new ZenListCaseExpr.
         /// </summary>
-        /// <param name="e">The list expr.</param>
-        /// <param name="emptyCase">The empty case.</param>
-        /// <param name="consCase">The cons case.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns></returns>
-        private static Zen<TResult> Simplify(Zen<FSeq<T>> e, Zen<TResult> emptyCase, ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> consCase)
+        private static Zen<TResult> Simplify((Zen<FSeq<T>> e, Zen<TResult> empty, ZenLambda<Pair<Option<T>, FSeq<T>>, TResult> cons) args)
         {
-            if (e is ZenConstantExpr<FSeq<T>> ce && ce.Value.IsEmpty())
+            if (args.e is ZenConstantExpr<FSeq<T>> ce && ce.Value.IsEmpty())
             {
-                return emptyCase;
+                return args.empty;
             }
 
-            if (e is ZenFSeqAddFrontExpr<T> l2)
+            if (args.e is ZenFSeqAddFrontExpr<T> l2)
             {
-                return consCase.Function(Pair.Create(l2.ElementExpr, l2.ListExpr));
+                return args.cons.Function(Pair.Create(l2.ElementExpr, l2.ListExpr));
             }
 
-            return new ZenFSeqCaseExpr<T, TResult>(e, emptyCase, consCase);
+            return new ZenFSeqCaseExpr<T, TResult>(args.e, args.empty, args.cons);
         }
 
         /// <summary>
@@ -65,7 +62,10 @@ namespace ZenLib
             Contract.AssertNotNull(empty);
             Contract.AssertNotNull(cons);
 
-            return Simplify(listExpr, empty, cons);
+            var key = (listExpr.Id, empty.Id, cons);
+            var flyweight = ZenAstCache<ZenFSeqCaseExpr<T, TResult>, (long, long, object), Zen<TResult>>.Flyweight;
+            flyweight.GetOrAdd(key, (listExpr, empty, cons), Simplify, out var value);
+            return value;
         }
 
         /// <summary>

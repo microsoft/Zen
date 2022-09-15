@@ -4,7 +4,6 @@
 
 namespace ZenLib
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -12,16 +11,6 @@ namespace ZenLib
     /// </summary>
     internal sealed class ZenSeqContainsExpr<T> : Zen<bool>
     {
-        /// <summary>
-        /// Static creation function for hash consing.
-        /// </summary>
-        private static Func<(Zen<Seq<T>>, Zen<Seq<T>>, SeqContainmentType), Zen<bool>> createFunc = (v) => Simplify(v.Item1, v.Item2, v.Item3);
-
-        /// <summary>
-        /// Hash cons table for ZenSeqContainsExpr.
-        /// </summary>
-        private static HashConsTable<(long, long, int), Zen<bool>> hashConsTable = new HashConsTable<(long, long, int), Zen<bool>>();
-
         /// <summary>
         /// Gets the seq expression.
         /// </summary>
@@ -40,13 +29,11 @@ namespace ZenLib
         /// <summary>
         /// Simplify and create a ZenSeqContainsExpr.
         /// </summary>
-        /// <param name="e1">The seq expr.</param>
-        /// <param name="e2">The subseq expr.</param>
-        /// <param name="containmentType">The containment type.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The new Zen expr.</returns>
-        public static Zen<bool> Simplify(Zen<Seq<T>> e1, Zen<Seq<T>> e2, SeqContainmentType containmentType)
+        public static Zen<bool> Simplify((Zen<Seq<T>> e1, Zen<Seq<T>> e2, SeqContainmentType containmentType) args)
         {
-            return new ZenSeqContainsExpr<T>(e1, e2, containmentType);
+            return new ZenSeqContainsExpr<T>(args.e1, args.e2, args.containmentType);
         }
 
         /// <summary>
@@ -62,7 +49,8 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)containmentType);
-            hashConsTable.GetOrAdd(key, (expr1, expr2, containmentType), createFunc, out var value);
+            var flyweight = ZenAstCache<ZenSeqContainsExpr<T>, (long, long, int), Zen<bool>>.Flyweight;
+            flyweight.GetOrAdd(key, (expr1, expr2, containmentType), Simplify, out var value);
             return value;
         }
 
