@@ -35,6 +35,40 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Double arithmetic negation.
+        /// </summary>
+        [TestMethod]
+        public void TestArithmeticNot()
+        {
+            var x = Zen.Symbolic<int>();
+            var y = Zen.Symbolic<int>();
+            Assert.AreEqual(x > y, Not(x <= y));
+            Assert.AreEqual(x >= y, Not(x < y));
+            Assert.AreEqual(x < y, Not(x >= y));
+            Assert.AreEqual(x <= y, Not(x > y));
+
+            var i = Zen.Symbolic<BigInteger>();
+            var j = Zen.Symbolic<BigInteger>();
+            Assert.AreEqual(i > j, Not(i <= j));
+            Assert.AreEqual(i >= j, Not(i < j));
+            Assert.AreEqual(i < j, Not(i >= j));
+            Assert.AreEqual(i <= j, Not(i > j));
+        }
+
+        /// <summary>
+        /// Test demorgan's simplification.
+        /// </summary>
+        [TestMethod]
+        public void TestDemorgan()
+        {
+            var a = Zen.Symbolic<bool>();
+            var b = Zen.Symbolic<bool>();
+
+            Assert.AreEqual(Not(And(a, b)), Or(Not(a), Not(b)));
+            Assert.AreEqual(Not(Or(a, b)), And(Not(a), Not(b)));
+        }
+
+        /// <summary>
         /// Simplify and with constants.
         /// </summary>
         [TestMethod]

@@ -333,7 +333,7 @@ namespace ZenLib.Tests
             var f = new ZenFunction<FString, FString, bool>(
                 (fs1, fs2) => Implies(fs2.EndsWith(fs1), fs2.Contains(fs1)));
 
-            var ex = f.Find((fs1, fs2, b) => Not(b));
+            var ex = f.Find((fs1, fs2, b) => Not(b), depth: 4);
             Assert.IsFalse(ex.HasValue);
         }
 

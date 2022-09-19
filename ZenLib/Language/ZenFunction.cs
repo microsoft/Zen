@@ -75,9 +75,8 @@ namespace ZenLib
         /// Compile the zen function to IL code and return
         /// an efficiently executable function.
         /// </summary>
-        /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>The native function.</returns>
-        public void Compile(int maxUnrollingDepth = 5)
+        public void Compile()
         {
             if (CompiledFunction != null)
             {
@@ -85,7 +84,7 @@ namespace ZenLib
             }
 
             var args = ImmutableDictionary<long, Expression>.Empty;
-            CompiledFunction = CodeGenerator.Compile(FunctionBodyExpr, args, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile(FunctionBodyExpr, args);
         }
 
         /// <summary>
@@ -178,9 +177,8 @@ namespace ZenLib
         /// Compile the zen function to IL code and return
         /// an efficiently executable function.
         /// </summary>
-        /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>The native function.</returns>
-        public void Compile(int maxUnrollingDepth = 5)
+        public void Compile()
         {
             if (CompiledFunction != null)
             {
@@ -190,7 +188,7 @@ namespace ZenLib
             var param1 = Expression.Parameter(typeof(T1));
             var args = ImmutableDictionary<long, Expression>.Empty
                 .Add(Argument1.ParameterId, param1);
-            CompiledFunction = CodeGenerator.Compile<T1, T2>(FunctionBodyExpr, args, param1, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2>(FunctionBodyExpr, args, param1);
         }
 
         /// <summary>
@@ -225,7 +223,7 @@ namespace ZenLib
         public Option<T1> Find(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
@@ -249,7 +247,7 @@ namespace ZenLib
         public IEnumerable<T1> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
@@ -287,7 +285,7 @@ namespace ZenLib
         public IEnumerable<T1> GenerateInputs(
             Zen<T1> input = null,
             Func<Zen<T1>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
@@ -385,9 +383,8 @@ namespace ZenLib
         /// Compile the zen function to IL code and return
         /// an efficiently executable function.
         /// </summary>
-        /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>The native function.</returns>
-        public void Compile(int maxUnrollingDepth = 5)
+        public void Compile()
         {
             if (CompiledFunction != null)
             {
@@ -399,7 +396,7 @@ namespace ZenLib
             var args = ImmutableDictionary<long, Expression>.Empty
                 .Add(Argument1.ParameterId, param1)
                 .Add(Argument2.ParameterId, param2);
-            CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(FunctionBodyExpr, args, param1, param2, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3>(FunctionBodyExpr, args, param1, param2);
         }
 
         /// <summary>
@@ -437,7 +434,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -465,7 +462,7 @@ namespace ZenLib
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -508,7 +505,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -616,9 +613,8 @@ namespace ZenLib
         /// Compile the zen function to IL code and return
         /// an efficiently executable function.
         /// </summary>
-        /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>The native function.</returns>
-        public void Compile(int maxUnrollingDepth = 5)
+        public void Compile()
         {
             if (CompiledFunction != null)
             {
@@ -632,7 +628,7 @@ namespace ZenLib
                 .Add(Argument1.ParameterId, param1)
                 .Add(Argument2.ParameterId, param2)
                 .Add(Argument3.ParameterId, param3);
-            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(FunctionBodyExpr, args, param1, param2, param3, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4>(FunctionBodyExpr, args, param1, param2, param3);
         }
 
         /// <summary>
@@ -672,7 +668,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -704,7 +700,7 @@ namespace ZenLib
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -751,7 +747,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -869,9 +865,8 @@ namespace ZenLib
         /// Compile the zen function to IL code and return
         /// an efficiently executable function.
         /// </summary>
-        /// <param name="maxUnrollingDepth">The maximum unrolling depth.</param>
         /// <returns>The native function.</returns>
-        public void Compile(int maxUnrollingDepth = 5)
+        public void Compile()
         {
             if (CompiledFunction != null)
             {
@@ -887,7 +882,7 @@ namespace ZenLib
                 .Add(Argument2.ParameterId, param2)
                 .Add(Argument3.ParameterId, param3)
                 .Add(Argument4.ParameterId, param4);
-            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(FunctionBodyExpr, args, param1, param2, param3, param4, maxUnrollingDepth);
+            CompiledFunction = CodeGenerator.Compile<T1, T2, T3, T4, T5>(FunctionBodyExpr, args, param1, param2, param3, param4);
         }
 
         /// <summary>
@@ -929,7 +924,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -965,7 +960,7 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
@@ -1016,7 +1011,7 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
-            int depth = 5,
+            int depth = 8,
             Solver.SolverType backend = Solver.SolverType.Z3)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);

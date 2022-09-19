@@ -33,6 +33,26 @@ namespace ZenLib
                 return y.Expr;
             }
 
+            var type = e.GetType();
+            if (type.IsGenericType && type.GetGenericTypeDefinitionCached() == typeof(ZenArithComparisonExpr<>))
+            {
+                dynamic expr = e;
+                var comparisonType = (ComparisonType)expr.ComparisonType;
+
+                switch (comparisonType)
+                {
+                    case ComparisonType.Lt:
+                        return Zen.Geq(expr.Expr1, expr.Expr2);
+                    case ComparisonType.Leq:
+                        return Zen.Gt(expr.Expr1, expr.Expr2);
+                    case ComparisonType.Gt:
+                        return Zen.Leq(expr.Expr1, expr.Expr2);
+                    default:
+                        Contract.Assert(comparisonType == ComparisonType.Geq);
+                        return Zen.Lt(expr.Expr1, expr.Expr2);
+                }
+            }
+
             return new ZenNotExpr(e);
         }
 
