@@ -160,12 +160,21 @@ namespace ZenLib
     }
 
     /// <summary>
-    /// Static factory class for map Zen objects.
+    /// Static factory class for cmap Zen objects.
     /// </summary>
     public static class CMap
     {
         /// <summary>
-        /// Add a value to a Zen map.
+        /// The Zen value for an empty cmap.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        public static Zen<CMap<TKey, TValue>> Empty<TKey, TValue>()
+        {
+            return EmptyCMap<TKey, TValue>();
+        }
+
+        /// <summary>
+        /// Add a value to a Zen cmap.
         /// </summary>
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="key">The key.</param>
@@ -181,7 +190,7 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Get a value from a Zen map.
+        /// Get a value from a Zen cmap.
         /// </summary>
         /// <param name="mapExpr">Zen map expression.</param>
         /// <param name="key">Zen key expression.</param>

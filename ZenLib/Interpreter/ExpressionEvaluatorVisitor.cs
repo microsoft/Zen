@@ -568,13 +568,13 @@ namespace ZenLib.Interpretation
 
             switch (expression.CombinationType)
             {
-                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
-                    return CommonUtilities.DictionaryIntersect(e1, e2);
-                case ZenMapCombineExpr<TKey>.CombineType.Union:
-                    return CommonUtilities.DictionaryUnion(e1, e2);
+                case ZenMapCombineExpr<TKey>.SetCombineType.Intersect:
+                    return CommonUtilities.MapIntersect(e1, e2);
+                case ZenMapCombineExpr<TKey>.SetCombineType.Union:
+                    return CommonUtilities.MapUnion(e1, e2);
                 default:
-                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
-                    return CommonUtilities.DictionaryDifference(e1, e2);
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.SetCombineType.Difference);
+                    return CommonUtilities.MapDifference(e1, e2);
             }
         }
 
@@ -601,6 +601,29 @@ namespace ZenLib.Interpretation
         {
             var e1 = (CMap<TKey, TValue>)this.Visit(expression.MapExpr, parameter);
             return e1.Get(expression.Key);
+        }
+
+        /// <summary>
+        /// Visit a Zen expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>The C# object.</returns>
+        public override object VisitConstMapCombine<TKey>(ZenConstMapCombineExpr<TKey> expression, ExpressionEvaluatorEnvironment parameter)
+        {
+            var e1 = (CMap<TKey, bool>)this.Visit(expression.MapExpr1, parameter);
+            var e2 = (CMap<TKey, bool>)this.Visit(expression.MapExpr2, parameter);
+
+            switch (expression.CombinationType)
+            {
+                case ZenConstMapCombineExpr<TKey>.CSetCombineType.Intersect:
+                    return CommonUtilities.CMapIntersect(e1, e2);
+                case ZenConstMapCombineExpr<TKey>.CSetCombineType.Union:
+                    return CommonUtilities.CMapUnion(e1, e2);
+                default:
+                    Contract.Assert(expression.CombinationType == ZenConstMapCombineExpr<TKey>.CSetCombineType.Difference);
+                    return CommonUtilities.CMapDifference(e1, e2);
+            }
         }
 
         /// <summary>

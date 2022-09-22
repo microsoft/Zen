@@ -115,47 +115,80 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Unions two dictionaries.
+        /// Unions two maps.
         /// </summary>
-        /// <param name="dict1">A dictionary.</param>
-        /// <param name="dict2">A dictionary.</param>
-        /// <returns>The union of the two dictionaries.</returns>
-        public static Map<T, SetUnit> DictionaryUnion<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
+        /// <param name="map1">A map.</param>
+        /// <param name="map2">A map.</param>
+        /// <returns>The union of the two maps.</returns>
+        public static Map<T, SetUnit> MapUnion<T>(Map<T, SetUnit> map1, Map<T, SetUnit> map2)
         {
-            Contract.Assert(!dict1.Negated);
-            Contract.Assert(!dict2.Negated);
-            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Union(dict2.Values)));
+            Contract.Assert(!map1.Negated);
+            Contract.Assert(!map2.Negated);
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(map1.Values.Union(map2.Values)));
         }
 
         /// <summary>
-        /// Intersects two dictionaries.
+        /// Intersects two maps.
         /// </summary>
-        /// <param name="dict1">A dictionary.</param>
-        /// <param name="dict2">A dictionary.</param>
-        /// <returns>The intersection of the two dictionaries.</returns>
-        public static Map<T, SetUnit> DictionaryIntersect<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
+        /// <param name="map1">A map.</param>
+        /// <param name="map2">A map.</param>
+        /// <returns>The intersection of the two maps.</returns>
+        public static Map<T, SetUnit> MapIntersect<T>(Map<T, SetUnit> map1, Map<T, SetUnit> map2)
         {
-            Contract.Assert(!dict1.Negated);
+            Contract.Assert(!map1.Negated);
 
-            if (dict2.Negated)
+            if (map2.Negated)
             {
-                return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Except(dict2.Values)));
+                return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(map1.Values.Except(map2.Values)));
             }
 
-            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Intersect(dict2.Values)));
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(map1.Values.Intersect(map2.Values)));
         }
 
         /// <summary>
-        /// Differences two dictionaries.
+        /// Differences two maps.
         /// </summary>
-        /// <param name="dict1">A dictionary.</param>
-        /// <param name="dict2">A dictionary.</param>
-        /// <returns>The difference of the two dictionaries.</returns>
-        public static Map<T, SetUnit> DictionaryDifference<T>(Map<T, SetUnit> dict1, Map<T, SetUnit> dict2)
+        /// <param name="map1">A map.</param>
+        /// <param name="map2">A map.</param>
+        /// <returns>The difference of the two maps.</returns>
+        public static Map<T, SetUnit> MapDifference<T>(Map<T, SetUnit> map1, Map<T, SetUnit> map2)
         {
-            Contract.Assert(!dict1.Negated);
-            Contract.Assert(!dict2.Negated);
-            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(dict1.Values.Except(dict2.Values)));
+            Contract.Assert(!map1.Negated);
+            Contract.Assert(!map2.Negated);
+            return new Map<T, SetUnit>(ImmutableDictionary<T, SetUnit>.Empty.AddRange(map1.Values.Except(map2.Values)));
+        }
+
+        /// <summary>
+        /// Unions two cmaps.
+        /// </summary>
+        /// <param name="cmap1">A cmap.</param>
+        /// <param name="cmap2">A cmap.</param>
+        /// <returns>The union of the two cmaps.</returns>
+        public static CMap<T, bool> CMapUnion<T>(CMap<T, bool> cmap1, CMap<T, bool> cmap2)
+        {
+            return new CMap<T, bool>(ImmutableDictionary<T, bool>.Empty.AddRange(cmap1.Values.Union(cmap2.Values)));
+        }
+
+        /// <summary>
+        /// Intersects two cmaps.
+        /// </summary>
+        /// <param name="cmap1">A cmap.</param>
+        /// <param name="cmap2">A cmap.</param>
+        /// <returns>The intersection of the two cmaps.</returns>
+        public static CMap<T, bool> CMapIntersect<T>(CMap<T, bool> cmap1, CMap<T, bool> cmap2)
+        {
+            return new CMap<T, bool>(ImmutableDictionary<T, bool>.Empty.AddRange(cmap1.Values.Intersect(cmap2.Values)));
+        }
+
+        /// <summary>
+        /// Difference two cmaps.
+        /// </summary>
+        /// <param name="cmap1">A cmap.</param>
+        /// <param name="cmap2">A cmap.</param>
+        /// <returns>The difference of the two cmaps.</returns>
+        public static CMap<T, bool> CMapDifference<T>(CMap<T, bool> cmap1, CMap<T, bool> cmap2)
+        {
+            return new CMap<T, bool>(ImmutableDictionary<T, bool>.Empty.AddRange(cmap1.Values.Except(cmap2.Values)));
         }
 
         /// <summary>

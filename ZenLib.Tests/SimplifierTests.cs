@@ -451,6 +451,39 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that cset simplification is working.
+        /// </summary>
+        [TestMethod]
+        public void TestCSetSimplification()
+        {
+            var x = CSet.Empty<int>().Add(10);
+            var y = CSet.Empty<int>().Add(11);
+
+            // equalities
+            Assert.AreEqual(x.Intersect(y).Intersect(y), x.Intersect(y));
+            Assert.AreEqual(x.Intersect(y).Intersect(x), x.Intersect(y));
+            Assert.AreEqual(x.Intersect(y.Intersect(x)), y.Intersect(x));
+            Assert.AreEqual(x.Union(y).Union(y), x.Union(y));
+            Assert.AreEqual(x.Union(y).Union(x), x.Union(y));
+            Assert.AreEqual(x.Union(y.Union(x)), y.Union(x));
+            Assert.AreEqual(x.Union(x), x);
+            Assert.AreEqual(x.Intersect(x), x);
+            Assert.AreEqual(x.Union(CSet.Empty<int>()), x);
+            Assert.AreEqual(CSet.Empty<int>().Union(x), x);
+            Assert.AreEqual(x.Intersect(CSet.Empty<int>()), CSet.Empty<int>());
+            Assert.AreEqual(CSet.Empty<int>().Intersect(x), CSet.Empty<int>());
+            Assert.AreEqual(x.Difference(CSet.Empty<int>()), x);
+            Assert.AreEqual(x.Difference(x), CSet.Empty<int>());
+            Assert.AreEqual(CSet.Empty<int>().Difference(x), CSet.Empty<int>());
+            Assert.AreEqual(x.Difference(y).Difference(x), CSet.Empty<int>());
+            Assert.AreEqual(x.Difference(y).Difference(y), x.Difference(y));
+
+            // inequalities
+            Assert.AreNotEqual(x.Union(y).Intersect(y), x.Union(y));
+            Assert.AreNotEqual(x.Intersect(y).Union(x), x.Intersect(y));
+        }
+
+        /// <summary>
         /// Simplify equality conditions.
         /// </summary>
         [TestMethod]

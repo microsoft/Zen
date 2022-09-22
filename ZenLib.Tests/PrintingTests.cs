@@ -219,5 +219,15 @@ namespace ZenLib.Tests
             var a = Zen.Symbolic<CMap<string, int>>("map");
             Console.WriteLine(a.Set("a", 1).Get("b").Format());
         }
+
+        /// <summary>
+        /// Test that formatting an expression works.
+        /// </summary>
+        [TestMethod]
+        public void TestFormatCSet()
+        {
+            var a = Zen.Symbolic<CSet<string>>("set");
+            Console.WriteLine(a.Add("a").Delete("b").Intersect(new CSet<string>("a", "c")).Format());
+        }
     }
 }

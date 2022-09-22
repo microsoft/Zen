@@ -1253,36 +1253,66 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// The Zen value for an empty cmap.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<CMap<TKey, TValue>> EmptyCMap<TKey, TValue>()
+        {
+            return ZenConstantExpr<CMap<TKey, TValue>>.Create(new CMap<TKey, TValue>());
+        }
+
+        /// <summary>
         /// The union of two zen maps.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<TKey, SetUnit>> Union<TKey>(
-            Zen<Map<TKey, SetUnit>> d1,
-            Zen<Map<TKey, SetUnit>> d2)
+        internal static Zen<Map<TKey, SetUnit>> Union<TKey>(Zen<Map<TKey, SetUnit>> d1, Zen<Map<TKey, SetUnit>> d2)
         {
-            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.CombineType.Union);
+            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.SetCombineType.Union);
+        }
+
+        /// <summary>
+        /// The union of two zen maps.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<CMap<TKey, bool>> Union<TKey>(Zen<CMap<TKey, bool>> d1, Zen<CMap<TKey, bool>> d2)
+        {
+            return ZenConstMapCombineExpr<TKey>.Create(d1, d2, ZenConstMapCombineExpr<TKey>.CSetCombineType.Union);
         }
 
         /// <summary>
         /// The intersection of two zen maps.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<TKey, SetUnit>> Intersect<TKey>(
-            Zen<Map<TKey, SetUnit>> d1,
-            Zen<Map<TKey, SetUnit>> d2)
+        internal static Zen<Map<TKey, SetUnit>> Intersect<TKey>(Zen<Map<TKey, SetUnit>> d1, Zen<Map<TKey, SetUnit>> d2)
         {
-            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.CombineType.Intersect);
+            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.SetCombineType.Intersect);
+        }
+
+        /// <summary>
+        /// The intersection of two zen maps.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<CMap<TKey, bool>> Intersect<TKey>(Zen<CMap<TKey, bool>> d1, Zen<CMap<TKey, bool>> d2)
+        {
+            return ZenConstMapCombineExpr<TKey>.Create(d1, d2, ZenConstMapCombineExpr<TKey>.CSetCombineType.Intersect);
         }
 
         /// <summary>
         /// The difference of two zen maps.
         /// </summary>
         /// <returns>Zen value.</returns>
-        internal static Zen<Map<TKey, SetUnit>> Difference<TKey>(
-            Zen<Map<TKey, SetUnit>> d1,
-            Zen<Map<TKey, SetUnit>> d2)
+        internal static Zen<Map<TKey, SetUnit>> Difference<TKey>(Zen<Map<TKey, SetUnit>> d1, Zen<Map<TKey, SetUnit>> d2)
         {
-            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.CombineType.Difference);
+            return ZenMapCombineExpr<TKey>.Create(d1, d2, ZenMapCombineExpr<TKey>.SetCombineType.Difference);
+        }
+
+        /// <summary>
+        /// The difference of two zen maps.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        internal static Zen<CMap<TKey, bool>> Difference<TKey>(Zen<CMap<TKey, bool>> d1, Zen<CMap<TKey, bool>> d2)
+        {
+            return ZenConstMapCombineExpr<TKey>.Create(d1, d2, ZenConstMapCombineExpr<TKey>.CSetCombineType.Difference);
         }
 
         /// <summary>

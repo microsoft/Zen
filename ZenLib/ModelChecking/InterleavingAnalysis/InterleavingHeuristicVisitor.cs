@@ -384,6 +384,18 @@ namespace ZenLib.ModelChecking
         /// <param name="parameter">The parameter.</param>
         /// <returns>The interleaving result.</returns>
         [ExcludeFromCodeCoverage]
+        public override InterleavingResult VisitConstMapCombine<TKey>(ZenConstMapCombineExpr<TKey> expression, ImmutableDictionary<long, object> parameter)
+        {
+            throw new ZenException($"Invalid map type used with Decision Diagram backend.");
+        }
+
+        /// <summary>
+        /// Evaluate an expression.
+        /// </summary>
+        /// <param name="expression">The zen expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The interleaving result.</returns>
+        [ExcludeFromCodeCoverage]
         public override InterleavingResult VisitSeqConcat<T>(ZenSeqConcatExpr<T> expression, ImmutableDictionary<long, object> parameter)
         {
             throw new ZenException($"Invalid sequence type used with Decision Diagram backend.");

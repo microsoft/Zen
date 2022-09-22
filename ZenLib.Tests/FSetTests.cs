@@ -333,10 +333,10 @@ namespace ZenLib.Tests
             var zf = new ZenFunction<FSet<byte>, FSet<byte>>(l => l.Add(7));
             var example = zf.Find((l, b) => l.Size() == (BigInteger)3);
             Assert.IsTrue(example.HasValue);
-
             var output = zf.Evaluate(example.Value);
+            var length = output.ToSet().ToArray().Length;
             Assert.IsTrue(output.ToSet().ToArray().Contains((byte)7));
-            Assert.AreEqual(4, output.ToSet().ToArray().Length);
+            Assert.IsTrue(length == 3 || length == 4);
         }
 
         /// <summary>

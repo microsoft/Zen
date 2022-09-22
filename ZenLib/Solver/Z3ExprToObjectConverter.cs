@@ -156,7 +156,7 @@ namespace ZenLib.Solver
                 var lambda = parameter.FuncDecl.Parameters[0].FuncDecl.Name.ToString();
                 var e1 = Convert(parameter.Args[0], mapType);
                 var e2 = Convert(parameter.Args[1], mapType);
-                var methodName = (lambda == "and") ? "DictionaryIntersect" : "DictionaryUnion";
+                var methodName = (lambda == "and") ? "MapIntersect" : "MapUnion";
                 var m = typeof(CommonUtilities).GetMethodCached(methodName).MakeGenericMethod(keyType);
                 return m.Invoke(null, new object[] { e1, e2 });
             }
@@ -173,7 +173,6 @@ namespace ZenLib.Solver
                 var dictConstructor = typeof(Map<,>).MakeGenericType(keyType, valueType).GetConstructor(new Type[] { });
                 var dict = dictConstructor.Invoke(new object[] { });
 
-                // var dict = CreateEmptyDictionary(keyType, valueType);
                 for (int i = 0; i < interpretation.NumEntries; i++)
                 {
                     var keyExpr = interpretation.Entries[i].Args[0];

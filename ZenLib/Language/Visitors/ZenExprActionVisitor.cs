@@ -212,6 +212,17 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Visit a ConstMapCombineExpr.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>A return value.</returns>
+        public virtual void Visit<TKey>(ZenConstMapCombineExpr<TKey> expression)
+        {
+            VisitCached(expression.MapExpr1);
+            VisitCached(expression.MapExpr2);
+        }
+
+        /// <summary>
         /// Visit a ListCaseExpr.
         /// </summary>
         /// <param name="expression">The expression.</param>

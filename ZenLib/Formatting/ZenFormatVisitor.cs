@@ -438,6 +438,21 @@ namespace ZenLib.Generation
         /// <param name="expression">The expression.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>A formatted string.</returns>
+        public override (LazyString, bool) VisitConstMapCombine<TKey>(ZenConstMapCombineExpr<TKey> expression, Parameter parameter)
+        {
+            var indent = parameter.Indent();
+            var e1 = Format(expression.MapExpr1, indent);
+            var e2 = Format(expression.MapExpr2, indent);
+            var op = expression.CombinationType.ToString();
+            return FormatFunction(parameter, op, e1, e2);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>A formatted string.</returns>
         public override (LazyString, bool) VisitListCase<TList, TResult>(ZenFSeqCaseExpr<TList, TResult> expression, Parameter parameter)
         {
             var indent = parameter.Indent();

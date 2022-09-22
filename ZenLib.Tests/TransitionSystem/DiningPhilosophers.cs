@@ -111,7 +111,6 @@ namespace ZenLib.Tests
     /// <summary>
     /// The state of the problem.
     /// </summary>
-    [ZenObject]
     [ExcludeFromCodeCoverage]
     public class State
     {
@@ -132,5 +131,40 @@ namespace ZenLib.Tests
         {
             return $"HasLeft={this.HasLeftFork}, HasRight={this.HasRightFork}";
         }
+    }
+
+    /// <summary>
+    /// Extension methods for state.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public static class StateExtensions
+    {
+        /// <summary>
+        /// Get the left fork.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        public static Zen<CMap<int, bool>> GetHasRightFork(this Zen<State> state) => state.GetField<State, CMap<int, bool>>("HasRightFork");
+
+        /// <summary>
+        /// Get the left fork.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        public static Zen<CMap<int, bool>> GetHasLeftFork(this Zen<State> state) => state.GetField<State, CMap<int, bool>>("HasLeftFork");
+
+        /// <summary>
+        /// With the left fork.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="value">The new value.</param>
+        public static Zen<State> WithHasLeftFork(this Zen<State> state, Zen<CMap<int, bool>> value) =>
+            state.WithField("HasLeftFork", value);
+
+        /// <summary>
+        /// With the right fork.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="value">The new value.</param>
+        public static Zen<State> WithHasRightFork(this Zen<State> state, Zen<CMap<int, bool>> value) =>
+            state.WithField("HasRightFork", value);
     }
 }

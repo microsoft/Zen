@@ -6,9 +6,7 @@ namespace ZenLib
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using static ZenLib.Zen;
 
     /// <summary>
@@ -92,6 +90,50 @@ namespace ZenLib
         }
 
         /// <summary>
+        /// Union this cset with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The union of the two sets.</returns>
+        public CSet<T> Union(CSet<T> other)
+        {
+            Contract.AssertNotNull(other);
+            return new CSet<T>(CommonUtilities.CMapUnion(this.Map, other.Map));
+        }
+
+        /// <summary>
+        /// Intersect this cset with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The intersection of the two sets.</returns>
+        public CSet<T> Intersect(CSet<T> other)
+        {
+            Contract.AssertNotNull(other);
+            return new CSet<T>(CommonUtilities.CMapIntersect(this.Map, other.Map));
+        }
+
+        /// <summary>
+        /// Difference of this cset with another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>The difference of the two sets.</returns>
+        public CSet<T> Difference(CSet<T> other)
+        {
+            Contract.AssertNotNull(other);
+            return new CSet<T>(CommonUtilities.CMapDifference(this.Map, other.Map));
+        }
+
+        /// <summary>
+        /// Check if this set is a subset of another.
+        /// </summary>
+        /// <param name="other">The other set.</param>
+        /// <returns>True if this set is a subset of the other..</returns>
+        public bool IsSubsetOf(CSet<T> other)
+        {
+            Contract.AssertNotNull(other);
+            return this.Equals(this.Intersect(other));
+        }
+
+        /// <summary>
         /// Convert the set to a string.
         /// </summary>
         /// <returns></returns>
@@ -159,6 +201,15 @@ namespace ZenLib
     public static class CSet
     {
         /// <summary>
+        /// The Zen value for an empty cset.
+        /// </summary>
+        /// <returns>Zen value.</returns>
+        public static Zen<CSet<T>> Empty<T>()
+        {
+            return Create<CSet<T>>(("Map", CMap.Empty<T, bool>()));
+        }
+
+        /// <summary>
         /// The underlying map for the set.
         /// </summary>
         /// <param name="setExpr">The set expr.</param>
@@ -205,6 +256,62 @@ namespace ZenLib
             Contract.AssertNotNull(setExpr);
 
             return setExpr.Map().Get(element);
+        }
+
+        /// <summary>
+        /// Union two sets together.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<CSet<T>> Union<T>(this Zen<CSet<T>> setExpr1, Zen<CSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return Create<CSet<T>>(("Map", Zen.Union(setExpr1.Map(), setExpr2.Map())));
+        }
+
+        /// <summary>
+        /// Intersect two sets.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<CSet<T>> Intersect<T>(this Zen<CSet<T>> setExpr1, Zen<CSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return Create<CSet<T>>(("Map", Zen.Intersect(setExpr1.Map(), setExpr2.Map())));
+        }
+
+        /// <summary>
+        /// Difference of two sets.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<CSet<T>> Difference<T>(this Zen<CSet<T>> setExpr1, Zen<CSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return Create<CSet<T>>(("Map", Zen.Difference(setExpr1.Map(), setExpr2.Map())));
+        }
+
+        /// <summary>
+        /// Check if one set is a subset of another.
+        /// </summary>
+        /// <param name="setExpr1">Zen set expression.</param>
+        /// <param name="setExpr2">Zen set expression.</param>
+        /// <returns>Zen value.</returns>
+        public static Zen<bool> IsSubsetOf<T>(this Zen<CSet<T>> setExpr1, Zen<CSet<T>> setExpr2)
+        {
+            Contract.AssertNotNull(setExpr1);
+            Contract.AssertNotNull(setExpr2);
+
+            return setExpr1 == setExpr1.Intersect(setExpr2);
         }
     }
 }

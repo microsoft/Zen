@@ -103,7 +103,7 @@ namespace ZenLib
         public Set<T> Union(Set<T> other)
         {
             Contract.AssertNotNull(other);
-            return new Set<T>(CommonUtilities.DictionaryUnion(this.Values, other.Values));
+            return new Set<T>(CommonUtilities.MapUnion(this.Values, other.Values));
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace ZenLib
         public Set<T> Intersect(Set<T> other)
         {
             Contract.AssertNotNull(other);
-            return new Set<T>(CommonUtilities.DictionaryIntersect(this.Values, other.Values));
+            return new Set<T>(CommonUtilities.MapIntersect(this.Values, other.Values));
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace ZenLib
         public Set<T> Difference(Set<T> other)
         {
             Contract.AssertNotNull(other);
-            return new Set<T>(CommonUtilities.DictionaryDifference(this.Values, other.Values));
+            return new Set<T>(CommonUtilities.MapDifference(this.Values, other.Values));
         }
 
         /// <summary>

@@ -626,14 +626,14 @@ namespace ZenLib.ModelChecking
             TArray expr;
             switch (expression.CombinationType)
             {
-                case ZenMapCombineExpr<TKey>.CombineType.Union:
+                case ZenMapCombineExpr<TKey>.SetCombineType.Union:
                     expr = this.Solver.DictUnion(e1.Value, e2.Value);
                     break;
-                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
+                case ZenMapCombineExpr<TKey>.SetCombineType.Intersect:
                     expr = this.Solver.DictIntersect(e1.Value, e2.Value);
                     break;
                 default:
-                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.SetCombineType.Difference);
                     expr = this.Solver.DictDifference(e1.Value, e2.Value);
                     break;
             }
@@ -671,6 +671,58 @@ namespace ZenLib.ModelChecking
             }
 
             return this.Visit(Zen.Default<TValue>(), parameter);
+        }
+
+        /// <summary>
+        /// Visit the expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The symbolic value.</returns>
+        public override SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> VisitConstMapCombine<TKey>(ZenConstMapCombineExpr<TKey> expression, SymbolicEvaluationEnvironment<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal> parameter)
+        {
+            var e1 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.MapExpr1, parameter);
+            var e2 = (SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)this.Visit(expression.MapExpr2, parameter);
+
+            var keys = new HashSet<object>(e1.Value.Keys);
+            keys.UnionWith(e2.Value.Keys);
+
+            var constantMap = ImmutableDictionary<object, SymbolicValue<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>>.Empty;
+            foreach (var key in keys)
+            {
+                if (!e1.Value.TryGetValue(key, out var val1))
+                {
+                    val1 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.False());
+                }
+
+                if (!e2.Value.TryGetValue(key, out var val2))
+                {
+                    val2 = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, this.Solver.False());
+                }
+
+                var v1 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)val1;
+                var v2 = (SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>)val2;
+
+                TBool result;
+                switch (expression.CombinationType)
+                {
+                    case ZenConstMapCombineExpr<TKey>.CSetCombineType.Union:
+                        result = this.Solver.Or(v1.Value, v2.Value);
+                        break;
+                    case ZenConstMapCombineExpr<TKey>.CSetCombineType.Intersect:
+                        result = this.Solver.And(v1.Value, v2.Value);
+                        break;
+                    default:
+                        Contract.Assert(expression.CombinationType == ZenConstMapCombineExpr<TKey>.CSetCombineType.Difference);
+                        result = this.Solver.And(v1.Value, this.Solver.Not(v2.Value));
+                        break;
+                }
+
+                var resultValue = new SymbolicBool<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, result);
+                constantMap = constantMap.Add(key, resultValue);
+            }
+
+            return new SymbolicConstMap<TModel, TVar, TBool, TBitvec, TInt, TSeq, TArray, TChar, TReal>(this.Solver, constantMap);
         }
 
         /// <summary>

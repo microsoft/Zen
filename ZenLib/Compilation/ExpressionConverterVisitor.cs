@@ -569,15 +569,15 @@ namespace ZenLib.Compilation
             MethodInfo method;
             switch (expression.CombinationType)
             {
-                case ZenMapCombineExpr<TKey>.CombineType.Union:
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryUnion").MakeGenericMethod(typeof(TKey));
+                case ZenMapCombineExpr<TKey>.SetCombineType.Union:
+                    method = typeof(CommonUtilities).GetMethodCached("MapUnion").MakeGenericMethod(typeof(TKey));
                     break;
-                case ZenMapCombineExpr<TKey>.CombineType.Intersect:
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryIntersect").MakeGenericMethod(typeof(TKey));
+                case ZenMapCombineExpr<TKey>.SetCombineType.Intersect:
+                    method = typeof(CommonUtilities).GetMethodCached("MapIntersect").MakeGenericMethod(typeof(TKey));
                     break;
                 default:
-                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.CombineType.Difference);
-                    method = typeof(CommonUtilities).GetMethodCached("DictionaryDifference").MakeGenericMethod(typeof(TKey));
+                    Contract.Assert(expression.CombinationType == ZenMapCombineExpr<TKey>.SetCombineType.Difference);
+                    method = typeof(CommonUtilities).GetMethodCached("MapDifference").MakeGenericMethod(typeof(TKey));
                     break;
             }
 
@@ -617,6 +617,36 @@ namespace ZenLib.Compilation
             var mapExpr = Expression.Convert(dict, typeof(CMap<TKey, TValue>));
             var method = typeof(CMap<TKey, TValue>).GetMethodCached("Get");
             return Expression.Call(mapExpr, method, key);
+        }
+
+        /// <summary>
+        /// Visit an expression.
+        /// </summary>
+        /// <param name="expression">The Zen expression.</param>
+        /// <param name="parameter">The environment.</param>
+        /// <returns>An expression tree.</returns>
+        public override Expression VisitConstMapCombine<TKey>(ZenConstMapCombineExpr<TKey> expression, ExpressionConverterEnvironment parameter)
+        {
+            MethodInfo method;
+            switch (expression.CombinationType)
+            {
+                case ZenConstMapCombineExpr<TKey>.CSetCombineType.Union:
+                    method = typeof(CommonUtilities).GetMethodCached("CMapUnion").MakeGenericMethod(typeof(TKey));
+                    break;
+                case ZenConstMapCombineExpr<TKey>.CSetCombineType.Intersect:
+                    method = typeof(CommonUtilities).GetMethodCached("CMapIntersect").MakeGenericMethod(typeof(TKey));
+                    break;
+                default:
+                    Contract.Assert(expression.CombinationType == ZenConstMapCombineExpr<TKey>.CSetCombineType.Difference);
+                    method = typeof(CommonUtilities).GetMethodCached("CMapDifference").MakeGenericMethod(typeof(TKey));
+                    break;
+            }
+
+            var dict1 = Convert(expression.MapExpr1, parameter);
+            var dict2 = Convert(expression.MapExpr2, parameter);
+            var mapExpr1 = Expression.Convert(dict1, typeof(CMap<TKey, bool>));
+            var mapExpr2 = Expression.Convert(dict2, typeof(CMap<TKey, bool>));
+            return Expression.Call(null, method, mapExpr1, mapExpr2);
         }
 
         /// <summary>
