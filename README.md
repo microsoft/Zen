@@ -3,7 +3,7 @@
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rabeckett/6623db8f2d0c01f6b2bc880e6219f97f/raw/code-coverage.json)
 
 # Introduction
-Zen is a constraint solving library for .NET. Zen simplifies expressing high-level symbolic computations and then translates these computations to low-level constraint solvers and back to .NET objects for the user. The Zen library comes equipped with a number of built-in tools for processing symbolic models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on the Z3 SMT solver and another based on Binary Decision Diagrams (BDDs).
+Zen is a constraint solving library for .NET. Zen makes it easy to express high-level symbolic computations directly in .NET. It translates these symbolic expressions to low-level constraint solvers and then back to .NET objects. The Zen library comes equipped with a number of built-in tools for processing symbolic models, including a compiler (to .NET IL), an exhaustive model checker, and a test input generator. It supports multiple backends including one based on the Z3 SMT solver and another based on Binary Decision Diagrams (BDDs).
 
 # Table of contents
 - [Introduction](#introduction)
