@@ -123,7 +123,7 @@ namespace ZenLib
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
 
             var key = (expr1.Id, expr2.Id, (int)comparisonType);
-            var flyweight = ZenAstCache<ZenArithComparisonExpr<T>, (long, long, int), Zen<bool>>.Flyweight;
+            var flyweight = ZenAstCache<ZenArithComparisonExpr<T>, Zen<bool>>.Flyweight;
             flyweight.GetOrAdd(key, (expr1, expr2, comparisonType), Simplify, out var value);
             return value;
         }

@@ -33,7 +33,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(seqExpr);
 
-            var flyweight = ZenAstCache<ZenSeqLengthExpr<T>, long, Zen<BigInteger>>.Flyweight;
+            var flyweight = ZenAstCache<ZenSeqLengthExpr<T>, Zen<BigInteger>>.Flyweight;
             flyweight.GetOrAdd(seqExpr.Id, seqExpr, Simplify, out var v);
             return v;
         }

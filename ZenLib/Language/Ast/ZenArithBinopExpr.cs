@@ -202,7 +202,7 @@ namespace ZenLib
             }
 
             var key = (expr1.Id, expr2.Id, (int)op);
-            var flyweight = ZenAstCache<ZenArithBinopExpr<T>, (long, long, int), Zen<T>>.Flyweight;
+            var flyweight = ZenAstCache<ZenArithBinopExpr<T>, Zen<T>>.Flyweight;
             flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }

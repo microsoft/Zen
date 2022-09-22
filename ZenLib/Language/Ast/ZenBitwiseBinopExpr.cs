@@ -76,7 +76,7 @@ namespace ZenLib
 
             var type = typeof(T);
             var key = (expr1.Id, expr2.Id, (int)op);
-            var flyweight = ZenAstCache<ZenBitwiseBinopExpr<T>, (long, long, int), Zen<T>>.Flyweight;
+            var flyweight = ZenAstCache<ZenBitwiseBinopExpr<T>, Zen<T>>.Flyweight;
             flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }

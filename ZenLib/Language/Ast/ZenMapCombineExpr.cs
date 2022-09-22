@@ -116,7 +116,7 @@ namespace ZenLib
             Contract.AssertNotNull(mapExpr2);
 
             var k = (mapExpr1.Id, mapExpr2.Id, (int)combineType);
-            var flyweight = ZenAstCache<ZenMapCombineExpr<TKey>, (long, long, int), Zen<Map<TKey, SetUnit>>>.Flyweight;
+            var flyweight = ZenAstCache<ZenMapCombineExpr<TKey>, Zen<Map<TKey, SetUnit>>>.Flyweight;
             flyweight.GetOrAdd(k, (mapExpr1, mapExpr2, combineType), Simplify, out var v);
             return v;
         }

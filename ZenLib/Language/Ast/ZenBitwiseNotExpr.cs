@@ -48,7 +48,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr);
             Contract.Assert(ReflectionUtilities.IsFiniteIntegerType(typeof(T)));
 
-            var flyweight = ZenAstCache<ZenBitwiseNotExpr<T>, long, Zen<T>>.Flyweight;
+            var flyweight = ZenAstCache<ZenBitwiseNotExpr<T>, Zen<T>>.Flyweight;
             flyweight.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }

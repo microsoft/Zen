@@ -50,7 +50,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr3);
 
             var key = (expr1.Id, expr2.Id, expr3.Id);
-            var flyweight = ZenAstCache<ZenSeqReplaceFirstExpr<T>, (long, long, long), Zen<Seq<T>>>.Flyweight;
+            var flyweight = ZenAstCache<ZenSeqReplaceFirstExpr<T>, Zen<Seq<T>>>.Flyweight;
             flyweight.GetOrAdd(key, (expr1, expr2, expr3), Simplify, out var value);
             return value;
         }

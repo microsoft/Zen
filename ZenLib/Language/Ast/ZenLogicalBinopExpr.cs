@@ -90,7 +90,7 @@ namespace ZenLib
             Contract.AssertNotNull(expr2);
 
             var key = (expr1.Id, expr2.Id, (int)op);
-            var flyweight = ZenAstCache<ZenLogicalBinopExpr, (long, long, int), Zen<bool>>.Flyweight;
+            var flyweight = ZenAstCache<ZenLogicalBinopExpr, Zen<bool>>.Flyweight;
             flyweight.GetOrAdd(key, (expr1, expr2, op), Simplify, out var value);
             return value;
         }

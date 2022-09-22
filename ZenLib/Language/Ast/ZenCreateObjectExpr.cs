@@ -46,7 +46,7 @@ namespace ZenLib
 
             System.Array.Sort(fields, (x, y) => x.Item1.CompareTo(y.Item1));
 
-            (string, long)[] fieldIds = new (string, long)[fields.Length];
+            var fieldIds = new object[fields.Length];
             for (int i = 0; i < fields.Length; i++)
             {
                 var f = fields[i];
@@ -54,7 +54,7 @@ namespace ZenLib
                 fieldIds[i] = (f.Item1, id);
             }
 
-            var flyweight = ZenAstCache<ZenCreateObjectExpr<TObject>, (string, long), Zen<TObject>>.FlyweightArray;
+            var flyweight = ZenAstCache<ZenCreateObjectExpr<TObject>, Zen<TObject>>.FlyweightArray;
             flyweight.GetOrAdd(fieldIds, fields, Simplify, out var value);
             return value;
         }

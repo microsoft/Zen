@@ -64,7 +64,7 @@ namespace ZenLib
             Contract.AssertFieldOrProperty(typeof(T1), typeof(T2), fieldName);
 
             var key = (expr.Id, fieldName);
-            var flyweight = ZenAstCache<ZenGetFieldExpr<T1, T2>, (long, string), Zen<T2>>.Flyweight;
+            var flyweight = ZenAstCache<ZenGetFieldExpr<T1, T2>, Zen<T2>>.Flyweight;
             flyweight.GetOrAdd(key, (expr, fieldName), Simplify, out var value);
             return value;
         }

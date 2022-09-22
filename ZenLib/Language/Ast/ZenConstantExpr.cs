@@ -30,7 +30,7 @@ namespace ZenLib
         /// <returns>The Zen expr.</returns>
         public static Zen<T> Create(T value)
         {
-            var flyweight = ZenAstCache<ZenConstantExpr<T>, T, Zen<T>>.Flyweight;
+            var flyweight = ZenAstCache<ZenConstantExpr<T>, Zen<T>>.Flyweight;
             flyweight.GetOrAdd(value, value, Simplify, out var v);
             return v;
         }

@@ -63,7 +63,7 @@ namespace ZenLib
             Contract.AssertNotNull(cons);
 
             var key = (listExpr.Id, empty.Id, cons);
-            var flyweight = ZenAstCache<ZenFSeqCaseExpr<T, TResult>, (long, long, object), Zen<TResult>>.Flyweight;
+            var flyweight = ZenAstCache<ZenFSeqCaseExpr<T, TResult>, Zen<TResult>>.Flyweight;
             flyweight.GetOrAdd(key, (listExpr, empty, cons), Simplify, out var value);
             return value;
         }

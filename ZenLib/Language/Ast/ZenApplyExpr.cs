@@ -43,7 +43,7 @@ namespace ZenLib
             Contract.AssertNotNull(parameterExpr);
 
             var key = (lambda, parameterExpr.Id);
-            var flyweight = ZenAstCache<ZenApplyExpr<TSrc, TDst>, (object, long), Zen<TDst>>.Flyweight;
+            var flyweight = ZenAstCache<ZenApplyExpr<TSrc, TDst>, Zen<TDst>>.Flyweight;
             flyweight.GetOrAdd(key, (lambda, parameterExpr), Simplify, out var value);
             return value;
         }

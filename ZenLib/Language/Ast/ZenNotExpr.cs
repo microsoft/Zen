@@ -65,7 +65,7 @@ namespace ZenLib
         {
             Contract.AssertNotNull(expr);
 
-            var flyweight = ZenAstCache<ZenNotExpr, long, Zen<bool>>.Flyweight;
+            var flyweight = ZenAstCache<ZenNotExpr, Zen<bool>>.Flyweight;
             flyweight.GetOrAdd(expr.Id, expr, Simplify, out var value);
             return value;
         }

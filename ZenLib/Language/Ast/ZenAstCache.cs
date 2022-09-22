@@ -10,25 +10,25 @@ namespace ZenLib
     /// <summary>
     /// A cache for Zen ast expressions.
     /// </summary>
-    internal static class ZenAstCache<TObj, TKey, TValue> where TValue : class
+    internal static class ZenAstCache<TObj, TValue> where TValue : class
     {
         /// <summary>
         /// A flyweight object that stores the expressions for each key.
         /// The object type TObj is to ensure that different flyweights are used
         /// for each AST node type. This ensures better parallelism.
         /// </summary>
-        internal static Flyweight<TKey, TValue> Flyweight = new Flyweight<TKey, TValue>();
+        internal static Flyweight<object, TValue> Flyweight = new Flyweight<object, TValue>();
 
         /// <summary>
         /// Hash cons table for ZenCreateObjectExpr.
         /// </summary>
-        internal static Flyweight<TKey[], TValue> FlyweightArray = new Flyweight<TKey[], TValue>(new ArrayComparer());
+        internal static Flyweight<object[], TValue> FlyweightArray = new Flyweight<object[], TValue>(new ArrayComparer());
 
         /// <summary>
         /// Custom array comparer for ensuring hash consing uniqueness.
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class ArrayComparer : IEqualityComparer<TKey[]>
+        private class ArrayComparer : IEqualityComparer<object[]>
         {
             /// <summary>
             /// Equality for key arrays.
@@ -36,7 +36,7 @@ namespace ZenLib
             /// <param name="a1">The first array.</param>
             /// <param name="a2">The second array.</param>
             /// <returns>True or false.</returns>
-            public bool Equals(TKey[] a1, TKey[] a2)
+            public bool Equals(object[] a1, object[] a2)
             {
                 if (a1.Length != a2.Length)
                 {
@@ -59,7 +59,7 @@ namespace ZenLib
             /// </summary>
             /// <param name="array">The array of keys.</param>
             /// <returns>An integer.</returns>
-            public int GetHashCode(TKey[] array)
+            public int GetHashCode(object[] array)
             {
                 int result = 31;
                 for (int i = 0; i < array.Length; i++)

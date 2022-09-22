@@ -40,7 +40,7 @@ namespace ZenLib
             Contract.AssertNotNull(element);
 
             var key = (expr.Id, element.Id);
-            var flyweight = ZenAstCache<ZenFSeqAddFrontExpr<T>, (long, long), Zen<FSeq<T>>>.Flyweight;
+            var flyweight = ZenAstCache<ZenFSeqAddFrontExpr<T>, Zen<FSeq<T>>>.Flyweight;
             flyweight.GetOrAdd(key, (expr, element), Simplify, out var value);
             return value;
         }

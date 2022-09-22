@@ -33,7 +33,7 @@ namespace ZenLib
             Contract.AssertNotNull(sourceExpr);
             Contract.Assert(CommonUtilities.IsSafeCast(typeof(TSource), typeof(TTarget)), "Invalid cast");
 
-            var flyweight = ZenAstCache<ZenCastExpr<TSource, TTarget>, long, Zen<TTarget>>.Flyweight;
+            var flyweight = ZenAstCache<ZenCastExpr<TSource, TTarget>, Zen<TTarget>>.Flyweight;
             flyweight.GetOrAdd(sourceExpr.Id, sourceExpr, Simplify, out var v);
             return v;
         }

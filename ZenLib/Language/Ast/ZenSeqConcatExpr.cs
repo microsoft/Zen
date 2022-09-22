@@ -53,7 +53,7 @@ namespace ZenLib
             Contract.AssertNotNull(seqExpr2);
 
             var k = (seqExpr1.Id, seqExpr2.Id);
-            var flyweight = ZenAstCache<ZenSeqConcatExpr<T>, (long, long), Zen<Seq<T>>>.Flyweight;
+            var flyweight = ZenAstCache<ZenSeqConcatExpr<T>, Zen<Seq<T>>>.Flyweight;
             flyweight.GetOrAdd(k, (seqExpr1, seqExpr2), Simplify, out var v);
             return v;
         }

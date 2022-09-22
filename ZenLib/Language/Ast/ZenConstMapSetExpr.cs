@@ -55,7 +55,7 @@ namespace ZenLib
             Contract.AssertNotNull(value);
 
             var k = (mapExpr.Id, key, value.Id);
-            var flyweight = ZenAstCache<ZenConstMapSetExpr<TKey, TValue>, (long, TKey, long), Zen<CMap<TKey, TValue>>>.Flyweight;
+            var flyweight = ZenAstCache<ZenConstMapSetExpr<TKey, TValue>, Zen<CMap<TKey, TValue>>>.Flyweight;
             flyweight.GetOrAdd(k, (mapExpr, key, value), Simplify, out var v);
             return v;
         }
