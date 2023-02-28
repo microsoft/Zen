@@ -83,6 +83,35 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test a transformer with an abitrary works.
+        /// </summary>
+        [TestMethod]
+        public void TestTransformerArbitraryLocal()
+        {
+            var manager = new StateSetTransformerManager(0);
+
+            var inputs = Zen.StateSet<Pair<uint, uint, uint>>(p =>
+                Zen.Or(
+                    Zen.And(p.Item1() == 6, p.Item2() == 1, p.Item3() == 44),
+                    Zen.And(p.Item1() == 6, p.Item2() == 2, p.Item3() == 55)), manager);
+            Assert.AreEqual(new Pair<uint, uint, uint>(6, 1, 44), inputs.Element());
+
+            var transformer = Zen.Transformer<Pair<uint, uint, uint>, Pair<uint, uint, uint>>(p => Pair.Create(p.Item1(), p.Item2(), Zen.Arbitrary<uint>()), manager);
+            var results = transformer.TransformForward(inputs);
+            Assert.AreEqual(new Pair<uint, uint, uint>(6, 1, 0), results.Element());
+
+            var postInputs = Zen.StateSet<Pair<uint, uint, uint>>(p => p.Item3() >= 11, manager);
+            results = results.Intersect(postInputs);
+            Assert.AreEqual(new Pair<uint, uint, uint>(6, 1, 11), results.Element());
+
+            var backwards = transformer.TransformBackwards(results);
+            Assert.AreEqual(new Pair<uint, uint, uint>(6, 1, 0), backwards.Element());
+
+            var init = backwards.Intersect(inputs);
+            Assert.AreEqual(new Pair<uint, uint, uint>(6, 1, 44), inputs.Element());
+        }
+
+        /// <summary>
         /// Test weaving sets through combinations of transformers.
         /// </summary>
         [TestMethod]
