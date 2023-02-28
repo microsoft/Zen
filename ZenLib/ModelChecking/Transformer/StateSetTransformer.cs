@@ -6,6 +6,7 @@ namespace ZenLib.ModelChecking
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using DecisionDiagrams;
     using ZenLib.Solver;
 
@@ -47,6 +48,21 @@ namespace ZenLib.ModelChecking
         private VariableSet<BDDNode> outputVariables;
 
         /// <summary>
+        /// Transient input variables.
+        /// </summary>
+        private VariableSet<BDDNode> transientInputVariables;
+
+        /// <summary>
+        /// Input and transient variables.
+        /// </summary>
+        private VariableSet<BDDNode> inputAndTransientVariables;
+
+        /// <summary>
+        /// Output and transient variables.
+        /// </summary>
+        private VariableSet<BDDNode> outputAndTransientVariables;
+
+        /// <summary>
         /// Manager object for transformers.
         /// </summary>
         private StateSetTransformerManager manager;
@@ -66,6 +82,7 @@ namespace ZenLib.ModelChecking
             DD setTransformer,
             (Zen<T1>, VariableSet<BDDNode>) inputAndVariables,
             (Zen<T2>, VariableSet<BDDNode>) outputAndVariables,
+            VariableSet<BDDNode> transientInputVariables,
             Dictionary<object, Variable<BDDNode>> arbitraryMappingInput,
             Dictionary<object, Variable<BDDNode>> arbitraryMappingOutput,
             StateSetTransformerManager manager)
@@ -76,6 +93,11 @@ namespace ZenLib.ModelChecking
             this.zenOutput = outputAndVariables.Item1;
             this.inputVariables = inputAndVariables.Item2;
             this.outputVariables = outputAndVariables.Item2;
+            this.transientInputVariables = transientInputVariables;
+            this.inputAndTransientVariables = this.solver.Manager.CreateVariableSet(
+                this.inputVariables.Variables.Concat(this.transientInputVariables.Variables).ToArray());
+            this.outputAndTransientVariables = this.solver.Manager.CreateVariableSet(
+                this.outputVariables.Variables.Concat(this.transientInputVariables.Variables).ToArray());
             this.arbitraryMappingInput = arbitraryMappingInput;
             this.arbitraryMappingOutput = arbitraryMappingOutput;
             this.manager = manager;
@@ -97,7 +119,7 @@ namespace ZenLib.ModelChecking
                 (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicEvaluator.Compute(expr, env);
             var ddOutput = symbolicResult.Value;
             set = this.solver.And(set, ddOutput);
-            var dd = solver.Manager.Exists(set, this.outputVariables);
+            var dd = solver.Manager.Exists(set, this.outputAndTransientVariables);
             var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }
@@ -118,7 +140,7 @@ namespace ZenLib.ModelChecking
                 (SymbolicBool<Assignment<BDDNode>, Variable<BDDNode>, DD, BitVector<BDDNode>, Unit, Unit, Unit, Unit, Unit>)symbolicEvaluator.Compute(expr, env);
             var ddInput = symbolicResult.Value;
             set = this.solver.And(set, ddInput);
-            var dd = solver.Manager.Exists(set, inputVariables);
+            var dd = solver.Manager.Exists(set, this.inputAndTransientVariables);
             var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
@@ -134,7 +156,7 @@ namespace ZenLib.ModelChecking
             input = input.ConvertTo(new StateSetMetadata { ZenParameter = this.zenInput, VariableSet = this.inputVariables, ZenArbitraryMapping = this.arbitraryMappingInput });
             DD set = input.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
-            dd = this.solver.Manager.Exists(dd, this.inputVariables);
+            dd = this.solver.Manager.Exists(dd, this.inputAndTransientVariables);
             var result = new StateSet<T2>(this.solver, dd, this.arbitraryMappingOutput, this.zenOutput, this.outputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T2)]);
         }
@@ -150,7 +172,7 @@ namespace ZenLib.ModelChecking
             output = output.ConvertTo(new StateSetMetadata { ZenParameter = this.zenOutput, VariableSet = this.outputVariables, ZenArbitraryMapping = this.arbitraryMappingOutput });
             DD set = output.Set;
             DD dd = this.solver.Manager.And(set, this.setTransformer);
-            dd = this.solver.Manager.Exists(dd, this.outputVariables);
+            dd = this.solver.Manager.Exists(dd, this.outputAndTransientVariables);
             var result = new StateSet<T1>(this.solver, dd, this.arbitraryMappingInput, this.zenInput, this.inputVariables);
             return result.ConvertTo(this.manager.CanonicalValues[typeof(T1)]);
         }

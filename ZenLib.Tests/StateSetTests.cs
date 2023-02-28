@@ -110,7 +110,7 @@ namespace ZenLib.Tests
         public void TestStateSetIsFull()
         {
             var manager = new StateSetTransformerManager(0);
-            var set = new ZenFunction<bool, bool>(b => true).StateSet(manager);
+            var set = Zen.FullSet<bool>(manager);
             Assert.IsTrue(set.IsFull());
         }
 
@@ -121,8 +121,8 @@ namespace ZenLib.Tests
         public void TestStateSetIsEmpty()
         {
             var manager = new StateSetTransformerManager(0);
-            var set = new ZenFunction<bool, bool>(b => true).StateSet(manager);
-            Assert.IsTrue(set.Complement().IsEmpty());
+            var set = Zen.EmptySet<bool>(manager);
+            Assert.IsTrue(set.IsEmpty());
         }
 
         /// <summary>
@@ -132,14 +132,14 @@ namespace ZenLib.Tests
         public void TestStateSetArgTypes()
         {
             var manager = new StateSetTransformerManager(0);
-            Assert.IsTrue(Zen.StateSet<bool>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<byte>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<short>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<ushort>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<int>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<uint>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<long>(b => true, manager).IsFull());
-            Assert.IsTrue(Zen.StateSet<ulong>(b => true, manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<bool>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<byte>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<short>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<ushort>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<int>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<uint>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<long>(manager).IsFull());
+            Assert.IsTrue(Zen.FullSet<ulong>(manager).IsFull());
         }
 
         /// <summary>
@@ -160,8 +160,8 @@ namespace ZenLib.Tests
         public void TestSetSetEquality()
         {
             var manager = new StateSetTransformerManager(0);
-            var set1 = new ZenFunction<bool, bool>(b => true).StateSet(manager).Complement();
-            var set2 = new ZenFunction<bool, bool>(b => true).StateSet(manager).Complement();
+            var set1 = Zen.FullSet<bool>(manager).Complement();
+            var set2 = Zen.FullSet<bool>(manager).Complement();
             Assert.IsTrue(set1.Equals(set2));
             Assert.IsFalse(set1.Equals(2));
         }
@@ -228,7 +228,7 @@ namespace ZenLib.Tests
         public void TestMultipleStateSets()
         {
             var manager = new StateSetTransformerManager(0);
-            var set1 = new ZenFunction<IpHeader, bool>(p => true).StateSet(manager);
+            var set1 = Zen.FullSet<IpHeader>(manager);
             var set2 = new ZenFunction<IpHeader, bool>(p => p.GetDstIp().GetValue() == 1).StateSet(manager);
             var set3 = new ZenFunction<uint, bool>(u => u == 2).StateSet(manager);
             Assert.IsTrue(set1.IsFull());
@@ -305,8 +305,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStateSetDifferentManagers()
         {
-            var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
-            var set2 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            var set1 = Zen.FullSet<uint>(new StateSetTransformerManager());
+            var set2 = Zen.FullSet<uint>(new StateSetTransformerManager());
             set1.Union(set2);
         }
 
@@ -317,8 +317,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStateSetInvalidArguments2()
         {
-            var set1 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
-            var set2 = new ZenFunction<uint, bool>(x => true).StateSet(new StateSetTransformerManager());
+            var set1 = Zen.FullSet<uint>(new StateSetTransformerManager());
+            var set2 = Zen.FullSet<uint>(new StateSetTransformerManager());
             set1.Intersect(set2);
         }
 
@@ -329,7 +329,7 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenException))]
         public void TestStateSetInvalidType()
         {
-            new ZenFunction<string, bool>(x => true).StateSet(new StateSetTransformerManager());
+            Zen.FullSet<string>(new StateSetTransformerManager());
         }
 
         /// <summary>
@@ -341,12 +341,12 @@ namespace ZenLib.Tests
             var m1 = new StateSetTransformerManager();
             var m2 = new StateSetTransformerManager();
 
-            var f1 = Zen.StateSet<byte>(x => true);
-            var f2 = Zen.StateSet<byte>(x => true);
-            var f3 = Zen.StateSet<byte>(x => true, m1);
-            var f4 = Zen.StateSet<byte>(x => true, m1);
-            var f5 = Zen.StateSet<byte>(x => true, m2);
-            var f6 = Zen.StateSet<byte>(x => true, m2);
+            var f1 = Zen.FullSet<byte>();
+            var f2 = Zen.FullSet<byte>();
+            var f3 = Zen.FullSet<byte>(m1);
+            var f4 = Zen.FullSet<byte>(m1);
+            var f5 = Zen.FullSet<byte>(m2);
+            var f6 = Zen.FullSet<byte>(m2);
 
             Assert.IsTrue(ReferenceEquals(f1, f2));
             Assert.IsTrue(ReferenceEquals(f3, f4));

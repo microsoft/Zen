@@ -274,6 +274,16 @@ namespace ZenLib
         private static MethodInfo eqListsMethod = typeof(Zen).GetMethod("EqLists", BindingFlags.Static | BindingFlags.NonPublic);
 
         /// <summary>
+        /// The empty state set cache.
+        /// </summary>
+        private static Dictionary<(Type, object), object> emptyStateSetCache = new Dictionary<(Type, object), object>();
+
+        /// <summary>
+        /// The full state set cache.
+        /// </summary>
+        private static Dictionary<(Type, object), object> fullStateSetCache = new Dictionary<(Type, object), object>();
+
+        /// <summary>
         /// Lift a C# value to a Zen value.
         /// </summary>
         /// <param name="x">The value.</param>
@@ -1840,6 +1850,40 @@ namespace ZenLib
             var environment = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(solution.VariableAssignment) };
             var interpreter = new ExpressionEvaluatorVisitor(false);
             return (T)interpreter.Visit(expr, environment);
+        }
+
+        /// <summary>
+        /// Gets the set containing all values.
+        /// </summary>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<T> FullSet<T>(StateSetTransformerManager manager = null)
+        {
+            var key = (typeof(T), manager);
+            if (!fullStateSetCache.TryGetValue(key, out var set))
+            {
+                set = Zen.StateSet<T>(x => true, manager);
+                fullStateSetCache[key] = set;
+            }
+
+            return (StateSet<T>)set;
+        }
+
+        /// <summary>
+        /// Gets the set containing no values.
+        /// </summary>
+        /// <param name="manager">An optional manager object.</param>
+        /// <returns>A state set for the function.</returns>
+        public static StateSet<T> EmptySet<T>(StateSetTransformerManager manager = null)
+        {
+            var key = (typeof(T), manager);
+            if (!emptyStateSetCache.TryGetValue(key, out var set))
+            {
+                set = Zen.StateSet<T>(x => false, manager);
+                emptyStateSetCache[key] = set;
+            }
+
+            return (StateSet<T>)set;
         }
 
         /// <summary>

@@ -115,8 +115,23 @@ namespace ZenLib.ModelChecking
             // collect information about input and output manager variables
             var inputVariables = new List<Variable<BDDNode>>();
             var outputVariables = new List<Variable<BDDNode>>();
+            var transientVariables = new List<Variable<BDDNode>>();
             var arbitraryMappingInput = new Dictionary<object, Variable<BDDNode>>();
             var arbitraryMappingOutput = new Dictionary<object, Variable<BDDNode>>();
+
+            // there might be Zen.Arbitrary variables used that are not part of the input type
+            // for example to set a field to be any value. In this case we want to include these
+            // variables as inputs so they will get quantified away when applying transformers.
+            // This means the variables are not respected across transformers.
+            foreach (var kv in symbolicEvaluator.ArbitraryVariables)
+            {
+                if (!arbitrariesForOutput.Contains(kv.Key) && !arbitrariesForInput.Contains(kv.Key))
+                {
+                    var variable = arbitraryToVariable[kv.Key];
+                    arbitraryMappingInput[kv.Key] = variable;
+                    transientVariables.Add(variable);
+                }
+            }
 
             foreach (var arbitrary in arbitrariesForInput)
             {
@@ -135,6 +150,7 @@ namespace ZenLib.ModelChecking
             // create variable sets for easy quantification
             var inputVariableSet = solver.Manager.CreateVariableSet(inputVariables.ToArray());
             var outputVariableSet = solver.Manager.CreateVariableSet(outputVariables.ToArray());
+            var transientVariableSet = solver.Manager.CreateVariableSet(transientVariables.ToArray());
 
             if (isDependencyFree && !manager.DependencyFreeOutput.ContainsKey(typeof(T2)))
             {
@@ -166,6 +182,7 @@ namespace ZenLib.ModelChecking
                 result,
                 (input, inputVariableSet),
                 (output, outputVariableSet),
+                transientVariableSet,
                 arbitraryMappingInput,
                 arbitraryMappingOutput,
                 manager);
