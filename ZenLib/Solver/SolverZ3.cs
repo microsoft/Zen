@@ -147,7 +147,7 @@ namespace ZenLib.Solver
             this.Params.Add("compact", false);
             if (timeout.HasValue)
             {
-                this.Params.Add("timeout", timeout.Value.TotalMilliseconds);
+                this.Params.Add("timeout", (uint)timeout.Value.TotalMilliseconds);
             }
             var t1 = Context.MkTactic("simplify");
             var t2 = Context.MkTactic("solve-eqs");
