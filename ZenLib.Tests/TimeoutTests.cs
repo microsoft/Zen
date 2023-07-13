@@ -25,6 +25,8 @@ namespace ZenLib.Tests
         [ExpectedException(typeof(ZenSolverTimeoutException))]
         public void TestTimeout()
         {
+            ZenSettings.UseLargeStack = true;
+
             var variables = new Zen<BigInteger>[2000];
 
             var constraints = new List<Zen<bool>>();
