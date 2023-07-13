@@ -288,7 +288,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
+                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual((short)257, example.Value);
                 Assert.AreEqual((byte)1, zf.Evaluate(257));
@@ -305,7 +305,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
+                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual((int)257, example.Value);
                 Assert.AreEqual((byte)1, zf.Evaluate(257));
@@ -322,7 +322,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), backend: backend);
+                var example = zf.Find((s, b) => Zen.And(s == 257, b == 1), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual(257L, example.Value);
                 Assert.AreEqual((byte)1, zf.Evaluate(257));
@@ -339,7 +339,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((b, s) => Zen.And(b == 4, s == 4), backend: backend);
+                var example = zf.Find((b, s) => Zen.And(b == 4, s == 4), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual((byte)4, example.Value);
                 Assert.AreEqual((short)4, zf.Evaluate(4));
@@ -356,7 +356,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((u, s) => Zen.And(u == ushort.MaxValue, s == -1), backend: backend);
+                var example = zf.Find((u, s) => Zen.And(u == ushort.MaxValue, s == -1), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual(ushort.MaxValue, example.Value);
                 Assert.AreEqual((short)-1, zf.Evaluate(ushort.MaxValue));
@@ -373,7 +373,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find((u, s) => u == new UInt<_16>(ushort.MaxValue), backend: backend);
+                var example = zf.Find((u, s) => u == new UInt<_16>(ushort.MaxValue), config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.AreEqual(new UInt<_16>(ushort.MaxValue), example.Value);
                 Assert.AreEqual((ulong)ushort.MaxValue, zf.Evaluate(new UInt<_16>(ushort.MaxValue)));
@@ -390,7 +390,7 @@ namespace ZenLib.Tests
 
             foreach (var backend in new SolverType[] { SolverType.Z3, SolverType.DecisionDiagrams })
             {
-                var example = zf.Find(backend: backend);
+                var example = zf.Find(config: new SolverConfig { SolverType = backend });
                 Assert.IsTrue(example.HasValue);
                 Assert.IsTrue(example.Value.ToLong() >= 4);
                 Assert.IsTrue(zf.Evaluate(example.Value));

@@ -14,6 +14,7 @@ namespace ZenLib
     using ZenLib.Generation;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
+    using ZenLib.Solver;
 
     /// <summary>
     /// A Zen expression object parameterized over the C# type.
@@ -1437,11 +1438,12 @@ namespace ZenLib
         /// Solves for an assignment to Arbitrary variables in a boolean expression.
         /// </summary>
         /// <param name="expr">The boolean expression.</param>
-        /// <param name="solverType">The solver type to use.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType solverType = Solver.SolverType.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, SolverConfig config = null)
         {
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), solverType));
+            config = config ?? new SolverConfig();
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), config));
             return new ZenSolution(model);
         }
 
@@ -1450,11 +1452,13 @@ namespace ZenLib
         /// </summary>
         /// <param name="objective">The objective function.</param>
         /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, SolverConfig config = null)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
+            config = config ?? new SolverConfig();
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), config));
             return new ZenSolution(model);
         }
 
@@ -1463,11 +1467,13 @@ namespace ZenLib
         /// </summary>
         /// <param name="objective">The objective function.</param>
         /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, SolverConfig config = null)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
+            config = config ?? new SolverConfig();
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), config));
             return new ZenSolution(model);
         }
 
@@ -1687,15 +1693,15 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">The input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<T1> Find<T1>(
             Func<Zen<T1>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Zen.Constraint<T1>(invariant).Find(input, depth, backend);
+            return Zen.Constraint<T1>(invariant).Find(input, depth, config);
         }
 
         /// <summary>
@@ -1705,16 +1711,16 @@ namespace ZenLib
         /// <param name="input1">The first input.</param>
         /// <param name="input2">The second input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, backend);
+            return Zen.Constraint<T1, T2>(invariant).Find(input1, input2, depth, config);
         }
 
         /// <summary>
@@ -1725,7 +1731,7 @@ namespace ZenLib
         /// <param name="input2">The second input.</param>
         /// <param name="input3">The third input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
@@ -1733,9 +1739,9 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, backend);
+            return Zen.Constraint<T1, T2, T3>(invariant).Find(input1, input2, input3, depth, config);
         }
 
         /// <summary>
@@ -1747,7 +1753,7 @@ namespace ZenLib
         /// <param name="input3">The third input.</param>
         /// <param name="input4">The fourth input.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> invariant,
@@ -1756,9 +1762,9 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, backend);
+            return Zen.Constraint<T1, T2, T3, T4>(invariant).Find(input1, input2, input3, input4, depth, config);
         }
 
         /// <summary>
@@ -1767,15 +1773,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="backend">The backend solver.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<T1> GenerateInputs<T1, T2>(
             Func<Zen<T1>, Zen<T2>> f,
             Func<Zen<T1>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, backend);
+            return new ZenFunction<T1, T2>(f).GenerateInputs(null, precondition, depth, config);
         }
 
         /// <summary>
@@ -1784,15 +1790,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="backend">The backend solver.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>> f,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, backend);
+            return new ZenFunction<T1, T2, T3>(f).GenerateInputs(null, null, precondition, depth, config);
         }
 
         /// <summary>
@@ -1801,15 +1807,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="backend">The backend solver.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, backend);
+            return new ZenFunction<T1, T2, T3, T4>(f).GenerateInputs(null, null, null, precondition, depth, config);
         }
 
         /// <summary>
@@ -1818,15 +1824,15 @@ namespace ZenLib
         /// <param name="f">The Zen function.</param>
         /// <param name="precondition">The precondition.</param>
         /// <param name="depth">The maximum depth.</param>
-        /// <param name="backend">The backend solver.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>The input values.</returns>
         public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> f,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, backend);
+            return new ZenFunction<T1, T2, T3, T4, T5>(f).GenerateInputs(null, null, null, null, precondition, depth, config);
         }
 
         /// <summary>

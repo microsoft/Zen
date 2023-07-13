@@ -88,10 +88,11 @@ namespace ZenLibBench
         public void VerifyRouteMapProvenance()
         {
             var f = new ZenFunction<Route, Pair<Option<Route>, int>>(this.routeMap.ProcessProvenance);
+            var config = new SolverConfig { SolverType = this.Backend };
             var packet = f.Find(
                 (p, o) => o.Item2() == (this.routeMap.Lines.Count + 1),
                 depth: this.ListSize,
-                backend: this.Backend);
+                config: config);
         }
 
         /// <summary>
@@ -101,10 +102,11 @@ namespace ZenLibBench
         public void VerifyRouteMap()
         {
             var f = new ZenFunction<Route, Option<Route>>(this.routeMap.Process);
+            var config = new SolverConfig { SolverType = this.Backend };
             var packet = f.Find(
                 (p, o) => Not(o.IsSome()),
                 depth: this.ListSize,
-                backend: this.Backend);
+                config: config);
         }
     }
 }

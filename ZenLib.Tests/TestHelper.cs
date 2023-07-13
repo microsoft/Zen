@@ -138,11 +138,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, o) => o, depth: p.FSeqSize, backend: p.SolverType);
+                result = f.Find((i1, o) => o, depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value));
@@ -167,11 +167,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid.
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation.
-                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
+                result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2));
@@ -196,11 +196,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, bool>(function);
-                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, i3, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
+                result = f.Find((i1, i2, i3, o) => Flatten(o, p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3));
@@ -226,11 +226,11 @@ namespace ZenLib.Tests
             {
                 // prove that it is valid
                 var f = Zen.Function<T1, T2, T3, T4, bool>(function);
-                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, i3, i4, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsFalse(result.HasValue);
 
                 // compare input with evaluation
-                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
+                result = f.Find((i1, i2, i3, i4, o) => Flatten(o, p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 Assert.IsTrue(f.Evaluate(result.Value.Item1, result.Value.Item2, result.Value.Item3, result.Value.Item4));
@@ -253,7 +253,7 @@ namespace ZenLib.Tests
             {
                 // prove that it is not valid
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -277,7 +277,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(Not(o), p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 Assert.IsTrue(result.HasValue);
 
                 // compare input with evaluation
@@ -297,7 +297,7 @@ namespace ZenLib.Tests
             foreach (var p in GetBoundedParameters(runBdds))
             {
                 var f = Zen.Function<bool>(function);
-                var result = f.Assert(o => Flatten(o, p), backend: p.SolverType);
+                var result = f.Assert(o => Flatten(o, p), config: new SolverConfig { SolverType = p.SolverType });
 
                 Assert.AreEqual(f.Evaluate(), result);
                 f.Compile();
@@ -317,7 +317,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, bool>(function);
-                var result = f.Find((i1, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, o) => Flatten(o, p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
                 if (result.HasValue)
                 {
                     Assert.IsTrue(f.Evaluate(result.Value));
@@ -341,7 +341,7 @@ namespace ZenLib.Tests
             foreach (var p in selectedParams)
             {
                 var f = Zen.Function<T1, T2, bool>(function);
-                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, backend: p.SolverType);
+                var result = f.Find((i1, i2, o) => Flatten(o, p), depth: p.FSeqSize, config: new SolverConfig { SolverType = p.SolverType });
 
                 if (result.HasValue)
                 {
