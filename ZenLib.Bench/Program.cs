@@ -5,7 +5,10 @@
 namespace ZenLibBench
 {
     using System;
+    using System.Collections.Generic;
+    using System.Numerics;
     using ZenLib;
+    using ZenLib.Solver;
  
     /// <summary>
     /// Run a collection of benchmarks for Zen.
@@ -18,8 +21,6 @@ namespace ZenLibBench
         /// <param name="args">Command line args.</param>
         static void Main(string[] args)
         {
-            ZenSettings.UseLargeStack = true;
-
             // ZenBench.BenchmarkSets();
             // ZenBench.BenchmarkComparisons();
             // ZenBench.BenchmarkTransformers();

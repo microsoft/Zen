@@ -300,6 +300,11 @@ namespace ZenLib
             // propagate an internal exception
             if (exn != null)
             {
+                if (exn is ZenException || exn is ZenSolverTimeoutException)
+                {
+                    throw exn;
+                }
+
                 throw new ZenException("Execption thrown in RunWithLargeStack", exn);
             }
 
