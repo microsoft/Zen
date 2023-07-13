@@ -27,28 +27,26 @@ namespace ZenLib.SymbolicExecution
         /// <param name="function">The function.</param>
         /// <param name="precondition">A precondition.</param>
         /// <param name="input">The symbolic input.</param>
-        /// <param name="solverType">The solver to use.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<T1> GenerateInputs<T1, T2>(
             Func<Zen<T1>, Zen<T2>> function,
             Func<Zen<T1>, Zen<bool>> precondition,
             Zen<T1> input,
-            SolverType solverType,
-            TimeSpan? timeout)
+            SolverConfig config)
         {
             var expression = function(input);
             var assume = precondition(input);
 
             (T2, PathConstraint, Dictionary<long, object>) interpretFunction(T1 e)
             {
-                var assignment = ModelCheckerFactory.CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments, timeout).ModelCheck(input == e, emptyArguments);
+                var assignment = ModelCheckerFactory.CreateModelChecker(config, ModelCheckerContext.Solving, null, emptyArguments).ModelCheck(input == e, emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
                 var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T2)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<T1> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input, solverType, timeout);
+            Option<T1> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input, config);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -60,16 +58,14 @@ namespace ZenLib.SymbolicExecution
         /// <param name="precondition">A precondition for inputs.</param>
         /// <param name="input1">The first symbolic input.</param>
         /// <param name="input2">The second symbolic input.</param>
-        /// <param name="solverType">The solver to use.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2)> GenerateInputs<T1, T2, T3>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>> function,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition,
             Zen<T1> input1,
             Zen<T2> input2,
-            SolverType solverType,
-            TimeSpan? timeout)
+            SolverConfig config)
         {
             var expression = function(input1, input2);
             var assume = precondition(input1, input2);
@@ -77,14 +73,14 @@ namespace ZenLib.SymbolicExecution
             (T3, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments, timeout)
+                    .CreateModelChecker(config, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
                 var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T3)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, solverType, timeout);
+            Option<(T1, T2)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, config);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -97,8 +93,7 @@ namespace ZenLib.SymbolicExecution
         /// <param name="input1">The first symbolic input.</param>
         /// <param name="input2">The second symbolic input.</param>
         /// <param name="input3">The third symbolic input.</param>
-        /// <param name="solverType">The solver to use.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2, T3)> GenerateInputs<T1, T2, T3, T4>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>> function,
@@ -106,8 +101,7 @@ namespace ZenLib.SymbolicExecution
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
-            SolverType solverType,
-            TimeSpan? timeout)
+            SolverConfig config)
         {
             var expression = function(input1, input2, input3);
             var assume = precondition(input1, input2, input3);
@@ -115,14 +109,14 @@ namespace ZenLib.SymbolicExecution
             (T4, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2, T3) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments, timeout)
+                    .CreateModelChecker(config, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
                 var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T4)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2, T3)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, solverType, timeout);
+            Option<(T1, T2, T3)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, config);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }
@@ -136,8 +130,7 @@ namespace ZenLib.SymbolicExecution
         /// <param name="input2">The second symbolic input.</param>
         /// <param name="input3">The third symbolic input.</param>
         /// <param name="input4">The fourth symbolic input.</param>
-        /// <param name="solverType">The solver to use.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>A collection of inputs.</returns>
         public static IEnumerable<(T1, T2, T3, T4)> GenerateInputs<T1, T2, T3, T4, T5>(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>> function,
@@ -146,8 +139,7 @@ namespace ZenLib.SymbolicExecution
             Zen<T2> input2,
             Zen<T3> input3,
             Zen<T4> input4,
-            SolverType solverType,
-            TimeSpan? timeout)
+            SolverConfig config)
         {
             var expression = function(input1, input2, input3, input4);
             var assume = precondition(input1, input2, input3, input4);
@@ -155,14 +147,14 @@ namespace ZenLib.SymbolicExecution
             (T5, PathConstraint, Dictionary<long, object>) interpretFunction((T1, T2, T3, T4) e)
             {
                 var assignment = ModelCheckerFactory
-                    .CreateModelChecker(solverType, ModelCheckerContext.Solving, null, emptyArguments, timeout)
+                    .CreateModelChecker(config, ModelCheckerContext.Solving, null, emptyArguments)
                     .ModelCheck(And(input1 == e.Item1, input2 == e.Item2, input3 == e.Item3, input4 == e.Item4), emptyArguments);
                 var evaluator = new ExpressionEvaluatorVisitor(true);
                 var env = new ExpressionEvaluatorEnvironment { ArbitraryAssignment = System.Collections.Immutable.ImmutableDictionary<object, object>.Empty.AddRange(assignment) };
                 return ((T5)evaluator.Visit(expression, env), evaluator.PathConstraint, evaluator.PathConstraintSymbolicEnvironment);
             }
 
-            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, input4, solverType, timeout);
+            Option<(T1, T2, T3, T4)> findFunction(Zen<bool> e, Dictionary<long, object> env) => SymbolicEvaluator.Find(e, env, input1, input2, input3, input4, config);
 
             return GenerateInputsSage(assume, findFunction, interpretFunction);
         }

@@ -19,20 +19,19 @@ namespace ZenLib.ModelChecking
         /// <summary>
         /// Create a model checker.
         /// </summary>
-        /// <param name="backend">The backend to use.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <param name="context">The checking context.</param>
         /// <param name="expression">The expression to evaluate.</param>
         /// <param name="arguments">The arguements.</param>
-        /// <param name="timeout">An optional timeout on the solver.</param>
         /// <returns>A new model checker.</returns>
-        internal static IModelChecker CreateModelChecker(SolverType backend, ModelCheckerContext context, Zen<bool> expression, Dictionary<long, object> arguments, TimeSpan? timeout)
+        internal static IModelChecker CreateModelChecker(SolverConfig config, ModelCheckerContext context, Zen<bool> expression, Dictionary<long, object> arguments)
         {
-            if (backend == SolverType.DecisionDiagrams)
+            if (config.SolverType == SolverType.DecisionDiagrams)
             {
                 return CreateModelCheckerDD(expression, arguments);
             }
 
-            return CreateModelCheckerZ3(context, timeout);
+            return CreateModelCheckerZ3(context, config.SolverTimeout);
         }
 
         /// <summary>

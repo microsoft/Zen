@@ -7,6 +7,7 @@ namespace ZenLib
     using System;
     using System.Collections.Generic;
     using ZenLib.ModelChecking;
+    using ZenLib.Solver;
 
     /// <summary>
     /// Zen constraint representation.
@@ -26,14 +27,14 @@ namespace ZenLib
         /// </summary>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="depth">The maximum number of elements to consider in an input list.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<T> Find(
             Zen<T> input = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Find((i, o) => o, input, depth, backend);
+            return Find((i, o) => o, input, depth, config);
         }
 
         /// <summary>
@@ -41,14 +42,14 @@ namespace ZenLib
         /// </summary>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T> FindAll(
             Zen<T> input = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return FindAll((i, o) => o, input, depth, backend);
+            return FindAll((i, o) => o, input, depth, config);
         }
 
         /// <summary>
@@ -80,15 +81,15 @@ namespace ZenLib
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="depth">The maximum number of elements to consider in an input list.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2)> Find(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Find((i1, i2, o) => o, input1, input2, depth, backend);
+            return Find((i1, i2, o) => o, input1, input2, depth, config);
         }
 
         /// <summary>
@@ -97,15 +98,15 @@ namespace ZenLib
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> FindAll(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return FindAll((i1, i2, o) => o, input1, input2, depth, backend);
+            return FindAll((i1, i2, o) => o, input1, input2, depth, config);
         }
 
         /// <summary>
@@ -138,16 +139,16 @@ namespace ZenLib
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="depth">The maximum number of elements to consider in an input list.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3)> Find(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Find((i1, i2, i3, o) => o, input1, input2, input3, depth, backend);
+            return Find((i1, i2, i3, o) => o, input1, input2, input3, depth, config);
         }
 
         /// <summary>
@@ -157,16 +158,16 @@ namespace ZenLib
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> FindAll(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, backend);
+            return FindAll((i1, i2, i3, o) => o, input1, input2, input3, depth, config);
         }
 
         /// <summary>
@@ -200,7 +201,7 @@ namespace ZenLib
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="input4">Fourth input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3, T4)> Find(
             Zen<T1> input1 = null,
@@ -208,9 +209,9 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, backend);
+            return Find((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, config);
         }
 
         /// <summary>
@@ -221,7 +222,7 @@ namespace ZenLib
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="input4">Fourth input that captures structural constraints.</param>
         /// <param name="depth">The maximum number of elements to consider in an input list.</param>
-        /// <param name="backend">The backend.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3, T4)> FindAll(
             Zen<T1> input1 = null,
@@ -229,9 +230,9 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3)
+            SolverConfig config = null)
         {
-            return FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, backend);
+            return FindAll((i1, i2, i3, i4, o) => o, input1, input2, input3, input4, depth, config);
         }
 
         /// <summary>

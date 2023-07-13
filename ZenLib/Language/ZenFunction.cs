@@ -11,6 +11,7 @@ namespace ZenLib
     using ZenLib.Compilation;
     using ZenLib.Interpretation;
     using ZenLib.ModelChecking;
+    using ZenLib.Solver;
     using ZenLib.SymbolicExecution;
     using static ZenLib.Zen;
 
@@ -91,13 +92,13 @@ namespace ZenLib
         /// then it also satisfies the postcondition.
         /// </summary>
         /// <param name="invariant">The invariant.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
-        public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Solver.SolverType backend = Solver.SolverType.Z3, TimeSpan? timeout = null)
+        public bool Assert(Func<Zen<T>, Zen<bool>> invariant, Solver.SolverConfig config = null)
         {
+            config = config ?? new SolverConfig();
             var result = invariant(Function());
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), backend, timeout) != null);
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, new Dictionary<long, object>(), config) != null);
         }
     }
 
@@ -218,24 +219,23 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<T1> Find(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input },
             };
 
             var result = invariant(Argument1, FunctionBodyExpr);
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input, config));
         }
 
         /// <summary>
@@ -244,17 +244,16 @@ namespace ZenLib
         /// <param name="invariant">The invariant.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T1> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<bool>> invariant,
             Zen<T1> input = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input },
@@ -267,7 +266,7 @@ namespace ZenLib
             while (true)
             {
                 var expr = And(result, Not(blocking));
-                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, args, input, backend, timeout));
+                var example = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, args, input, config));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -284,19 +283,18 @@ namespace ZenLib
         /// <param name="precondition">A precondition for inputs to satisfy.</param>
         /// <param name="input">Default input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<T1> GenerateInputs(
             Zen<T1> input = null,
             Func<Zen<T1>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input = CommonUtilities.GetArbitraryIfNull(input, depth);
+            config = config ?? new SolverConfig();
             precondition = precondition == null ? (x) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input, config));
         }
     }
 
@@ -434,19 +432,18 @@ namespace ZenLib
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2)> Find(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -454,7 +451,7 @@ namespace ZenLib
             };
 
             var result = invariant(Argument1, Argument2, FunctionBodyExpr);
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, config));
         }
 
         /// <summary>
@@ -464,19 +461,18 @@ namespace ZenLib
         /// <param name="input1">First input that captures structural constraints.</param>
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> invariant,
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -491,7 +487,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, args, input1, input2, backend, timeout));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, config));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -509,21 +505,20 @@ namespace ZenLib
         /// <param name="input1">Default first input that captures structural constraints.</param>
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2)> GenerateInputs(
             Zen<T1> input1 = null,
             Zen<T2> input2 = null,
             Func<Zen<T1>, Zen<T2>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
+            config = config ?? new SolverConfig();
             precondition = precondition == null ? (x, y) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, config));
         }
     }
 
@@ -673,8 +668,7 @@ namespace ZenLib
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3)> Find(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> invariant,
@@ -682,12 +676,12 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -696,7 +690,7 @@ namespace ZenLib
             };
 
             var result = invariant(Argument1, Argument2, Argument3, FunctionBodyExpr);
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, config));
         }
 
         /// <summary>
@@ -707,8 +701,7 @@ namespace ZenLib
         /// <param name="input2">Second input that captures structural constraints.</param>
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> invariant,
@@ -716,12 +709,12 @@ namespace ZenLib
             Zen<T2> input2 = null,
             Zen<T3> input3 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -737,7 +730,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, backend, timeout));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, config));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -756,8 +749,7 @@ namespace ZenLib
         /// <param name="input2">Default second input that captures structural constraints.</param>
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3)> GenerateInputs(
             Zen<T1> input1 = null,
@@ -765,14 +757,14 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
+            config = config ?? new SolverConfig();
             precondition = precondition == null ? (x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, config));
         }
     }
 
@@ -934,8 +926,7 @@ namespace ZenLib
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="input4">Default fourth input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public Option<(T1, T2, T3, T4)> Find(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>, Zen<bool>> invariant,
@@ -944,13 +935,13 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -960,7 +951,7 @@ namespace ZenLib
             };
 
             var result = invariant(Argument1, Argument2, Argument3, Argument4, FunctionBodyExpr);
-            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(result, args, input1, input2, input3, input4, config));
         }
 
         /// <summary>
@@ -972,8 +963,7 @@ namespace ZenLib
         /// <param name="input3">Third input that captures structural constraints.</param>
         /// <param name="input4">Fourth input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3, T4)> FindAll(
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<T5>, Zen<bool>> invariant,
@@ -982,13 +972,13 @@ namespace ZenLib
             Zen<T3> input3 = null,
             Zen<T4> input4 = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
+            config = config ?? new SolverConfig();
             var args = new Dictionary<long, object>
             {
                 { Argument1.ParameterId, input1 },
@@ -1005,7 +995,7 @@ namespace ZenLib
             {
                 var expr = And(result, Not(blocking));
                 var example = CommonUtilities.RunWithLargeStack(
-                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, input4, backend, timeout));
+                    () => SymbolicEvaluator.Find(expr, args, input1, input2, input3, input4, config));
                 if (!example.HasValue)
                 {
                     yield break;
@@ -1025,8 +1015,7 @@ namespace ZenLib
         /// <param name="input3">Default third input that captures structural constraints.</param>
         /// <param name="input4">Default fourth input that captures structural constraints.</param>
         /// <param name="depth">The maximum depth of elements to consider in an input.</param>
-        /// <param name="backend">The backend.</param>
-        /// <param name="timeout">The optional solver timeout.</param>
+        /// <param name="config">The solver configuration to use.</param>
         /// <returns>An input if one exists satisfying the constraints.</returns>
         public IEnumerable<(T1, T2, T3, T4)> GenerateInputs(
             Zen<T1> input1 = null,
@@ -1035,15 +1024,15 @@ namespace ZenLib
             Zen<T4> input4 = null,
             Func<Zen<T1>, Zen<T2>, Zen<T3>, Zen<T4>, Zen<bool>> precondition = null,
             int depth = 8,
-            Solver.SolverType backend = Solver.SolverType.Z3,
-            TimeSpan? timeout = null)
+            SolverConfig config = null)
         {
             input1 = CommonUtilities.GetArbitraryIfNull(input1, depth);
             input2 = CommonUtilities.GetArbitraryIfNull(input2, depth);
             input3 = CommonUtilities.GetArbitraryIfNull(input3, depth);
             input4 = CommonUtilities.GetArbitraryIfNull(input4, depth);
+            config = config ?? new SolverConfig();
             precondition = precondition == null ? (w, x, y, z) => true : precondition;
-            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, input4, backend, timeout));
+            return CommonUtilities.RunWithLargeStack(() => InputGenerator.GenerateInputs(Function, precondition, input1, input2, input3, input4, config));
         }
     }
 }

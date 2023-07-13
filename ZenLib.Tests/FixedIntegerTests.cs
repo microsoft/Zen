@@ -745,7 +745,7 @@ namespace ZenLib.Tests
             var b = new UInt<_128>(IPAddress.Parse("2000::").GetAddressBytes());
 
             var f = new ZenFunction<UInt<_128>, bool>(x => And(x >= a, x <= b));
-            var input = f.Find((x, y) => y, backend: SolverType.DecisionDiagrams);
+            var input = f.Find((x, y) => y, config: new SolverConfig { SolverType = SolverType.DecisionDiagrams });
 
             Assert.AreEqual(a, input.Value);
         }

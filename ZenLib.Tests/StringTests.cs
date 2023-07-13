@@ -11,6 +11,7 @@ namespace ZenLib.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.Z3;
     using ZenLib;
+    using ZenLib.Solver;
     using static ZenLib.Tests.TestHelper;
     using static ZenLib.Zen;
 
@@ -642,7 +643,7 @@ namespace ZenLib.Tests
         public void TestDiagramBackendException1()
         {
             var f = new ZenFunction<string, bool>(s => s == "a");
-            f.Find((x, y) => y, backend: ZenLib.Solver.SolverType.DecisionDiagrams);
+            f.Find((x, y) => y, config: new SolverConfig { SolverType = ZenLib.Solver.SolverType.DecisionDiagrams });
         }
 
         /// <summary>
@@ -653,7 +654,7 @@ namespace ZenLib.Tests
         public void TestDiagramBackendException2()
         {
             var f = new ZenFunction<string, string>(s => s + "a");
-            f.Find((x, y) => x == y, backend: ZenLib.Solver.SolverType.DecisionDiagrams);
+            f.Find((x, y) => x == y, config: new SolverConfig { SolverType = ZenLib.Solver.SolverType.DecisionDiagrams });
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace ZenLib.Tests
         [TestMethod]
         public void TestNegatives()
         {
-            var result = Zen.Find<short>(x => -2 > -1, backend: SolverType.DecisionDiagrams);
+            var result = Zen.Find<short>(x => -2 > -1, config: new SolverConfig { SolverType = SolverType.DecisionDiagrams });
             Assert.IsFalse(result.HasValue);
         }
 
@@ -491,7 +491,7 @@ namespace ZenLib.Tests
         public void TestMultiplicationIntegers()
         {
             var f = new ZenFunction<int, int, bool>((a, b) => a * b == 10);
-            var inputs = f.Find((a, b, res) => res, backend: SolverType.Z3);
+            var inputs = f.Find((a, b, res) => res, config: new SolverConfig { SolverType = SolverType.Z3 });
             Assert.IsTrue(inputs.HasValue);
             Assert.AreEqual(10, inputs.Value.Item1 * inputs.Value.Item2);
 
@@ -513,7 +513,7 @@ namespace ZenLib.Tests
         public void TestMultiplicationReals()
         {
             var f = new ZenFunction<Real, bool>(a => (Real)2 * a == (Real)10);
-            var inputs = f.Find((a, res) => res, backend: SolverType.Z3);
+            var inputs = f.Find((a, res) => res, config: new SolverConfig { SolverType = SolverType.Z3 });
             Assert.IsTrue(inputs.HasValue);
             Assert.AreEqual(new Real(10), new Real(2) * inputs.Value);
 
@@ -547,7 +547,7 @@ namespace ZenLib.Tests
         public void TestMultiplicationException()
         {
             var f = new ZenFunction<int, int, bool>((a, b) => a * b == 10);
-            var inputs = f.Find((a, b, res) => res, backend: SolverType.DecisionDiagrams);
+            var inputs = f.Find((a, b, res) => res, config: new SolverConfig { SolverType = SolverType.DecisionDiagrams });
         }
 
         /// <summary>
