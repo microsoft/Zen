@@ -1438,10 +1438,11 @@ namespace ZenLib
         /// </summary>
         /// <param name="expr">The boolean expression.</param>
         /// <param name="solverType">The solver type to use.</param>
+        /// <param name="timeout">The optional solver timeout.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType solverType = Solver.SolverType.Z3)
+        public static ZenSolution Solve(this Zen<bool> expr, Solver.SolverType solverType = Solver.SolverType.Z3, TimeSpan? timeout = null)
         {
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), solverType));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Find(expr, new Dictionary<long, object>(), solverType, timeout));
             return new ZenSolution(model);
         }
 
@@ -1450,11 +1451,12 @@ namespace ZenLib
         /// </summary>
         /// <param name="objective">The objective function.</param>
         /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <param name="timeout">The optional solver timeout.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        public static ZenSolution Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, TimeSpan? timeout = null)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Maximize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3, timeout));
             return new ZenSolution(model);
         }
 
@@ -1463,11 +1465,12 @@ namespace ZenLib
         /// </summary>
         /// <param name="objective">The objective function.</param>
         /// <param name="subjectTo">The boolean expression constraints.</param>
+        /// <param name="timeout">The optional solver timeout.</param>
         /// <returns>Mapping from arbitrary expressions to C# objects.</returns>
-        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo)
+        public static ZenSolution Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, TimeSpan? timeout = null)
         {
             Contract.Assert(ReflectionUtilities.IsArithmeticType(typeof(T)));
-            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3));
+            var model = CommonUtilities.RunWithLargeStack(() => SymbolicEvaluator.Minimize(objective, subjectTo, new Dictionary<long, object>(), Solver.SolverType.Z3, timeout));
             return new ZenSolution(model);
         }
 

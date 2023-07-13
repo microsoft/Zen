@@ -4,6 +4,7 @@
 
 namespace ZenLib.ModelChecking
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using ZenLib.Interpretation;
@@ -20,10 +21,11 @@ namespace ZenLib.ModelChecking
         /// <param name="expression">The Zen expression for the function.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Find(Zen<bool> expression, Dictionary<long, object> arguments, SolverType backend)
+        public static Dictionary<object, object> Find(Zen<bool> expression, Dictionary<long, object> arguments, SolverType backend, TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments, timeout);
             return modelChecker.ModelCheck(expression, arguments);
         }
 
@@ -34,10 +36,11 @@ namespace ZenLib.ModelChecking
         /// <param name="subjectTo">The constraints.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend)
+        public static Dictionary<object, object> Maximize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend, TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments, timeout);
             return modelChecker.Maximize(objective, subjectTo, arguments);
         }
 
@@ -48,10 +51,11 @@ namespace ZenLib.ModelChecking
         /// <param name="subjectTo">The constraints.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>True or false.</returns>
-        public static Dictionary<object, object> Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend)
+        public static Dictionary<object, object> Minimize<T>(Zen<T> objective, Zen<bool> subjectTo, Dictionary<long, object> arguments, SolverType backend, TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Optimization, null, arguments, timeout);
             return modelChecker.Minimize(objective, subjectTo, arguments);
         }
 
@@ -62,14 +66,16 @@ namespace ZenLib.ModelChecking
         /// <param name="arguments">The arguments.</param>
         /// <param name="input">The Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>An optional input value.</returns>
         public static Option<T> Find<T>(
             Zen<bool> expression,
             Dictionary<long, object> arguments,
             Zen<T> input,
-            SolverType backend)
+            SolverType backend,
+            TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments, timeout);
             var assignment = modelChecker.ModelCheck(expression, arguments);
             if (assignment == null)
             {
@@ -90,15 +96,17 @@ namespace ZenLib.ModelChecking
         /// <param name="input1">The first Zen expression for the input to the function.</param>
         /// <param name="input2">The second Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2)> Find<T1, T2>(
             Zen<bool> expression,
             Dictionary<long, object> arguments,
             Zen<T1> input1,
             Zen<T2> input2,
-            SolverType backend)
+            SolverType backend,
+            TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments, timeout);
 
             var assignment = modelChecker.ModelCheck(expression, arguments);
 
@@ -123,6 +131,7 @@ namespace ZenLib.ModelChecking
         /// <param name="input2">The second Zen expression for the input to the function.</param>
         /// <param name="input3">The third Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3)> Find<T1, T2, T3>(
             Zen<bool> expression,
@@ -130,9 +139,10 @@ namespace ZenLib.ModelChecking
             Zen<T1> input1,
             Zen<T2> input2,
             Zen<T3> input3,
-            SolverType backend)
+            SolverType backend,
+            TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments, timeout);
             var assignment = modelChecker.ModelCheck(expression, arguments);
 
             if (assignment == null)
@@ -158,6 +168,7 @@ namespace ZenLib.ModelChecking
         /// <param name="input3">The third Zen expression for the input to the function.</param>
         /// <param name="input4">The fourth Zen expression for the input to the function.</param>
         /// <param name="backend">The backend to use.</param>
+        /// <param name="timeout">The optional timeout for the solver.</param>
         /// <returns>An optional input value.</returns>
         public static Option<(T1, T2, T3, T4)> Find<T1, T2, T3, T4>(
             Zen<bool> expression,
@@ -166,9 +177,10 @@ namespace ZenLib.ModelChecking
             Zen<T2> input2,
             Zen<T3> input3,
             Zen<T4> input4,
-            SolverType backend)
+            SolverType backend,
+            TimeSpan? timeout)
         {
-            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments);
+            var modelChecker = ModelCheckerFactory.CreateModelChecker(backend, ModelCheckerContext.Solving, expression, arguments, timeout);
             var assignment = modelChecker.ModelCheck(expression, arguments);
 
             if (assignment == null)

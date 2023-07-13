@@ -138,12 +138,17 @@ namespace ZenLib.Solver
         /// Ininitializes a new instance of the <see cref="SolverZ3"/> class.
         /// </summary>
         /// <param name="context">The model checking context.</param>
-        public SolverZ3(ModelCheckerContext context)
+        /// <param name="timeout">The timeout for the solver.</param>
+        public SolverZ3(ModelCheckerContext context, TimeSpan? timeout)
         {
             this.nextIndex = 0;
             this.ModelCheckerContext = context;
             this.Params = Context.MkParams();
             this.Params.Add("compact", false);
+            if (timeout.HasValue)
+            {
+                this.Params.Add("timeout", timeout.Value.TotalMilliseconds);
+            }
             var t1 = Context.MkTactic("simplify");
             var t2 = Context.MkTactic("solve-eqs");
             var t3 = Context.MkTactic("smt");
@@ -1413,7 +1418,14 @@ namespace ZenLib.Solver
         {
             if (status == Status.UNKNOWN)
             {
-                throw new ZenException($"Unknown result: {this.Solver.ReasonUnknown}");
+                if (this.Solver.ReasonUnknown == "timeout")
+                {
+                    throw new ZenSolverTimeoutException();
+                }
+                else
+                {
+                    throw new ZenException($"Unknown result: {this.Solver.ReasonUnknown}");
+                }
             }
         }
 
