@@ -29,7 +29,8 @@ Zen is a constraint solving library for .NET. Zen makes it easy to express high-
   - [Custom classes and structs](#custom-classes-and-structs)
   - [Enumerated values](#enumerated-values)
 - [Zen Attributes](#zen-attributes)
-- [Solver backends](#solver-backends)
+- [Solver Backends](#solver-backends)
+- [Solver Timeouts](#solver-timeouts)
 - [Example: Network ACLs](#example-network-acls)
 - [Implementation Details](#implementation-details)
 - [Contributing](#contributing)
@@ -542,9 +543,32 @@ public class Person
 
 
 <a name="solver-backends"></a>
-# Solver backends
+# Solver Backends
 
 Zen currently supports two solvers, one based on the [Z3](https://github.com/Z3Prover/z3) SMT solver and another based on [binary decision diagrams](https://github.com/microsoft/DecisionDiagrams) (BDDs). The `Find` and `Zen.Solve` APIs provide an option to select one of the two backends and will default to Z3 if left unspecified. The `StateSetTransformer` API uses the BDD backend. The BDD backend has the limitation that it can only reason about bounded-size objects. This means that it can not reason about values with type `BigInteger` or `string` and will throw an exception. Similarly, these types along with `FSeq<T>`, `FSet<T>`, and `Map<T1, T2>` can not be used with transformers.
+
+<a name="solver-timeouts"></a>
+# Solver Timeouts
+
+Zen supports terminating a call to the solver via the `Solve`, `Maximize`, `Minimize`, and `Find` methods for the Z3 backend. If the solver times out, it will raise a `ZenSolverTimeoutException`. For example, you can try to find a solution within 100 milliseconds with the following:
+
+```csharp
+var solverConfig = new ZenLib.Solver.SolverConfig
+{
+    SolverType = SolverType.Z3,
+    SolverTimeout = TimeSpan.FromMilliseconds(100),
+};
+
+try
+{
+    var solution = Zen.And(constraints).Solve(config: solverConfig);
+    ...
+}
+catch (ZenSolverTimeoutException)
+{
+    Console.WriteLine($"a timeout occurred.");
+}
+```
 
 <a name="example-network-acls"></a>
 # Example: Network ACLs
