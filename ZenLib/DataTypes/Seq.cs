@@ -493,7 +493,7 @@ namespace ZenLib
         /// <returns>The string for the bytes.</returns>
         public static string AsString(this Seq<char> seq)
         {
-            return string.Join(string.Empty, seq.Values.Select(c => CommonUtilities.CharToString(c)));
+            return new string(seq.Values.ToArray());
         }
 
         /// <summary>

@@ -575,6 +575,19 @@ namespace ZenLib.Tests
             Assert.AreEqual(expected, a3.IsMatch(bytes3));
         }
 
+        /// <summary>
+        /// Test that Regex parsing produces the right AST.
+        /// </summary>
+        [TestMethod]
+        [DataRow("^[fF][oO][oO]𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄$", "foo𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄", true)]
+        [DataRow("^[fF][oO][oO]𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄$", "FOO𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄", true)]
+        [DataRow("^𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄$", "𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄", true)]
+        public void TestRegexParsingAstUnicode(string regex, string input, bool expected)
+        {
+            var r = Regex.Parse(regex);
+            Assert.AreEqual(expected, r.IsMatch(input.ToCharArray()));
+        }
+
         private void CheckIsMatch<T>(Regex<T> regex, IEnumerable<T> sequence) where T : IComparable<T>
         {
             var a = regex.ToAutomaton();
