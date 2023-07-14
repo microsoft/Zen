@@ -81,6 +81,8 @@ namespace ZenLib
         public bool MatchesRegex(Regex<T> regex)
         {
             Contract.AssertNotNull(regex);
+            Console.WriteLine(regex);
+            Console.WriteLine(this);
             return regex.IsMatch(this.Values);
         }
 
@@ -493,7 +495,8 @@ namespace ZenLib
         /// <returns>The string for the bytes.</returns>
         public static string AsString(this Seq<char> seq)
         {
-            return string.Join(string.Empty, seq.Values.Select(c => CommonUtilities.CharToString(c)));
+            return new string(seq.Values.ToArray());
+            // return string.Join(string.Empty, seq.Values.Select(c => CommonUtilities.CharToString(c)));
         }
 
         /// <summary>

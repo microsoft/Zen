@@ -1,4 +1,4 @@
-// <copyright file="StringTests.cs" company="Microsoft">
+﻿// <copyright file="StringTests.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -480,6 +480,20 @@ namespace ZenLib.Tests
         }
 
         /// <summary>
+        /// Test that matching regexes works for unicode strings with surrogate values.
+        /// </summary>
+        [TestMethod]
+        public void TestMatchesRegexUnicodeSurrogate()
+        {
+            var b = Zen.MatchesRegex("𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄", Regex.Parse("𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄"));
+            var result = b.Evaluate(new System.Collections.Generic.Dictionary<object, object>());
+            Assert.IsTrue(result);
+
+            var str = Zen.Find<string>(s => s == "𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄").Value;
+            Assert.AreEqual("𝅘𝅥𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲⛄⛄⛄", str);
+        }
+
+        /// <summary>
         /// Test string matchesregex.
         /// </summary>
         [TestMethod]
@@ -554,7 +568,10 @@ namespace ZenLib.Tests
         {
             var seq = new Seq<char>().Add((char)0xd800).Add((char)0xdfff);
             var s = Zen.Constraint<string>(s => s == Seq.AsString(seq)).Find();
-            Assert.AreEqual(@"\u{D800}\u{DFFF}", s.Value);
+            var chars = s.Value.ToCharArray();
+            Assert.AreEqual(2, chars.Length);
+            Assert.AreEqual((char)0xd800, chars[0]);
+            Assert.AreEqual((char)0xdfff, chars[1]);
         }
 
         /// <summary>
