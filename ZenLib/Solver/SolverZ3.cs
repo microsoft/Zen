@@ -9,6 +9,7 @@ namespace ZenLib.Solver
     using System.Diagnostics.CodeAnalysis;
     using System.Numerics;
     using System.Threading;
+    using System.Timers;
     using Microsoft.Z3;
     using ZenLib.ModelChecking;
 
@@ -28,6 +29,11 @@ namespace ZenLib.Solver
         /// Whether we are are model checking or doing optimization.
         /// </summary>
         internal ModelCheckerContext ModelCheckerContext;
+
+        /// <summary>
+        /// An optional debugging callback with the Z3 query.
+        /// </summary>
+        internal Action<SolverDebugInfo> Debug;
 
         /// <summary>
         /// The Z3 parameters used.
@@ -139,10 +145,12 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="context">The model checking context.</param>
         /// <param name="timeout">The timeout for the solver.</param>
-        public SolverZ3(ModelCheckerContext context, TimeSpan? timeout)
+        /// <param name="debug">An optional debugging callback.</param>
+        public SolverZ3(ModelCheckerContext context, TimeSpan? timeout, Action<SolverDebugInfo> debug = null)
         {
             this.nextIndex = 0;
             this.ModelCheckerContext = context;
+            this.Debug = debug;
             this.Params = Context.MkParams();
             this.Params.Add("compact", false);
             if (timeout.HasValue)
@@ -1293,7 +1301,14 @@ namespace ZenLib.Solver
         public Model Solve(BoolExpr x)
         {
             this.Assert((BoolExpr)x.Simplify());
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             var status = this.Solver.Check();
+            this.Debug?.Invoke(new SolverDebugInfo
+            {
+                SolverQuery = this.Solver.ToString(),
+                SolverTime = timer.Elapsed,
+            });
+
             if (status == Status.UNSATISFIABLE)
             {
                 return null;
@@ -1346,7 +1361,14 @@ namespace ZenLib.Solver
         {
             this.Assert(subjectTo);
             this.Optimize.MkMaximize(objective);
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             var status = this.Optimize.Check();
+            this.Debug?.Invoke(new SolverDebugInfo
+            {
+                SolverQuery = this.Optimize.ToString(),
+                SolverTime = timer.Elapsed,
+            });
+
             if (status == Status.UNSATISFIABLE)
             {
                 return null;
@@ -1399,7 +1421,14 @@ namespace ZenLib.Solver
         {
             this.Assert(subjectTo);
             this.Optimize.MkMinimize(objective);
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             var status = this.Optimize.Check();
+            this.Debug?.Invoke(new SolverDebugInfo
+            {
+                SolverQuery = this.Optimize.ToString(),
+                SolverTime = timer.Elapsed,
+            });
+
             if (status == Status.UNSATISFIABLE)
             {
                 return null;

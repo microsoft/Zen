@@ -20,5 +20,10 @@ namespace ZenLib.Solver
         /// The solver timeout to use.
         /// </summary>
         public TimeSpan? SolverTimeout { get; set; } = null;
+
+        /// <summary>
+        /// An optional debugging callback with the .
+        /// </summary>
+        public Action<SolverDebugInfo> Debug { get; set; } = null;
     }
 }

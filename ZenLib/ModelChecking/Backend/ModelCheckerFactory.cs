@@ -31,7 +31,7 @@ namespace ZenLib.ModelChecking
                 return CreateModelCheckerDD(expression, arguments);
             }
 
-            return CreateModelCheckerZ3(context, config.SolverTimeout);
+            return CreateModelCheckerZ3(context, config.SolverTimeout, config.Debug);
         }
 
         /// <summary>
@@ -56,10 +56,11 @@ namespace ZenLib.ModelChecking
         /// </summary>
         /// <param name="context">The model checker context.</param>
         /// <param name="timeout">A solver timeout parameter.</param>
+        /// <param name="debug">An optional debugging callback.</param>
         /// <returns>A model checker.</returns>
-        private static IModelChecker CreateModelCheckerZ3(ModelCheckerContext context, TimeSpan? timeout)
+        private static IModelChecker CreateModelCheckerZ3(ModelCheckerContext context, TimeSpan? timeout, Action<SolverDebugInfo> debug)
         {
-            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(new SolverZ3(context, timeout));
+            return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(new SolverZ3(context, timeout, debug));
         }
     }
 }
