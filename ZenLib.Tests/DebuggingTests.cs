@@ -25,7 +25,7 @@ namespace ZenLib.Tests
         public void TestSolveDebugging()
         {
             string query = null;
-            var solverConfig = new SolverConfig { Debug = (x) => query = x };
+            var solverConfig = new SolverConfig { Debug = (x) => query = x.SolverQuery };
             var b = Zen.Symbolic<bool>();
             var s = Zen.Symbolic<string>();
             var e = Zen.If(b, "hello", s);
@@ -43,12 +43,28 @@ namespace ZenLib.Tests
         public void TestMaximizeDebugging()
         {
             string query = null;
-            var solverConfig = new SolverConfig { Debug = (x) => query = x };
+            var solverConfig = new SolverConfig { Debug = (x) => query = x.SolverQuery };
             var a = Zen.Symbolic<byte>();
             var solution = Zen.Maximize(a, Zen.True(), solverConfig);
             Assert.IsTrue(query.Contains("(declare-fun k!1 () (_ BitVec 8))"));
             Assert.IsTrue(query.Contains("(assert true)"));
             Assert.IsTrue(query.Contains("(maximize k!1)"));
+            Assert.IsTrue(query.Contains("(check-sat)"));
+        }
+
+        /// <summary>
+        /// Test that debugging works with minimize.
+        /// </summary>
+        [TestMethod]
+        public void TestMinimizeDebugging()
+        {
+            string query = null;
+            var solverConfig = new SolverConfig { Debug = (x) => query = x.SolverQuery };
+            var a = Zen.Symbolic<byte>();
+            var solution = Zen.Minimize(a, Zen.True(), solverConfig);
+            Assert.IsTrue(query.Contains("(declare-fun k!1 () (_ BitVec 8))"));
+            Assert.IsTrue(query.Contains("(assert true)"));
+            Assert.IsTrue(query.Contains("(minimize k!1)"));
             Assert.IsTrue(query.Contains("(check-sat)"));
         }
     }

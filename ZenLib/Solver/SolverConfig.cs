@@ -24,6 +24,6 @@ namespace ZenLib.Solver
         /// <summary>
         /// An optional debugging callback with the .
         /// </summary>
-        public Action<string> Debug { get; set; } = null;
+        public Action<SolverDebugInfo> Debug { get; set; } = null;
     }
 }

@@ -58,7 +58,7 @@ namespace ZenLib.ModelChecking
         /// <param name="timeout">A solver timeout parameter.</param>
         /// <param name="debug">An optional debugging callback.</param>
         /// <returns>A model checker.</returns>
-        private static IModelChecker CreateModelCheckerZ3(ModelCheckerContext context, TimeSpan? timeout, Action<string> debug)
+        private static IModelChecker CreateModelCheckerZ3(ModelCheckerContext context, TimeSpan? timeout, Action<SolverDebugInfo> debug)
         {
             return new ModelChecker<Model, Expr, BoolExpr, BitVecExpr, IntExpr, SeqExpr, ArrayExpr, Expr, RealExpr>(new SolverZ3(context, timeout, debug));
         }
