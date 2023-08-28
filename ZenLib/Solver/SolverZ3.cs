@@ -30,6 +30,11 @@ namespace ZenLib.Solver
         internal ModelCheckerContext ModelCheckerContext;
 
         /// <summary>
+        /// An optional debugging callback with the Z3 query.
+        /// </summary>
+        internal Action<string> Debug;
+
+        /// <summary>
         /// The Z3 parameters used.
         /// </summary>
         internal Params Params;
@@ -139,10 +144,12 @@ namespace ZenLib.Solver
         /// </summary>
         /// <param name="context">The model checking context.</param>
         /// <param name="timeout">The timeout for the solver.</param>
-        public SolverZ3(ModelCheckerContext context, TimeSpan? timeout)
+        /// <param name="debug">An optional debugging callback.</param>
+        public SolverZ3(ModelCheckerContext context, TimeSpan? timeout, Action<string> debug = null)
         {
             this.nextIndex = 0;
             this.ModelCheckerContext = context;
+            this.Debug = debug;
             this.Params = Context.MkParams();
             this.Params.Add("compact", false);
             if (timeout.HasValue)
@@ -1293,6 +1300,10 @@ namespace ZenLib.Solver
         public Model Solve(BoolExpr x)
         {
             this.Assert((BoolExpr)x.Simplify());
+            if (this.Debug != null)
+            {
+                this.Debug(this.Solver.ToString());
+            }
             var status = this.Solver.Check();
             if (status == Status.UNSATISFIABLE)
             {
@@ -1346,6 +1357,10 @@ namespace ZenLib.Solver
         {
             this.Assert(subjectTo);
             this.Optimize.MkMaximize(objective);
+            if (this.Debug != null)
+            {
+                this.Debug(this.Optimize.ToString());
+            }
             var status = this.Optimize.Check();
             if (status == Status.UNSATISFIABLE)
             {
