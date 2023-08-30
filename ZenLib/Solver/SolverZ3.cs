@@ -1301,14 +1301,11 @@ namespace ZenLib.Solver
         public Model Solve(BoolExpr x)
         {
             this.Assert((BoolExpr)x.Simplify());
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            var status = this.Solver.Check();
             this.Debug?.Invoke(new SolverDebugInfo
             {
                 SolverQuery = this.Solver.ToString(),
-                SolverTime = timer.Elapsed,
             });
-
+            var status = this.Solver.Check();
             if (status == Status.UNSATISFIABLE)
             {
                 return null;
@@ -1361,14 +1358,11 @@ namespace ZenLib.Solver
         {
             this.Assert(subjectTo);
             this.Optimize.MkMaximize(objective);
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            var status = this.Optimize.Check();
             this.Debug?.Invoke(new SolverDebugInfo
             {
                 SolverQuery = this.Optimize.ToString(),
-                SolverTime = timer.Elapsed,
             });
-
+            var status = this.Optimize.Check();
             if (status == Status.UNSATISFIABLE)
             {
                 return null;
@@ -1421,14 +1415,11 @@ namespace ZenLib.Solver
         {
             this.Assert(subjectTo);
             this.Optimize.MkMinimize(objective);
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            var status = this.Optimize.Check();
             this.Debug?.Invoke(new SolverDebugInfo
             {
                 SolverQuery = this.Optimize.ToString(),
-                SolverTime = timer.Elapsed,
             });
-
+            var status = this.Optimize.Check();
             if (status == Status.UNSATISFIABLE)
             {
                 return null;

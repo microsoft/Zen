@@ -46,6 +46,7 @@ namespace ZenLib.Tests
             var solverConfig = new SolverConfig { Debug = (x) => query = x.SolverQuery };
             var a = Zen.Symbolic<byte>();
             var solution = Zen.Maximize(a, Zen.True(), solverConfig);
+            Console.WriteLine(query);
             Assert.IsTrue(query.Contains("(declare-fun k!1 () (_ BitVec 8))"));
             Assert.IsTrue(query.Contains("(assert true)"));
             Assert.IsTrue(query.Contains("(maximize k!1)"));
@@ -62,6 +63,7 @@ namespace ZenLib.Tests
             var solverConfig = new SolverConfig { Debug = (x) => query = x.SolverQuery };
             var a = Zen.Symbolic<byte>();
             var solution = Zen.Minimize(a, Zen.True(), solverConfig);
+            Console.WriteLine(query);
             Assert.IsTrue(query.Contains("(declare-fun k!1 () (_ BitVec 8))"));
             Assert.IsTrue(query.Contains("(assert true)"));
             Assert.IsTrue(query.Contains("(minimize k!1)"));

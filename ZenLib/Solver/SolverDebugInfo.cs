@@ -15,10 +15,5 @@ namespace ZenLib.Solver
         /// The solver query that was used for Z3.
         /// </summary>
         public String SolverQuery;
-
-        /// <summary>
-        /// The solve time for Z3.
-        /// </summary>
-        public TimeSpan SolverTime;
     }
 }
