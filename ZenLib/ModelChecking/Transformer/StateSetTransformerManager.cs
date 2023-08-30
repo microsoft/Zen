@@ -46,7 +46,7 @@ namespace ZenLib.ModelChecking
         /// <param name="cacheSize">The maximum cache size.</param>
         public StateSetTransformerManager(int cacheSize = 1024)
         {
-            this.DecisionDiagramManager = new DDManager<BDDNode>(new BDDNodeFactory());
+            this.DecisionDiagramManager = new DDManager<BDDNode>();
             this.CanonicalValues = new Dictionary<Type, StateSetMetadata>();
             this.DependencyFreeOutput = new Dictionary<Type, VariableSet<BDDNode>>();
             this.TransformerCache = new FiniteCache<(Type, long), object>(cacheSize);

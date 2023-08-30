@@ -45,7 +45,7 @@ namespace ZenLib.ModelChecking
             var heuristic = new InterleavingHeuristicVisitor();
             var args = ImmutableDictionary<long, object>.Empty.AddRange(arguments);
             var mustInterleave = heuristic.GetInterleavedVariables(expression, args);
-            var manager = new DDManager<CBDDNode>(new CBDDNodeFactory());
+            var manager = new DDManager<CBDDNode>();
             var solver = new SolverDD<CBDDNode>(manager, mustInterleave);
             solver.Init();
             return new ModelChecker<Assignment<CBDDNode>, Variable<CBDDNode>, DD, BitVector<CBDDNode>, Unit, Unit, Unit, Unit, Unit>(solver);

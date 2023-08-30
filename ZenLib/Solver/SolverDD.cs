@@ -16,7 +16,7 @@ namespace ZenLib.Solver
     /// </summary>
     /// <typeparam name="T">The diagram node type.</typeparam>
     internal class SolverDD<T> : ISolver<Assignment<T>, Variable<T>, DD, BitVector<T>, Unit, Unit, Unit, Unit, Unit>
-        where T : IDDNode
+        where T : IDDNode, IEquatable<T>
     {
         /// <summary>
         /// Gets the manger object.
