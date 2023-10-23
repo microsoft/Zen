@@ -93,18 +93,9 @@ namespace ZenLib
                     return Regex.Concat(parameter.Item1, Regex.Concat(expression, parameter.Item2));
                 default:
                     Contract.Assert(expression.OpType == RegexBinopExprType.Concatenation);
-                    if (parameter.Item1.Equals(Regex.All<T>()) && parameter.Item2.Equals(Regex.All<T>()))
-                    {
-                        var param1 = (Regex.All<T>(), Regex.Epsilon<T>());
-                        var param2 = (Regex.Epsilon<T>(), Regex.All<T>());
-                        return Regex.Concat(expression.Expr1.Accept(this, param1), expression.Expr2.Accept(this, param2));
-                    }
-                    else
-                    {
-                        Contract.Assert(parameter.Item1.Equals(Regex.Epsilon<T>()));
-                        Contract.Assert(parameter.Item2.Equals(Regex.All<T>()));
-                        return Regex.Concat(expression.Expr1, expression.Expr2.Accept(this, parameter));
-                    }
+                    var e1 = expression.Expr1.Accept(this, (parameter.Item1, Regex.Epsilon<T>()));
+                    var e2 = expression.Expr2.Accept(this, (Regex.Epsilon<T>(), parameter.Item2));
+                    return Regex.Concat(e1, e2);
             }
         }
     }
