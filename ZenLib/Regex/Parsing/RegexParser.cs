@@ -88,7 +88,6 @@ namespace ZenLib
                 throw new ZenException($"Unable to parse trailing: {remaining}");
             }
 
-            Console.WriteLine($"got: {ret}");
             return new RegexRemoveAnchorVisitor<T>().Compute(ret);
         }
 
