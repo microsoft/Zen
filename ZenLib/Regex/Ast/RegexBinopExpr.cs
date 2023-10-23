@@ -5,6 +5,7 @@
 namespace ZenLib
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -78,22 +79,10 @@ namespace ZenLib
                     return e1;
                 }
 
-                // simplify (a + (a + b)) = a + b
+                // simplify (a & (a & b)) = a & b
                 if (e2 is RegexBinopExpr<T> w && w.OpType == RegexBinopExprType.Intersection && w.Expr1.Equals(e1))
                 {
                     return e2;
-                }
-
-                // simplify (r & s) & t = r & (s & t)
-                if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Intersection)
-                {
-                    return Regex.Intersect(z.Expr1, Regex.Intersect(z.Expr2, e2));
-                }
-
-                // simplify r & s = s & r when s < r
-                if (e2.Id < e1.Id)
-                {
-                    return Regex.Intersect(e2, e1);
                 }
             }
 
@@ -151,17 +140,59 @@ namespace ZenLib
                     return e2;
                 }
 
-                // simplify (r + s) + t = r + (s + t)
-                if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Union)
+                // To ensure that the regular expression derivative algorithm works
+                // we need to maintain the invariant that unions are ordered such
+                // that they are invariant with respect to the commutativity and
+                // associativity equivalence relation. To do so, we arrange the
+                // unions to be sorted and right associative: a + (b + (c + d)).
+                // First, we obtain the order of all nested unions using a DFS.
+                var stack = new Stack<Regex<T>>();
+                var order = new List<Regex<T>>();
+                stack.Push(e2);
+                stack.Push(e1);
+                while (stack.Count > 0)
                 {
-                    return Regex.Union(z.Expr1, Regex.Union(z.Expr2, e2));
+                    var e = stack.Pop();
+                    if (e is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Union)
+                    {
+                        stack.Push(z.Expr2);
+                        stack.Push(z.Expr1);
+                    }
+                    else
+                    {
+                        order.Add(e);
+                    }
                 }
 
-                // simplify r + s = s + r when s < r
-                if (e2.Id < e1.Id)
+                // Check if the terms are already ordered. If so, then we don't
+                // need to do anything and we can avoid an infinite recursion.
+                var isOrdered = true;
+                for (int i = 0; i < order.Count - 1; i++)
                 {
-                    return Regex.Union(e2, e1);
+                    if (order[i].Id > order[i + 1].Id)
+                    {
+                        isOrdered = false;
+                        break;
+                    }
                 }
+
+                // If the left term has no unions and the subterms are already ordered
+                // then we are done. We know by construction that the second term e2
+                // is already in the correct form, we we just return (e1 + e2).
+                if (!(e1 is RegexBinopExpr<T> zz && zz.OpType == RegexBinopExprType.Union) && isOrdered)
+                {
+                    return new RegexBinopExpr<T>(e1, e2, RegexBinopExprType.Union);
+                }
+
+                // Otherwise, we will sort the subterms and then construct the regexes
+                // in the correct order.
+                order.Sort((r1, r2) => r2.Id.CompareTo(r1.Id));
+                var acc = order[0];
+                for (int j = 1; j < order.Count; j++)
+                {
+                    acc = Regex.Union(order[j], acc);
+                }
+                return acc;
             }
 
             if (opType == RegexBinopExprType.Concatenation)
@@ -194,12 +225,6 @@ namespace ZenLib
                 if (e2 is RegexAnchorExpr<T> b && b.IsBegin && e1 is RegexRangeExpr<T>)
                 {
                     return Regex.Empty<T>();
-                }
-
-                // simplify (r . s) . t = r . (s . t)
-                if (e1 is RegexBinopExpr<T> z && z.OpType == RegexBinopExprType.Concatenation)
-                {
-                    return Regex.Concat(z.Expr1, Regex.Concat(z.Expr2, e2));
                 }
             }
 

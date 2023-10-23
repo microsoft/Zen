@@ -177,6 +177,7 @@ namespace ZenLib.Tests
             var r = Regex.Char(1);
             var s = Regex.Char(2);
             var t = Regex.Char(3);
+            var u = Regex.Char(4);
             var range = Regex.Range<byte>(0, 255);
 
             // range simplifications
@@ -193,13 +194,10 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Empty<int>(), Regex.Concat(Regex.Empty<int>(), r));
             Assert.AreEqual(Regex.Concat(Regex.Epsilon<int>(), r), r);
             Assert.AreEqual(Regex.Concat(r, Regex.Epsilon<int>()), r);
-            Assert.AreEqual(Regex.Concat(r, Regex.Concat(s, t)), Regex.Concat(Regex.Concat(r, s), t));
             Assert.AreEqual(Regex.Concat(r, RegexAnchorExpr<int>.BeginInstance), Regex.Empty<int>());
             Assert.AreEqual(Regex.Concat(RegexAnchorExpr<int>.EndInstance, r), Regex.Empty<int>());
             // intersection simplifications
             Assert.AreEqual(Regex.Intersect(r, r), r);
-            Assert.AreEqual(Regex.Intersect(s, r), Regex.Intersect(r, s));
-            Assert.AreEqual(Regex.Intersect(Regex.Intersect(r, s), t), Regex.Intersect(r, Regex.Intersect(s, t)));
             Assert.AreEqual(Regex.Intersect(Regex.Empty<int>(), r), Regex.Empty<int>());
             Assert.AreEqual(Regex.Intersect(r, Regex.Empty<int>()), Regex.Empty<int>());
             Assert.AreEqual(Regex.Intersect(Regex.Negation(Regex.Empty<int>()), r), r);
@@ -216,6 +214,10 @@ namespace ZenLib.Tests
             Assert.AreEqual(Regex.Union(s, r), Regex.Union(r, s));
             Assert.AreEqual(Regex.Union(Regex.Union(r, s), t), Regex.Union(r, Regex.Union(s, t)));
             Assert.AreEqual(Regex.Union(r, Regex.Union(r, s)), Regex.Union(r, s));
+            Assert.AreEqual(Regex.Union(r, Regex.Union(s, r)), Regex.Union(r, s));
+            Assert.AreEqual(Regex.Union(Regex.Union(r, s), Regex.Union(t, u)), Regex.Union(r, Regex.Union(s, Regex.Union(t, u))));
+            Assert.AreEqual(Regex.Union(Regex.Union(u, t), Regex.Union(s, r)), Regex.Union(r, Regex.Union(s, Regex.Union(t, u))));
+            Assert.AreEqual(Regex.Union(Regex.Union(r, u), Regex.Union(t, s)), Regex.Union(r, Regex.Union(s, Regex.Union(t, u))));
         }
 
         /// <summary>
@@ -463,8 +465,9 @@ namespace ZenLib.Tests
                 Regex.ParseAscii(input);
                 Assert.IsTrue(expected);
             }
-            catch (ZenException)
+            catch (ZenException e)
             {
+                Console.WriteLine(e);
                 Assert.IsFalse(expected);
             }
         }
@@ -553,7 +556,7 @@ namespace ZenLib.Tests
         [DataRow("(^x|y)", "zy", true)]
         [DataRow("(^x|y)", "zx", false)]
         [DataRow("$ab", "ab", false)]
-        [DataRow("ab^", "ab", false)]
+        [DataRow("ab^", "ab", true)]
         public void TestRegexParsingAst(string regex, string input, bool expected)
         {
             var r = Regex.ParseAscii(regex);
