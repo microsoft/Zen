@@ -53,7 +53,7 @@ namespace ZenLib
         /// </summary>
         /// <param name="other">The default-generating function.</param>
         /// <returns>An option of the underlying type.</returns>
-        public Option<T> SomeOrDefault(Func<Option<T>> other)
+        public Option<T> OrElse(Func<Option<T>> other)
         {
             if (this.HasValue)
             {
@@ -76,10 +76,11 @@ namespace ZenLib
 
         /// <summary>
         /// Map a function that returns an option over an option and "flatten" the result.
+        /// Also known as "flat map" or "bind".
         /// </summary>
         /// <param name="function">The function.</param>
         /// <returns>A new option with the function mapped over the value.</returns>
-        public Option<TResult> SelectMany<TResult>(Func<T, Option<TResult>> function)
+        public Option<TResult> AndThen<TResult>(Func<T, Option<TResult>> function)
         {
             Contract.AssertNotNull(function);
             return this.HasValue ? function(this.Value) : Option.None<TResult>();
@@ -130,25 +131,25 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// Return the "intersection" of the option with another:
+        /// Return the "conjunction" of the option with another:
         /// an option with no value if this option has no value,
         /// otherwise the other option.
         /// </summary>
         /// <param name="other">The other option.</param>
         /// <returns>An option.</returns>
-        public Option<T> Intersect(Option<T> other)
+        public Option<T> And(Option<T> other)
         {
             return !this.HasValue ? this : other;
         }
 
         /// <summary>
-        /// Return the "union" of the option with another:
+        /// Return the "disjunction" of the option with another:
         /// this option if it has a value,
         /// otherwise the other option.
         /// </summary>
         /// <param name="other">The other option.</param>
         /// <returns>An option.</returns>
-        public Option<T> Union(Option<T> other)
+        public Option<T> Or(Option<T> other)
         {
             return this.HasValue ? this : other;
         }
@@ -273,13 +274,14 @@ namespace ZenLib
 
         /// <summary>
         /// The Zen expression for mapping (and projecting) over an option.
+        /// Also known as "flat map" or "bind".
         /// </summary>
         /// <param name="expr">The expression.</param>
         /// <param name="function">The function.</param>
         /// <typeparam name="T1">The expression type.</typeparam>
         /// <typeparam name="T2">The function return type.</typeparam>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<T2>> SelectMany<T1, T2>(this Zen<Option<T1>> expr,
+        public static Zen<Option<T2>> AndThen<T1, T2>(this Zen<Option<T1>> expr,
             Func<Zen<T1>, Zen<Option<T2>>> function)
         {
             Contract.AssertNotNull(expr);
@@ -322,7 +324,7 @@ namespace ZenLib
         /// <param name="expr">The expression.</param>
         /// <param name="function">The function.</param>
         /// <returns>Zen value.</returns>
-        public static Zen<Option<T>> SomeOrDefault<T>(this Zen<Option<T>> expr, Func<Zen<Option<T>>> function)
+        public static Zen<Option<T>> OrElse<T>(this Zen<Option<T>> expr, Func<Zen<Option<T>>> function)
         {
             Contract.AssertNotNull(expr);
             Contract.AssertNotNull(function);
@@ -368,14 +370,14 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The Zen expression for an "intersection" of two options.
+        /// The Zen expression for a "conjunction" of two options.
         /// None if the first option is None, otherwise the second value.
         /// </summary>
         /// <param name="expr1"></param>
         /// <param name="expr2"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Zen<Option<T>> Intersect<T>(this Zen<Option<T>> expr1, Zen<Option<T>> expr2)
+        public static Zen<Option<T>> And<T>(this Zen<Option<T>> expr1, Zen<Option<T>> expr2)
         {
             Contract.AssertNotNull(expr1);
             Contract.AssertNotNull(expr2);
@@ -384,14 +386,14 @@ namespace ZenLib
         }
 
         /// <summary>
-        /// The Zen expression for a "union" of two options.
+        /// The Zen expression for a "disjunction" of two options.
         /// The first option if it is Some, otherwise the second value.
         /// </summary>
         /// <param name="expr1"></param>
         /// <param name="expr2"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Zen<Option<T>> Union<T>(this Zen<Option<T>> expr1, Zen<Option<T>> expr2)
+        public static Zen<Option<T>> Or<T>(this Zen<Option<T>> expr1, Zen<Option<T>> expr2)
         {
             Contract.AssertNotNull(expr1);
             Contract.AssertNotNull(expr2);

@@ -132,12 +132,12 @@ namespace ZenLib.Tests
     }
 
     /// <summary>
-    /// Test option some or default.
+    /// Test option OrElse.
     /// </summary>
     [TestMethod]
-    public void TestOptionSomeOrDefault()
+    public void TestOptionOrElse()
     {
-      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.SomeOrDefault(() => o2));
+      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.OrElse(() => o2));
 
       Assert.AreEqual(Option.Some(1), zf.Evaluate(Option.Some(1), Option.Some(3)));
       Assert.AreEqual(Option.Some(3), zf.Evaluate(Option.None<int>(), Option.Some(3)));
@@ -146,8 +146,8 @@ namespace ZenLib.Tests
       Assert.AreEqual(Option.Some(1), zf.Evaluate(Option.Some(1), Option.Some(3)));
       Assert.AreEqual(Option.Some(3), zf.Evaluate(Option.None<int>(), Option.Some(3)));
 
-      Assert.AreEqual(Option.Some(1), Option.Some(1).SomeOrDefault(() => Option.Some(3)));
-      Assert.AreEqual(Option.Some(3), Option.None<int>().SomeOrDefault(() => Option.Some(3)));
+      Assert.AreEqual(Option.Some(1), Option.Some(1).OrElse(() => Option.Some(3)));
+      Assert.AreEqual(Option.Some(3), Option.None<int>().OrElse(() => Option.Some(3)));
     }
 
     /// <summary>
@@ -290,12 +290,12 @@ namespace ZenLib.Tests
     }
 
     /// <summary>
-    /// Test option SelectMany.
+    /// Test option AndThen.
     /// </summary>
     [TestMethod]
-    public void TestOptionSelectMany()
+    public void TestOptionAndThen()
     {
-      var zf = new ZenFunction<Option<int>, Option<int>>(o => o.SelectMany(i => Option.Create(i + 1)));
+      var zf = new ZenFunction<Option<int>, Option<int>>(o => o.AndThen(i => Option.Create(i + 1)));
 
       Assert.AreEqual(Option.None<int>(), zf.Evaluate(Option.None<int>()));
       Assert.AreEqual(Option.Some(2), zf.Evaluate(Option.Some(1)));
@@ -306,9 +306,9 @@ namespace ZenLib.Tests
       Assert.AreEqual(Option.Some(2), zf.Evaluate(Option.Some(1)));
       Assert.AreEqual(Option.Some(11), zf.Evaluate(Option.Some(10)));
 
-      Assert.AreEqual(Option.None<int>(), Option.None<int>().SelectMany(i => Option.Some(i + 1)));
-      Assert.AreEqual(Option.Some(2), Option.Some(1).SelectMany(i => Option.Some(i + 1)));
-      Assert.AreEqual(Option.Some(11), Option.Some(10).SelectMany(i => Option.Some(i + 1)));
+      Assert.AreEqual(Option.None<int>(), Option.None<int>().AndThen(i => Option.Some(i + 1)));
+      Assert.AreEqual(Option.Some(2), Option.Some(1).AndThen(i => Option.Some(i + 1)));
+      Assert.AreEqual(Option.Some(11), Option.Some(10).AndThen(i => Option.Some(i + 1)));
     }
 
     /// <summary>
@@ -327,12 +327,12 @@ namespace ZenLib.Tests
     }
 
     /// <summary>
-    /// Test option intersect.
+    /// Test option and.
     /// </summary>
     [TestMethod]
-    public void TestOptionIntersect()
+    public void TestOptionAnd()
     {
-      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.Intersect(o2));
+      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.And(o2));
 
       Assert.AreEqual(Option.None<int>(), zf.Evaluate(Option.None<int>(), Option.Some(1)));
       Assert.AreEqual(Option.Some(2), zf.Evaluate(Option.Some(1), Option.Some(2)));
@@ -343,18 +343,18 @@ namespace ZenLib.Tests
       Assert.AreEqual(Option.Some(2), zf.Evaluate(Option.Some(1), Option.Some(2)));
       Assert.AreEqual(Option.None<int>(), zf.Evaluate(Option.Some(1), Option.None<int>()));
 
-      Assert.AreEqual(Option.None<int>(), Option.None<int>().Intersect(Option.Some(1)));
-      Assert.AreEqual(Option.Some(2), Option.Some(1).Intersect(Option.Some(2)));
-      Assert.AreEqual(Option.None<int>(), Option.Some(1).Intersect(Option.None<int>()));
+      Assert.AreEqual(Option.None<int>(), Option.None<int>().And(Option.Some(1)));
+      Assert.AreEqual(Option.Some(2), Option.Some(1).And(Option.Some(2)));
+      Assert.AreEqual(Option.None<int>(), Option.Some(1).And(Option.None<int>()));
     }
 
     /// <summary>
-    /// Test option union.
+    /// Test option or.
     /// </summary>
     [TestMethod]
-    public void TestOptionUnion()
+    public void TestOptionOr()
     {
-      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.Union(o2));
+      var zf = new ZenFunction<Option<int>, Option<int>, Option<int>>((o1, o2) => o1.Or(o2));
 
       Assert.AreEqual(Option.None<int>(), zf.Evaluate(Option.None<int>(), Option.None<int>()));
       Assert.AreEqual(Option.Some(1), zf.Evaluate(Option.None<int>(), Option.Some(1)));
@@ -365,9 +365,9 @@ namespace ZenLib.Tests
       Assert.AreEqual(Option.Some(1), zf.Evaluate(Option.None<int>(), Option.Some(1)));
       Assert.AreEqual(Option.Some(1), zf.Evaluate(Option.Some(1), Option.None<int>()));
 
-      Assert.AreEqual(Option.None<int>(), Option.None<int>().Union(Option.None<int>()));
-      Assert.AreEqual(Option.Some(1), Option.None<int>().Union(Option.Some(1)));
-      Assert.AreEqual(Option.Some(1), Option.Some(1).Union(Option.None<int>()));
+      Assert.AreEqual(Option.None<int>(), Option.None<int>().Or(Option.None<int>()));
+      Assert.AreEqual(Option.Some(1), Option.None<int>().Or(Option.Some(1)));
+      Assert.AreEqual(Option.Some(1), Option.Some(1).Or(Option.None<int>()));
     }
   }
 }
